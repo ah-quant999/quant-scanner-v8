@@ -3291,7 +3291,7 @@ function fmtSigned(v){
         <div id="stFinalSelMore" style="display:none;margin:6px 0 4px;">
           <button id="stFinalSelMoreBtn" onclick="window.toggleStFinalSel()" style="background:transparent;color:#5ee0a0;border:1px solid #5ee0a0;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开全部</button>
         </div>
-        <div class="note">口径：金股池经「金钻+缠论共振」过滤的高信念子集（selection_mode=high_conviction_resonance），由 generate_top10.py 每日盘前产出（盘前定稿·盘中不刷新）、按 total_score 降序。本卡 = <b>当日终选输出全量</b>；🏷 Top5 = 本榜总分降序前 5 名（即设计上应推的「最终推荐」）。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
+        <div class="note">口径：金股池（~800 只）经「金钻+缠论双共振」过滤的高信念子集（selection_mode=high_conviction_resonance，由 generate_top10.py 每日盘前产出·盘中不刷新·按 total_score 降序）。本卡 = <b>当日终选输出全量</b>；🏷 Top5 = 本榜总分降序前 5 名（即设计上应推的「最终推荐」）。⚠️ 双共振集天然窄且慢变＝设计生效（高信念机会本就稀有），非冻结；卡头「金股池 N → 双共振 M」可一眼看全貌。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
       </div>
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #fbbf24;">
@@ -15008,8 +15008,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       sumEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px;">'
         + pill('🎯 终选 <b>'+arr.length+'</b> 只','#5ee0a0')
         + '<span title="selection_mode='+ (mode||'—') +'" style="background:#60a5fa1a;color:#60a5fa;border:1px solid #60a5fa4d;border-radius:4px;padding:2px 7px;white-space:nowrap;">模式 '+modeTxt+'</span>'
-        + (TD.hc_count != null ? pill('共振候选 hc='+TD.hc_count,'#fbbf24') : '')
-        + (TD.total_scored != null ? pill('全池评分 <b>'+TD.total_scored+'</b> 只','#a78bfa') : '')
+        + (TD.hc_count != null ? pill('双共振 <b>'+TD.hc_count+'</b> 只','#fbbf24') : '')
+        + (TD.total_scored != null ? pill('金股池 <b>'+TD.total_scored+'</b> 只','#a78bfa') : '')
+        + (TD.chan_source && TD.chan_source.stale ? pill('⚠ 缠论源陈旧'+TD.chan_source.stale_days+'天','#ef5350') : '')
         + '<span style="color:var(--dim);margin-left:auto;">金股池 → 金钻+缠论双共振过滤</span>'
         + '</div>';
     }

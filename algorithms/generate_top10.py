@@ -2227,6 +2227,27 @@ def main():
     #   V8_HIGH_CONVICTION 默认开（"1"）：只在 scored 中保留「chan & jinzuan」共振票（金钻+缠论），
     #   按 total_score 降序【全量输出】，V8_HC_CAP=0（默认）即不限只数——主人令「好票我就都要」；
     #   共振数为 0 时自然空仓（坏行情不硬凑）。设 V8_HIGH_CONVICTION=0 回退传统 top20 评分口径。
+    # 🔴 2026-10-30 根因修复：HC 重赋值前捕获真实金股池规模（非双共振子集），
+    #   避免 total_scored 被误报为 54（双共振子集）而掩盖真实 800 池 → 主人误判「池子掉到45/冻住」。
+    _pool_total = len(scored)
+    # 🔴 2026-10-30 透明度：ima「缠论买点每日推荐」源(本机侧连接器拉取)可能停更，
+    #   其信号账本若陈旧，对应展示卡会显示过期信号。仅做透明度透出，不用于 HC 过滤
+    #   （HC 的 chan 来自日K线实时计算 has_chan，与此 ima 报告无关）。
+    _chan_src = {"stale": None, "last_update": None, "signal_dates": [], "stale_days": None}
+    try:
+        _cj = load_json(os.path.join(DATA_DIR, "chan_buy_point_signals.json"), {})
+        _chan_src["last_update"] = _cj.get("update_time")
+        _chan_src["signal_dates"] = _cj.get("signal_dates", [])
+        _cul = _cj.get("update_time")
+        if _cul:
+            try:
+                _cd = datetime.strptime(_cul[:19], "%Y-%m-%d %H:%M:%S")
+                _chan_src["stale_days"] = (datetime.now() - _cd).days
+                _chan_src["stale"] = _chan_src["stale_days"] > 3
+            except Exception:
+                pass
+    except Exception:
+        pass
     _hc = os.environ.get("V8_HIGH_CONVICTION", "1").strip() == "1"
     _hc_cap = int(os.environ.get("V8_HC_CAP", "0"))
     _hc_limit = _hc_cap if _hc_cap > 0 else None  # None=全量
@@ -2235,7 +2256,14 @@ def main():
         _reso = [s for s in scored
                  if (s.get("breakdown", {}).get("signals", {}) or {}).get("jinzuan")
                  and (s.get("breakdown", {}).get("signals", {}) or {}).get("chan")]
-        _reso.sort(key=lambda x: -x["total_score"])
+        # 🔴 2026-10-30 根因修复：双共振集内 total_score 几乎不可分(max 43.3/130、0只过80)，
+        #   纯按总分排序导致 top-10 看似卡死。加次级键：优先新触发的高信念形态(form_A=金钻+缠论A形)，
+        #   其次连续共振天数，让新冒头的高信念票自然轮动到前排；不引入非双共振票(守住主人「只要 jinzuan+chan」规则)。
+        _reso.sort(key=lambda x: (
+            -x["total_score"],
+            -int(bool((x.get("breakdown", {}).get("signals", {}) or {}).get("form_A", False))),
+            -x.get("details", {}).get("consecutive_days", 0),
+        ))
         scored = _reso if _hc_limit is None else _reso[:_hc_limit]
         _SELECTION_MODE = "high_conviction_resonance"
         _cap_txt = f"前 {_hc_limit} 只" if _hc_limit else "全量"
@@ -2312,7 +2340,9 @@ def main():
         "selection_mode": _SELECTION_MODE,
         "hc_cap": _hc_limit if _hc else None,
         "hc_count": len(scored) if _hc else None,
-        "total_scored": len(scored),
+        "total_scored": _pool_total,
+        "pool_total": _pool_total,
+        "chan_source": _chan_src,
         "count_80plus": count_80plus,
         "max_score": max_score,
         "norm_version": NORM_VERSION,
@@ -2366,7 +2396,7 @@ def main():
             hist = {}
         hist[today_str] = {
             "count_80plus": count_80plus,
-            "total_scored": len(scored),
+            "total_scored": _pool_total,
             "max_score": max_score,
             "update_time": result["update_time"],
         }
