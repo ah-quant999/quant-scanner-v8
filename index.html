@@ -8159,13 +8159,6 @@ c.innerHTML = h;
       + '</div>';   // /padding 12 14
   };
 
-  // ===== 🔮 AI 洞察·多源观点对比（2026-09-15 主人令·方案A：「统计」→「实情解析」）=====
-  // 宿主：🌍 观测平台 > 🌍 宏观观测（2026-09-15 由「暂未上架·观测类」整卡迁入，置于 K 型分层卡上方）
-  // 数据源：window.MAHORO_INSIGHTS —— 每日 08:50 / 12:30 / 15:10「AI 阅读后撰写」产出，与「机构研究·AI 解析建议」同源同稿。
-  //   三段实情解析由每日 AI 步骤直接写入 MAHORO_INSIGHTS.compare（三段各 3 行 + 顶部一句话结论），
-  //   前端直读 ⇒ 与源卡同一时刻刷新（不再走 raw→update_v8 桥接，避免滞后一整天）。
-  //   旧「统计」口径（极性百分条 / 板块绝对次数条 / 字数）与 scripts/fetch_ai_insights_compare.py
-  //   → data/AI_INSIGHTS_COMPARE.js 整链已下线。
 
 window.__cpeRetry = 0;
 window.__renderCiticPeObserve = function(){
@@ -18046,7 +18039,6 @@ h+=`</div>`;
     if(tab === 'macro'){
       try{ if(typeof window._fillMahoroCard === 'function'){ window._fillMahoroCard(); out.push('_fillMahoroCard:ok'); } else { out.push('_fillMahoroCard:nofn'); __obsFbShow('_fillMahoroCard', 'nofn', ''); } }
       catch(e){ out.push('_fillMahoroCard:THROW'); __obsFbShow('_fillMahoroCard', 'throw', (e && e.message) || e); }
-      // 2026-09-15 主人令：AI 洞察·多源观点对比 随卡迁入本页，与 maharo 卡同处派发（唯一真源）。
     }
     for(var i = 0; i < names.length; i++){
       var k = names[i];
