@@ -10161,3 +10161,53 @@ items:
       全仓无 B/C 相关未完成改动；generate_top10.py 维持现状（C方案不引入多套强度口径）。
     updated: "2026-10-29 17:35"
     updated_by: 小九
+
+  - id: sel-obsfix-observability-1030
+    owner: 双机共用
+    priority: P1
+    status: done
+    created: 2026-10-30
+    title: 选股池可观测性修复（终选卡透出全池规模 + algo 提交独立标记）
+    note: >
+      根因=高信念双共振模式(jinzuan AND chan)使金股池 800→双共振集约 54；total_scored 原取
+      HC 重赋值后子集掩盖真实池。修复：终选卡显示「金股池 N → 双共振 M」；api_push_raw.py
+      盘后算法链(PUSH_ALGO_RAW=1)提交前缀改「v8 algo:」与盘中 cn fetch 区分。commit ce3826e64。
+    verify_how: >
+      线上 Pages 硬抓 index.html 含「金股池 <b>」；git log 算法链产物带 v8 algo 前缀。
+    verified_at: "2026-10-30 09:30"
+    updated: "2026-10-30 09:30"
+    updated_by: 家用机AI
+
+  - id: ai-insight-card-removed-1030
+    owner: 双机共用
+    priority: P2
+    status: done
+    created: 2026-10-30
+    title: 删除「AI 洞察·多源观点对比」卡（死代码清理）
+    note: >
+      该卡与「机构研究·AI 解析建议」同源同稿(window.MAHORO_INSIGHTS)，纯冗余展示卡；按主人
+      轻量化收尾令退役。删除渲染函数+重试计数+派发片段+注册/observer+宿主 div+tab 重试+
+      orphaned 注释约 154 行。node --check 31 段内联脚本通过。commit da7d23fe5。
+    verify_how: >
+      线上 Pages 硬抓 aiInsightsCompareBody / __renderAiInsightsCompare 均=0；size 减约 11.5KB。
+    verified_at: "2026-10-30 09:30"
+    updated: "2026-10-30 09:30"
+    updated_by: 家用机AI
+
+  - id: sel-rootcause-fix-1030
+    owner: 双机共用
+    priority: P1
+    status: done
+    created: 2026-10-30
+    title: 选股池根因修复（真实池规模透出 + HC 近端触发轮动 + 缠论源陈旧告警）
+    note: >
+      真因：①HC 双共振集内 total_score 几乎不可分(max 43.3/130、0 只过 80)纯按总分排致
+      top-10 看似冻住；②total_scored 取 HC 重赋值后子集掩盖 800 真实池。修复：HC 重赋值前
+      捕获真实池规模；双共振集内排序加次级键(新触发 form_A 优先/连续共振天数)让新票自然轮动
+      且不引入非双共振票；透出 chan_source{stale,stale_days}。commit 078e03e9d。
+    verify_how: >
+      线上 Pages 硬抓「金股池 <b>」「双共振 <b>」「缠论源陈旧」均=1；generate_top10.py 含
+      _pool_total/form_A/chan_source；api_push_raw.py 含 v8 algo。
+    verified_at: "2026-10-30 09:30"
+    updated: "2026-10-30 09:30"
+    updated_by: 家用机AI
