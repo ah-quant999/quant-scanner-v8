@@ -292,7 +292,15 @@ READY_SPEC: dict[str, dict] = {
         #         must 项必须同时在 _ALWAYS_PUSH 中，否则内容天然稳定的 must 项
         #         （如 TOP10 名单连续两日相同 ⇒ 剥时间戳后逐字节相同）会被判「伪变更」永不推送
         #         ⇒ update_time 恒旧 ⇒ must 恒不满足 ⇒ B 批每轮重跑 60~90min 永不收敛。
-        "must": ["data/TOP10_DAILY.js"],
+        #   🔴 2026-10-31 一劳永逸（主人令·选股冻结根治）：将 raw_data/gold_pool.json 升为 B 批 must。
+        #         根因：gold_pool.json（金钻信号 history 源）曾因某次派生失败写成 0 字节；
+        #         read_ut 对 0 字节返回 None 被判 MISS，但 B 批 need=4 容错把它当「可容忍 1 项不新鲜」
+        #         ⇒ 闸门恒判 B 已就绪 ⇒ B 永不重跑 ⇒ 信号源永不再生 ⇒ 最终推荐 Top5 连续一周不变
+        #         （10-28~10-31 逐位相同，实锤）。升 must 后：空/0字节/陈旧即判 B 未就绪 ⇒ 强制重跑 B
+        #         ⇒ build_candidate_pool 重生非空 gold_pool ⇒ 下一轮 B 判就绪（自洽闭环，永不冻结）。
+        #         不变式已满足：raw_data/gold_pool.json 已在 dedup_fetch_manifest.py::_ALWAYS_PUSH 白名单
+        #         （见该文件 L78），内容稳定日也会被强制推送，不会触发「伪变更永不推送」死循环。
+        "must": ["data/TOP10_DAILY.js", "raw_data/gold_pool.json"],
     },
     # 🛡 2026-10-13 阿狸咪（主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」）：
     #   D 批 items 纳 data/FINAL_RECOMMEND_BACKTEST.js —— 生产者与 FINAL_RECOMMEND_DATA
