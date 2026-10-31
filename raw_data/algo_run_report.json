@@ -1,21 +1,8 @@
 {
-  "update_time": "2026-10-31 17:51:14",
-  "run_start": "2026-10-31 15:50:33",
-  "ok": 42,
-  "fail": 3,
-  "failed_scripts": [
-    {
-      "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    },
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
-    },
-    {
-      "script": "factor_walkforward.py",
-      "reason": "退出码 1 | TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'"
-    }
-  ],
+  "update_time": "2026-10-31 22:13:01",
+  "run_start": "2026-10-31 22:09:40",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }

@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-31 13:04",
-  "republish_time": "2026-10-31 17:49:15",
+  "update_time": "2026-10-31 20:48",
+  "republish_time": "2026-10-31 22:12:59",
   "data_date": "2026-10-30",
   "rule_ver": 2,
   "top_n": 5,
@@ -717,5 +717,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "cache",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-10-31 17:49:15 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-10-31 22:12:59 跟随 FINAL 重算(一劳永逸)"
 }
