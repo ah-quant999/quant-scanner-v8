@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-30 20:32",
+ "update_time": "2026-10-31 14:14",
  "legend": [
   {
    "title": "重要政策",
@@ -575,19 +575,19 @@
     {
      "num": 30,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇨🇳 官方制造业PMI",
        "cls": "data",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 31,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
