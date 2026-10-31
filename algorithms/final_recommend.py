@@ -813,66 +813,12 @@ def main():
     # 2026-09-07 一劳永逸：清理该次下线遗留的孤儿代码块（仍引用已删除的 label/tech/qs/tier），
     #   导致 UnboundLocalError 崩溃 → D 档 final_recommend 持续未产出（红灯 all_FINAL_RECOMMEND_DATA）。
 
-    # 3) 四量终极 (top10_daily.top10)
-    SIG_MAP = {
-        "chan": "缠论买点",
-        "jinzuan": "金钻信号",
-        "jigou": "机构变红",
-        "trend": "上涨趋势",
-        "form_A": "形态A",
-    }
-    _alpha_skipped = 0   # 改动12：因「无正 edge 资格」被拦下的四量票数（诊断回显）
-    for s in top10.get("top10") or []:
-        code = s.get("code")
-        if not code:
-            continue
-        r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
-        sig_count = safe_float(s.get("sig_count"))
-        qd = bool(s.get("qd"))
-        # 🔴 2026-09-14 阿狸咪修复（回测驱动·最高ROI）：原 src_score = sig_count*0.6 对所有信号
-        #   （含强负的 trend/jigou）等量计数 → 反向奖励回测亏钱组合（by_signal 0,0,1,1 胜率仅39%、edge -2.42）。
-        #   现改用与 generate_top10.py 同源的 walk-forward T+10 边际加权（jinzuan+8.11/chan+3.68/
-        #   trend-7.54/jigou-10.36）：正edge组合高分、负edge组合压到0（剔除），与回测证据方向一致。
-        _sig_d = s.get("signals", {}) or {}
-        # 🔴 2026-09-18 改动1：edge 改由模块级 SIGNAL_EDGE 提供（运行期从
-        #   backtest_expectancy.json 动态加载，见文件头 _load_signal_edge_dynamic）。
-        #   读不到时回退硬编码默认值并已置 SIGNAL_EDGE_DEGRADED 降级标记。
-        _edge = _signal_edge_of(_sig_d)
-        src_score = max(0.0, min(4.5, 1.5 + _edge * 0.18))
-        # 🔴 2026-09-18 改动12：按边际 alpha 精选源 —— 基础分≤0 = 无任何正 edge
-        #   信号命中（如纯 trend/jigou 负 alpha 组合）⇒ 不给加分资格，防负 alpha
-        #   票借 qd/60m 加分复活成独立源。资格随动态 edge 自适应（扩样后自动跟随）。
-        #   V8_FUSION_ALPHA_SELECT=0 可回退旧行为。
-        _alpha_qualified = (src_score > 0.0) or (not V8_FUSION_ALPHA_SELECT)
-        if V8_FUSION_ALPHA_SELECT and not _alpha_qualified:
-            _alpha_skipped += 1
-        if qd and _alpha_qualified:
-            src_score += 0.5
-        # 🔴 2026-10-18 主人令「完全下架」：四量多周期共振加分（0.5/0.8 两档 + 信号标签）
-        #   随四量整体下架移除 —— 加分主体已不存在，见上方共振读数块墓碑。
-        src_score = round(min(4.5, max(0.0, src_score)), 2)
-        if src_score > 0:
-            r["sources"].append("四量终极")
-            r["source_scores"]["四量终极"] = src_score
-            _set_close(r, s.get("close"), s.get("pct_chg"), "四量终极", top10.get("update_time"))
-            r["stop_loss"] = s.get("stop_loss") or r["stop_loss"]
-            r["target_price"] = s.get("target_price") or r["target_price"]
-            r["risk_reward"] = s.get("risk_reward") or r["risk_reward"]
-            r["industry"] = r["industry"] or ""
-            r["concepts"] = list(set((r["concepts"] or []) + (s.get("sectors") or [])))
-            r["reasons"].append(f"四量终极 信号{sig_count:.0f}项")
-            for k, label in SIG_MAP.items():
-                if s.get("signals", {}).get(k):
-                    r["signals"].append(label)
-            if qd:
-                r["signals"].append("主力动量翻多")
-            if s.get("enter_date"):
-                r["enter_dates"].append(s["enter_date"])
-            elif top10.get("update_time"):
-                r["enter_dates"].append(top10["update_time"][:10])
-    # 🔴 2026-09-18 改动12：拦截情况回显（不许静默——被拦了多少只必须可见）
-    if V8_FUSION_ALPHA_SELECT and _alpha_skipped:
-        print(f"[改动12] alpha精选：{_alpha_skipped} 只四量票因无正edge信号命中被拦（不计独立源，标签仍展示）")
+    # 🔴 2026-10-18 主人令「完全下架」+ 2026-11-01 一劳永逸修复：四量终极（top10_daily）整体下架移除。
+    #   原第3部分把 TOP10_DAILY 全部票以"四量终极"源塞入最终推荐且零新鲜度门控，
+    #   导致下架后最终推荐仍 100% 来自四量终极、且一周不变（"强势跟踪"源因 data_date 门控被跳过）。
+    #   下架后最终推荐来源 = 强势跟踪（IMA）/ 高手共振 / 动量共识 / 缩量强势 等已校验源。
+    #   相关符号 SIG_MAP / _alpha_skipped / _alpha_qualified 仅本节使用，随块移除。
+
 
     # 2026-09-03 主人令：#4 全站精选 source 整段下线（allsite.* 不再读）
 
@@ -1183,12 +1129,12 @@ def main():
     #   共振加分；源恢复当天即自动回来。边界：老产物无这两个字段 ⇒ 不判停更（保守兼容），
     #   此时退回原有「update_time 非当日才跳过」的单口径判断。
     _ima_dd = str((ima or {}).get("data_date") or "").strip()
-    if ima and ((ima or {}).get("source_stale") is True or (_ima_dd and _ima_dd != _today)):
-        print(f"[warn] ⚠️ IMA_STRONG_STOCK 源侧停更（data_date={_ima_dd or '缺失'} / "
-              f"update_time={_ima_ut or '缺失'}）→ 跳过高手共振融合（内容级判据，非抓取失败）")
-        ima = {}
-    elif ima and _ima_ut != _today:
-        print(f"[warn] ⚠️ IMA_STRONG_STOCK 非当日（update_time={_ima_ut or '缺失'}）→ 跳过高手共振融合")
+    # 🔴 2026-11-01 一劳永逸修复：移除 data_date/update_time==today 的整源硬跳过。
+    #   原门控在周末/源延迟更新（data_date 停在最近交易日如 10-29）时整源跳过 ⇒ 强势跟踪 0 命中，
+    #   最终推荐退化成已下架的四量终极单源。现仅以 source_stale 判停更（源侧真废弃才跳过），
+    #   周末/延迟时沿用最近交易日强势跟踪池（源未标 stale 即视为有效）。
+    if ima and (ima.get("source_stale") is True):
+        print(f"[warn] IMA_STRONG_STOCK 源侧停更（source_stale=True）→ 跳过高手共振融合")
         ima = {}
     if ima:
         _ima_norm = {}
@@ -1777,7 +1723,7 @@ def main():
         # 🔴 2026-09-18 改动12：alpha 精选运行时真相（回测复现/看板核对用）
         "alpha_select": {
             "enabled": bool(V8_FUSION_ALPHA_SELECT),
-            "skipped_no_positive_edge": int(_alpha_skipped),
+            "skipped_no_positive_edge": 0,  # 四量终极已下架，诊断项恒为0
         },
     }
 
