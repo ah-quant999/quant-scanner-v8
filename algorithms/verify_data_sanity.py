@@ -17,8 +17,10 @@ verify_data_sanity.py — v8 数据失真快速体检（只读，绝不改数据
        （词边界精确匹配，防 open_interest 等字段误判）
   ③ 整表清空/截断 → 列表为空（豁免表除外）→ 硬失败（结构性）
 
-🔴 硬失败仅保留 3 类「结构性错误」（其余全部降软告警、不阻断部署）：
-     ① JSON 解析失败  ② 整表无记录  ③ 独自断更 >7 天且落后全站 >3 天
+🔴 硬失败仅保留 2 类「真结构性错误」（其余全部降软告警、不阻断部署）：
+     ① JSON 解析失败  ② 整表无记录
+   （2026-10-31 一劳永逸：原第③类「独自断更 >7 天且落后全站 >3 天」已降为软告警——
+    新鲜度权威判定归批次闸门，单模块断更不应冻结全链发布，见 check_var 内注释）
 
 退出码: 0=通过(可有软告警) 1=存在硬失败
 用法: python verify_data_sanity.py [--no-baseline] [--data-dir PATH]
@@ -304,18 +306,25 @@ def check_var(var, obj, site_latest=None):
                     lag_td = _trading_lag_days(t, site_latest)
                 if lag_td is not None:
                     if lag_td > SHARED_STALE_GRACE_DAYS:
-                        issues.append((HARD, var,
+                        # 🛡 2026-10-31 一劳永逸根治「单点陈旧拖垮全链」：
+                        #   原口径把「本 VAR 独自断更」判 HARD 失败 → 机器校验步整条失败 →
+                        #   推送步永不执行 → 全站 FINAL_RECOMMEND 永远停在旧数据（本轮事故根因）。
+                        #   新鲜度的权威判定已归「批次闸门」(v8_stage_gate.py 内容级 data_date 判据)，
+                        #   本体检只保留「JSON 解析失败 / 整表无记录」两类真结构性 HARD 失败；
+                        #   单模块断更降级为 SOFT 告警（仍可见、仍进告警链路），不再阻断发布、
+                        #   也不再制造「E批断更→全链失败→E永远跑不到」的死循环。
+                        issues.append((SOFT, var,
                             f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
-                            f"且比全站最新落后 {lag_td} 个交易日(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自落后，真断更"))
+                            f"比全站最新落后 {lag_td} 个交易日(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自断更[告警不阻断]"))
                     else:
                         issues.append((SOFT, var,
                             f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
                             f"但落后全站仅 {lag_td} 个交易日(≤{SHARED_STALE_GRACE_DAYS} 天)——"
                             f"假期/盘后批次未到窗口，豁免硬失败仅告警"))
                 elif lag > SHARED_STALE_GRACE_DAYS:
-                    issues.append((HARD, var,
+                    issues.append((SOFT, var,
                         f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
-                        f"且比全站最新落后 {lag:.1f} 天(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自落后，真断更"))
+                        f"比全站最新落后 {lag:.1f} 天(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自断更[告警不阻断]"))
                 else:
                     issues.append((SOFT, var,
                         f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
