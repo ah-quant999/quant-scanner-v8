@@ -302,7 +302,16 @@ READY_SPEC: dict[str, dict] = {
     #   （与 B 批 LQSQ_TRACK「跟踪卡」同哲学；必新项由 must 表达，D 批 must=[] 不变）。
     #   🔴 联动不变式（guard_double_blind.py I-1/I-2 机器断言）：已同步纳入
     #      dedup_fetch_manifest.py::_ALWAYS_PUSH（内容稳定日不得被判「伪变更」丢弃）。
-    "D": {"items": ["data/FINAL_RECOMMEND_DATA.js", "data/FINAL_RECOMMEND_BACKTEST.js"], "need": 1, "must": []},
+    #   🔴 2026-10-31 一劳永逸（主人令·最终推荐"假新鲜"根治）：
+    #   D 批 must 由 [] 改为 ["data/FINAL_RECOMMEND_DATA.js"]。原因：原 need=1 语义是
+    #   「任一 item 当日生成即就绪」，而 FINAL_RECOMMEND_BACKTEST.js 是 final_recommend.py
+    #   末尾本地秒级伴生卡（try/except 包裹、失败不影响主产物），它 update_time=今天 就会让
+    #   need 达标 → D 误判就绪 → 主产物 FINAL_RECOMMEND_DATA.js 即使内容是昨天早上的陈旧数据
+    #   也永不再重算（2026-10-31 实锤：文件 update_time=今天10:18 但 data_date=10-29）。
+    #   现把主产物列为 must：D 就绪当且仅当 FINAL_RECOMMEND_DATA.js 内容新鲜（data_date==链数据日，
+    #   见 check_ready 内 D_CONTENT_STALE 守卫）。缺失 data_date 字段时回退 update_time 判据（不锁死）。
+    "D": {"items": ["data/FINAL_RECOMMEND_DATA.js", "data/FINAL_RECOMMEND_BACKTEST.js"], "need": 1,
+          "must": ["data/FINAL_RECOMMEND_DATA.js"]},
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：E 批就绪清单 2 → 3 项，need 1 → 2。
     #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），
     #   但 data/BACKTEST_ALL_ALGOS.js **远端不存在**时全链零红灯 —— 它不在本清单里。
@@ -562,6 +571,19 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
             ((c[0] == day) or (_run_day_tol and c[0] == run_day))
             and (c[1], c[2]) >= floor
             for c in _cand(r)))
+        # 🔴 2026-10-31 一劳永逸（主人令·最终推荐"假新鲜"根治）：
+        #   D 批主产物 FINAL_RECOMMEND_DATA.js 此前只认 update_time(生成时间) 判就绪，
+        #   导致「今天用冻住的旧数据重生成一次 → update_time=今天 → 闸门误判已就绪 →
+        #   之后 raw_data 刷新鲜也永远不再重算」。这与诊断面板读真实 data_date 判红错位，
+        #   正是「文件是今天的、内容却是昨天早上的」根因（2026-10-31 实锤）。
+        #   修法：D 批主产物额外要求嵌入的 data_date(=数据日) == 链数据日；不一致(陈旧)
+        #   即判未就绪 → 强制重算。仅作用于 D 批主产物，A/B/E 的容错语义保持不变。
+        if stage == "D" and it == "data/FINAL_RECOMMEND_DATA.js":
+            _vi = read_vintage(root, it)
+            if _vi and _vi != day:
+                ok = False
+                parts.append(
+                    f"⚠️D_CONTENT_STALE({os.path.basename(it)} 数据日={_vi}≠链数据日={day})→判未就绪")
         if ok:
             hit += 1
             _tag = "·运行日" if (_run_day_tol and r[0] == run_day) else ""
