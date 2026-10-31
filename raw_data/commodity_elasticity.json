@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-31 16:53:37",
+  "update_time": "2026-10-31 17:13:16",
   "data_date": "2026-10-31",
   "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + Sina免费外盘期货(LME/NYMEX/CBOT共15个，westock-mcp不可用/缓存陈旧时兜底) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 0,
@@ -220,48 +220,6 @@
       ]
     },
     {
-      "key": "soda_ash",
-      "name": "纯碱",
-      "unit": "元/吨",
-      "exchange": "国内期货",
-      "available": true,
-      "current_price": 972.0,
-      "price_date": "",
-      "source": "eastmoney-push2(郑商所·纯碱主力)",
-      "baseline_30d": 978.267,
-      "baseline_label": "30日z-score",
-      "dev_pct": -0.64,
-      "is_hot": false,
-      "hot_basis": "z-score=-0.232(σ=27.068, μ=978.267)",
-      "z_score": -0.232,
-      "ma30": 978.267,
-      "std30": 27.068,
-      "use_zscore": true,
-      "stocks": [
-        {
-          "code": "000822",
-          "name": "山东海化",
-          "business_pct": 0.75,
-          "elasticity_pct": -26.1,
-          "note": "纯碱+小苏打"
-        },
-        {
-          "code": "000683",
-          "name": "远兴能源",
-          "business_pct": 0.85,
-          "elasticity_pct": -29.58,
-          "note": "天然碱低成本"
-        },
-        {
-          "code": "000707",
-          "name": "双环科技",
-          "business_pct": 0.9,
-          "elasticity_pct": -31.32,
-          "note": "联碱法"
-        }
-      ]
-    },
-    {
       "key": "corn",
       "name": "玉米",
       "unit": "美分/蒲式耳",
@@ -300,6 +258,48 @@
           "business_pct": 0.5,
           "elasticity_pct": -193.58,
           "note": "粮食种植（含玉米）"
+        }
+      ]
+    },
+    {
+      "key": "soda_ash",
+      "name": "纯碱",
+      "unit": "元/吨",
+      "exchange": "国内期货",
+      "available": true,
+      "current_price": 972.0,
+      "price_date": "",
+      "source": "eastmoney-push2(郑商所·纯碱主力)",
+      "baseline_30d": 980.733,
+      "baseline_label": "30日z-score",
+      "dev_pct": -0.89,
+      "is_hot": false,
+      "hot_basis": "z-score=-0.294(σ=29.719, μ=980.733)",
+      "z_score": -0.294,
+      "ma30": 980.733,
+      "std30": 29.719,
+      "use_zscore": true,
+      "stocks": [
+        {
+          "code": "000822",
+          "name": "山东海化",
+          "business_pct": 0.75,
+          "elasticity_pct": -33.07,
+          "note": "纯碱+小苏打"
+        },
+        {
+          "code": "000683",
+          "name": "远兴能源",
+          "business_pct": 0.85,
+          "elasticity_pct": -37.48,
+          "note": "天然碱低成本"
+        },
+        {
+          "code": "000707",
+          "name": "双环科技",
+          "business_pct": 0.9,
+          "elasticity_pct": -39.69,
+          "note": "联碱法"
         }
       ]
     },
