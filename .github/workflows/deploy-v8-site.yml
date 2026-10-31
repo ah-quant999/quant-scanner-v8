@@ -1,0 +1,53 @@
+name: Deploy v8 Site (self-hosted)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 经自托管 Windows 运行器构建静态站点并发布到 GitHub Pages。
+# 目的：绕开 GitHub 原生 "branch: main" 构建服务器（其持久化工作克隆含已删除的
+# docs/ops 超长名文件，git checkout 永远失败 -> Pages 长期 build errored）。
+# 本工作流用干净的运行器 checkout 当前 main，仅打包站点所需文件为制品，
+# 由 actions/deploy-pages 经 API 发布（不依赖中毒的构建服务器克隆）。
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Windows]
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout (clean, fetch-depth 1)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Build site artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force _site | Out-Null
+          Copy-Item index.html _site/ -Force
+          Copy-Item *.css _site/ -Force
+          Copy-Item *.js _site/ -Force
+          Copy-Item *.html _site/ -Force
+          Copy-Item assets _site/assets -Recurse -Force
+          Copy-Item data _site/data -Recurse -Force
+          echo "artifact files:"; (Get-ChildItem _site -Recurse | Measure-Object).Count
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
