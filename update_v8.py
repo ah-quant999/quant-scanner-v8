@@ -1835,18 +1835,34 @@ def main():
         return 0
     rc = build(category=args.category, detect_changes=args.detect_changes)
     if rc == 0:
-        run_health_check()
-        run_experiment_cards()
-        # 2026-08-22 主人令：为缺 update_time 的 data/*.js 补时间戳（须在全部生成之后）
-        stamp_missing_update_time()
-        # 🆕 2026-09-05 主人令：build 后补 RUNNER_STATUS 全量 + AUDIT_TRAIL
-        _post_build_extras()
-        # 2026-08-15 缓存戳铁律修复：必须在全部数据生成（含 run_experiment_cards
-        # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
-        # 不符 → CDN 吐旧副本。
-        _ensure_momentum_loader()
-        _rewrite_cache_busters_for(ROOT / "logic.html")
-        _rewrite_index_html_cache_busters()
+        # 🔴 2026-11-01 一劳永逸（主人令·选股冻结根治·彻底版）：
+        #   此前 build() 已容错（单文件异常隔离 + updated>0 即成功），但 build 之后的
+        #   辅助步骤 —— run_health_check / run_experiment_cards / stamp_missing_update_time /
+        #   _post_build_extras / 缓存戳重写 —— 任一抛未捕获异常 ⇒ main 返回非 0 ⇒
+        #   workflow `set -e` 中断整档位更新_v8 ⇒ 唯一推送步骤被 skip ⇒
+        #   最终推荐(FINAL_RECOMMEND_DATA)等核心产物永不上线（run#41219515589 复现）。
+        #   现把「数据已生成」视为不可动摇的底线：
+        #     · 缓存戳重写（部署上线必需，必须最先跑、且独立隔离）—— 决定 CDN 是否吐新副本；
+        #     · stamp / _post_build_extras / run_health_check / run_experiment_cards
+        #       全部 try/except 隔离，辅助步骤失败只告警、绝不阻断部署。
+        #   结论：build 成功(updated>0) ⇒ 整档位成功；辅助步骤再崩也不影响上线。
+        def _safe(label, fn):
+            try:
+                fn()
+            except Exception as _e:
+                import traceback as _tb
+                print(f"  ⚠️ {label} 异常(已隔离，不影响部署)：{_e}")
+                _tb.print_exc()
+        # 1) 缓存戳重写：部署上线必需，最先执行且独立隔离
+        _safe("缓存戳重写", lambda: (_ensure_momentum_loader(),
+                                      _rewrite_cache_busters_for(ROOT / "logic.html"),
+                                      _rewrite_index_html_cache_busters()))
+        # 2) 补时间戳 / 补 RUNNER_STATUS+AUDIT_TRAIL（辅助，失败不影响上线）
+        _safe("stamp_missing_update_time", stamp_missing_update_time)
+        _safe("_post_build_extras", _post_build_extras)
+        # 3) 健康校验 / 实验卡（辅助，失败不影响上线）
+        _safe("run_health_check", run_health_check)
+        _safe("run_experiment_cards", run_experiment_cards)
     return rc
 
 

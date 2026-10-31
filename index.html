@@ -188,7 +188,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=e448740627" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=26774deb3d" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=92ef908a1f" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1321,9 +1321,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=873e47ba60" defer></script>
 <script src="data/HB_XIAOJIU.js?v=cdc68c6bc8" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=000046d973" defer></script>
-<script src="data/HEALTH_CHECK.js?v=ff47925a70" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=3af164a4a3" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=34dd2285ff" defer></script>
+<script src="data/HEALTH_CHECK.js?v=20e089d88f" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=c750700212" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=8ca37df38e" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=50c04bc44b" defer></script>
@@ -2024,13 +2024,13 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=cbf73e3f5c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=ead8a18019" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=aa69bbb53c" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=00202652b3" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=5d9caaf6ab" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=fdc7d844b9" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=c3ca14a11b" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3160c67897" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=c9dcff9d87" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=bc1f352c9e" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=7054cf11ac" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=5144841451" defer></script>
@@ -16090,7 +16090,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=00202652b3');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=c3ca14a11b');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -16099,7 +16099,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=5d9caaf6ab');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=3160c67897');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -17647,7 +17647,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     Object.keys(modules).forEach(function(k){
       var m = modules[k];
       if(!m) return;
-      if(m.status === 'fail') diags.push('Runner 模块 <b>'+k+'</b> 失败：'+(m.message || '未知错误'));
+      // 🔴 2026-11-01 一劳永逸（主人令·诊断面板误报根治）：自托管 runner「服务=NOT_FOUND / 离线」
+      //   是「机器未开机/未连网」，并非处理失败；原逻辑一律标红「失败」→ 周末/关机期常驻假告警。
+      //   现按 message 语义区分：离线→标「离线」+ 灰字说明（开机即恢复）；真失败→仍标「失败」。
+      var _off = /NOT_FOUND|离线|offline|未连接|not connected|未运行|进程未启动/i.test(m.message || '');
+      if(m.status === 'fail') diags.push('Runner 模块 <b>'+k+'</b> ' + (_off ? '离线' : '失败') + '：' + (m.message || '未知错误') + (_off ? ' <span style="color:#94a3b8;font-size:11px">（自托管 runner 未开机/未连网，非处理失败；开机后即恢复）</span>' : ''));
       else if(m.status === 'empty' && !isNonTrade) diags.push('Runner 模块 <b>'+k+'</b> 返回空数据');
     });
     // 2) HEALTH_CHECK 失败项
@@ -17668,7 +17672,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
          未来任何新状态默认不进诊断区，需报警则显式点名。 */
       if(!it || it.status !== 'fail') return;
       // 2026-09-02 主人令:每个 HEALTH_CHECK fail 项附运维行动提示
-      var _hint = (it.id==='SH_FIB' || it.id==='INST_TRADE') ? ' → 静候 16:40 CST STAGE A 采集批;或在 Actions 手动 Run workflow(force_run) 重跑本盘后算法链'
+      var _hint = (it.id==='IMA_STRONG_STOCK' || it.id==='W52_HIGH' || /CN.?IP|_CN$|^CN_/i.test(it.id||'')) ? ' → CN-IP 自托管数据（需小九单位机/自托管 runner 在线抓取）；该机当前离线，开机后自动恢复，非代码故障'
+                : (it.id==='SH_FIB' || it.id==='INST_TRADE') ? ' → 静候 16:40 CST STAGE A 采集批;或在 Actions 手动 Run workflow(force_run) 重跑本盘后算法链'
                 : (it.id==='MARKET_REGIME') ? ' → 静候 20:00 CST STAGE D 汇总批(final_recommend)前一并产出;或手动 Run workflow(force_run) 重跑'
                 : (it.id==='AVG_PRICE_DATA') ? ' → 盘中每 30 分自愈;非盘中时段按 24h 阈值判 fail,下一时段自愈'
                 : (it.id==='MARGIN_DATA') ? ' → 交易所日频 16:15 一次,阈值已放宽 24h,目前属正常窗口'
