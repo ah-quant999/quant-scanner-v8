@@ -1,8 +1,15 @@
 {
-  "update_time": "2026-10-31 22:13:01",
-  "run_start": "2026-10-31 22:09:40",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": []
+  "update_time": "2026-11-01 02:45:15",
+  "run_start": "2026-11-01 01:29:43",
+  "ok": 17,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    }
+  ],
+  "skipped_by_time_gate": [
+    "fetch_weekend_run.py"
+  ]
 }
