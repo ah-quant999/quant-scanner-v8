@@ -1,18 +1,13 @@
 {
-"update_time": "2026-10-30 20:31:27",
+"update_time": "2026-10-31 10:16:24",
 "total": 8031,
-"new_listings_count": 2,
-"delisted_count": 1,
-"new_listings": [
-"08159 新华联合投资－新",
-"08555 亚太金融投资股权"
-],
-"delisted": [
-"02915 云迹（旧）"
-],
+"new_listings_count": 0,
+"delisted_count": 0,
+"new_listings": [],
+"delisted": [],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8030,
+"old_universe": 8031,
 "fresh_universe": 8031
 }

@@ -1,13 +1,13 @@
 {
-  "generated": "2026-10-30 06:07:22",
-  "update_time": "2026-10-30 06:07:22",
+  "generated": "2026-10-31 10:19:53",
+  "update_time": "2026-10-31 10:19:53",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
   "n_top": 3,
-  "days": 36,
+  "days": 37,
   "date_from": "2026-09-03",
-  "date_to": "2026-10-28",
+  "date_to": "2026-10-31",
   "by_date": {
     "2026-09-03": {
       "date": "2026-09-03",
@@ -1582,6 +1582,50 @@
           "close": 63.48,
           "close_date": "2026-10-28",
           "final_score": 24.5,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        }
+      ]
+    },
+    "2026-10-31": {
+      "date": "2026-10-31",
+      "update_time": "2026-10-31 10:18:40",
+      "file": "final_recommend_20261031.json",
+      "degraded": true,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "600869",
+          "name": "远东股份",
+          "close": 13.57,
+          "close_date": "2026-10-30",
+          "final_score": 43.3,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "301511",
+          "name": "德福科技",
+          "close": 53.81,
+          "close_date": "2026-10-30",
+          "final_score": 25.8,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "688432",
+          "name": "有研硅",
+          "close": 28.84,
+          "close_date": "2026-10-30",
+          "final_score": 12.2,
           "resonance": 1,
           "sources": [
             "四量终极"
