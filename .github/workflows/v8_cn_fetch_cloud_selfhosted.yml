@@ -33,8 +33,8 @@ on:
   schedule:
     # 🔴 2026-10-09 CN runner2号机的工程师：cn-IP 硬约束源常规兜底档（W52_HIGH 等东财 push2delay 系
     #   在境外托管 runner 上结构性不可达）。cron 字符串必须与下方 step1 case 分支逐字匹配。
-    - cron: '25 0 * * 1-5'   # 08:25 CST 盘前 → category=premarket
-    - cron: '20 9 * * 1-5'   # 17:20 CST 盘后 → category=post_close
+    - cron: '25 0 * * 1-7'   # 08:25 CST 盘前 → category=premarket
+    - cron: '20 9 * * 1-7'   # 17:20 CST 盘后 → category=post_close
   workflow_dispatch:
     inputs:
       category:
@@ -120,13 +120,13 @@ jobs:
           fi
           CRON="${{ github.event.schedule }}"
           case "$CRON" in
-            "25 0 * * 1-5")
+            "25 0 * * 1-7")
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
-            "*/30 1-8 * * 1-5")
+            "*/30 1-8 * * 1-7")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
               echo "label=盘中" ;;
-            "20 9 * * 1-5")
+            "20 9 * * 1-7")
               echo "category=post_close" >> "$GITHUB_OUTPUT"
               echo "label=盘后" ;;
             # 🛡️ 2026-08-13 23:1x 根因修复（CN runner2号机令）：yml cron '0 9,14'（北京 17:00/22:00）
