@@ -1,24 +1,12 @@
 {
-  "update_time": "2026-10-31 10:26:15",
-  "run_start": "2026-10-31 08:25:23",
-  "ok": 41,
-  "fail": 4,
+  "update_time": "2026-10-31 14:34:22",
+  "run_start": "2026-10-31 13:19:40",
+  "ok": 18,
+  "fail": 1,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
-    },
-    {
-      "script": "backtest_tdx.py",
-      "reason": "退出码 1 | TypeError: unsupported format string passed to NoneType.__format__"
-    },
-    {
-      "script": "refresh_dividend_cninfo.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "factor_walkforward.py",
-      "reason": "退出码 1 | TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'"
     }
   ],
   "skipped_by_time_gate": []
