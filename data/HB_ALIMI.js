@@ -1,1 +1,1 @@
-window.HB_ALIMI = {"last_time":"2026-11-01 02:38:23","status":"ok","machine":"alimi-cn","source":"alimi_heartbeat","mail_channel":"down","mail_channel_detail":"no_config (两处标准路径均无 v8_smtp_config.json，亦无通道旗标)","update_time":"2026-11-01 02:38:23","republish_time":"2026-11-01 02:41:42"};
+window.HB_ALIMI = {"last_time":"2026-11-01 07:28:21","status":"ok","machine":"alimi-cn","source":"alimi_heartbeat","mail_channel":"down","mail_channel_detail":"no_config (两处标准路径均无 v8_smtp_config.json，亦无通道旗标)","update_time":"2026-11-01 07:28:21","republish_time":"2026-11-01 07:29:19"};
