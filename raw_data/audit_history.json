@@ -3891,5 +3891,38 @@
   },
   "warn_items": [],
   "fail_items": []
+ },
+ {
+  "date": "2026-11-01",
+  "time": "02:41:22",
+  "tz": "Asia/Shanghai",
+  "overall": "fail",
+  "summary": {
+   "ok": 117,
+   "warn": 0,
+   "fail": 3,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 120
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "IMA_STRONG_STOCK",
+    "name": "强势跟踪",
+    "message": "更新于 2天前 02:56；超过阈值 2291 分钟"
+   },
+   {
+    "id": "runner_local",
+    "name": "runner 本地检测",
+    "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 15 次，checkout 失败 0 次，最新 .github/workflows/v8_cn_f"
+   },
+   {
+    "id": "runner",
+    "name": "self-hosted runner",
+    "message": "runner 本地检测:fail-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 15 次，checkout 失败 0 次，最新 .github/"
+   }
+  ]
  }
 ]
