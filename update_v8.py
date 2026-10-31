@@ -1551,7 +1551,11 @@ def build(category=None, detect_changes=False):
     # 🛡 2026-10-28 九宝量化（一劳永逸根治「单文件崩→整档位 blank」）：
     #   只要有文件成功重建即视为批次成功（避免一颗雷炸掉 US_HK_MAP 等后续文件）；
     #   失败文件仍会被 HEALTH_CHECK 按 staleness 单独标红，且本次 traceback 已打印，下次运行即定位真凶。
-    return 1 if failed > 0 else 0
+    # 🔴 2026-10-31 一劳永逸（主人令·选股冻结根治）：原 `return 1 if failed>0` 配合 workflow `set -e`
+    #   会让「单文件重建异常」直接把整档位 update_v8 判失败 ⇒ 唯一推送步骤被 skip ⇒
+    #   最终推荐(FINAL_RECOMMEND_DATA)等核心产物永不上线（实测 run#41213870566 即因此整档位 failure）。
+    #   现改为「只要有文件成功重建即视为批次成功」(updated>0)，单点故障绝不再阻断其余 200+ 产物部署。
+    return 0 if updated > 0 else 1
 
 
 def _derive_etf_eastmoney(obj):
@@ -1698,12 +1702,13 @@ def run_experiment_cards():
                     print("[experiment]   ⏭️ 识别为【时间门控未就绪】——非数据造假，属设计内状态；"
                           "跳过本卡，其余 data/*.js 照常部署（15:30 后本轮会自然产出真实数据）")
                 else:
-                    # 🛡 2026-08-29 硬化：动量 V2 回测数据必须真实，禁止「data_available=false 全 0」继续发布。
-                    #   直接抛异常让 update_v8 / build 失败，触发重试或人工介入。
-                    raise RuntimeError(f"gen_strong_breakout 失败（退出码 {r.returncode}），拒绝发布虚假回测")
+                    # 🛡 2026-10-31 一劳永逸（主人令·选股冻结根治）：不再因单张实验卡失败而中断整个
+                    #   update_v8 ⇒ 阻断 data/*.js 推送 ⇒ 最终推荐等核心产物永不上线。
+                    #   gen_strong_breakout 自身的「拒绝发布虚假回测」闸门已守住诚实底线（不写假数据），
+                    #   此处仅跳过该卡并告警，绝不 raise 拖垮全链；该卡陈旧由 v8_health_check 标红。
+                    print(f"[experiment]   ⚠️ gen_strong_breakout 退出码 {r.returncode}（拒绝发布虚假回测闸门触发）"
+                          f"→ 跳过本卡，其余 data/*.js 照常部署（该卡陈旧由健康巡检标红）")
         except Exception as e:
-            if isinstance(e, RuntimeError):
-                raise
             print(f"[experiment]   ⚠️ gen_strong_breakout 异常: {e}")
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_strong_breakout.py，跳过")
