@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全站「更新时间 vs 数据」一致性审计报告 · 2026-08-09</title>
+<style>
+:root{--bg:#0b1220;--card:#101a2e;--card2:#16233c;--bd:#243a5e;--ok:#22c55e;--warn:#f5b3d6;--bad:#ef4444;--txt:#dbe6f7;--sub:#8aa0c2;--acc:#7fb4ff;}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,"Microsoft Yahei",sans-serif;line-height:1.6;padding:28px;}
+.wrap{max-width:980px;margin:0 auto;}
+h1{font-size:24px;margin:0 0 4px;}
+.meta{color:var(--sub);font-size:13px;margin-bottom:22px;}
+h2{font-size:18px;margin:30px 0 12px;padding-left:10px;border-left:3px solid var(--acc);}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin:12px 0;}
+.ok{border-color:rgba(34,197,94,.4);}
+.bad{border-color:rgba(239,68,68,.4);}
+.warn{border-color:rgba(245,179,214,.4);}
+.done{border-color:rgba(127,180,255,.4);}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;margin-right:6px;}
+.t-ok{background:rgba(34,197,94,.15);color:var(--ok);}
+.t-bad{background:rgba(239,68,68,.15);color:var(--bad);}
+.t-warn{background:rgba(245,179,214,.15);color:var(--warn);}
+.t-done{background:rgba(127,180,255,.15);color:var(--acc);}
+code{background:var(--card2);padding:1px 6px;border-radius:5px;font-size:12px;color:#9fd0ff;}
+ul{margin:8px 0;padding-left:22px;}
+li{margin:5px 0;}
+.big{font-size:15px;font-weight:700;}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
+th,td{border:1px solid var(--bd);padding:7px 9px;text-align:left;}
+th{background:var(--card2);color:var(--sub);}
+.note{font-size:12px;color:var(--sub);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>全站「更新时间 vs 数据」一致性审计报告</h1>
+<div class="meta">审计日期：2026-08-09（周日，A股休市；上一交易日 2026-08-07）· 范围：stock-scanner 全站 data/*.js + index.html 时间展示层 · 铁律：不弄虚作假、旧数据不蒙混、没有就标注原因</div>
+
+<h2>一、审计结论（先说结果）</h2>
+<div class="card ok">
+<p class="big">✅ 展示层总体诚实：所有时间展示都基于真实数据时间戳，<b>没有</b>谎称「今日」、<b>没有</b>用批量重打包戳蒙混。</p>
+<p class="note">但发现 1 处「旧信号被更新戳混淆」已修复，另有 2 处需后续根治（见第三节）。</p>
+</div>
+
+<h2>二、逐项核查（展示层 vs 真实数据）</h2>
+
+<div class="card ok">
+<span class="tag t-ok">通过</span><b>无硬编码假「今日」</b>
+<p>index.html 中全部「今日已计算 / 今日已跑完 / 今日已入仓」字样均出现在 <code>_runBadgeInfo</code> 等动态函数内，由真实数据日期与当前北京时间比对得出。今天周日，RPS 屏正确显示 <code>08-08 已计算</code>、三重共识显示 <code>08-08 已跑 / 已入仓 0</code>，无一处谎称「今日」。</p>
+</div>
+
+<div class="card ok">
+<span class="tag t-ok">通过</span><b>展示读取真实戳，未用重打包戳</b>
+<p>所有胶囊/徽章读取 <code>update_time / data_time / calc_date</code>（8/7–8/8 真实值）。批量重打包时在 56 个文件写入的 <code>build_time:"2026-08-09 11:15:54"</code> 字段（原报告误写为 <code>time</code>，已纠正），经全局 grep 在 index.html 中<b>零引用</b>，未被任何展示路径使用。</p>
+</div>
+
+<div class="card ok">
+<span class="tag t-ok">通过</span><b>新鲜度判定未被重打包戳误导</b>
+<p><code>guard_v8_freshness.py</code> 提取各文件 <code>update_time</code> 比对「最近交易日收盘」；<code>freshness_status.json</code> 的 core_stale:0 基于此真实戳。判定口径未被 8/9 重打包戳污染。</p>
+</div>
+
+<div class="card ok">
+<span class="tag t-ok">通过</span><b>缓存 ?v= 戳准确</b>
+<p>各数据脚本 <code>?v=</code> 等于该文件<b>真实数据日期</b>（CANDIDATE/LHB_DATA 数据确为 8/7 → <code>?v=20260807</code>；RPS 为 8/8 → <code>?v=20260808</code>）。缓存失效逻辑正确，不会出现「内容更新但戳不变导致旧缓存常驻」。</p>
+</div>
+
+<div class="card ok">
+<span class="tag t-ok">通过</span><b>引用文件全部存在 · 缺失即标注</b>
+<p>index.html 引用的数据文件全部存在于 data/，无悬空引用。三重共识 <code>count:0</code> 如实显示「已入仓 0」，未编造入选股。</p>
+</div>
+
+<h2>三、发现的问题与整改</h2>
+
+<div class="card done">
+<span class="tag t-done">已修复</span><b>问题1：驾驶舱建议信号陈旧被「更新于」戳混淆</b>
+<p><b>现象：</b><code>COCKPIT_ADVICE.js</code> 共 11 条信号，<code>signal_date</code> 全部为 <code>2026-07-07 ~ 07-09</code>（一个月前），卡头却显示「更新于 08-08」。虽每只已标「07-09入」，仍容易被视为新建议。</p>
+<p><b>整改：</b>commit <code>03f5022a</code>。在「回测驱动关注」卡顶部新增警示横幅——当最新信号日期早于最近交易日时，明确标注：<code>⚠️ 信号数据较旧（最新信号 07-09）· 早于最近交易日 08-07，非当日新信号，仅供参考，请勿据此新建仓位。</code></p>
+</div>
+
+<div class="card done">
+<span class="tag t-done">已修复</span><b>问题2：批量重打包戳 <code>build_time</code> → <code>republish_time</code></b>
+<p><b>纠正：</b>原报告误把字段写成 <code>time</code>，实际字段是 <code>build_time</code>，写入 56 个 data/*.js（由 <code>update_v8.py</code> 统一注入）。</p>
+<p><b>整改：</b>修改 <code>update_v8.py</code>，将 <code>build_time</code> 重命名为 <code>republish_time</code>，并加注释明确「仅用于排障与缓存戳，前端不得当作数据时间展示」。全量重建 56 个 data/*.js 与 <code>index.html</code> cache-busting。</p>
+</div>
+
+<div class="card done">
+<span class="tag t-done">已修复</span><b>问题3：健康检查增加 signal_date / enter_date 偏差检测</b>
+<p><b>整改：</b>在 <code>v8_health_check.py</code> 新增 <code>check_signal_date_freshness()</code>：读取 <code>COCKPIT_ADVICE.js</code> 的 <code>watch[].signal_date</code> 与 <code>FINAL_RECOMMEND_DATA.js</code> 的 <code>stocks[].enter_date</code>，取最大值与「最近交易日」比对；若信号日期早于最近交易日，则 page="内容审计" warn 告警，并绕过 self_heal 自动派发（内容级陈旧需算法/数据根治，不能简单刷新）。</p>
+<p><b>实测：</b>2026-08-09 15:52 运行即检出「驾驶舱建议最新 signal_date 2026-07-09 早于最近交易日 2026-08-07」。</p>
+</div>
+
+<h2>四、已验证为正常、非问题的「陈旧」</h2>
+<div class="card">
+<table>
+<tr><th>文件</th><th>内含远期日期</th><th>判定</th></tr>
+<tr><td>ETF_SUBSCRIPTION / MARGIN_DATA / MACRO_DATA</td><td>5月~去年</td><td>时间序列历史值（申赎日序列、两融余额日序列、宏观指标发布日），正常</td></tr>
+<tr><td>STOCK_QUOTE / SH_SZ_HISTORY / LHB_HISTORY</td><td>历史 K 线/历史榜</td><td>行情与历史数据本身，正常</td></tr>
+<tr><td>LHB_7D</td><td>7/28~8/7</td><td>7日滚动窗口，正常</td></tr>
+</table>
+</div>
+
+<h2>五、缺失数据备注（原因）</h2>
+<div class="card">
+<ul>
+<li><b>三重共识 count:0</b>：如实显示「已入仓 0」。原因：周五 8/7 盘后严格三重条件无个股满足，非数据缺失，符合「没有就是没有」。</li>
+<li><b>周末/节假日无新数据</b>：所有 8/8–8/9 时间戳均为最近一次盘后批跑结果（周六重算），符合预期，不构成陈旧蒙混。</li>
+<li><b>驾驶舱建议</b>：信号停留在 7/9，属「未维护」而非「缺失」。已加警示横幅；根本解决需在交易日盘后真正重算，或在卡头明确「历史参考信号」。</li>
+</ul>
+</div>
+
+<h2>六、后续建议</h2>
+<div class="card">
+<ol>
+<li>✅ 已落实问题2：<code>build_time</code> → <code>republish_time</code> 重命名（消除歧义）。</li>
+<li>✅ 已落实问题3：健康检查增加「建议类卡 signal_date / enter_date 偏差」检测项。</li>
+<li>驾驶舱建议应在每个交易日盘后真正重算；若暂无力维护，卡头固定标注「历史参考信号」（当前已加警示横幅 + 健康检查告警）。</li>
+</ol>
+</div>
+
+<p class="note" style="margin-top:30px;">审计脚本与结论均基于 data/*.js 实际内容与 index.html 展示逻辑交叉核对，未引用任何外部/推测数据。问题1 整改 commit：<code>03f5022a</code>；问题2/3 整改 commit 见本次推送。</p>
+</div>
+</body>
+</html>
