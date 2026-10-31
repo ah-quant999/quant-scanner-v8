@@ -188,7 +188,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=5df2a1857f" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=26774deb3d" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=92ef908a1f" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1321,9 +1321,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=873e47ba60" defer></script>
 <script src="data/HB_XIAOJIU.js?v=cdc68c6bc8" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=4f529960a7" defer></script>
-<script src="data/HEALTH_CHECK.js?v=a3b3e16305" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=b2636e08e9" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=34dd2285ff" defer></script>
+<script src="data/HEALTH_CHECK.js?v=20e089d88f" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=c750700212" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=8ca37df38e" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=50c04bc44b" defer></script>
@@ -2024,13 +2024,13 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=cbf73e3f5c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=7d08b32b51" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=aa69bbb53c" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=82cbdbf45c" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=35eeedb3ae" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=9cac1b0611" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=c3ca14a11b" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3160c67897" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=c9dcff9d87" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=44da5697d8" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=7054cf11ac" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=5144841451" defer></script>
@@ -15875,7 +15875,22 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         if(window.setBadge) setBadge('morningPlanFresh','盘前','短线',D.update_time,'观测类 · 工作日 07:50 派发');
         else { var _fr = document.getElementById('morningPlanFresh'); if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16)); }
         card.style.display = 'block';
+        /* 2026-11-01 主人令「这卡重复太多→折叠」：卡体默认折叠只显标题+展开按钮；折叠态切 morningPlanCollapse 的 display，不干扰 body 自愈重渲。 */
+        var _mc = document.getElementById('morningPlanCollapse');
+        if(_mc) _mc.style.display = window.__morningPlanCollapsed ? 'none' : '';
       }catch(e){ console.warn('[renderMorningPlan]', e); }
+    };
+    // 2026-11-01 主人令「这卡重复太多→折叠」：盘前预案默认折叠（收起省空间），按钮可一键展开。
+    //   与今日判定·环境综合同范式（__toggleJudgmentCard）：只切 morningPlanCollapse 的 display，
+    //   不影响 __renderMorningPlan 的 body 自愈重渲；__renderMorningPlan 末尾会按当前折叠态回写 display。
+    window.__morningPlanCollapsed = true;   // 默认折叠（收起）；展开后由此标记翻转
+    window.__toggleMorningPlan = function(){
+      var b = document.getElementById('morningPlanCollapse');
+      var btn = document.getElementById('morningPlanToggleBtn');
+      if(!b || !btn) return;
+      window.__morningPlanCollapsed = !window.__morningPlanCollapsed;
+      b.style.display = window.__morningPlanCollapsed ? 'none' : '';
+      btn.innerHTML = window.__morningPlanCollapsed ? '&#x25B4; 展开' : '&#x25BE; 折叠';
     };
 
     // ═══ 🏛️ 2026-10-21 主人令：「国家队活跃度」复合信号卡（暂未上架·盘前预案之后）═══
@@ -16075,7 +16090,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=82cbdbf45c');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=c3ca14a11b');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -16084,7 +16099,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=35eeedb3ae');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=3160c67897');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -16153,9 +16168,11 @@ h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(-
 h += '<div id="morningPlanCard" style="display:none;margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CB; 盘前预案</span>'
-   + '<span id="morningPlanFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
+   + '<span id="morningPlanFresh" style="display:inline-flex;align-items:center;">&#x2014;</span>'
+   + '<button id="morningPlanToggleBtn" onclick="window.__toggleMorningPlan()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25B4; 展开</button></div>'
+   + '<div id="morningPlanCollapse" style="display:none;">'
    + '<div id="morningPlanBody"><div class="note">加载中&#x2026;</div></div>'
-   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
+   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div></div>';
 // ── L1/L2 市场状态机+仓位引擎 ──
 h += '<div id="marketStateCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
