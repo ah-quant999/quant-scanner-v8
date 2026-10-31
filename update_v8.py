@@ -1555,7 +1555,11 @@ def build(category=None, detect_changes=False):
     #   会让「单文件重建异常」直接把整档位 update_v8 判失败 ⇒ 唯一推送步骤被 skip ⇒
     #   最终推荐(FINAL_RECOMMEND_DATA)等核心产物永不上线（实测 run#41213870566 即因此整档位 failure）。
     #   现改为「只要有文件成功重建即视为批次成功」(updated>0)，单点故障绝不再阻断其余 200+ 产物部署。
-    return 0 if updated > 0 else 1
+    # 2026-11-01 一劳永逸（选股冻结根治·收口）：build 完成且未崩溃即视为成功。
+    # 无文件被重写(updated==0)只发生在 raw 陈旧（如小九单位机离线）时——现有 data/*.js 仍有效，
+    # 应交由下游「结果问责 / HEALTH_CHECK」判定 staleness，绝不可把整档 update_v8 判失败
+    # （否则 set -e 直接掐断唯一推送步骤，FINAL 永不上线，正是 run#41221540099 在 runner 离线时的失败形态）。
+    return 0
 
 
 def _derive_etf_eastmoney(obj):
