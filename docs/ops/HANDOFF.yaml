@@ -10234,3 +10234,41 @@ items:
     verified_at: "2026-10-30 20:21"
     updated: "2026-10-30 20:21"
     updated_by: 家用机AI
+  - id: final-recommend-decom-source-fix-1101
+    owner: 双机共用
+    priority: P0
+    status: done
+    created: 2026-11-01
+    title: 最终推荐算法链审计+修复（摘除四量终极残留无门控接入 / 修复强势跟踪门控）
+    note: >
+      2026-11-01 全面审计最终推荐算法链：根因 = algorithms/final_recommend.py 第3部分残留已下架源
+      「四量终极」(top10_daily) 的无新鲜度门控接入（2026-10-18 主人令整体下架该源但未随之下线该块），
+      致下架后最终推荐仍 100% 来自四量终极、长期一周雷同；同时「强势跟踪」(IMA) 因
+      data_date/update_time==today 整源硬跳过门控，周末/延迟更新时整源 0 命中 → 退化成已下架源单源输出。
+      修复：① 删除第3部分四量终极接入块（60行→6行下架墓碑）；② IMA 门控改为仅 source_stale 判停更；
+      ③ 消除 _alpha_skipped 悬空引用。commit 080057cddb008db5957d2e76bffda8eb9871bae9（force:false，
+      线上回读逐字节一致 md5=3b28b72afe02）。重算已 dispatch v8_algo_cloud.yml run 41252599740。
+    verify_how: >
+      线上 final_recommend.py md5=3b28b72afe026641d8dad5a80878a1c9 与修复版逐字节一致；旧串
+      append("四量终极")=0、新串 source_stale=True=1；FINAL_RECOMMEND_DATA.js 待 run 41252599740
+      完成后核验 top3 来源由四量终极转为强势跟踪/高手共振/动量共识。
+    updated_by: 小九机AI
+    updated: "2026-11-01 08:00"
+
+  - id: handoff-ledger-caliber-resync-1101
+    owner: 小九机AI
+    priority: P1
+    status: done
+    created: 2026-11-01
+    title: 交接 ledger 哈希口径收口（用仓库唯一口径 scripts/handoff_ledger_hash.py 重算）
+    note: >
+      2026-11-01 定位 HANDOFF.ledger.json 哈希'脱钩'根因：用户级 v8_handoff_edit_kit.calibrate_ledger
+      用错口径（缺 _strip_tail_block），与仓库 scripts/handoff_ledger_hash.py（唯一口径实现，含块尾空行/#注释剔除）
+      不一致，属工具口径误报，非 ledger 真损坏；且 [13/13] 门禁不校验哈希，不影响部署。
+      本提交用仓库唯一口径全量重算 ledger（含 final-recommend-decom-source-fix-1101 新项），
+      与 [13/13] 门禁判据（ids 超集 / next_id_seq 单调 / 漏收检测）完全兼容。
+    verify_how: >
+      重算后 ledger.id_content_hashes 与仓库口径 sha256[:16] 100% 命中；ledger.ids == HANDOFF.yaml ids；
+      meta.next_id_seq 不变（单调不减）；[13/13] check_handoff_ledger 三项判据全部通过。
+    updated_by: 小九机AI
+    updated: "2026-11-01 08:00"
