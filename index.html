@@ -7877,6 +7877,7 @@ c.innerHTML = h;
   // 边界：纯前端交叉现有数据，无新增管线、不进选股评分、不构成投资建议。
   window.__tvRetry = 0;
   window.__tvTheme = 'ai_pharma';
+  window.__tvAuto = true;   // 2026-11-01 主人令「死卡」根治：默认跟随当日资金热度第一主题；手动点 chip 后由 __tvSetTheme 置 false 锁定
   // 🔴 2026-09-13 主人令（主人第三次重申「这个主题是会变动的吧，不能写死啊」）：
   //   主题清单由「写死 7 个」改为「种子 + 自动追加」双轨，全集在每次渲染时按当日资金榜重建。
   //   · 种子（__TV_SEED_THEMES）= 7 个长期主题，提供稳定的分组语义（人工知识，无法从行情数据自动得出）；
@@ -7899,6 +7900,7 @@ c.innerHTML = h;
   window.__TV_DYN_KEYS = [];                     // 当日自动追加主题 key（渲染时填充）
   window.__tvSetTheme = function(k){
     window.__tvTheme = k;
+    window.__tvAuto = false; // 用户手动选主题 ⇒ 锁定，不再被热度自动覆盖
     window.__tvRetry = 0; // 重置：若数据未就绪允许重新走重试
     window.__renderThemeValue();
   };
@@ -7978,6 +7980,16 @@ c.innerHTML = h;
         if(n2 > leadNet){ leadNet = n2; lead = ss[i2]; }
       }
       themeStat[tk] = { net: net, nSec: ss.length, avg: ss.length ? chgSum/ss.length : 0, lead: lead, leadNet: leadNet };
+    }
+    // 🔴 2026-11-01 主人令「死卡」根治：默认选中主题不再写死 创新药，改为「当日资金热度第一的概念主题」自动选取
+    //   → 卡一打开即显示今日最热概念板块及其三项齐股票，股票列表随行情每天轮换（呼应 09-13「主题不能写死」诉求）。
+    //   用户手动点 chip 后 __tvAuto=false，锁定其选择、不再被热度覆盖。
+    if(window.__tvAuto){
+      var _bestTk = null, _bestNet = -1e18;
+      for(var _tk2 in themeStat){
+        if(themeStat[_tk2] && themeStat[_tk2].net > _bestNet){ _bestNet = themeStat[_tk2].net; _bestTk = _tk2; }
+      }
+      if(_bestTk) window.__tvTheme = _bestTk;
     }
     var _numColor = function(v){ return v > 0 ? '#f87171' : (v < 0 ? '#4ade80' : 'var(--dim)'); };  // 红涨绿跌
     var _sign = function(v, d){ return (v > 0 ? '+' : '') + Number(v).toFixed(d == null ? 1 : d); };
@@ -16166,10 +16178,11 @@ h += '<div style="padding:0 0 8px;"><button id="judgmentToggleBtn" onclick="wind
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px;"></div>';
 // ── 盘前预案 ──
 h += '<div id="morningPlanCard" style="display:none;margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CB; 盘前预案</span>'
    + '<span id="morningPlanFresh" style="display:inline-flex;align-items:center;">&#x2014;</span>'
-   + '<button id="morningPlanToggleBtn" onclick="window.__toggleMorningPlan()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25B4; 展开</button></div>'
+   + '</div>'
+   + '<div style="padding:0 0 8px;"><button id="morningPlanToggleBtn" onclick="window.__toggleMorningPlan()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25B4; 展开</button></div>'
    + '<div id="morningPlanCollapse" style="display:none;">'
    + '<div id="morningPlanBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div></div>';
