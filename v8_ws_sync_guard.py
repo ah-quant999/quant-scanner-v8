@@ -274,14 +274,42 @@ def main():
     # 复检
     still = []
     for rel in mism:
-        rb = _blob_of(ref, rel, repo)
-        wb = _worktree_blob(rel, repo)
-        if rb != wb:
+        if _blob_of(ref, rel, repo) != _worktree_blob(rel, repo):
             still.append(rel)
-    if still:
-        print(f"  🔴 拉齐后仍不一致 {len(still)} 个：{still} → exit 1")
+    if not still:
+        print(f"[ws-guard] ✅ 已拉齐 {len(mism)} 个文件；原文件备份在 {bak}")
+        return 0
+
+    # 🔴 2026-11-01 一劳永逸增强（九宝令）：个别文件（实测 .github/scripts/v8_stage_gate.py）
+    #   经普通 `git checkout` 后仍判定不一致 —— 根因多为 junction / 文件锁 / stat-cache 让
+    #   git「误以为已一致」而跳过重写。治法：先删后 `checkout -f`，强制从 blob 重素材化。
+    for rel in list(still):
+        wp = os.path.join(repo, rel.replace("/", os.sep))
+        try:
+            if os.path.islink(wp) or os.path.exists(wp):
+                os.remove(wp)
+        except OSError as _e:
+            print(f"    ⚠️ 删除 {rel} 失败（{_e}），改试强制 checkout")
+        _run(["git", "-C", repo, "checkout", "-f", ref, "--", rel])
+        _run(["git", "-C", repo, "reset", "-q", "HEAD", "--", rel])
+        if _blob_of(ref, rel, repo) == _worktree_blob(rel, repo):
+            still.remove(rel)
+            print(f"    ✅ 强制重素材化成功 {rel}")
+    if not still:
+        print(f"[ws-guard] ✅ 已拉齐 {len(mism)} 个文件（含强制重素材化）；原文件备份在 {bak}")
+        return 0
+
+    # 🔴 终救：逐项修复仍拉不齐 → 整仓 `git reset --hard <ref>`（**不带 clean**，
+    #   仅重置受跟踪文件，绝不碰 raw_data/kline_cache 等未跟踪/忽略产物），确保跑批不卡死。
+    #   不一致文件已在上文备份到仓库外，故此处硬重置安全。
+    print(f"  🔴 逐项拉齐仍有 {len(still)} 个不齐：{still} → 整仓 git reset --hard {ref}")
+    _run(["git", "-C", repo, "reset", "--hard", ref])
+    still2 = [r for r in mism
+              if _blob_of(ref, r, repo) != _worktree_blob(r, repo)]
+    if still2:
+        print(f"  🔴 硬重置后仍不一致 {still2} → exit 1")
         return 1
-    print(f"[ws-guard] ✅ 已拉齐 {len(mism)} 个文件；原文件备份在 {bak}")
+    print(f"[ws-guard] ✅ 硬重置后整仓一致；原不一致文件备份在 {bak}")
     return 0
 
 
