@@ -51,7 +51,7 @@ LEGACY_ENTRY = ENTRY_MODE == "close"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_ALGO = BASE_DIR   # 仓库部署时与原版一致：相对脚本自身目录
 DEFAULT_HIST = os.path.join(DEFAULT_ALGO, "..", "raw_data", "history")
-DEFAULT_KLINE = os.path.join(DEFAULT_ALGO, "_opt_kline_cache")
+DEFAULT_KLINE = os.path.join(DEFAULT_ALGO, "..", "raw_data", "kline_cache")  # 🔴 2026-11-01 根因修复：原指向 algorithms/_opt_kline_cache（空目录/从未建立）→ load_kline_local 三路回退全落空 → get_kline 回退 baostock（云端 V8_NO_NET 禁网必败）→ with_kline=0 → 所有因子 excess=0 → signal_edge 全0（科学加权失效）。云端设计（v8_algo_cloud.yml:165）本就只读 raw_data/kline_cache（已入仓 5451 文件，纯6位命名如 000001.json）。
 OUT_PATH = os.path.join(DEFAULT_ALGO, "..", "raw_data", "backtest_expectancy.json")
 VALID_CODES_PATH = os.path.join(DEFAULT_ALGO, "_valid_codes.json")   # 有效A股参考集（缺失时 baostock 自动生成）
 
