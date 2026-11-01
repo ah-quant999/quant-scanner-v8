@@ -169,11 +169,19 @@ def main():
         # 🔴 2026-10-23 晚主人令·终态：收益率(均益 avg)为第一驱动，胜率仅作微小质量修正。
         #   主人原话"我只要收益率最高的股票能选出来就行"——故均益权重抬到 5.0/3.0，
         #   胜率腿从 0.5 压到 0.3/0.2（≈20:1），使"历史信号后平均涨得最多"的票真正排前。
+        # 🔴 2026-11-01 根因修复（九宝令）：小样本过拟合折扣。
+        # 原 winrate_score 由 avg_shrunk×5.0 主导，而 avg_shrunk=avg×n/(n+10) 对 n=1~4 收缩过弱，
+        # 致 1~4 个极端暴涨窗口（均益 +40~55%）被吹成 +50~96 分霸榜，真实稳健票（n≥11、均益仅 +7%）
+        # 被压到 #11+ —— 这是"永远卡同一批幸运股"的真凶。
+        # 修复：按【各周期已实现回测样本数】给可信度折扣，n≥12 才满权；
+        # n=1~5 大幅收缩（0.15 下限，与现有 signal_confidence 0.5 下限同源但更陡，因均值噪声远大于边权）。
+        def _wr_conf(n):
+            return max(0.15, min(1.0, (n or 0) / 12.0))
         score = 0.0
         if s5:
-            score += s5["avg_shrunk"] * 5.0 + (s5["win_shrunk"] - 50.0) * 0.3
+            score += (s5["avg_shrunk"] * 5.0 + (s5["win_shrunk"] - 50.0) * 0.3) * _wr_conf(s5["n"])
         if s10:
-            score += s10["avg_shrunk"] * 3.0 + (s10["win_shrunk"] - 50.0) * 0.2
+            score += (s10["avg_shrunk"] * 3.0 + (s10["win_shrunk"] - 50.0) * 0.2) * _wr_conf(s10["n"])
         rec["winrate_score"] = round(score, 2)
         stocks.append(rec)
 
@@ -187,7 +195,7 @@ def main():
             "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
             "cost_pct_roundtrip": COST_PCT,
             "shrinkage_k": SHRINK_K,
-            "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w]，h∈{5:(5.0,0.3), 10:(3.0,0.2)}；均益主导、胜率仅微修正",
+            "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w] × conf(n_h)；h∈{5:(5.0,0.3),10:(3.0,0.2)}；conf(n)=max(0.15,min(1,n/12)) 小样本可信度折扣（2026-11-01 根因修复：防 1~4 样本极端均值霸榜）",
             "n_signals": len(occ),
             "n_stocks": len(stocks),
             "signal_date_range": [min(o["signal_date"] for o in occ), max(o["signal_date"] for o in occ)] if occ else [],
