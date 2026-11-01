@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-10-29 22:20",
+ "update_time": "2026-11-01 08:35",
  "legend": [
   {
    "title": "重要政策",
@@ -197,7 +197,7 @@
       {
        "text": "富时A50交割日",
        "cls": "a50",
-       "released": false
+       "released": true
       }
      ]
     },
@@ -209,7 +209,7 @@
       {
        "text": "🇨🇳 官方制造业PMI",
        "cls": "data",
-       "released": false
+       "released": true
       }
      ]
     },
