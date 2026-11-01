@@ -1,15 +1,21 @@
 {
-  "check_time": "2026-10-31 00:01:42",
+  "check_time": "2026-11-01 08:52:56",
   "last_trade_close": "2026-10-30 15:30:00",
   "is_trading_day": false,
   "core_stale": [],
-  "warn_stale": [],
+  "warn_stale": [
+    {
+      "var": "HUIJIN_HOLDINGS",
+      "reason": "文件缺失",
+      "category": "post_close"
+    }
+  ],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 39,
     "core_stale": 0,
-    "warn_stale": 0,
+    "warn_stale": 1,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
