@@ -10272,3 +10272,21 @@ items:
       meta.next_id_seq 不变（单调不减）；[13/13] check_handoff_ledger 三项判据全部通过。
     updated_by: 小九机AI
     updated: "2026-11-01 08:00"
+  - id: final-recommend-top3-redline-1101
+    owner: 双机共用
+    priority: P0
+    status: done
+    created: 2026-11-01
+    title: 最终推荐 top3 稳定性红线（铁律化）+ 重算验证通过
+    note: >
+      2026-11-01 主人令：最终推荐 top3 连续 3 个交易日（日历≥3天）完全不变⇒立即自查算法链，
+      写入 AGENTS.md 一屏速查第 8 条；并建每日自动监控 automation v8-top3-stability-watch。
+      同日 final_recommend.py 修复（摘除四量终极残留无门控接入 / 修复强势跟踪门控，commit 080057c）
+      经 run 41252599740 重算验证：FINAL_RECOMMEND_DATA.js 四量终极出现0次、强势跟踪24/高手共振9/
+      动量共识6/缩量强势2；top3=上海沪工(动量共识+强势跟踪)/光洋股份(强势跟踪)/西部材料(强势跟踪)，
+      根因（已下架源垄断致一周雷同）确认根除。
+    verify_how: >
+      线上 FINAL_RECOMMEND_DATA.js consensus_stocks top3 来源均含强势跟踪/动量共识、四量终极=0；
+      AGENTS.md 含「top3 稳定性红线」第 8 条；automation v8-top3-stability-watch 已 ACTIVE。
+    updated_by: 小九机AI
+    updated: "2026-11-01 09:40"
