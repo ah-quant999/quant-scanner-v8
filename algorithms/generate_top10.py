@@ -193,12 +193,15 @@ WINRATE_DEMOTE_MIN_N = 3
 WINRATE_DEMOTE_RAW = 10.0
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🔴 2026-11-02 主人令·收益率提升核心因子：动量 / RPS（相对强度）
-#   回测证据(backtest_all_algos 因子实验室「L1 最强分位」)：动量因子 T+20 +3.2% / T+90 +12% /
-#   T+180 +26% / T+250 +46%，是当前真实能提升收益率的因子；而原 expected_return_term 在 HC 高信念
-#   子集内(sig_tuple 全员=1,1,*,*)返回同值、不分高下 ⇒ 新增本 RPS 项作为 HC 子集内的【主导区分项】，
-#   让「金钻+缠论」共振票里动量最强的真正排到前排。
-#   口径：个股 60/120 日区间收益率 → 候选池内横截面分位(0~1) → 合成 RPS；同源复用 _p5_percentile / _load_kline_full。
+# 🔴 2026-11-02 主人令·收益率提升核心因子：动量 / RPS（相对强度）【科学等级 S 级】
+#   逻辑：动量/相对强度异象（Jegadeesh-Titman 学术证实），有经济/统计逻辑 → S 级主区分项。
+#   回测佐证(backtest_all_algos 因子实验室「L1 最强分位」)：动量因子 T+20 +3.2% / T+90 +12% /
+#   T+180 +26% / T+250 +46%（**仅作存在性佐证，不作为权重依据的 in-sample 数字**）；
+#   原 expected_return_term 在 HC 高信念子集内(sig_tuple 全员=1,1,*,*)返回同值、不分高下
+#   ⇒ 本 RPS 项作为 HC 子集内的【主导区分项】，让「金钻+缠论」共振票里动量最强的真正排到前排。
+#   口径：个股 60/120 日区间收益率（**当下价格数据，非回测拟合参数**）→ 候选池内横截面分位(0~1) → 合成 RPS；
+#   同源复用 _p5_percentile / _load_kline_full。
+#   ⚠️ 权重依据 = 动量异象学术证据 + 样本外 IC；🚫 禁止取自 in-sample 回测收益数字（防 data snooping）。
 #   回退：V8_RPS=0 关闭（仅保留 expected_return_term 跨组合区分）。
 RPS_TERM_MAX = 55.0
 
@@ -551,11 +554,13 @@ except Exception:
 #   原 winrate_term(±55) 是错误目标——高胜率≠高收益。实证（raw_data/backtest_expectancy.json）：
 #   combo '1,1,0,0'(禅+金钻共振) win5=38.6% 但 ret5=-2.67% / ret10=+1.05%（短空长多），
 #   且 2026-06~11 偏空窗口下全 16 组合前瞻收益均为负 → 选「收益率最高」=选「前瞻收益相对最好」的票。
-#   现以 by_signal 的 ret5/ret10 前瞻收益混合为中心化主项（±EXP_RET_TERM_MAX），
-#   让预期前瞻收益最高的票真正排到前排；winrate 降级为置信微调（见 WR_CONF_WEIGHT）。
+#   🔴 2026-11-02 科学定级（IRON_RULE_SCIENTIFIC_SELECTION）：本项基于 **in-sample 回测** ret5/ret10，
+#   且 HC 高信念模式下所有票 sig_tuple 同值 → 返回同值、完全不分高下（失效）→ 定 **A 级降级项**，
+#   权重 ±55→±15，仅作跨组合辅助区分（非 HC 模式下有微弱区分力），不再承担主排序。
+#   主排序交由 RPS 动量项（S 级，用当下价格数据，非回测拟合参数）。
 EXP_RET_BLEND_W5 = 0.5
 EXP_RET_BLEND_W10 = 0.5
-EXP_RET_TERM_MAX = 55.0
+EXP_RET_TERM_MAX = 15.0
 
 def _exp_ret_raw(chan, jinzuan, jigou, trend):
     """个股四信号组合 → 前瞻收益混合 raw(%)：0.5*ret5 + 0.5*ret10（by_signal）。缺失→0。"""
