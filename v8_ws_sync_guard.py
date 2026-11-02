@@ -29,7 +29,7 @@
 ■ 用法
   python v8_ws_sync_guard.py            # 只检查，不一致则 exit 1（不改工作区）
   python v8_ws_sync_guard.py --heal     # 检查 + 备份 + 拉齐 + 复检（推荐给跑批入口用）
-  python v8_ws_sync_guard.py --ref <sha>  # 指定目标 ref（默认 origin/main，退回 FETCH_HEAD）
+  python v8_ws_sync_guard.py --ref <sha>  # 指定目标 ref（默认 HEAD，退回 origin/main/FETCH_HEAD）
 
 ■ 说明
   · `V8_SKIP_WS_GUARD=1` 可整体跳过（逃生舱；正常情况不要设）。
@@ -132,7 +132,28 @@ def _worktree_blob(rel, repo):
 
 
 def pick_ref(repo):
-    """优先拉远端；拉不到就退回本地已有的 origin/main，最后退回 FETCH_HEAD。"""
+    """🔴 2026-11-03 一劳永逸根治：比对基准必须是「本次检出的 HEAD」，而非 live origin/main。
+
+    ■ 根因（11-03 实证复现）：盘后算法链跑批耗时数分钟~数十分钟，期间他人（alimi / 云构建）
+      频繁往 origin/main 推提交；若以 **实时** origin/main 为基准，origin/main 一旦前进 →
+      守卫误判工作区「落后」→ 治愈 `git checkout origin/main -- <文件>` 又常因 self-hosted
+      runner 本地 clone 对象缺失而失败 → 中止 `update_v8` ⇒ 算法链算好的 raw_data 落不了地
+      ⇒ 全站核心数据（FINAL_RECOMMEND / 汇金等）集体陈旧，且 self-hosted runner 在 GitHub 侧
+      连续失败计数被反复累加（11-03 审计：self-hosted 连续失败 15 次）。
+
+    ■ 正确语义：本次跑批**本就执行 HEAD 这份代码**；工作区与 HEAD 一致即放行。
+      「工作区落后于 origin/main」是并发协作的预期常态（别人先推了），绝不该触发 fail-closed。
+      这样既保留原意图（在 坚果云同步导致工作区与已提交代码不一致时仍能检出并治愈），
+      又彻底消除并发推送竞态导致的误杀。
+
+    ■ 兜底：HEAD 取不到再退回 origin/main / FETCH_HEAD（保留原语义）。
+    """
+    rc, out, _ = _run(["git", "-C", repo, "rev-parse", "HEAD"])
+    if rc == 0:
+        sha = out.decode().strip()
+        print(f"  [ref] 目标 = HEAD ({sha[:10]})（比对基准=本次检出提交，"
+              f"不追 live origin/main，杜绝并发推送竞态误杀）")
+        return "HEAD"
     rc, _, err = _run(["git", "-C", repo, "fetch", "origin", "main", "-q"])
     if rc == 0:
         print("  [ref] fetch origin main 成功")
