@@ -275,6 +275,12 @@ CARD_DEFS = [
     #   （09-20 判定全链退役，实测 index.html / logic.html 的 <script src> 引用 = 0/0，
     #    但产物仍在远端 data/，且被同一次回推提交 8bc8275fdc 复活）⇒ 本批一并删除并登记同上两处护栏。
     {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
+    # 🛡 2026-11-02 一劳永逸（九宝令·修复诊断面板三文件永久 fail）：
+    #   TOP10_DAILY / INDEX_VALUE_FRAMEWORK / DAIJIN_REDUCTION 此前**全部缺 heal_cat**
+    #   ⇒ 陈旧时自愈链无从派发 ⇒ 永久 fail 红灯。现按真实生产者补 heal_cat：
+    #   · TOP10_DAILY        → algo_run（盘后算法链·云端 ubuntu，含 generate_top10）
+    #   · INDEX_VALUE_FRAMEWORK → experiments（v8_cn_fetch_experiments.yml·ubuntu-latest，独立 workflow）
+    #   · DAJIN_REDUCTION    → dajijin（v8_dajijin_fetch.yml·cn 自托管，独立 workflow；cn 离线跳过、恢复后自愈补跑）
     # 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
     #   最终推荐 Top3 信号层真实回测卡（data/FINAL_RECOMMEND_BACKTEST.js）。
     #   与 FINAL_RECOMMEND_DATA 同批产出（final_recommend.py 末尾调用
@@ -341,13 +347,13 @@ CARD_DEFS = [
     {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
     {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
     {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
-    {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "每日盘前1次(算法链)", "max_age": 1440, "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
+    {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "每日盘前1次(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
     {"id": "maharo_insights", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
-    {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
+    {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "heal_cat": "experiments", "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
-    {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "key_fields": ["update_time"], "cycle": (3, 30)},
+    {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "heal_cat": "dajijin", "key_fields": ["update_time"], "cycle": (3, 30)},
     # 🛡 2026-10-27 一劳永逸（CN runner1号机·all-generic-redline 家族）：以下 4 个「前端活跃卡消费、
     #   却未登记 CARD_DEFS」的产物，此前掉进 check_all_data_files 通用 1620 红线被误判 fail。
     #   逐条补齐登记，按真实节拍给 max_age=1440（盘后产物 24h 红线），保留真故障监控（生产者真漏刷仍 fail 触发自愈）。
@@ -787,6 +793,13 @@ def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
 CN_WORKFLOW_ID = 327687211        # v8_cn_fetch_cloud workflow id（云端 ubuntu 主力，用于 API 派发刷新）
 BUILD_DEPLOY_WORKFLOW_ID = 324135263  # ☁️ v8 构建部署(云端ubuntu) workflow id
 ALGO_RUN_WORKFLOW_ID = 324119592      # ☁️ v8 盘后算法链(云端) workflow id（重新产出 FINAL_RECOMMEND 等）
+# 🆕 2026-11-02 一劳永逸（九宝令·修复诊断面板三文件永久 fail）：
+#   TOP10_DAILY / INDEX_VALUE_FRAMEWORK / DAIJIN_REDUCTION 由**各自独立的** workflow 产出，
+#   不在主链 cn_fetch / 算法链派发覆盖内。此前 CARD_DEFS 漏配 heal_cat ⇒ 陈旧时自愈链
+#   无从派发 ⇒ 永久 fail 红灯。现新增直达这俩独立 workflow 的派发函数；
+#   GitHub Dispatch API 的 workflow_id 支持直接传文件名（无需数字 ID）。
+EXPERIMENTS_WORKFLOW = "v8_cn_fetch_experiments.yml"   # 🧪 实验卡(ubuntu-latest)：产出 INDEX_VALUE_FRAMEWORK/VALUATION_PERCENTILE/FACTOR_AUDIT
+DAIJIN_WORKFLOW = "v8_dajijin_fetch.yml"                # 🚨 大基金增减持(cn 自托管)：产出 DAIJIN_REDUCTION
 HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
 # 2026-08-11 漏洞 #1：自愈单次最多派发 N 个 workflow，防 runner 打爆/事件风暴
@@ -1064,6 +1077,82 @@ def _dispatch_build_deploy():
         return False, f"派发异常: {e}", False
 
 
+def _dispatch_experiments():
+    """经 GitHub API 派发 v8_cn_fetch_experiments（实验卡·云端 ubuntu-latest），
+    重新产出 INDEX_VALUE_FRAMEWORK / VALUATION_PERCENTILE / FACTOR_AUDIT 等。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    🛡 2026-11-02 一劳永逸（九宝令）：INDEX_VALUE_FRAMEWORK 此前无 heal_cat ⇒ 陈旧永久 fail。
+       该卡由**独立** experiments workflow 产出（不在主链 cn_fetch post_close 覆盖内），
+       故新增直达派发（GitHub Dispatch API 支持以文件名 v8_cn_fetch_experiments.yml 作标识）。
+    🛡 窗口收窄：实验卡天然 16:30 盘后产出，自愈仅 16:00-20:30 放行（与 post_close 同窗口，防风暴）。
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    # 🛡 窗口收窄：仅 16:00-20:30 允许（与 post_close HEAL 窗口一致，防非交易时段无意义重跑）
+    _cst = now_cst()
+    _cst_min = _cst.hour * 60 + _cst.minute
+    if not (16 * 60 <= _cst_min <= 20 * 60 + 30):
+        return True, (f"当前 {_cst.strftime('%H:%M')} 非盘后产出窗口(16:00-20:30)，"
+                      "跳过 experiments 派发"), False
+    pending, since = _has_pending_run(EXPERIMENTS_WORKFLOW, headers)
+    if pending:
+        return True, (f"已有排队中的 experiments 运行(created {since})，"
+                      f"跳过派发（避免顶掉该 pending run）"), False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{EXPERIMENTS_WORKFLOW}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 experiments(实验卡) (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+    except Exception as e:
+        return False, f"派发异常: {e}", False
+
+
+def _dispatch_dajijin():
+    """经 GitHub API 派发 v8_dajijin_fetch（大基金增减持·cn 自托管），刷新 DAIJIN_REDUCTION。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    🛡 2026-11-02 一劳永逸（九宝令）：DAIJIN_REDUCTION 此前无 heal_cat ⇒ 陈旧永久 fail。
+       该卡由**独立** dajijin workflow（cn 自托管 runner）产出，不在主链派发覆盖内。
+    🛡 cn runner 离线则跳过（防派发风暴，留到 runner 恢复）；cn 恢复后自愈**立即补跑**，
+       无需干等次日 20:30 cron —— 根治「cn 离线数日 → 大基金卡永久陈旧红灯」类故障。
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    online, names = _cn_runner_available()
+    if not online:
+        return True, "cn 自托管 runner 全部离线，跳过 dajijin 派发（恢复后自愈自动补跑）", False
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    pending, since = _has_pending_run(DAIJIN_WORKFLOW, headers)
+    if pending:
+        return True, (f"已有排队中的 dajijin 运行(created {since})，"
+                      f"跳过派发（避免顶掉该 pending run）"), False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{DAIJIN_WORKFLOW}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 dajijin(大基金增减持·cn) (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+    except Exception as e:
+        return False, f"派发异常: {e}", False
+
+
 def _heal_local_sync(pull_raw_data_only=False):
     """尝试让本地 HEAD 与 origin/main 对齐（fetch + ff-only，必要时 stash）。
 
@@ -1335,6 +1424,12 @@ def self_heal(report):
             # 避免 18:00 前空转 45min（选股脚本全被时间闸跳过）。
             _picking = bool(items) and all(it.get("picking") for it in items)
             ok, dmsg, dispatched = _dispatch_algo_run(picking_only=_picking)
+        elif cat == "experiments":
+            # 🆕 2026-11-02 一劳永逸（九宝令）：直达实验卡独立 workflow（ubuntu-latest）
+            ok, dmsg, dispatched = _dispatch_experiments()
+        elif cat == "dajijin":
+            # 🆕 2026-11-02 一劳永逸（九宝令）：直达大基金增减持独立 workflow（cn 自托管，含在线守卫）
+            ok, dmsg, dispatched = _dispatch_dajijin()
         else:
             ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
         if ok:
