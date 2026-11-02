@@ -205,6 +205,100 @@ WINRATE_DEMOTE_RAW = 10.0
 #   回退：V8_RPS=0 关闭（仅保留 expected_return_term 跨组合区分）。
 RPS_TERM_MAX = 55.0
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-11-02 因子样本外验证 gate（铁律 IRON_RULE_SCIENTIFIC_SELECTION W2 自动执行）
+#   启动时读 raw_data/factor_walkforward.json（algorithms/factor_walkforward.py 的 walk-forward OOS 证据：
+#   调仓点前 60% IS / 后 40% OOS 切分，OOS 绝不参与选向），对每个启用的科学因子按
+#   OOS IR / PSR / IC 衰减做分级，动态定权重：
+#     S 级(ir_oos>0.3 且 psr_oos≥0.95 且 IC 不衰减) → 允许主权重(常量原值)
+#     A 级(有证据但边缘/watch)                     → 降级 ≤ ±15
+#     B 级(FAIL / ir_oos≤0 / IC 衰减 suggest=downgrade / 无证据) → 禁入(0)
+#   铁律 W2：因子若无 OOS 证据默认关闭；有则按 IR/PSR 分级；IC 连续衰减自动降级。
+#   回退：V8_OOS_GATE=0 关闭整道 gate（权重回退常量写死值，仅应急回滚）。
+# ─────────────────────────────────────────────────────────────────────────────
+FACTOR_OOS_GATE_ON = os.environ.get("V8_OOS_GATE", "1") != "0"
+_FACTOR_WF_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "raw_data", "factor_walkforward.json")
+
+# 评分项 → walk-forward 因子 key 家族映射（科学因子对应）
+#   RPS 动量项(60/120 日区间收益横截面分位) 属动量家族：取家族里最严等级（从严）
+_TERM_OOS_KEYS = {
+    "rps": ["mom12_1", "resid_mom", "vamom"],   # 动量家族（12月动量 / 残差动量 / 量价动量）
+    # exp_ret 项来自 in-sample backtest_expectancy，铁律已定 A 级 ±15（不依赖 OOS gate）
+}
+
+# 动态权重容器（main 启动时由 factor_oos_gate() 填充；评分循环读此而非写死常量）
+_RPS_TERM_MAX_DYN = RPS_TERM_MAX
+_EXP_RET_TERM_MAX_DYN = EXP_RET_TERM_MAX
+_OOS_GATE_REPORT = {}
+
+
+def _load_factor_oos():
+    """读 walk-forward OOS 证据；返回 {key: {verdict,ir_oos,psr_oos,ic_suggest}}；失败返回 {}。"""
+    if not FACTOR_OOS_GATE_ON:
+        return {}
+    try:
+        with open(_FACTOR_WF_JSON, encoding="utf-8") as _f:
+            _d = json.load(_f)
+        _fs = (_d.get("factors") or {})
+        _out = {}
+        for _k, _v in _fs.items():
+            if not isinstance(_v, dict):
+                continue
+            _ic = _v.get("ic_st") or {}
+            _out[_k] = {
+                "verdict": _v.get("verdict"),
+                "ir_oos": _v.get("ir_oos"),
+                "psr_oos": _v.get("psr_oos"),
+                "ic_suggest": (_ic.get("suggest") if isinstance(_ic, dict) else None),
+            }
+        return _out
+    except Exception:
+        return {}
+
+
+def _oos_grade(ev):
+    """对单因子证据定级 S/A/B；ev=None → B(无证据默认关闭)。"""
+    if not ev:
+        return "B", "无 OOS 证据(默认关闭)"
+    _ir, _psr, _verd, _ics = ev["ir_oos"], ev["psr_oos"], ev["verdict"], ev["ic_suggest"]
+    if (_ir is not None and _ir > 0.3) and (_psr is not None and _psr >= 0.95) \
+            and _ics != "downgrade" and _verd != "FAIL":
+        return "S", "OOS IR>0.3 & PSR≥0.95 & IC 不衰减"
+    if _verd == "FAIL" or (_ir is not None and _ir <= 0) or _ics == "downgrade":
+        return "B", "OOS FAIL / ir_oos≤0 / IC 衰减 ⇒ 自动禁入"
+    return "A", "有证据但边缘(降级≤±15)"
+
+
+def factor_oos_gate():
+    """启动时对所有科学因子做 OOS 分级，写入动态权重容器。返回报告 dict。
+
+    铁律 W2 自动执行：无证据默认关闭；按 IR/PSR 分级；IC 衰减自动降级。
+    """
+    global _RPS_TERM_MAX_DYN, _EXP_RET_TERM_MAX_DYN, _OOS_GATE_REPORT
+    _oos = _load_factor_oos()
+    _rep = {}
+    # RPS 动量项：取动量家族里最严等级（从严）
+    _rk = _TERM_OOS_KEYS.get("rps", [])
+    _grade, _reason = "B", "无 OOS 证据(默认关闭)"
+    if _rk:
+        _gmap = {"S": 3, "A": 2, "B": 1}
+        _worst = None
+        for _k in _rk:
+            _g, _r = _oos_grade(_oos.get(_k))
+            if _worst is None or _gmap[_g] < _gmap[_worst[0]]:
+                _worst = (_g, "动量因子 %s: %s" % (_k, _r))
+        if _worst:
+            _grade, _reason = _worst
+    _rps_w = {"S": RPS_TERM_MAX, "A": 15.0, "B": 0.0}[_grade]
+    _rep["rps"] = (_grade, _rps_w, _reason)
+    # exp_ret 项：铁律已定 A 级 ±15（不依赖 OOS gate，仅记录）
+    _rep["exp_ret"] = ("A", EXP_RET_TERM_MAX, "铁律定级 A 级(±15, in-sample 来源)")
+    _RPS_TERM_MAX_DYN = _rps_w
+    _EXP_RET_TERM_MAX_DYN = _rep["exp_ret"][1]
+    _OOS_GATE_REPORT = _rep
+    return _rep
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-10-01 质量分时效/活跃度衰减辅助函数（根治「总这几只」）
@@ -585,8 +679,8 @@ def expected_return_term(chan, jinzuan, jigou, trend):
     if _EXP_RET_MAX == _EXP_RET_MIN:
         return 0.0
     _raw = _exp_ret_raw(chan, jinzuan, jigou, trend)
-    return max(-EXP_RET_TERM_MAX, min(EXP_RET_TERM_MAX,
-        (_raw - _EXP_RET_MIN) / (_EXP_RET_MAX - _EXP_RET_MIN) * 2.0 * EXP_RET_TERM_MAX - EXP_RET_TERM_MAX))
+    return max(-_EXP_RET_TERM_MAX_DYN, min(_EXP_RET_TERM_MAX_DYN,
+        (_raw - _EXP_RET_MIN) / (_EXP_RET_MAX - _EXP_RET_MIN) * 2.0 * _EXP_RET_TERM_MAX_DYN - _EXP_RET_TERM_MAX_DYN))
 
 def bt_excess5_for(chan, jinzuan, jigou, trend):
     """给定四信号布尔 (chan, jinzuan, jigou, trend) → walk-forward **T+5 收益**(%)；
@@ -1715,6 +1809,11 @@ def main():
     _env_rps = os.environ.get("V8_RPS", "1").strip() != "0"
     _rps_map = _rps_prepass(_p5_codes) if _env_rps else {}
     print(f"  🚀 RPS 动量因子：{'启用' if _env_rps else '关闭(V8_RPS=0)'} · 覆盖 {len(_rps_map)}/{len(_p5_codes)} 只")
+    # 🔴 2026-11-02 因子样本外验证 gate（铁律 W2 自动执行）：启动即校验各科学因子 OOS 证据并动态定权重
+    _gate_rep = factor_oos_gate()
+    print(f"  🔬 因子样本外验证 gate（铁律 W2）：{'开' if FACTOR_OOS_GATE_ON else '关(V8_OOS_GATE=0)'}")
+    for _term, (_g, _w, _r) in _gate_rep.items():
+        print(f"     · {_term:8s} 等级={_g} 动态权重=±{_w:.1f}  ({_r})")
     for _k5 in P5_FALLBACK:
         _m5 = P5_META.get(_k5) or {}
         if P5_ON.get(_k5):
@@ -2166,7 +2265,7 @@ def main():
         #   回测证明动量因子 T+90 +12% / T+250 +46% 是当前能提升收益率的因子；
         #   原 expected_return_term 在 HC 子集(sig_tuple 全员 1,1,*,* 同值)内失效 → 本项补位作主区分。
         _rps_pct = (_RPS_PCT.get(raw_code) or {}).get("rps", 0.5)
-        rps_term = (_rps_pct - 0.5) * 2.0 * RPS_TERM_MAX
+        rps_term = (_rps_pct - 0.5) * 2.0 * _RPS_TERM_MAX_DYN
         _raw_noform += rps_term
         raw_total += rps_term
         # T+5 胜率（用于前端展示；改动15 从 win10 改 win5 —— T+10 胜率同样被 β 撑高：
@@ -2241,6 +2340,8 @@ def main():
                 "backtest": score_backtest,
                 "winrate": round(wr_term, 1),
                 "rps": round(rps_term, 1),
+                "oos_grade": _OOS_GATE_REPORT.get("rps", ("?", 0, ""))[0],
+                "oos_rps_weight": round(_RPS_TERM_MAX_DYN, 1),
                 "breakout": 5 if breakout_5d else 0,
                 "research": research_score,
                 "p4": p4_score,

@@ -24,8 +24,10 @@
 
 ### 当前因子定级（落到代码常量，2026-11-02）
 
-- **`RPS 动量项`**（`_rps_prepass`）：逻辑成立（动量/相对强度异象，Jegadeesh-Titman 学术证实）→ **S 级，主区分项 ±55**。
-  实现用**当下价格数据**（个股 60/120 日区间收益）做候选池横截面排序，**非回测拟合参数**；权重依据 = 动量异象学术证据 + 样本外 IC，**禁止取自 in-sample 回测收益数字**（如「T+250 +46%」）。
+- **`RPS 动量项`**（`_rps_prepass`）：逻辑成立（动量/相对强度异象，Jegadeesh-Titman 学术证实）→ **逻辑基础达 S 级门槛**，但 **2026-11-02 walk-forward OOS 验证实测 FAIL**：
+  `raw_data/factor_walkforward.json` 中动量家族 `mom12_1`/`resid_mom`/`vamom` 的 `verdict` 全为 **FAIL**、`ir_oos` 为 **-0.133 / -0.133 / -0.123（样本外负向）**。
+  ⇒ **铁律 W2 gate 自动定级 B → 动态权重 ±0.0（禁入，仅保留展示）**。这正是铁律要防的「无 OOS 证据却主排序」被 gate 机械封杀的实例。
+  实现用**当下价格数据**（个股 60/120 日区间收益）做候选池横截面排序，**非回测拟合参数**；权重依据原本含「动量异象学术证据 + 样本外 IC」，但 OOS 实证推翻了「样本外 IC>0」假设，故 gate 依证禁入。
 - **`expected_return_term`**（`BT_BY_SIGNAL`）：基于 **in-sample 回测** ret5/ret10 中心化；且 HC 高信念模式下 sig_tuple 全员同值 → **完全不分高下（失效）** → **A 级降级**，权重 ±55→**±15**，仅作跨组合辅助区分（非 HC 模式下有微弱区分力）。
 - **`winrate`**（`WR_CONF_WEIGHT`）：历史胜率微调 → **A 级**，置信微调 ±11，不作主排序。
 
@@ -33,6 +35,7 @@
 
 1. **逻辑先于数据**：任何新因子先有可解释的经济/行为逻辑，再做验证；禁止「回测好就上」。
 2. **样本外验证 gate**：S 级因子上线前必须有 walk-forward / out-of-sample 验证（IC>0、IR 稳定）；证据缺口默认关闭（`V8_*=0`）。
+   🔴 **2026-11-02 已落地为代码自动执行**：`algorithms/generate_top10.py` 新增 `factor_oos_gate()`，启动时读 `raw_data/factor_walkforward.json`（walk-forward OOS 证据：调仓点前 60% IS / 后 40% OOS 切分，OOS 绝不参与选向），对 RPS/exp_ret 等科学因子按 OOS IR/PSR/IC 衰减动态定级定权重；无证据默认关闭；`V8_OOS_GATE=0` 可应急回滚。
 3. **多因子正交化**：相关因子做横截面中性化（现有 `_raw_noform` 中性化重建机制保留），禁止共线因子双计。
 4. **风险约束优先**：因子分再高，触及 P1 风险闸（历史 T+5 胜率<线、质差一票否决）仍降级/剔除 —— 坏行情不硬凑。
 5. **成本现实**：所有回测/预期收益口径必须含交易成本（现有 next_open + 扣费口径保留）。
@@ -56,3 +59,19 @@
 ① **审计**（本地复现 CI 15 项门禁，结论绑定 `HEAD=<sha>`）
 ② **四方对齐**（云端 workflow · 双机时窗 · 运维页 index.html · 逻辑详解页 logic.html）
 ③ **推仓**（基于 `origin/main` 快进、`Git Data API force:false`、逐字节自证）+ 交接件。
+
+## 六、OOS 实证发现（2026-11-02 gate 首跑）
+
+`factor_oos_gate()` 启动读 `raw_data/factor_walkforward.json`（2026-10-24 生成，walk-forward OOS 证据）实测结论：
+
+- **RPS 动量项 → 自动定级 B（禁入，权重 ±0）**：动量家族 `mom12_1`/`resid_mom`/`vamom` 的 OOS `verdict` 全 FAIL、`ir_oos` 全为负（-0.133~-0.123）。即上轮加的 RPS 项其「动量异象」在样本外并未成立——in-sample 漂亮数字（T+250 +46%）正是 data snooping 噪声，被 gate 机械封杀。✅ 证明铁律 W2 有效。
+- **`expected_return_term` → A 级 ±15**：铁律已定级，gate 维持。
+- **真正 OOS PASS 且 ir_oos>0.3 的因子（证据支持，当前评分结构未启用，下一步候选接主排序）**：
+  | 因子 | ir_oos | psr_oos | 含义 |
+  |---|---|---|---|
+  | `turntrend` | 1.238 | 0.840 | 换手率趋势 |
+  | `skew60` | 0.998 | 0.910 | 60 日收益偏度 |
+  | `amt60` | 0.951 | 0.887 | 60 日成交额 |
+  | `ivol60` | 0.700 | 0.868 | 特质波动率 |
+
+⚠️ **待办**：当前评分主区分项因 RPS 被 gate 禁入而弱化（仅剩 exp_ret ±15 + winrate ±11）。若要恢复「科学证据支持的主排序」，应把上述 OOS PASS 因子接进 `generate_top10.py` 评分维度（属下一轮工程，需主人明确授权，不擅自扩写算法结构）。
