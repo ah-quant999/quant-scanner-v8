@@ -59,6 +59,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "💹 跑 fetch_huijin_holdings.py（汇金持仓季报·D胶囊真实源，best-effort 兜底）"
+        id: huijin
         if: always()
         continue-on-error: true
         env:
@@ -67,13 +68,31 @@ jobs:
         run: |
           dow=$(date +%u)
           if [ "$dow" -ge 6 ]; then echo "[skip] weekend, exit ok"; exit 0; fi
+          [ -f data/HUIJIN_HOLDINGS.js ] && rm -f data/HUIJIN_HOLDINGS.js
           python v8/fetch_huijin_holdings.py
           rc=$?
-          if [ "$rc" -ne 0 ]; then
-            echo "::warning title=v8-huijin-fetch(failed)::💹 汇金持仓抓取失败（非阻塞）；将沿用 checkout 基线 data/HUIJIN_HOLDINGS.js（如有）。"
+          if [ "$rc" -ne 0 ] || [ ! -f data/HUIJIN_HOLDINGS.js ]; then
+            echo "::warning title=v8-huijin-fetch(failed)::💹 汇金持仓抓取失败（非阻塞）；checkout 基线 data/HUIJIN_HOLDINGS.js 亦从未入库 ⇒ 线上继续 404，前端报「汇金 未接入」。下轮补算。"
+            echo "produced=false" >> "$GITHUB_OUTPUT"
           else
             echo "[ok] data/HUIJIN_HOLDINGS.js ready (best-effort)"
+            echo "produced=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: "📤 推送 data/HUIJIN_HOLDINGS.js（api_put_file.py，best-effort）"
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          if [ "${{ steps.huijin.outputs.produced }}" != "true" ]; then
+            echo "[skip] 汇金持仓未成功抓取，不推送"
+            exit 0
+          fi
+          python scripts/api_put_file.py data/HUIJIN_HOLDINGS.js "data: 汇金持仓 refresh ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') CST)"
+          rc=$?
+          if [ "$rc" -ne 0 ]; then echo "::error title=v8-huijin(push-failed)::📤 data/HUIJIN_HOLDINGS.js 推送失败（非阻塞，下一轮补推）。"; exit 1; fi
 
       - name: "🏛️ 跑 gen_national_team.py（产出 data/NATIONAL_TEAM.js）"
         id: gen
