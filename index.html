@@ -124,7 +124,7 @@ window.__domReadyFns=[];
     <script src="data/DO_NOT_DELETE.js?v=65f14102b0" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=540758e3a4" defer></script>
-    <script src="data/GOLD_POOL.js?v=5c640fdbd5" defer></script>
+    <script src="data/GOLD_POOL.js?v=e50e90e1eb" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
@@ -181,7 +181,7 @@ window.__domReadyFns=[];
         <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=09d5b4f20d" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=0ea7ad19f8" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=e248ab5379" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=078d0fda0c" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=42a8cc40ce" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 CN runner2号机的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
@@ -2030,7 +2030,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=8d928563bf" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=f1007eba39" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=ff169bf57b" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=450bc83472" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=555b0b16d8" defer></script>
