@@ -6,7 +6,7 @@
     --border:#243150; --border2:#2e3d63;
     --txt:#e6edf7; --sub:#93a4c4; --dim:#5f7099;
     --cyan:#38bdf8; --purple:#a78bfa; --gold:#fbbf24; --pink:#f472b6;
-    --up:#f87171; --down:#4ade80;
+    --up:#ef5350; --down:#26a69a;
     --lock:#5f7099;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -258,11 +258,11 @@
   .fl-card-metric{font-size:13px;font-weight:700}
   .fl-card-sub{font-size:10px;color:var(--dim)}
   .fl-badge{font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(148,163,184,.15);color:var(--dim);white-space:nowrap}
-  .fl-pass{background:rgba(34,197,94,.18);color:#5ee0a0}
+  .fl-pass{background:rgba(34,197,94,.18);color:#26a69a}
   .fl-sec-label{font-size:12px;font-weight:700;color:var(--txt);margin:10px 0 4px;display:flex;align-items:center;gap:6px}
   .fl-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
   .fl-dot-pass{background:#22c55e}
-  .fl-dot-weak{background:#f87171}
+  .fl-dot-weak{background:#ef5350}
   .fl-toggle{padding:6px 10px;border-radius:6px;background:var(--bg2);color:var(--sub);font-size:12px;cursor:pointer;display:inline-block;margin:6px 0;border:1px solid var(--border)}
   .fl-toggle:hover{border-color:var(--cyan);color:var(--txt)}
   .fl-collapsed{display:none}
@@ -326,7 +326,7 @@
   .v8cal-event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid #43a047}
   .v8cal-event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid #9c27b0}
   .v8cal-event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid #42a5f5}
-  .v8cal-event.hk{background:rgba(248,113,113),.15);color:#ef9a9a;border-left:3px solid #f87171}
+  .v8cal-event.hk{background:rgba(248,113,113),.15);color:#ef9a9a;border-left:3px solid #ef5350}
   .v8cal-event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid #ff9800}
   .v8cal-event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid #e91e63}
   .v8cal-event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid #673ab7}
