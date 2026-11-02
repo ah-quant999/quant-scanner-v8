@@ -354,6 +354,11 @@ CARD_DEFS = [
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
     {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "heal_cat": "dajijin", "key_fields": ["update_time"], "cycle": (3, 30)},
+    # 🛡 2026-11-02 一劳永逸（九宝令）：此二卡纯本地生成（零网络、不需 cn IP），此前完全漏登记 →
+    #   掉进通用扫描 1440 红线判 fail 却无 heal_cat ⇒ 自愈链够不到、且定时 workflow 跳步骤 → 永久停更。
+    #   补登记 + heal_cat='local_gen'，巡检发现 stale 直接本地跑生成器并推送真实数据。
+    {"id": "NATIONAL_TEAM", "name": "国家队活跃度", "page": "暂未上架", "freq": "工作日20:50(纯本地生成)", "max_age": 1440, "heal_cat": "local_gen", "key_fields": ["score", "subs"], "raw_file": "national_team.json", "producer": "v8/gen_national_team.py"},
+    {"id": "SECTOR_YEAR_FLOW", "name": "板块年度主力净流入", "page": "暂未上架", "freq": "工作日20:50(纯本地生成)", "max_age": 1440, "heal_cat": "local_gen", "key_fields": ["sectors"], "raw_file": "sector_year_flow.json", "producer": "v8/gen_sector_year_flow.py"},
     # 🛡 2026-10-27 一劳永逸（CN runner1号机·all-generic-redline 家族）：以下 4 个「前端活跃卡消费、
     #   却未登记 CARD_DEFS」的产物，此前掉进 check_all_data_files 通用 1620 红线被误判 fail。
     #   逐条补齐登记，按真实节拍给 max_age=1440（盘后产物 24h 红线），保留真故障监控（生产者真漏刷仍 fail 触发自愈）。
@@ -800,6 +805,16 @@ ALGO_RUN_WORKFLOW_ID = 324119592      # ☁️ v8 盘后算法链(云端) workfl
 #   GitHub Dispatch API 的 workflow_id 支持直接传文件名（无需数字 ID）。
 EXPERIMENTS_WORKFLOW = "v8_cn_fetch_experiments.yml"   # 🧪 实验卡(ubuntu-latest)：产出 INDEX_VALUE_FRAMEWORK/VALUATION_PERCENTILE/FACTOR_AUDIT
 DAIJIN_WORKFLOW = "v8_dajijin_fetch.yml"                # 🚨 大基金增减持(cn 自托管)：产出 DAIJIN_REDUCTION
+
+# ── 纯本地生成器自愈映射（2026-11-02 一劳永逸·九宝令）──────────────────────
+# 部分卡由「纯本地生成器」产出（只读 data/*.js、零网络、不需要 cn IP），
+# 却因定时 workflow 跳步骤/延迟而永久停更（实证：同链 SECTOR_YEAR_FLOW 鲜新而
+# NATIONAL_TEAM 卡在 10-30）。此处让巡检直接本地跑官方生成器并推送真实数据，
+# 不再依赖那条不可靠的 workflow。仅对 CARD_DEFS 中 heal_cat='local_gen' 的卡生效。
+LOCAL_GEN = {
+    'NATIONAL_TEAM':    ('v8/gen_national_team.py', 'data/NATIONAL_TEAM.js'),
+    'SECTOR_YEAR_FLOW': ('v8/gen_sector_year_flow.py', 'data/SECTOR_YEAR_FLOW.js'),
+}
 HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
 # 2026-08-11 漏洞 #1：自愈单次最多派发 N 个 workflow，防 runner 打爆/事件风暴
@@ -1153,6 +1168,70 @@ def _dispatch_dajijin():
         return False, f"派发异常: {e}", False
 
 
+def _file_ut(path):
+    """从 data/*.js 提取 update_time 字符串（用于判断本地生成器是否产出新数据）。"""
+    try:
+        s = open(path, encoding="utf-8").read()
+        m = re.search(r'"update_time"\s*:\s*"([^"]+)"', s)
+        return m.group(1) if m else None
+    except Exception:
+        return None
+
+
+def _dispatch_local_gen(items):
+    """纯本地生成器自愈：对每张 stale 卡本地跑官方生成器并推送真实数据。
+
+    返回三元组 (ok, msg, dispatched)，语义同其它 _dispatch_*。
+    🛡 2026-11-02 一劳永逸（九宝令）：NATIONAL_TEAM / SECTOR_YEAR_FLOW 等纯本地卡，
+       此前仅靠会跳步骤的定时 workflow 产出 → 永久停更且自愈链够不到（无 heal_cat）。
+       现巡检直接本地跑生成器（零网络、真实数据）+ api_put_file 推送，
+       彻底根治「步骤被跳过→卡永久陈旧」。单卡失败不影响其它卡。
+    """
+    if not items:
+        return True, "无本地生成卡", False
+    token = os.environ.get("V8_GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if not token:
+        # 仅本地无 token 环境会触发；正常巡检（v8_health_patrol.yml）自带 V8_GH_TOKEN。
+        return False, "缺 V8_GH_TOKEN，无法推送本地再生数据", False
+    ok_any = False
+    dispatched_any = False
+    msgs = []
+    for it in items:
+        gid = it.get("id")
+        spec = LOCAL_GEN.get(gid)
+        if not spec:
+            msgs.append("%s: 无本地生成器映射" % gid)
+            continue
+        script, out = spec
+        try:
+            if not os.path.exists(script):
+                msgs.append("%s: 生成器缺失 %s" % (gid, script))
+                continue
+            before = _file_ut(out)
+            rc = subprocess.run([sys.executable, script], capture_output=True,
+                                text=True, timeout=300).returncode
+            if rc != 0:
+                msgs.append("%s: 生成器退出码 %d" % (gid, rc))
+                continue
+            after = _file_ut(out)
+            if before and before == after:
+                # 生成器未改变文件（闸门拦/同源去重）→ 不推送，保留线上旧卡。
+                msgs.append("%s: 生成器未产出新数据（闸门/去重），保留线上" % gid)
+                continue
+            prc = subprocess.run([sys.executable, "scripts/api_put_file.py", out,
+                                  "data: local-self-heal regenerate (%s)" % gid],
+                                 capture_output=True, text=True, timeout=120).returncode
+            if prc != 0:
+                msgs.append("%s: 推送失败(rc=%d)" % (gid, prc))
+                continue
+            ok_any = True
+            dispatched_any = True
+            msgs.append("%s: 本地再生并推送成功(%s)" % (gid, after))
+        except Exception as e:
+            msgs.append("%s: 异常 %s" % (gid, e))
+    return ok_any, "; ".join(msgs), dispatched_any
+
+
 def _heal_local_sync(pull_raw_data_only=False):
     """尝试让本地 HEAD 与 origin/main 对齐（fetch + ff-only，必要时 stash）。
 
@@ -1430,6 +1509,11 @@ def self_heal(report):
         elif cat == "dajijin":
             # 🆕 2026-11-02 一劳永逸（九宝令）：直达大基金增减持独立 workflow（cn 自托管，含在线守卫）
             ok, dmsg, dispatched = _dispatch_dajijin()
+        elif cat == "local_gen":
+            # 🆕 2026-11-02 一劳永逸（九宝令）：纯本地生成器自愈
+            #   NATIONAL_TEAM / SECTOR_YEAR_FLOW 等纯本地卡，巡检直接本地跑生成器+推送真实数据，
+            #   不再依赖会跳步骤的定时 workflow（此前同链 SECTOR_YEAR_FLOW 鲜新而 NATIONAL_TEAM 卡死即此因）。
+            ok, dmsg, dispatched = _dispatch_local_gen(items)
         else:
             ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
         if ok:
