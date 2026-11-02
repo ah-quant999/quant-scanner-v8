@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-30 15:51:06",
+  "update_time": "2026-11-02 09:30:47",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -9,9 +9,9 @@
   },
   "range": [
     "09/11",
-    "10/30"
+    "11/02"
   ],
-  "columns": 30,
+  "columns": 31,
   "cycle_count": 17,
   "cycles": [
     {
@@ -25,32 +25,32 @@
       "peak": 28,
       "peak_date": "09/22",
       "total": 311,
-      "ongoing": true
+      "ongoing": false
     },
     {
       "sector": "其他",
       "start": "09/11",
-      "end": "10/30",
+      "end": "11/02",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 31,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1766,
+      "total": 1785,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "09/11",
-      "end": "10/30",
+      "end": "11/02",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 392,
+      "total": 400,
       "ongoing": true
     },
     {
@@ -69,14 +69,14 @@
     {
       "sector": "消费电子",
       "start": "09/11",
-      "end": "10/30",
+      "end": "11/02",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 29,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 247,
+      "total": 252,
       "ongoing": true
     },
     {
@@ -108,40 +108,40 @@
     {
       "sector": "新能源车",
       "start": "09/14",
-      "end": "10/30",
+      "end": "11/02",
       "start_idx": 1,
-      "end_idx": 29,
-      "days": 29,
-      "hot_days": 25,
+      "end_idx": 30,
+      "days": 30,
+      "hot_days": 26,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 274,
+      "total": 277,
       "ongoing": true
     },
     {
       "sector": "机器人",
       "start": "09/16",
-      "end": "10/30",
+      "end": "11/02",
       "start_idx": 3,
-      "end_idx": 29,
-      "days": 27,
-      "hot_days": 27,
+      "end_idx": 30,
+      "days": 28,
+      "hot_days": 28,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 477,
+      "total": 484,
       "ongoing": true
     },
     {
       "sector": "白酒消费",
       "start": "09/18",
-      "end": "10/30",
+      "end": "11/02",
       "start_idx": 5,
-      "end_idx": 29,
-      "days": 25,
-      "hot_days": 24,
-      "peak": 10,
-      "peak_date": "10/30",
-      "total": 140,
+      "end_idx": 30,
+      "days": 26,
+      "hot_days": 25,
+      "peak": 12,
+      "peak_date": "11/02",
+      "total": 152,
       "ongoing": true
     },
     {
