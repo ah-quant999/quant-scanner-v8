@@ -144,7 +144,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=1a214d081a" defer></script>
 <script src="data/MARGIN_DATA.js?v=71d7e8cd84" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=c76d41d341" defer></script>
-<script src="data/IPO_DATA.js?v=e607a387fe" defer></script>
+<script src="data/IPO_DATA.js?v=8e6e10f526" defer></script>
     <script src="data/CRISIS_DATA.js?v=77611531a7" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=d54c175477" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=7d3a9cc6e2" defer></script>
@@ -1319,8 +1319,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=079b26539d" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=8cc5ff44c0" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=fac0498dab" defer></script>
-<script src="data/HB_XIAOJIU.js?v=03fa9b9ffd" defer></script>
+<script src="data/RUNNER_STATUS.js?v=058cc66018" defer></script>
+<script src="data/HB_XIAOJIU.js?v=0ab4a3afd1" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=fa7a2c7151" defer></script>
 <script src="data/HEALTH_CHECK.js?v=25b33b15e9" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=349a807c70" defer></script>
@@ -10701,11 +10701,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=e607a387fe"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=8e6e10f526"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=e607a387fe';
+        return 'data/IPO_DATA.js?v=8e6e10f526';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
