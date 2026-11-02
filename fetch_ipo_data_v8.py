@@ -165,11 +165,11 @@ def calculate_bond_scores(bonds):
 
         # 建议等级
         if score >= 70:
-            recommend, tag_color, bg_color = "建议申购", "#0d7d4a", "#e8f5e9"
+            recommend, tag_color, bg_color = "建议申购", "#ef5350", "rgba(239,83,80,.12)"
         elif score >= 55:
-            recommend, tag_color, bg_color = "谨慎参与", "#f57f17", "#fffde7"
+            recommend, tag_color, bg_color = "谨慎参与", "#fbbf24", "rgba(251,191,36,.12)"
         else:
-            recommend, tag_color, bg_color = "不建议申购", "#c62828", "#ffebee"
+            recommend, tag_color, bg_color = "不建议申购", "#26a69a", "rgba(38,106,154,.12)"
 
         b["score"] = score
         b["arbitrage_score"] = arbitrage
@@ -320,8 +320,8 @@ def process_bond_listed(bonds):
                 advice, tcol, bg = tracking_advice(issue_price, latest, change_pct, turnover)
             else:
                 advice = "上市首日"
-                tcol = "#0d7d4a"
-                bg = "#e8f5e9"
+                tcol = "#fbbf24"
+                bg = "rgba(251,191,36,.12)"
 
             highlights = [
                 f"较发行 {total_return:+.1f}%",
@@ -500,13 +500,13 @@ def tracking_advice(issue_price, latest_price, change_pct, turnover):
     
     # 判断逻辑
     if total_return > 50 and change_pct > 5:
-        return "🔴 强势上涨，可考虑追入", "#c62828", "#ffebee"
+        return "🔴 强势上涨，可考虑追入", "#ef5350", "rgba(239,83,80,.12)"
     elif total_return > 20 and change_pct > 0:
-        return "🟡 表现良好，观望等回调", "#e65100", "#fff3e0"
+        return "🔴 表现良好，观望等回调", "#ef5350", "rgba(239,83,80,.12)"
     elif total_return > 0 and change_pct > -3:
-        return "🟠 温和上涨，可小仓位", "#f57f17", "#fffde7"
+        return "🔴 温和上涨，可小仓位", "#ef5350", "rgba(239,83,80,.12)"
     elif total_return < 0 or change_pct < -5:
-        return "🟢 已破发或走弱，不建议追", "#2e7d32", "#e8f5e9"
+        return "🟢 已破发或走弱，不建议追", "#26a69a", "rgba(38,106,154,.12)"
     else:
         return "⚪ 震荡，建议观望", "#888", "#f5f5f5"
 
@@ -939,13 +939,13 @@ def calculate_scores(candidates, status_filter=None):
         total = round(arbitrage_score * 0.6 + fundamental_score * 0.4)
 
         if total >= 80:
-            recommend, tag_color, bg_color = "强烈推荐申购", "#2e7d32", "#e8f5e9"
+            recommend, tag_color, bg_color = "强烈推荐申购", "#ef5350", "rgba(239,83,80,.12)"
         elif total >= 65:
-            recommend, tag_color, bg_color = "建议申购", "#e65100", "#fff3e0"
+            recommend, tag_color, bg_color = "建议申购", "#ef5350", "rgba(239,83,80,.12)"
         elif total >= 50:
-            recommend, tag_color, bg_color = "谨慎参与", "#f57f17", "#fffde7"
+            recommend, tag_color, bg_color = "谨慎参与", "#fbbf24", "rgba(251,191,36,.12)"
         else:
-            recommend, tag_color, bg_color = "不建议申购", "#c62828", "#ffebee"
+            recommend, tag_color, bg_color = "不建议申购", "#26a69a", "rgba(38,106,154,.12)"
 
         # 价格未知的标注
         # 发行价未知时不再覆盖 recommend；前端已按 issue_price==0 归入「待定价」tab，

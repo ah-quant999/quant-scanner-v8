@@ -216,13 +216,13 @@ def regime(idx_metrics):
     vol_falling = vol_short_vs_long < 0
 
     if idx_up_20d and vol_falling:
-        code, label, color = "stabilize", "企稳回升", "#2e7d32"
+        code, label, color = "stabilize", "企稳回升", "#26a69a"
     elif (not idx_up_20d) and vol_falling:
-        code, label, color = "grind", "阴跌磨底", "#f57f17"
+        code, label, color = "grind", "阴跌磨底", "#fbbf24"
     elif idx_up_20d and (not vol_falling):
         code, label, color = "rebound_diverge", "反弹分歧", "#1565c0"
     else:
-        code, label, color = "panic", "恐慌下行", "#c62828"
+        code, label, color = "panic", "恐慌下行", "#ef5350"
 
     trend_word = (f"短端5日波动率({avg_vol_5d:.1f}%)"
                     f"{'低于' if vol_falling else '高于'}20日中枢({avg_vol_20d:.1f}%) "

@@ -110,7 +110,7 @@
   .etf-row span{color:var(--sub)}
 .etf-row .pct{width:46px;text-align:right;font-weight:600}
 .etf-row .pct.up{color:#ef5350}
-.etf-row .pct.down{color:#2e7d32}
+.etf-row .pct.down{color:#26a69a}
 .etf-row .subtotal{font-size:11px;color:var(--dim);padding:6px 0 0;border-top:1px solid var(--border);margin-top:4px;display:flex;justify-content:space-between}
 .etf-spark{display:inline-block;width:16px;height:4px;border-radius:2px;margin-left:4px;vertical-align:middle}
   .etf-row b{font-variant-numeric:tabular-nums}
@@ -141,11 +141,11 @@
   .limit-up-analysis{font-size:12px;line-height:1.7;margin-bottom:10px;padding:8px 10px;background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;color:var(--sub)}
   .limit-up-analysis b{color:var(--txt)}
   .lu-h0{background:transparent;color:var(--dim)}
-  .lu-h1{background:rgba(198,40,40,.12);color:#ff8a80}
-  .lu-h2{background:rgba(198,40,40,.28);color:#ff5252;font-weight:600}
-  .lu-h3{background:rgba(198,40,40,.48);color:#fff;font-weight:700}
-  .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
-  .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
+  .lu-h1{background:rgba(239,83,80,.12);color:#ff8a80}
+  .lu-h2{background:rgba(239,83,80,.28);color:#ff5252;font-weight:600}
+  .lu-h3{background:rgba(239,83,80,.48);color:#fff;font-weight:700}
+  .lu-h4{background:rgba(239,83,80,.68);color:#fff;font-weight:700}
+  .lu-h5{background:rgba(239,83,80,.88);color:#fff;font-weight:700}
   /* 🌊 2026-09-15 主人令：退潮日标注（青蓝冷色，与金色「启动日」一眼区分）——
        前一日仍 ≥3 只涨停、当日骤降到 ≤1 ⇒ 这天是这轮热度的退潮日。
        退潮标记只保留 5 个交易日，之后自动退出（不长期挂着误导）。 */
@@ -184,7 +184,7 @@
   .lu-tl-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:1px;padding-left:92px}
   /* 📊 统计层徽章：平均周期 / 当前位置（红＝已超历史均值，金＝均值附近，蓝＝仍在初期，灰＝已退潮） */
   .lu-stat-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;white-space:nowrap}
-  .lu-stat-over{background:rgba(198,40,40,.22);color:#ff8a80}
+  .lu-stat-over{background:rgba(239,83,80,.22);color:#ff8a80}
   .lu-stat-near{background:rgba(245,158,11,.20);color:#fbbf24}
   .lu-stat-early{background:rgba(56,189,248,.18);color:#7dd3fc}
   .lu-stat-done{background:rgba(148,163,184,.16);color:var(--dim)}
@@ -192,11 +192,11 @@
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .limit-up-analysis b{color:var(--txt)}
   .lu-h0{background:transparent;color:var(--dim)}
-  .lu-h1{background:rgba(198,40,40,.12);color:#ff8a80}
-  .lu-h2{background:rgba(198,40,40,.28);color:#ff5252;font-weight:600}
-  .lu-h3{background:rgba(198,40,40,.48);color:#fff;font-weight:700}
-  .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
-  .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
+  .lu-h1{background:rgba(239,83,80,.12);color:#ff8a80}
+  .lu-h2{background:rgba(239,83,80,.28);color:#ff5252;font-weight:600}
+  .lu-h3{background:rgba(239,83,80,.48);color:#fff;font-weight:700}
+  .lu-h4{background:rgba(239,83,80,.68);color:#fff;font-weight:700}
+  .lu-h5{background:rgba(239,83,80,.88);color:#fff;font-weight:700}
 
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .sf-block{border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border)}

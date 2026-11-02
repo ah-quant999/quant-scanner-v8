@@ -610,13 +610,13 @@ def _sanitize_ipo_recommend(stock):
 
     score = stock.get("score") or 0
     if score >= 80:
-        rec, tc, bc = "强烈推荐申购", "#2e7d32", "#e8f5e9"
+        rec, tc, bc = "强烈推荐申购", "#ef5350", "rgba(239,83,80,.12)"
     elif score >= 65:
-        rec, tc, bc = "建议申购", "#e65100", "#fff3e0"
+        rec, tc, bc = "建议申购", "#ef5350", "rgba(239,83,80,.12)"
     elif score >= 50:
-        rec, tc, bc = "谨慎参与", "#f57f17", "#fffde7"
+        rec, tc, bc = "谨慎参与", "#fbbf24", "rgba(251,191,36,.12)"
     else:
-        rec, tc, bc = "不建议申购", "#c62828", "#ffebee"
+        rec, tc, bc = "不建议申购", "#26a69a", "rgba(38,106,154,.12)"
     stock["recommend"] = rec
     stock["tag_color"] = tc
     stock["bg_color"] = bc
