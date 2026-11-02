@@ -1,19 +1,19 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-02 23:26:47",
+  "generated": "2026-11-03 00:18:11",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
-  "total_unique_stocks": 219,
-  "total_appearances": 587,
-  "kline_available": 219,
+  "total_unique_stocks": 213,
+  "total_appearances": 616,
+  "kline_available": 213,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
  "periods": {
   "2026-09": {
-   "count": 430,
+   "count": 410,
    "leaders": [
     {
      "code": "301190",
@@ -179,81 +179,81 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "code": "688678",
      "symbol": "sh688678",
      "name": "福立旺精密",
-     "date": "2026-09-18",
-     "count": 2,
+     "date": "2026-09-21",
+     "count": 1,
      "categories": [
       "加速",
       "短线选股",
       "突破"
      ],
-     "change_pct": 6.56,
-     "sel_change_pct": 6.56,
+     "change_pct": 13.17,
+     "sel_change_pct": 13.17,
      "data_available": true,
-     "consec_before": 2,
-     "stage": "启动",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 32.21,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 13.17,
-     "t3_gain_pct": 27.35,
-     "t5_gain_pct": 26.66,
-     "t10_gain_pct": 13.09,
-     "last_gain_pct": 13.09,
+     "consec_before": 3,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 16.83,
+     "max_drawdown_pct": 0.54,
+     "t1_gain_pct": -0.47,
+     "t3_gain_pct": 16.83,
+     "t5_gain_pct": 14.57,
+     "t10_gain_pct": -0.54,
+     "last_gain_pct": -0.54,
      "pattern": "普通",
-     "note": "连涨前2天 回撤0.0%",
+     "note": "连涨前3天 回撤0.54%",
      "daily_returns": [
       {
        "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 13.17
+       "date": "2026-09-22",
+       "gain": -0.47
       },
       {
        "T": "T+2",
-       "date": "2026-09-22",
-       "gain": 12.64
+       "date": "2026-09-23",
+       "gain": 12.53
       },
       {
        "T": "T+3",
-       "date": "2026-09-23",
-       "gain": 27.35
+       "date": "2026-09-24",
+       "gain": 16.83
       },
       {
        "T": "T+4",
-       "date": "2026-09-24",
-       "gain": 32.21
+       "date": "2026-09-28",
+       "gain": 11.92
       },
       {
        "T": "T+5",
-       "date": "2026-09-28",
-       "gain": 26.66
+       "date": "2026-09-29",
+       "gain": 14.57
       },
       {
        "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 29.66
+       "date": "2026-09-30",
+       "gain": 11.53
       },
       {
        "T": "T+7",
-       "date": "2026-09-30",
-       "gain": 26.22
+       "date": "2026-10-08",
+       "gain": 4.69
       },
       {
        "T": "T+8",
-       "date": "2026-10-08",
-       "gain": 18.48
+       "date": "2026-10-09",
+       "gain": 3.11
       },
       {
        "T": "T+9",
-       "date": "2026-10-09",
-       "gain": 16.69
+       "date": "2026-10-12",
+       "gain": -0.07
       },
       {
        "T": "T+10",
-       "date": "2026-10-12",
-       "gain": 13.09
+       "date": "2026-10-13",
+       "gain": -0.54
       }
      ],
-     "entry_price": 24.68
+     "entry_price": 27.93
     },
     {
      "code": "688112",
@@ -414,86 +414,6 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 3.65
-    },
-    {
-     "code": "600059",
-     "symbol": "sh600059",
-     "name": "古越龙山",
-     "date": "2026-09-18",
-     "count": 3,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 8.63,
-     "sel_change_pct": 8.63,
-     "data_available": true,
-     "consec_before": 3,
-     "stage": "主升",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 14.67,
-     "max_drawdown_pct": 0.65,
-     "t1_gain_pct": 7.29,
-     "t3_gain_pct": 5.89,
-     "t5_gain_pct": 9.63,
-     "t10_gain_pct": -0.65,
-     "last_gain_pct": -0.65,
-     "pattern": "普通",
-     "note": "连涨前3天 回撤0.65%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 7.29
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": 0.84
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": 5.89
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": 2.8
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": 9.63
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 4.21
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": 14.67
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": 11.03
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": 8.97
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -0.65
-      }
-     ],
-     "entry_price": 10.7
     },
     {
      "code": "688123",
@@ -814,6 +734,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 185.93
+    },
+    {
+     "code": "300835",
+     "symbol": "sz300835",
+     "name": "龙磁科技",
+     "date": "2026-09-21",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 3.03,
+     "sel_change_pct": 3.03,
+     "data_available": true,
+     "consec_before": 1,
+     "stage": "启动",
+     "consecutive_up_days": 1,
+     "max_gain_pct": 0.8,
+     "max_drawdown_pct": 10.57,
+     "t1_gain_pct": 0.29,
+     "t3_gain_pct": -1.42,
+     "t5_gain_pct": 0.8,
+     "t10_gain_pct": -8.13,
+     "last_gain_pct": -8.13,
+     "pattern": "普通",
+     "note": "连涨前1天 回撤10.57%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-09-22",
+       "gain": 0.29
+      },
+      {
+       "T": "T+2",
+       "date": "2026-09-23",
+       "gain": 0.28
+      },
+      {
+       "T": "T+3",
+       "date": "2026-09-24",
+       "gain": -1.42
+      },
+      {
+       "T": "T+4",
+       "date": "2026-09-28",
+       "gain": -3.57
+      },
+      {
+       "T": "T+5",
+       "date": "2026-09-29",
+       "gain": 0.8
+      },
+      {
+       "T": "T+6",
+       "date": "2026-09-30",
+       "gain": -2.83
+      },
+      {
+       "T": "T+7",
+       "date": "2026-10-08",
+       "gain": -7.52
+      },
+      {
+       "T": "T+8",
+       "date": "2026-10-09",
+       "gain": -6.64
+      },
+      {
+       "T": "T+9",
+       "date": "2026-10-12",
+       "gain": -10.57
+      },
+      {
+       "T": "T+10",
+       "date": "2026-10-13",
+       "gain": -8.13
+      }
+     ],
+     "entry_price": 192.66
     }
    ],
    "all": [
@@ -821,7 +821,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "code": "605577",
      "symbol": "sh605577",
      "name": "龙版传媒",
-     "date": "2026-09-18",
+     "date": "2026-09-21",
      "count": 17,
      "categories": [
       "加速",
@@ -898,2332 +898,11 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 18.67
     },
     {
-     "code": "000978",
-     "symbol": "sz000978",
-     "name": "桂林旅游",
-     "date": "2026-09-18",
-     "count": 4,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.99,
-     "sel_change_pct": 9.99,
-     "data_available": true,
-     "consec_before": 4,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前4天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 9.69
-    },
-    {
-     "code": "300464",
-     "symbol": "sz300464",
-     "name": "星徽股份",
-     "date": "2026-09-18",
-     "count": 3,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 20.0,
-     "sel_change_pct": 20.0,
-     "data_available": true,
-     "consec_before": 4,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前4天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 10.02
-    },
-    {
-     "code": "002172",
-     "symbol": "sz002172",
-     "name": "澳洋健康",
-     "date": "2026-09-18",
-     "count": 10,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.94,
-     "sel_change_pct": 9.94,
-     "data_available": true,
-     "consec_before": 1,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前1天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 5.09
-    },
-    {
-     "code": "300865",
-     "symbol": "sz300865",
-     "name": "大宏立",
-     "date": "2026-09-18",
-     "count": 1,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 7.82,
-     "sel_change_pct": 7.82,
-     "data_available": true,
-     "consec_before": 1,
-     "stage": "震荡",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前1天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 32.28
-    },
-    {
-     "code": "301227",
-     "symbol": "sz301227",
-     "name": "森鹰窗业",
-     "date": "2026-09-18",
-     "count": 4,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 3.78,
-     "sel_change_pct": 3.78,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 35.17
-    },
-    {
-     "code": "000993",
-     "symbol": "sz000993",
-     "name": "闽东电力",
-     "date": "2026-09-18",
-     "count": 9,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.98,
-     "sel_change_pct": 9.98,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前2天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 13.88
-    },
-    {
-     "code": "003006",
-     "symbol": "sz003006",
-     "name": "百亚股份",
-     "date": "2026-09-18",
-     "count": 9,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.43,
-     "sel_change_pct": 6.43,
-     "data_available": true,
-     "consec_before": 8,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前8天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 18.2
-    },
-    {
-     "code": "300153",
-     "symbol": "sz300153",
-     "name": "科泰电源",
-     "date": "2026-09-18",
-     "count": 1,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.43,
-     "sel_change_pct": 6.43,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": -3.0,
-     "max_drawdown_pct": 26.68,
-     "t1_gain_pct": -3.0,
-     "t3_gain_pct": -4.9,
-     "t5_gain_pct": -14.5,
-     "t10_gain_pct": -26.68,
-     "last_gain_pct": -26.68,
-     "pattern": "波动大",
-     "note": "连涨前2天 回撤26.68%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": -3.0
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": -4.69
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": -4.9
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": -7.87
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": -14.5
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": -15.71
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": -18.16
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": -22.95
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": -25.41
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -26.68
-      }
-     ],
-     "entry_price": 28.97
-    },
-    {
-     "code": "301086",
-     "symbol": "sz301086",
-     "name": "鸿富瀚",
-     "date": "2026-09-18",
-     "count": 4,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.4,
-     "sel_change_pct": 6.4,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 165.79
-    },
-    {
-     "code": "300943",
-     "symbol": "sz300943",
-     "name": "春晖智控",
-     "date": "2026-09-18",
-     "count": 7,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 5.49,
-     "sel_change_pct": 5.49,
-     "data_available": true,
-     "consec_before": 3,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前3天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 37.45
-    },
-    {
-     "code": "300808",
-     "symbol": "sz300808",
-     "name": "久量股份",
-     "date": "2026-09-18",
-     "count": 2,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.47,
-     "sel_change_pct": 9.47,
-     "data_available": true,
-     "consec_before": 6,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前6天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 24.96
-    },
-    {
-     "code": "301366",
-     "symbol": "sz301366",
-     "name": "一博科技",
-     "date": "2026-09-18",
-     "count": 1,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 12.04,
-     "sel_change_pct": 12.04,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.98,
-     "max_drawdown_pct": 18.72,
-     "t1_gain_pct": -3.25,
-     "t3_gain_pct": 0.98,
-     "t5_gain_pct": -7.62,
-     "t10_gain_pct": -18.72,
-     "last_gain_pct": -18.72,
-     "pattern": "波动大",
-     "note": "连涨前0天 回撤18.72%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": -3.25
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": -3.04
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": 0.98
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": -1.67
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": -7.62
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 0.78
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": -6.26
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": -9.29
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": -14.7
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -18.72
-      }
-     ],
-     "entry_price": 74.42
-    },
-    {
-     "code": "603626",
-     "symbol": "sh603626",
-     "name": "科森科技",
-     "date": "2026-09-18",
-     "count": 2,
-     "categories": [
-      "加速",
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.0,
-     "sel_change_pct": 10.0,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 4.57,
-     "max_drawdown_pct": 3.93,
-     "t1_gain_pct": -0.3,
-     "t3_gain_pct": -2.31,
-     "t5_gain_pct": -3.93,
-     "t10_gain_pct": -0.94,
-     "last_gain_pct": -0.94,
-     "pattern": "普通",
-     "note": "连涨前2天 回撤3.93%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": -0.3
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": -2.09
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": -2.31
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": -3.89
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": -3.93
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 2.09
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": 3.42
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": -0.73
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": 4.57
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -0.94
-      }
-     ],
-     "entry_price": 23.42
-    },
-    {
-     "code": "300553",
-     "symbol": "sz300553",
-     "name": "集智股份",
-     "date": "2026-09-18",
-     "count": 5,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 12.83,
-     "sel_change_pct": 12.83,
-     "data_available": true,
-     "consec_before": 1,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前1天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 57.86
-    },
-    {
-     "code": "688678",
-     "symbol": "sh688678",
-     "name": "福立旺精密",
-     "date": "2026-09-18",
-     "count": 2,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.56,
-     "sel_change_pct": 6.56,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "启动",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 32.21,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 13.17,
-     "t3_gain_pct": 27.35,
-     "t5_gain_pct": 26.66,
-     "t10_gain_pct": 13.09,
-     "last_gain_pct": 13.09,
-     "pattern": "普通",
-     "note": "连涨前2天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 13.17
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": 12.64
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": 27.35
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": 32.21
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": 26.66
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 29.66
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": 26.22
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": 18.48
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": 16.69
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": 13.09
-      }
-     ],
-     "entry_price": 24.68
-    },
-    {
-     "code": "301041",
-     "symbol": "sz301041",
-     "name": "金百泽",
-     "date": "2026-09-18",
-     "count": 2,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.2,
-     "sel_change_pct": 6.2,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "主升",
-     "consecutive_up_days": 3,
-     "max_gain_pct": 9.79,
-     "max_drawdown_pct": 7.01,
-     "t1_gain_pct": 0.64,
-     "t3_gain_pct": 6.01,
-     "t5_gain_pct": -2.09,
-     "t10_gain_pct": -7.01,
-     "last_gain_pct": -7.01,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤7.01%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 0.64
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": 4.11
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": 6.01
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": 4.45
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": -2.09
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 9.79
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": 3.42
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": 1.75
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": -1.78
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -7.01
-      }
-     ],
-     "entry_price": 35.97
-    },
-    {
-     "code": "600712",
-     "symbol": "sh600712",
-     "name": "南宁百货",
-     "date": "2026-09-18",
-     "count": 5,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.98,
-     "sel_change_pct": 9.98,
-     "data_available": true,
-     "consec_before": 4,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前4天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 6.83
-    },
-    {
-     "code": "600318",
-     "symbol": "sh600318",
-     "name": "新力金融",
-     "date": "2026-09-18",
-     "count": 6,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.07,
-     "sel_change_pct": 10.07,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 8.09
-    },
-    {
-     "code": "605003",
-     "symbol": "sh605003",
-     "name": "众望布艺",
-     "date": "2026-09-18",
-     "count": 4,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.21,
-     "sel_change_pct": 6.21,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前2天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 25.47
-    },
-    {
-     "code": "600059",
-     "symbol": "sh600059",
-     "name": "古越龙山",
-     "date": "2026-09-18",
-     "count": 3,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 8.63,
-     "sel_change_pct": 8.63,
-     "data_available": true,
-     "consec_before": 3,
-     "stage": "主升",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 14.67,
-     "max_drawdown_pct": 0.65,
-     "t1_gain_pct": 7.29,
-     "t3_gain_pct": 5.89,
-     "t5_gain_pct": 9.63,
-     "t10_gain_pct": -0.65,
-     "last_gain_pct": -0.65,
-     "pattern": "普通",
-     "note": "连涨前3天 回撤0.65%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 7.29
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": 0.84
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": 5.89
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": 2.8
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": 9.63
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": 4.21
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": 14.67
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": 11.03
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": 8.97
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -0.65
-      }
-     ],
-     "entry_price": 10.7
-    },
-    {
-     "code": "603051",
-     "symbol": "sh603051",
-     "name": "鹿山新材",
-     "date": "2026-09-18",
-     "count": 6,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 7.86,
-     "sel_change_pct": 7.86,
-     "data_available": true,
-     "consec_before": 8,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前8天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 25.67
-    },
-    {
-     "code": "688090",
-     "symbol": "sh688090",
-     "name": "瑞松科技",
-     "date": "2026-09-18",
-     "count": 1,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.25,
-     "sel_change_pct": 10.25,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "震荡",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 1.6,
-     "max_drawdown_pct": 22.97,
-     "t1_gain_pct": 1.6,
-     "t3_gain_pct": -2.09,
-     "t5_gain_pct": -9.5,
-     "t10_gain_pct": -22.97,
-     "last_gain_pct": -22.97,
-     "pattern": "波动大",
-     "note": "连涨前0天 回撤22.97%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 1.6
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": -0.4
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": -2.09
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": -3.81
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": -9.5
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": -9.59
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": -10.77
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": -22.49
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": -22.97
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 86.61
-    },
-    {
-     "code": "688719",
-     "symbol": "sh688719",
-     "name": "爱科赛博",
-     "date": "2026-09-18",
-     "count": 6,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 6.81,
-     "sel_change_pct": 6.81,
-     "data_available": true,
-     "consec_before": 3,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前3天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 58.2
-    },
-    {
-     "code": "600838",
-     "symbol": "sh600838",
-     "name": "上海九百",
-     "date": "2026-09-18",
-     "count": 9,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.99,
-     "sel_change_pct": 9.99,
-     "data_available": true,
-     "consec_before": 1,
-     "stage": "震荡",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 1.4,
-     "max_drawdown_pct": 5.59,
-     "t1_gain_pct": 1.4,
-     "t3_gain_pct": -0.35,
-     "t5_gain_pct": -5.24,
-     "t10_gain_pct": -3.26,
-     "last_gain_pct": -3.26,
-     "pattern": "普通",
-     "note": "连涨前1天 回撤5.59%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": 1.4
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": 0.12
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": -0.35
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": -3.26
-      },
-      {
-       "T": "T+5",
-       "date": "2026-09-28",
-       "gain": -5.24
-      },
-      {
-       "T": "T+6",
-       "date": "2026-09-29",
-       "gain": -5.12
-      },
-      {
-       "T": "T+7",
-       "date": "2026-09-30",
-       "gain": -4.77
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-08",
-       "gain": -5.59
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-09",
-       "gain": 1.28
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-12",
-       "gain": -3.26
-      }
-     ],
-     "entry_price": 8.59
-    },
-    {
-     "code": "002902",
-     "symbol": "sz002902",
-     "name": "铭普光磁",
-     "date": "2026-09-18",
-     "count": 3,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.02,
-     "sel_change_pct": 10.02,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "震荡",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前2天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 30.86
-    },
-    {
-     "code": "603321",
-     "symbol": "sh603321",
-     "name": "梅轮电梯",
-     "date": "2026-09-18",
-     "count": 2,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 7.78,
-     "sel_change_pct": 7.78,
-     "data_available": true,
-     "consec_before": 1,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前1天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 7.48
-    },
-    {
-     "code": "002285",
-     "symbol": "sz002285",
-     "name": "世联行",
-     "date": "2026-09-18",
-     "count": 3,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.17,
-     "sel_change_pct": 10.17,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "震荡",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 2.6
-    },
-    {
-     "code": "300623",
-     "symbol": "sz300623",
-     "name": "捷捷微电",
-     "date": "2026-09-18",
-     "count": 1,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 7.26,
-     "sel_change_pct": 7.26,
-     "data_available": true,
-     "consec_before": 4,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": -0.76,
-     "max_drawdown_pct": 3.85,
-     "t1_gain_pct": -0.76,
-     "t3_gain_pct": -0.88,
-     "t5_gain_pct": -3.85,
-     "t10_gain_pct": -3.85,
-     "last_gain_pct": -3.85,
-     "pattern": "普通",
-     "note": "连涨前4天 回撤3.85%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-09-21",
-       "gain": -0.76
-      },
-      {
-       "T": "T+2",
-       "date": "2026-09-22",
-       "gain": -2.21
-      },
-      {
-       "T": "T+3",
-       "date": "2026-09-23",
-       "gain": -0.88
-      },
-      {
-       "T": "T+4",
-       "date": "2026-09-24",
-       "gain": -3.85
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 35.3
-    },
-    {
-     "code": "601996",
-     "symbol": "sh601996",
-     "name": "丰林集团",
-     "date": "2026-09-18",
-     "count": 1,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 4.53,
-     "sel_change_pct": 4.53,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 3.0
-    },
-    {
      "code": "002909",
      "symbol": "sz002909",
      "name": "集泰股份",
      "date": "2026-09-21",
-     "count": 6,
+     "count": 7,
      "categories": [
       "加速",
       "短线选股",
@@ -3463,7 +1142,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301046",
      "name": "能辉科技",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -3543,7 +1222,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002811",
      "name": "郑中设计",
      "date": "2026-09-21",
-     "count": 11,
+     "count": 12,
      "categories": [
       "加速",
       "短线选股",
@@ -3617,6 +1296,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 15.68
+    },
+    {
+     "code": "002172",
+     "symbol": "sz002172",
+     "name": "澳洋健康",
+     "date": "2026-09-21",
+     "count": 10,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.94,
+     "sel_change_pct": 9.94,
+     "data_available": true,
+     "consec_before": 1,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前1天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 5.09
     },
     {
      "code": "600792",
@@ -3703,7 +1462,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300741",
      "name": "华宝股份",
      "date": "2026-09-21",
-     "count": 3,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -3859,11 +1618,91 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 10.1
     },
     {
+     "code": "688678",
+     "symbol": "sh688678",
+     "name": "福立旺精密",
+     "date": "2026-09-21",
+     "count": 1,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 13.17,
+     "sel_change_pct": 13.17,
+     "data_available": true,
+     "consec_before": 3,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 16.83,
+     "max_drawdown_pct": 0.54,
+     "t1_gain_pct": -0.47,
+     "t3_gain_pct": 16.83,
+     "t5_gain_pct": 14.57,
+     "t10_gain_pct": -0.54,
+     "last_gain_pct": -0.54,
+     "pattern": "普通",
+     "note": "连涨前3天 回撤0.54%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-09-22",
+       "gain": -0.47
+      },
+      {
+       "T": "T+2",
+       "date": "2026-09-23",
+       "gain": 12.53
+      },
+      {
+       "T": "T+3",
+       "date": "2026-09-24",
+       "gain": 16.83
+      },
+      {
+       "T": "T+4",
+       "date": "2026-09-28",
+       "gain": 11.92
+      },
+      {
+       "T": "T+5",
+       "date": "2026-09-29",
+       "gain": 14.57
+      },
+      {
+       "T": "T+6",
+       "date": "2026-09-30",
+       "gain": 11.53
+      },
+      {
+       "T": "T+7",
+       "date": "2026-10-08",
+       "gain": 4.69
+      },
+      {
+       "T": "T+8",
+       "date": "2026-10-09",
+       "gain": 3.11
+      },
+      {
+       "T": "T+9",
+       "date": "2026-10-12",
+       "gain": -0.07
+      },
+      {
+       "T": "T+10",
+       "date": "2026-10-13",
+       "gain": -0.54
+      }
+     ],
+     "entry_price": 27.93
+    },
+    {
      "code": "002514",
      "symbol": "sz002514",
      "name": "*ST宝馨",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -4099,11 +1938,171 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 13.65
     },
     {
+     "code": "301227",
+     "symbol": "sz301227",
+     "name": "森鹰窗业",
+     "date": "2026-09-21",
+     "count": 3,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 3.78,
+     "sel_change_pct": 3.78,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 35.17
+    },
+    {
+     "code": "000993",
+     "symbol": "sz000993",
+     "name": "闽东电力",
+     "date": "2026-09-21",
+     "count": 9,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.98,
+     "sel_change_pct": 9.98,
+     "data_available": true,
+     "consec_before": 2,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前2天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 13.88
+    },
+    {
      "code": "600734",
      "symbol": "sh600734",
      "name": "*ST实达",
      "date": "2026-09-21",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -4183,7 +2182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh920075",
      "name": "柏星龙",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -4263,7 +2262,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000523",
      "name": "红棉股份",
      "date": "2026-09-21",
-     "count": 7,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -4497,6 +2496,166 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 66.24
+    },
+    {
+     "code": "301086",
+     "symbol": "sz301086",
+     "name": "鸿富瀚",
+     "date": "2026-09-21",
+     "count": 3,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 6.4,
+     "sel_change_pct": 6.4,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 165.79
+    },
+    {
+     "code": "300943",
+     "symbol": "sz300943",
+     "name": "春晖智控",
+     "date": "2026-09-21",
+     "count": 7,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 5.49,
+     "sel_change_pct": 5.49,
+     "data_available": true,
+     "consec_before": 3,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前3天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 37.45
     },
     {
      "code": "600601",
@@ -4743,7 +2902,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002011",
      "name": "盾安环境",
      "date": "2026-09-21",
-     "count": 3,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -4823,7 +2982,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688656",
      "name": "浩欧博",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -5063,7 +3222,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301133",
      "name": "金钟股份",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -5223,7 +3382,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300691",
      "name": "联合光电",
      "date": "2026-09-21",
-     "count": 8,
+     "count": 9,
      "categories": [
       "加速",
       "短线选股",
@@ -5297,6 +3456,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 17.76
+    },
+    {
+     "code": "600712",
+     "symbol": "sh600712",
+     "name": "南宁百货",
+     "date": "2026-09-21",
+     "count": 5,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.98,
+     "sel_change_pct": 9.98,
+     "data_available": true,
+     "consec_before": 4,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前4天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 6.83
     },
     {
      "code": "001389",
@@ -5379,11 +3618,91 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 185.93
     },
     {
+     "code": "600318",
+     "symbol": "sh600318",
+     "name": "新力金融",
+     "date": "2026-09-21",
+     "count": 6,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 10.07,
+     "sel_change_pct": 10.07,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 8.09
+    },
+    {
      "code": "300352",
      "symbol": "sz300352",
      "name": "ST信源",
      "date": "2026-09-21",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -5623,7 +3942,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000020",
      "name": "深华发Ａ",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -5939,6 +4258,166 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 8.42
     },
     {
+     "code": "600059",
+     "symbol": "sh600059",
+     "name": "古越龙山",
+     "date": "2026-09-21",
+     "count": 2,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 7.29,
+     "sel_change_pct": 7.29,
+     "data_available": true,
+     "consec_before": 4,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 6.88,
+     "max_drawdown_pct": 10.02,
+     "t1_gain_pct": -6.01,
+     "t3_gain_pct": -4.18,
+     "t5_gain_pct": -2.87,
+     "t10_gain_pct": -10.02,
+     "last_gain_pct": -10.02,
+     "pattern": "普通",
+     "note": "连涨前4天 回撤10.02%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-09-22",
+       "gain": -6.01
+      },
+      {
+       "T": "T+2",
+       "date": "2026-09-23",
+       "gain": -1.31
+      },
+      {
+       "T": "T+3",
+       "date": "2026-09-24",
+       "gain": -4.18
+      },
+      {
+       "T": "T+4",
+       "date": "2026-09-28",
+       "gain": 2.18
+      },
+      {
+       "T": "T+5",
+       "date": "2026-09-29",
+       "gain": -2.87
+      },
+      {
+       "T": "T+6",
+       "date": "2026-09-30",
+       "gain": 6.88
+      },
+      {
+       "T": "T+7",
+       "date": "2026-10-08",
+       "gain": 3.48
+      },
+      {
+       "T": "T+8",
+       "date": "2026-10-09",
+       "gain": 1.57
+      },
+      {
+       "T": "T+9",
+       "date": "2026-10-12",
+       "gain": -7.4
+      },
+      {
+       "T": "T+10",
+       "date": "2026-10-13",
+       "gain": -10.02
+      }
+     ],
+     "entry_price": 11.48
+    },
+    {
+     "code": "688719",
+     "symbol": "sh688719",
+     "name": "爱科赛博",
+     "date": "2026-09-21",
+     "count": 6,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 6.81,
+     "sel_change_pct": 6.81,
+     "data_available": true,
+     "consec_before": 3,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前3天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 58.2
+    },
+    {
      "code": "688662",
      "symbol": "sh688662",
      "name": "广东富信科技",
@@ -6017,6 +4496,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 107.9
+    },
+    {
+     "code": "603321",
+     "symbol": "sh603321",
+     "name": "梅轮电梯",
+     "date": "2026-09-21",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 7.78,
+     "sel_change_pct": 7.78,
+     "data_available": true,
+     "consec_before": 1,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前1天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 7.48
     },
     {
      "code": "000002",
@@ -6103,7 +4662,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000428",
      "name": "华天酒店",
      "date": "2026-09-21",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -6183,7 +4742,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301016",
      "name": "雷尔伟",
      "date": "2026-09-21",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -6257,6 +4816,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 15.53
+    },
+    {
+     "code": "002285",
+     "symbol": "sz002285",
+     "name": "世联行",
+     "date": "2026-09-21",
+     "count": 2,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 10.17,
+     "sel_change_pct": 10.17,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "震荡",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 2.6
     },
     {
      "code": "000702",
@@ -6343,7 +4982,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002100",
      "name": "天康生物",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -6583,7 +5222,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000829",
      "name": "天音控股",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -6663,7 +5302,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000816",
      "name": "智慧农业",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -7059,6 +5698,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 8.44
     },
     {
+     "code": "003006",
+     "symbol": "sz003006",
+     "name": "百亚股份",
+     "date": "2026-09-22",
+     "count": 8,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 6.43,
+     "sel_change_pct": 6.43,
+     "data_available": true,
+     "consec_before": 8,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前8天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 18.2
+    },
+    {
      "code": "300110",
      "symbol": "sz300110",
      "name": "华仁药业",
@@ -7303,7 +6022,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601999",
      "name": "出版传媒",
      "date": "2026-09-22",
-     "count": 8,
+     "count": 9,
      "categories": [
       "加速",
       "短线选股",
@@ -7463,7 +6182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605168",
      "name": "三人行",
      "date": "2026-09-22",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -7543,7 +6262,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz001326",
      "name": "联域股份",
      "date": "2026-09-22",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -7617,6 +6336,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 78.95
+    },
+    {
+     "code": "301041",
+     "symbol": "sz301041",
+     "name": "金百泽",
+     "date": "2026-09-22",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 3.45,
+     "sel_change_pct": 3.45,
+     "data_available": true,
+     "consec_before": 2,
+     "stage": "主升",
+     "consecutive_up_days": 1,
+     "max_gain_pct": 7.18,
+     "max_drawdown_pct": 10.68,
+     "t1_gain_pct": 1.82,
+     "t3_gain_pct": -5.95,
+     "t5_gain_pct": -0.67,
+     "t10_gain_pct": 4.17,
+     "last_gain_pct": 4.17,
+     "pattern": "普通",
+     "note": "连涨前2天 回撤10.68%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-09-23",
+       "gain": 1.82
+      },
+      {
+       "T": "T+2",
+       "date": "2026-09-24",
+       "gain": 0.32
+      },
+      {
+       "T": "T+3",
+       "date": "2026-09-28",
+       "gain": -5.95
+      },
+      {
+       "T": "T+4",
+       "date": "2026-09-29",
+       "gain": 5.45
+      },
+      {
+       "T": "T+5",
+       "date": "2026-09-30",
+       "gain": -0.67
+      },
+      {
+       "T": "T+6",
+       "date": "2026-10-08",
+       "gain": -2.27
+      },
+      {
+       "T": "T+7",
+       "date": "2026-10-09",
+       "gain": -5.66
+      },
+      {
+       "T": "T+8",
+       "date": "2026-10-12",
+       "gain": -10.68
+      },
+      {
+       "T": "T+9",
+       "date": "2026-10-13",
+       "gain": 7.18
+      },
+      {
+       "T": "T+10",
+       "date": "2026-10-14",
+       "gain": 4.17
+      }
+     ],
+     "entry_price": 37.45
     },
     {
      "code": "603893",
@@ -7857,6 +6656,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 36.24
+    },
+    {
+     "code": "000978",
+     "symbol": "sz000978",
+     "name": "桂林旅游",
+     "date": "2026-09-23",
+     "count": 4,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.99,
+     "sel_change_pct": 9.99,
+     "data_available": true,
+     "consec_before": 4,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前4天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 9.69
     },
     {
      "code": "600641",
@@ -9143,7 +8022,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002819",
      "name": "东方中科",
      "date": "2026-09-24",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -9303,7 +8182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002264",
      "name": "新 华 都",
      "date": "2026-09-24",
-     "count": 6,
+     "count": 7,
      "categories": [
       "强势股",
       "短线选股",
@@ -9943,7 +8822,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603421",
      "name": "鼎信通讯",
      "date": "2026-09-29",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -10263,7 +9142,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603886",
      "name": "元祖股份",
      "date": "2026-09-29",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -10343,7 +9222,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002620",
      "name": "*ST瑞和",
      "date": "2026-09-29",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -10743,7 +9622,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688696",
      "name": "极米科技",
      "date": "2026-09-30",
-     "count": 8,
+     "count": 9,
      "categories": [
       "强势股",
       "短线选股",
@@ -11220,7 +10099,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-10": {
-   "count": 150,
+   "count": 190,
    "leaders": [
     {
      "code": "002343",
@@ -11623,6 +10502,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 49.21
     },
     {
+     "code": "603626",
+     "symbol": "sh603626",
+     "name": "科森科技",
+     "date": "2026-10-23",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.95,
+     "sel_change_pct": 9.95,
+     "data_available": true,
+     "consec_before": 1,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 4.94,
+     "max_drawdown_pct": 4.6,
+     "t1_gain_pct": -2.26,
+     "t3_gain_pct": 4.94,
+     "t5_gain_pct": 4.94,
+     "t10_gain_pct": 4.94,
+     "last_gain_pct": 4.94,
+     "pattern": "普通",
+     "note": "连涨前1天 回撤4.6%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-10-26",
+       "gain": -2.26
+      },
+      {
+       "T": "T+2",
+       "date": "2026-10-27",
+       "gain": -4.6
+      },
+      {
+       "T": "T+3",
+       "date": "2026-10-28",
+       "gain": 4.94
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 26.52
+    },
+    {
      "code": "300979",
      "symbol": "sz300979",
      "name": "华利集团",
@@ -11941,86 +10900,6 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 30.17
-    },
-    {
-     "code": "002702",
-     "symbol": "sz002702",
-     "name": "海欣食品",
-     "date": "2026-10-08",
-     "count": 4,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.05,
-     "sel_change_pct": 10.05,
-     "data_available": true,
-     "consec_before": 2,
-     "stage": "启动",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前2天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 6.79
     }
    ],
    "all": [
@@ -12109,7 +10988,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002702",
      "name": "海欣食品",
      "date": "2026-10-08",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -12349,7 +11228,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002300",
      "name": "太阳电缆",
      "date": "2026-10-08",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -12749,7 +11628,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000513",
      "name": "丽珠集团",
      "date": "2026-10-09",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -12825,11 +11704,91 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 32.9
     },
     {
+     "code": "600838",
+     "symbol": "sh600838",
+     "name": "上海九百",
+     "date": "2026-10-09",
+     "count": 8,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 7.27,
+     "sel_change_pct": 7.27,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "震荡",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 26.44,
+     "max_drawdown_pct": 7.13,
+     "t1_gain_pct": -4.48,
+     "t3_gain_pct": -3.79,
+     "t5_gain_pct": -5.98,
+     "t10_gain_pct": 26.44,
+     "last_gain_pct": 26.44,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤7.13%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-10-12",
+       "gain": -4.48
+      },
+      {
+       "T": "T+2",
+       "date": "2026-10-13",
+       "gain": -0.57
+      },
+      {
+       "T": "T+3",
+       "date": "2026-10-14",
+       "gain": -3.79
+      },
+      {
+       "T": "T+4",
+       "date": "2026-10-15",
+       "gain": -4.71
+      },
+      {
+       "T": "T+5",
+       "date": "2026-10-16",
+       "gain": -5.98
+      },
+      {
+       "T": "T+6",
+       "date": "2026-10-19",
+       "gain": -7.13
+      },
+      {
+       "T": "T+7",
+       "date": "2026-10-20",
+       "gain": -5.06
+      },
+      {
+       "T": "T+8",
+       "date": "2026-10-21",
+       "gain": 4.48
+      },
+      {
+       "T": "T+9",
+       "date": "2026-10-22",
+       "gain": 14.94
+      },
+      {
+       "T": "T+10",
+       "date": "2026-10-23",
+       "gain": 26.44
+      }
+     ],
+     "entry_price": 8.7
+    },
+    {
      "code": "603721",
      "symbol": "sh603721",
      "name": "中广天择",
      "date": "2026-10-09",
-     "count": 7,
+     "count": 8,
      "categories": [
       "强势股",
       "短线选股",
@@ -13149,7 +12108,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300830",
      "name": "金现代",
      "date": "2026-10-09",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -13625,6 +12584,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 26.41
     },
     {
+     "code": "300464",
+     "symbol": "sz300464",
+     "name": "星徽股份",
+     "date": "2026-10-14",
+     "count": 2,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 20.0,
+     "sel_change_pct": 20.0,
+     "data_available": true,
+     "consec_before": 4,
+     "stage": "主升",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前4天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 10.02
+    },
+    {
      "code": "002272",
      "symbol": "sz002272",
      "name": "川润股份",
@@ -13703,6 +12742,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 17.94
+    },
+    {
+     "code": "002902",
+     "symbol": "sz002902",
+     "name": "铭普光磁",
+     "date": "2026-10-14",
+     "count": 3,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 10.02,
+     "sel_change_pct": 10.02,
+     "data_available": true,
+     "consec_before": 2,
+     "stage": "震荡",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前2天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 30.86
     },
     {
      "code": "600698",
@@ -13789,7 +12908,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300992",
      "name": "泰福泵业",
      "date": "2026-10-14",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -14023,6 +13142,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 10.42
+    },
+    {
+     "code": "605003",
+     "symbol": "sh605003",
+     "name": "众望布艺",
+     "date": "2026-10-15",
+     "count": 3,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 6.21,
+     "sel_change_pct": 6.21,
+     "data_available": true,
+     "consec_before": 2,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前2天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 25.47
     },
     {
      "code": "300006",
@@ -14269,7 +13468,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh920690",
      "name": "捷众科技",
      "date": "2026-10-16",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -14343,6 +13542,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 19.24
+    },
+    {
+     "code": "300553",
+     "symbol": "sz300553",
+     "name": "集智股份",
+     "date": "2026-10-16",
+     "count": 5,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 12.83,
+     "sel_change_pct": 12.83,
+     "data_available": true,
+     "consec_before": 1,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前1天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 57.86
     },
     {
      "code": "603595",
@@ -14423,6 +13702,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 31.65
+    },
+    {
+     "code": "603051",
+     "symbol": "sh603051",
+     "name": "鹿山新材",
+     "date": "2026-10-16",
+     "count": 6,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 7.86,
+     "sel_change_pct": 7.86,
+     "data_available": true,
+     "consec_before": 8,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前8天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 25.67
     },
     {
      "code": "603668",
@@ -14669,7 +14028,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600329",
      "name": "达仁堂",
      "date": "2026-10-19",
-     "count": 2,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -15309,7 +14668,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002518",
      "name": "科士达",
      "date": "2026-10-20",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -15629,7 +14988,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002201",
      "name": "九鼎新材",
      "date": "2026-10-21",
-     "count": 3,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -16745,6 +16104,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 60.18
     },
     {
+     "code": "603626",
+     "symbol": "sh603626",
+     "name": "科森科技",
+     "date": "2026-10-23",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.95,
+     "sel_change_pct": 9.95,
+     "data_available": true,
+     "consec_before": 1,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 4.94,
+     "max_drawdown_pct": 4.6,
+     "t1_gain_pct": -2.26,
+     "t3_gain_pct": 4.94,
+     "t5_gain_pct": 4.94,
+     "t10_gain_pct": 4.94,
+     "last_gain_pct": 4.94,
+     "pattern": "普通",
+     "note": "连涨前1天 回撤4.6%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "2026-10-26",
+       "gain": -2.26
+      },
+      {
+       "T": "T+2",
+       "date": "2026-10-27",
+       "gain": -4.6
+      },
+      {
+       "T": "T+3",
+       "date": "2026-10-28",
+       "gain": 4.94
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 26.52
+    },
+    {
      "code": "300378",
      "symbol": "sz300378",
      "name": "鼎捷数智",
@@ -16909,7 +16348,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301376",
      "name": "致欧科技",
      "date": "2026-10-23",
-     "count": 2,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -17949,7 +17388,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301281",
      "name": "科源制药",
      "date": "2026-10-28",
-     "count": 2,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -18587,14 +18026,94 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-11": {
-   "count": 7,
+   "count": 16,
    "leaders": [
+    {
+     "code": "300808",
+     "symbol": "sz300808",
+     "name": "久量股份",
+     "date": "2026-11-02",
+     "count": 2,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.47,
+     "sel_change_pct": 9.47,
+     "data_available": true,
+     "consec_before": 6,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前6天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 24.96
+    },
     {
      "code": "000679",
      "symbol": "sz000679",
      "name": "大连友谊",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18674,7 +18193,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601098",
      "name": "中南传媒",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18754,7 +18273,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000532",
      "name": "华金资本",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18834,7 +18353,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002771",
      "name": "真视通",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18914,7 +18433,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603587",
      "name": "地素时尚",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18994,7 +18513,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002489",
      "name": "浙江永强",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19074,7 +18593,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600793",
      "name": "宜宾纸业",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19152,11 +18671,91 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ],
    "all": [
     {
+     "code": "300808",
+     "symbol": "sz300808",
+     "name": "久量股份",
+     "date": "2026-11-02",
+     "count": 2,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 9.47,
+     "sel_change_pct": 9.47,
+     "data_available": true,
+     "consec_before": 6,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前6天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 24.96
+    },
+    {
      "code": "000679",
      "symbol": "sz000679",
      "name": "大连友谊",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19236,7 +18835,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601098",
      "name": "中南传媒",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19316,7 +18915,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000532",
      "name": "华金资本",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19396,7 +18995,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002771",
      "name": "真视通",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19476,7 +19075,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603587",
      "name": "地素时尚",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19556,7 +19155,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002489",
      "name": "浙江永强",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -19636,7 +19235,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600793",
      "name": "宜宾纸业",
      "date": "2026-11-02",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
