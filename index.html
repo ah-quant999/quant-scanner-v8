@@ -3424,7 +3424,7 @@ function fmtSigned(v){
       <div class="card" id="riskGateCard" style="margin-top:16px;border-left:4px solid #ef5350;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
           <span style="font-size:14px;font-weight:700;color:var(--txt);">🛡️ 风险闸 · 回撤 / 估值 / 行业（执行卡已据此真实缩放仓位）</span>
-          <span style="font-size:10px;font-weight:700;background:rgba(248,113,113,.12);color:#ef5350;border:1px solid rgba(248,113,113,.3);padding:1px 7px;border-radius:10px;">三闸真实生效</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(239,83,80,.12);color:#ef5350;border:1px solid rgba(239,83,80,.3);padding:1px 7px;border-radius:10px;">三闸真实生效</span>
         </div>
         <div id="riskGateHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">🛡️ 风险闸加载中…</div></div>
       </div>
@@ -7373,19 +7373,19 @@ c.innerHTML = h;
       }).join('');
       var dets = [];
       _detKeys.forEach(function(k){ var v = String(s[k]==null?'':s[k]).trim(); if(v && !/^已下架/.test(v)) dets.push(v); });
-      return '<tr style="border-top:1px solid rgba(148,163,184,.16);'+(isRec?'background:rgba(248,113,113),.06);':'')+'">'
+      return '<tr style="border-top:1px solid rgba(148,163,184,.16);'+(isRec?'background:rgba(239,83,80,.06);':'')+'">'
          + '<td style="padding:5px 6px;color:var(--dim);">'+(idx+1)+'</td>'
          + '<td style="padding:5px 6px;white-space:nowrap;"><b style="color:var(--txt);">'+_e(s.name||'')+'</b> <span style="color:var(--dim);">'+_e(code)+'</span>'
-         + (isRec ? ' <span style="font-size:10px;font-weight:700;color:#ef5350;background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.35);padding:1px 6px;border-radius:8px;white-space:nowrap;">🏷 最终推荐</span>' : '')
+         + (isRec ? ' <span style="font-size:10px;font-weight:700;color:#ef5350;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);padding:1px 6px;border-radius:8px;white-space:nowrap;">🏷 最终推荐</span>' : '')
          + '</td>'
          + tds
          + '<td style="padding:5px 6px;text-align:right;"><b style="color:#fbbf24;font-size:12.5px;">'+_e(s.total_score)+'</b></td>'
-         + '<tr'+(isRec?' style="background:rgba(248,113,113),.06);"':'')+'><td></td>'
+         + '<tr'+(isRec?' style="background:rgba(239,83,80,.06);"':'')+'><td></td>'
          + '<td colspan="'+(VIS.length+2)+'" style="padding:1px 6px 6px;font-size:10px;color:var(--dim);line-height:1.55;">'
          + '<span style="color:#64748b;">🧮</span> ' + _eq + '</td></tr>'
          + '</tr>'
          + (dets.length
-            ? '<tr style="'+(isRec?'background:rgba(248,113,113),.06);':'')+'"><td></td>'
+            ? '<tr style="'+(isRec?'background:rgba(239,83,80,.06);':'')+'"><td></td>'
               + '<td colspan="'+(VIS.length+2)+'" style="padding:0 6px 7px;font-size:10.5px;color:var(--dim);line-height:1.6;">'
               + _e(dets.join(' ｜ ')) + '</td></tr>'
             : '');
@@ -9100,7 +9100,7 @@ function switchSec(sec,el){
       console.error('[showV8QueryDropdown]', e);
       // 🔴 2026-08-12 主人紧急：抛错时显示具体错误，不再「什么都查不了」假象
       var _errDd = _q$('v8QueryDropdown');
-      if(_errDd) _errDd.innerHTML = '<div style="padding:10px 14px;color:#ef5350;font-size:12px;background:rgba(248,113,113),.08);">⚠️ 下拉查询错误: '+(e.message||e)+'</div>';
+      if(_errDd) _errDd.innerHTML = '<div style="padding:10px 14px;color:#ef5350;font-size:12px;background:rgba(239,83,80,.08);">⚠️ 下拉查询错误: '+(e.message||e)+'</div>';
     }
   };
   window.selectV8QueryStock = function(code){
@@ -9147,7 +9147,7 @@ function switchSec(sec,el){
     const arr = alert.stocks || [];
     const row = arr.find(r=>normCode(r.code)===normCode(code));
     if(!row) return '';
-    let h='<div style="padding:12px;background:rgba(244,73,93,.08);border-radius:8px;border:1px solid rgba(244,73,93,.3);">';
+    let h='<div style="padding:12px;background:rgba(239,83,80,.08);border-radius:8px;border:1px solid rgba(239,83,80,.3);">';
     h+='<div style="font-size:13px;font-weight:700;color:var(--down);margin-bottom:8px;">🚫 停牌识别</div>';
     h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
     h+='<div>状态 <b>'+(row.status||'停牌')+'</b> · 已停牌 <b>'+(row.days||'-')+'</b> 天</div>';
@@ -9447,7 +9447,7 @@ function switchSec(sec,el){
       h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
       signals.forEach(function(s){
         const clr = s.c==='up'?'#ef5350':s.c==='down'?'#26a69a':'#94a3b8';
-        const bg  = s.c==='up'?'rgba(244,73,93,.10)':s.c==='down'?'rgba(31,209,123,.10)':'rgba(148,163,184,.10)';
+        const bg  = s.c==='up'?'rgba(239,83,80,.10)':s.c==='down'?'rgba(38,106,154,.10)':'rgba(148,163,184,.10)';
         h+='<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;font-size:10.5px;font-weight:600;background:'+bg+';color:'+clr+';border:1px solid '+clr+'30;white-space:nowrap;"><span>●</span>'+s.t+'</span>';
       });
       h+='</div>';
@@ -9779,7 +9779,7 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     if(!input || !res){
       // 🔴 2026-08-12 主人紧急修复：DOM 元素未找到时显示错误（之前静默失败=「什么都查不了」假象）
       var _e=document.createElement('div');
-      _e.style.cssText='padding:14px;background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.35);border-radius:8px;color:#ef5350;font-size:13px;margin-top:10px;';
+      _e.style.cssText='padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:13px;margin-top:10px;';
       _e.textContent='⚠️ DOM 未就绪：找不到 v8QueryInput/v8QueryResult 元素，请刷新页面重试。';
       var _container=document.getElementById('v8QueryResult');
       if(_container) _container.innerHTML=_e.outerHTML;
@@ -9826,7 +9826,7 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     } catch(e) {
       // 🔴 2026-08-12 主人紧急修复：JS 抛错时显式显示，不再「什么都查不了」假象
       console.error('[doV8Query] 错误:', e);
-      res.innerHTML = '<div style="padding:14px;background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;margin-bottom:14px;">'+
+      res.innerHTML = '<div style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;margin-bottom:14px;">'+
         '<b>⚠️ 查询执行错误</b>（不是数据问题，是 JS 代码问题）：<br>'+
         '<code style="display:block;margin-top:6px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;font-family:monospace;font-size:11px;white-space:pre-wrap;">'+
         (e && e.message ? e.message.replace(/</g,'&lt;') : String(e)) + '\n' +
@@ -10419,9 +10419,9 @@ window.__renderV8CalFull = function(D){
   if(lg){
     function hx(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
     var LG=[
-      {n:'重要政策',c:'#c62828',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['关注国务院/证监会/交易所重大发布']},
+      {n:'重要政策',c:'#ef5350',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['关注国务院/证监会/交易所重大发布']},
       {n:'央行/LPR',c:'#1565c0',d:'央行货币政策、利率决议、LPR报价等',i:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
-      {n:'中国数据',c:'#f57f17',d:'中国宏观经济数据发布',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
+      {n:'中国数据',c:'#fbbf24',d:'中国宏观经济数据发布',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
       {n:'财报截止',c:'#673ab7',d:'A股财报披露法定截止日',i:['7/15 🇨🇳 A股半年报预告强制截止日']},
       {n:'期权交割',c:'#00838f',d:'各交易所期权合约到期日，涉及多空博弈',i:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间']},
       {n:'期货交割',c:'#1d6f42',d:'期货合约最后交易日，交割前后波动加大',i:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
@@ -10600,17 +10600,17 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     if(isLive){
       const totalRet = it.total_return!=null ? it.total_return
                     : (it.change_pct!=null ? it.change_pct : 0);
-      if(totalRet<=-3)      { rec='🔴 破发 '+totalRet.toFixed(1)+'%'; tagColor='#c62828'; bgColor='#ffebee'; }
-      else if(totalRet>=3)   { rec='🟢 涨 +'+totalRet.toFixed(1)+'%'; tagColor='#0d7d4a'; bgColor='#e8f5e9'; }
+      if(totalRet<=-3)      { rec='🟢 破发 '+totalRet.toFixed(1)+'%'; tagColor='#26a69a'; bgColor='rgba(38,106,154,.12)'; }
+      else if(totalRet>=3)   { rec='🔴 涨 +'+totalRet.toFixed(1)+'%'; tagColor='#ef5350'; bgColor='rgba(239,83,80,.12)'; }
       else if(totalRet===0)  { rec='⚪ 震荡 平';        tagColor='#888';    bgColor='#f5f5f5'; }
-      else if(totalRet<0)    { rec='🟡 微跌 '+totalRet.toFixed(1)+'%'; tagColor='#fb8c00'; bgColor='#fff3e0'; }
-      else                  { rec='🟢 微涨 +'+totalRet.toFixed(1)+'%'; tagColor='#0d7d4a'; bgColor='#e8f5e9'; }
+      else if(totalRet<0)    { rec='🟢 微跌 '+totalRet.toFixed(1)+'%'; tagColor='#26a69a'; bgColor='rgba(38,106,154,.12)'; }
+      else                  { rec='🔴 微涨 +'+totalRet.toFixed(1)+'%'; tagColor='#ef5350'; bgColor='rgba(239,83,80,.12)'; }
     } else {
       // ⚠️ 不建议必须在建议申购之前,否则"不建议申购"包含子串"建议申购"会被误匹配为红色
       rec=it.recommend||'—';
-      if(/不建议/.test(rec))                  { tagColor='#26a69a'; bgColor='rgba(74,222,128,.12)'; }
-      else if(/强烈推荐|建议申购/.test(rec))   { tagColor='#ef5350'; bgColor='rgba(248,113,113),.14)'; }
-      else if(/谨慎|观望/.test(rec))           { tagColor='#ffb74d'; bgColor='rgba(255,183,77,.12)'; }
+      if(/不建议/.test(rec))                  { tagColor='#26a69a'; bgColor='rgba(38,106,154,.12)'; }
+      else if(/强烈推荐|建议申购/.test(rec))   { tagColor='#ef5350'; bgColor='rgba(239,83,80,.14)'; }
+      else if(/谨慎|观望/.test(rec))           { tagColor='#fbbf24'; bgColor='rgba(251,191,36,.12)'; }
       else                                      { tagColor='#93a4c4'; bgColor='rgba(147,164,196,.12)'; }
     }
     const highlights=(it.highlights||[]).filter(Boolean).slice(0,4);
@@ -10679,7 +10679,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     }));
   }
 
-  const IPO_FALLBACK = {"update_time":"2026-07-28 12:18:54","eligible_count":3,"pre_listing_count":6,"listed_count":0,"tracking_count":0,"summary":"3只待评估，6只待上市。 📋 可转债5待申购","stocks":[{"code":"920165","name":"珈凯生物","issue_price":19.26,"issue_pe":14.98,"industry_pe":29.3,"pe_discount":48.9,"board":"北交所","apply_date":"20260729","listing_date":"","score":63,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":73,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"化妆品功效原料的研发、生产及销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资1亿"],"status":"applying"},{"code":"301717","name":"超纯应材","issue_price":0,"issue_pe":60.01,"industry_pe":70.6,"pe_discount":15.0,"board":"科创板","apply_date":"20260731","listing_date":"","score":55,"recommend":"待定价","tag_color":"#888","bg_color":"#f5f5f5","arbitrage_score":47,"fundamental_score":68,"fundamentals":{"track_label":"高景气赛道","main_business":"专注于特殊涂层工艺及其关联技术和材料的国家级专精特新重点“小巨人”企业,主要面向芯片制造、精密光学等领域,提供经材料改性、精密表面加工、精密清洗和特殊涂层工艺后的精密零部件产品及服务","industry":"","over_subscription":1.0,"over_label":"足额募资","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资11亿"],"status":"applying"},{"code":"688828","name":"国仪公司","issue_price":0,"issue_pe":57.63,"industry_pe":67.8,"pe_discount":15.0,"board":"科创板","apply_date":"20260731","listing_date":"","score":55,"recommend":"待定价","tag_color":"#888","bg_color":"#f5f5f5","arbitrage_score":47,"fundamental_score":68,"fundamentals":{"track_label":"高景气赛道","main_business":"专注于高端科学仪器的研发,面向量子科技、材料科学、化学化工、生物医药、先进制造等多个领域,向全球范围内的高校及科研院所、企业提供科技前沿探索所需的高端科学仪器装备、以增强型量子传感器为代表的核心关键器件以及解决方案","industry":"","over_subscription":1.0,"over_label":"足额募资","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资12亿"],"status":"applying"},{"code":"603468","name":"津富士达","issue_price":17.46,"issue_pe":19.25,"industry_pe":33.5,"pe_discount":42.5,"board":"科创板","apply_date":"20260724","listing_date":"","score":69,"recommend":"建议申购","tag_color":"#e65100","bg_color":"#fff3e0","arbitrage_score":71,"fundamental_score":65,"fundamentals":{"track_label":"高景气赛道","main_business":"从事自行车、电助力自行车、共享单车等产品及其关键零部件的研发、设计、生产与销售业务","industry":"铁路、船舶、航空航天和其他运输设备制造业","over_subscription":0.93,"over_label":"募资0.9倍计划","pb":2.26,"pb_label":"PB2.3","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资7亿"],"status":"pre_listing"},{"code":"301707","name":"展芯股份","issue_price":23.45,"issue_pe":44.23,"industry_pe":73.6,"pe_discount":39.9,"board":"科创板","apply_date":"20260727","listing_date":"","score":67,"recommend":"建议申购","tag_color":"#e65100","bg_color":"#fff3e0","arbitrage_score":70,"fundamental_score":62,"fundamentals":{"track_label":"高景气赛道","main_business":"高可靠模拟芯片及微模块产品的研发设计、测试及销售","industry":"计算机、通信和其他电子设备制造业","over_subscription":1.08,"over_label":"足额募资","pb":5.94,"pb_label":"高PB5.9","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资10亿"],"status":"pre_listing"},{"code":"920038","name":"森合高科","issue_price":29.06,"issue_pe":11.49,"industry_pe":29.6,"pe_discount":61.2,"board":"北交所","apply_date":"20260727","listing_date":"","score":67,"recommend":"建议申购","tag_color":"#e65100","bg_color":"#fff3e0","arbitrage_score":80,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"环保型贵金属选矿剂的研发、生产及销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资6亿"],"status":"pre_listing"},{"code":"920065","name":"千岸科技","issue_price":24.3,"issue_pe":10.28,"industry_pe":21.6,"pe_discount":52.4,"board":"北交所","apply_date":"20260720","listing_date":"20260729","score":64,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":75,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"从事自有品牌产品研发、设计并主要通过电商平台和自营网站进行销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["预计07.29上市","募资4亿"],"status":"pre_listing"},{"code":"001232","name":"嘉立创","issue_price":84.46,"issue_pe":38.19,"industry_pe":73.6,"pe_discount":48.1,"board":"科创板","apply_date":"20260724","listing_date":"","score":60,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":59,"fundamental_score":62,"fundamentals":{"track_label":"高景气赛道","main_business":"(1)印制电路板业务,可满足客户“样板→小批量→中大批量”的PCB制造需求;(2)电子元器件业务,主要通过全品类现货模式满足客户样品、小批量电子元器件的采购需求;(3)电子装联业务,通过对工程管理及生产环节等流程的高效组织,公司能够快速响应样品、小批量客户的PCBA订单需求;(4)其他主营业务,包含EDA/CAM工业软件、激光钢网等电子产业配套服务和与电子产业链服务具有“客户同源”特点的3D打印、CNC制造、FA机械零部件商城等机械产业服务","industry":"计算机、通信和其他电子设备制造业","over_subscription":1.12,"over_label":"足额募资","pb":5.58,"pb_label":"高PB5.6","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资47亿"],"status":"pre_listing"},{"code":"920258","name":"聚仁新材","issue_price":4.48,"issue_pe":14.97,"industry_pe":30.2,"pe_discount":50.4,"board":"北交所","apply_date":"20260722","listing_date":"","score":59,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":67,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"己内酯系列产品的研发、生产和销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资2亿"],"status":"pre_listing"},{"type":"bond","code":"113709","name":"振26转债","issue_price":100.0,"transfer_price":40.33,"bond_scale":8.78,"stock_code":"","apply_date":"20260730","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":8.78,"score":61,"arbitrage_score":65,"fundamental_score":55,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":8.78,"transfer_price":40.33,"bond_safety":"高"},"highlights":["转股价 ¥40.33","规模 8.8亿","债底安全 高"]},{"type":"bond","code":"123278","name":"合金转债","issue_price":100.0,"transfer_price":13.98,"bond_scale":5.45,"stock_code":"","apply_date":"20260730","listing_date":"","status":"applying","market_code":"SZ","dec_sumfina":5.45,"score":61,"arbitrage_score":65,"fundamental_score":55,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":5.45,"transfer_price":13.98,"bond_safety":"高"},"highlights":["转股价 ¥13.98","规模 5.5亿","债底安全 高"]},{"type":"bond","code":"118075","name":"奥普转债","issue_price":100.0,"transfer_price":150.03,"bond_scale":12.7,"stock_code":"","apply_date":"20260729","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":12.7,"score":56,"arbitrage_score":60,"fundamental_score":50,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":12.7,"transfer_price":150.03,"bond_safety":"中"},"highlights":["转股价 ¥150.03","规模 12.7亿","债底安全 中"]},{"type":"bond","code":"123277","name":"玉禾转债","issue_price":100.0,"transfer_price":16.35,"bond_scale":15.0,"stock_code":"","apply_date":"20260729","listing_date":"","status":"applying","market_code":"SZ","dec_sumfina":15.0,"score":66,"arbitrage_score":70,"fundamental_score":60,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":15.0,"transfer_price":16.35,"bond_safety":"高"},"highlights":["转股价 ¥16.35","规模 15.0亿","债底安全 高"]},{"type":"bond","code":"118074","name":"特宝转债","issue_price":100.0,"transfer_price":58.56,"bond_scale":15.33,"stock_code":"","apply_date":"20260728","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":15.33266,"score":63,"arbitrage_score":65,"fundamental_score":60,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":15.33,"transfer_price":58.56,"bond_safety":"高"},"highlights":["转股价 ¥58.56","规模 15.3亿","债底安全 高"]},{"type":"bond","code":"127115","name":"炬申转债","issue_price":100.0,"transfer_price":13.76,"bond_scale":3.8,"stock_code":"","apply_date":"20260724","listing_date":"","status":"pre_listing","market_code":"SZ","dec_sumfina":3.8,"score":54,"arbitrage_score":60,"fundamental_score":45,"recommend":"不建议申购","tag_color":"#c62828","bg_color":"#ffebee","board":"可转债","fundamentals":{"track":"可转债","scale":3.8,"transfer_price":13.76,"bond_safety":"中"},"highlights":["转股价 ¥13.76","规模 3.8亿","债底安全 中"]},{"type":"bond","code":"110103","name":"申能转债","issue_price":100.0,"transfer_price":8.74,"bond_scale":20.0,"stock_code":"","apply_date":"20260724","listing_date":"","status":"pre_listing","market_code":"SH","dec_sumfina":20.0,"score":71,"arbitrage_score":75,"fundamental_score":65,"recommend":"建议申购","tag_color":"#0d7d4a","bg_color":"#e8f5e9","board":"可转债","fundamentals":{"track":"可转债","scale":20.0,"transfer_price":8.74,"bond_safety":"高"},"highlights":["转股价 ¥8.74","规模 20.0亿","债底安全 高"]},{"type":"bond","code":"123275","name":"肇民转债","issue_price":100.0,"transfer_price":33.8,"bond_scale":5.9,"stock_code":"","apply_date":"20260709","listing_date":"20260724","status":"tracking","market_code":"SZ","dec_sumfina":5.9,"latest":100.0,"open_price":100.0,"change_pct":0,"turnover":0,"total_return":0,"open_return":0,"score":46,"arbitrage_score":50,"fundamental_score":40,"recommend":"⚪ 震荡，建议观望","tag_color":"#888","bg_color":"#f5f5f5","fundamentals":{"track":"可转债","total_return":0,"turnover":0},"highlights":["较发行 +0.0%","现价 ¥100.00","⚪ 震荡，建议观望"]}]};
+  const IPO_FALLBACK = {"update_time":"2026-07-28 12:18:54","eligible_count":3,"pre_listing_count":6,"listed_count":0,"tracking_count":0,"summary":"3只待评估，6只待上市。 📋 可转债5待申购","stocks":[{"code":"920165","name":"珈凯生物","issue_price":19.26,"issue_pe":14.98,"industry_pe":29.3,"pe_discount":48.9,"board":"北交所","apply_date":"20260729","listing_date":"","score":63,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","arbitrage_score":73,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"化妆品功效原料的研发、生产及销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资1亿"],"status":"applying"},{"code":"301717","name":"超纯应材","issue_price":0,"issue_pe":60.01,"industry_pe":70.6,"pe_discount":15.0,"board":"科创板","apply_date":"20260731","listing_date":"","score":55,"recommend":"待定价","tag_color":"#888","bg_color":"#f5f5f5","arbitrage_score":47,"fundamental_score":68,"fundamentals":{"track_label":"高景气赛道","main_business":"专注于特殊涂层工艺及其关联技术和材料的国家级专精特新重点“小巨人”企业,主要面向芯片制造、精密光学等领域,提供经材料改性、精密表面加工、精密清洗和特殊涂层工艺后的精密零部件产品及服务","industry":"","over_subscription":1.0,"over_label":"足额募资","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资11亿"],"status":"applying"},{"code":"688828","name":"国仪公司","issue_price":0,"issue_pe":57.63,"industry_pe":67.8,"pe_discount":15.0,"board":"科创板","apply_date":"20260731","listing_date":"","score":55,"recommend":"待定价","tag_color":"#888","bg_color":"#f5f5f5","arbitrage_score":47,"fundamental_score":68,"fundamentals":{"track_label":"高景气赛道","main_business":"专注于高端科学仪器的研发,面向量子科技、材料科学、化学化工、生物医药、先进制造等多个领域,向全球范围内的高校及科研院所、企业提供科技前沿探索所需的高端科学仪器装备、以增强型量子传感器为代表的核心关键器件以及解决方案","industry":"","over_subscription":1.0,"over_label":"足额募资","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资12亿"],"status":"applying"},{"code":"603468","name":"津富士达","issue_price":17.46,"issue_pe":19.25,"industry_pe":33.5,"pe_discount":42.5,"board":"科创板","apply_date":"20260724","listing_date":"","score":69,"recommend":"建议申购","tag_color":"#ef5350","bg_color":"rgba(239,83,80,.12)","arbitrage_score":71,"fundamental_score":65,"fundamentals":{"track_label":"高景气赛道","main_business":"从事自行车、电助力自行车、共享单车等产品及其关键零部件的研发、设计、生产与销售业务","industry":"铁路、船舶、航空航天和其他运输设备制造业","over_subscription":0.93,"over_label":"募资0.9倍计划","pb":2.26,"pb_label":"PB2.3","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资7亿"],"status":"pre_listing"},{"code":"301707","name":"展芯股份","issue_price":23.45,"issue_pe":44.23,"industry_pe":73.6,"pe_discount":39.9,"board":"科创板","apply_date":"20260727","listing_date":"","score":67,"recommend":"建议申购","tag_color":"#ef5350","bg_color":"rgba(239,83,80,.12)","arbitrage_score":70,"fundamental_score":62,"fundamentals":{"track_label":"高景气赛道","main_business":"高可靠模拟芯片及微模块产品的研发设计、测试及销售","industry":"计算机、通信和其他电子设备制造业","over_subscription":1.08,"over_label":"足额募资","pb":5.94,"pb_label":"高PB5.9","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资10亿"],"status":"pre_listing"},{"code":"920038","name":"森合高科","issue_price":29.06,"issue_pe":11.49,"industry_pe":29.6,"pe_discount":61.2,"board":"北交所","apply_date":"20260727","listing_date":"","score":67,"recommend":"建议申购","tag_color":"#ef5350","bg_color":"rgba(239,83,80,.12)","arbitrage_score":80,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"环保型贵金属选矿剂的研发、生产及销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资6亿"],"status":"pre_listing"},{"code":"920065","name":"千岸科技","issue_price":24.3,"issue_pe":10.28,"industry_pe":21.6,"pe_discount":52.4,"board":"北交所","apply_date":"20260720","listing_date":"20260729","score":64,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","arbitrage_score":75,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"从事自有品牌产品研发、设计并主要通过电商平台和自营网站进行销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["预计07.29上市","募资4亿"],"status":"pre_listing"},{"code":"001232","name":"嘉立创","issue_price":84.46,"issue_pe":38.19,"industry_pe":73.6,"pe_discount":48.1,"board":"科创板","apply_date":"20260724","listing_date":"","score":60,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","arbitrage_score":59,"fundamental_score":62,"fundamentals":{"track_label":"高景气赛道","main_business":"(1)印制电路板业务,可满足客户“样板→小批量→中大批量”的PCB制造需求;(2)电子元器件业务,主要通过全品类现货模式满足客户样品、小批量电子元器件的采购需求;(3)电子装联业务,通过对工程管理及生产环节等流程的高效组织,公司能够快速响应样品、小批量客户的PCBA订单需求;(4)其他主营业务,包含EDA/CAM工业软件、激光钢网等电子产业配套服务和与电子产业链服务具有“客户同源”特点的3D打印、CNC制造、FA机械零部件商城等机械产业服务","industry":"计算机、通信和其他电子设备制造业","over_subscription":1.12,"over_label":"足额募资","pb":5.58,"pb_label":"高PB5.6","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资47亿"],"status":"pre_listing"},{"code":"920258","name":"聚仁新材","issue_price":4.48,"issue_pe":14.97,"industry_pe":30.2,"pe_discount":50.4,"board":"北交所","apply_date":"20260722","listing_date":"","score":59,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","arbitrage_score":67,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"己内酯系列产品的研发、生产和销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资2亿"],"status":"pre_listing"},{"type":"bond","code":"113709","name":"振26转债","issue_price":100.0,"transfer_price":40.33,"bond_scale":8.78,"stock_code":"","apply_date":"20260730","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":8.78,"score":61,"arbitrage_score":65,"fundamental_score":55,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":8.78,"transfer_price":40.33,"bond_safety":"高"},"highlights":["转股价 ¥40.33","规模 8.8亿","债底安全 高"]},{"type":"bond","code":"123278","name":"合金转债","issue_price":100.0,"transfer_price":13.98,"bond_scale":5.45,"stock_code":"","apply_date":"20260730","listing_date":"","status":"applying","market_code":"SZ","dec_sumfina":5.45,"score":61,"arbitrage_score":65,"fundamental_score":55,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":5.45,"transfer_price":13.98,"bond_safety":"高"},"highlights":["转股价 ¥13.98","规模 5.5亿","债底安全 高"]},{"type":"bond","code":"118075","name":"奥普转债","issue_price":100.0,"transfer_price":150.03,"bond_scale":12.7,"stock_code":"","apply_date":"20260729","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":12.7,"score":56,"arbitrage_score":60,"fundamental_score":50,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":12.7,"transfer_price":150.03,"bond_safety":"中"},"highlights":["转股价 ¥150.03","规模 12.7亿","债底安全 中"]},{"type":"bond","code":"123277","name":"玉禾转债","issue_price":100.0,"transfer_price":16.35,"bond_scale":15.0,"stock_code":"","apply_date":"20260729","listing_date":"","status":"applying","market_code":"SZ","dec_sumfina":15.0,"score":66,"arbitrage_score":70,"fundamental_score":60,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":15.0,"transfer_price":16.35,"bond_safety":"高"},"highlights":["转股价 ¥16.35","规模 15.0亿","债底安全 高"]},{"type":"bond","code":"118074","name":"特宝转债","issue_price":100.0,"transfer_price":58.56,"bond_scale":15.33,"stock_code":"","apply_date":"20260728","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":15.33266,"score":63,"arbitrage_score":65,"fundamental_score":60,"recommend":"谨慎参与","tag_color":"#fbbf24","bg_color":"rgba(251,191,36,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":15.33,"transfer_price":58.56,"bond_safety":"高"},"highlights":["转股价 ¥58.56","规模 15.3亿","债底安全 高"]},{"type":"bond","code":"127115","name":"炬申转债","issue_price":100.0,"transfer_price":13.76,"bond_scale":3.8,"stock_code":"","apply_date":"20260724","listing_date":"","status":"pre_listing","market_code":"SZ","dec_sumfina":3.8,"score":54,"arbitrage_score":60,"fundamental_score":45,"recommend":"不建议申购","tag_color":"#26a69a","bg_color":"rgba(38,106,154,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":3.8,"transfer_price":13.76,"bond_safety":"中"},"highlights":["转股价 ¥13.76","规模 3.8亿","债底安全 中"]},{"type":"bond","code":"110103","name":"申能转债","issue_price":100.0,"transfer_price":8.74,"bond_scale":20.0,"stock_code":"","apply_date":"20260724","listing_date":"","status":"pre_listing","market_code":"SH","dec_sumfina":20.0,"score":71,"arbitrage_score":75,"fundamental_score":65,"recommend":"建议申购","tag_color":"#ef5350","bg_color":"rgba(239,83,80,.12)","board":"可转债","fundamentals":{"track":"可转债","scale":20.0,"transfer_price":8.74,"bond_safety":"高"},"highlights":["转股价 ¥8.74","规模 20.0亿","债底安全 高"]},{"type":"bond","code":"123275","name":"肇民转债","issue_price":100.0,"transfer_price":33.8,"bond_scale":5.9,"stock_code":"","apply_date":"20260709","listing_date":"20260724","status":"tracking","market_code":"SZ","dec_sumfina":5.9,"latest":100.0,"open_price":100.0,"change_pct":0,"turnover":0,"total_return":0,"open_return":0,"score":46,"arbitrage_score":50,"fundamental_score":40,"recommend":"⚪ 震荡，建议观望","tag_color":"#888","bg_color":"#f5f5f5","fundamentals":{"track":"可转债","total_return":0,"turnover":0},"highlights":["较发行 +0.0%","现价 ¥100.00","⚪ 震荡，建议观望"]}]};
 
   function applyData(data){
     today = dateFromUpdate(data&&data.update_time) || todayStr(new Date());
@@ -11602,7 +11602,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     var h='<div style="padding:8px 4px;">';
     // 🏷 2026-09-28：ETF_DAILY_MONITOR 降级口径标注（后端 f_etf_daily_monitor 降级即置 partial，此处据实提示）
     if(daily.partial===true){
-      h+='<div style="font-size:10.5px;color:#ffb74d;margin:-2px 0 8px;">⚠️ 部分页口径 '+((daily.covered_pages||'?')+'/'+(daily.total_pages||'?'))+'（东财底表本轮未取全）· 上方合计与排名仅覆盖已取回部分，非全市场</div>';
+      h+='<div style="font-size:10.5px;color:#fbbf24;margin:-2px 0 8px;">⚠️ 部分页口径 '+((daily.covered_pages||'?')+'/'+(daily.total_pages||'?'))+'（东财底表本轮未取全）· 上方合计与排名仅覆盖已取回部分，非全市场</div>';
     }
     h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只 <span style="color:var(--dim);font-size:10.5px;margin-left:6px;">'+_dataHint+'</span></div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">';
@@ -13138,7 +13138,7 @@ function drawUpDownChart(){
           if(isFuture){ bg='rgba(255,255,255,.05)'; co='var(--dim)'; sym='⬜'; title=s+' 未到期'; }
           else if(ok){ bg='rgba(31,209,123,.12)'; co='var(--down)'; sym='✓'; title=s+' 已更新 '+lastStr; }
           else if(isClosedSlot){ bg='rgba(120,120,120,.12)'; co='var(--dim)'; sym='休'; title=s+' 休市'; }
-          else { bg='rgba(244,73,93,.12)'; co='var(--up)'; sym='✗'; title=s+' 未更新'; }
+          else { bg='rgba(239,83,80,.12)'; co='var(--up)'; sym='✗'; title=s+' 未更新'; }
 
           slotsHtml += '<span title="'+title+'" style="display:inline-block;min-width:32px;text-align:center;padding:2px 4px;border-radius:3px;background:'+bg+';color:'+co+';border:1px solid var(--border);font-size:11px;margin:0 2px 2px 0;">'+sym+'</span>';
 
@@ -13247,8 +13247,8 @@ function drawUpDownChart(){
     limited: {color:'var(--dim)',  sym:'🔒', bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
     info:    {color:'var(--dim)',  sym:'ⓘ',  bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
     skip:    {color:'var(--dim)',  sym:'—',  bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
-    fail:    {color:'var(--up)',   sym:'✗',  bg:'rgba(244,73,93,.06)',   border:'rgba(244,73,93,.2)'},
-    unknown: {color:'var(--up)',   sym:'‼',  bg:'rgba(244,73,93,.14)',   border:'rgba(244,73,93,.5)'}
+    fail:    {color:'var(--up)',   sym:'✗',  bg:'rgba(239,83,80,.06)',   border:'rgba(239,83,80,.2)'},
+    unknown: {color:'var(--up)',   sym:'‼',  bg:'rgba(239,83,80,.14)',   border:'rgba(239,83,80,.5)'}
   };
   function _v8StatusVisual(s){ return V8_STATUS_VISUAL[s] || V8_STATUS_VISUAL.unknown; }
   window._v8StatusVisual = _v8StatusVisual;
@@ -14243,7 +14243,7 @@ window.showRestrictedItems = showRestrictedItems;
     var rowHtml=function(t){
       var st = t.status==='active'
         ? '<span class="tp-badge cons">在池</span>'
-        : '<span class="tp-badge near" style="background:rgba(244,73,93,.16);color:var(--up)">已掉出</span>';
+        : '<span class="tp-badge near" style="background:rgba(239,83,80,.16);color:var(--up)">已掉出</span>';
       var hold = (t.hold_days==null?'—':t.hold_days+'日');
       var cons = (t.consecutive_days==null?'—':t.consecutive_days+'日');
       return '<tr>'
@@ -14444,7 +14444,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         var t = latest[s2.code] || {};
         var st = t.status==='active'
           ? '<span class="tp-badge cons">在池</span>'
-          : (t.status==='dropped' ? '<span class="tp-badge near" style="background:rgba(244,73,93,.16);color:var(--up)">已掉出</span>' : '');
+          : (t.status==='dropped' ? '<span class="tp-badge near" style="background:rgba(239,83,80,.16);color:var(--up)">已掉出</span>' : '');
         var pnl = (t.pnl_pct==null) ? '' : ('<span '+pnlClass(t.pnl_pct)+' style="font-weight:700">'+fvPct(t.pnl_pct)+'</span>');
         s += '<div class="tp-hist-cell">'
           + '<div class="tp-hd"><span class="tp-code">'+(s2.code||'')+'</span><span class="tp-name" title="'+(s2.name||'')+'">'+(s2.name||'')+'</span></div>'
@@ -14584,7 +14584,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){
       try{ console.error('[st-mc] 渲染错误', e); }catch(_){}
       var host2 = document.getElementById('mcBody');
-      if(host2) host2.innerHTML = '<div class="note" style="padding:14px;background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.35);border-radius:8px;color:#ef5350;font-size:12px;">⚠️ 多 algo 共识 子页渲染错误: '+(e && e.message ? e.message : String(e))+'</div>';
+      if(host2) host2.innerHTML = '<div class="note" style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;">⚠️ 多 algo 共识 子页渲染错误: '+(e && e.message ? e.message : String(e))+'</div>';
     }
   };
 
@@ -16568,7 +16568,7 @@ window.__renderSevereSwing = function(){
       h += '<div style="font-size:13px;font-weight:700;color:#ef5350;margin:6px 0 6px;">&#x1F525; 已触发档（'+trig.length+'）</div>';
       h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;">';
       trig.forEach(function(x){
-        h += '<div style="border-left:3px solid #ef5350;background:rgba(248,113,113,.06);border-radius:0 8px 8px 0;padding:7px 10px;">'
+        h += '<div style="border-left:3px solid #ef5350;background:rgba(239,83,80,.06);border-radius:0 8px 8px 0;padding:7px 10px;">'
            + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;"><span style="font-size:13px;font-weight:700;color:var(--txt);">'+_e(x.name)+'</span><span style="font-size:11px;color:var(--sub);">'+_e(x.code||'')+'</span></div>'
            + '<div style="font-size:12px;color:#ef5350;margin-top:2px;">'+_pct(x.pct)+' · '+_e(x.boards)+'连板</div>'
            + '<div style="font-size:11px;color:var(--sub);margin-top:1px;">'+_e(x.desc||'')+'</div></div>';
@@ -16973,7 +16973,7 @@ window.__renderComprehensiveSynthesis = function(){
     h += '<thead><tr style="border-bottom:1px solid var(--border);color:var(--dim);"><th style="text-align:left;padding:6px 4px;">优先级</th><th style="text-align:left;">板块</th><th style="text-align:left;">分组</th><th style="text-align:right;">5d</th><th style="text-align:right;">资金(亿)</th><th style="text-align:left;padding-left:8px;">信号</th></tr></thead><tbody>';
     for(var i=0;i<recs.length;i++){
       var r = recs[i];
-      var bg = r.priority<0 ? 'rgba(248,113,113),.06)' : (r.action==='🔥 跟随' ? 'rgba(248,113,113),.12)' : (r.action==='⏸️ 观望(已涨过)' ? 'rgba(148,163,184,.06)' : 'transparent'));
+      var bg = r.priority<0 ? 'rgba(239,83,80,.06)' : (r.action==='🔥 跟随' ? 'rgba(239,83,80,.12)' : (r.action==='⏸️ 观望(已涨过)' ? 'rgba(148,163,184,.06)' : 'transparent'));
       h += '<tr style="background:'+bg+';border-bottom:1px solid var(--border);">';
       h += '<td style="padding:6px 4px;color:'+(r.priority<0?'#ef5350':'var(--txt)')+';font-weight:600;">'+(r.priority<0?'⚠️ P-1':'P'+r.priority)+'</td>';
       h += '<td style="font-weight:600;color:var(--txt);">'+r.sector+'</td>';
@@ -17260,7 +17260,7 @@ window.__renderComprehensiveSynthesis = function(){
     var touched = sealed + zbTotal;
     var zbRate = touched > 0 ? (zbTotal / touched * 100) : 0;
     var zbLvl = zbRate >= 30 ? {c:'#26a69a', bg:'rgba(255,107,129,.12)', bd:'rgba(255,107,129,.35)', txt:'退潮·承接弱'}
-              : zbRate >= 15 ? {c:'#ffb74d', bg:'rgba(255,183,77,.12)', bd:'rgba(255,183,77,.35)', txt:'偏弱·分歧大'}
+              : zbRate >= 15 ? {c:'#fbbf24', bg:'rgba(255,183,77,.12)', bd:'rgba(255,183,77,.35)', txt:'偏弱·分歧大'}
               : {c:'#ef5350', bg:'rgba(94,224,160,.12)', bd:'rgba(94,224,160,.35)', txt:'健康·承接足'};
     html += '<div style="border-top:1px dashed var(--border2);margin-top:12px;padding-top:12px;">';
     // 2026-08-30 主人令：6 列一行 · 全部紧跟卡片名 · 股票不再遮挡（grid 16% × 6）
@@ -18142,7 +18142,7 @@ if(_fib2.windows&&_fib2.windows.length){
     h+=`<div style="font-size:12px;color:var(--txt);line-height:1.5;">从 <b>${_c.peak_date.slice(5)}</b> 高点回调 · 模式：<b>${_c.mode||'—'}</b></div>`;
   } else { h+=`<div style="font-size:12px;color:var(--dim);">暂无中枢数据</div>`; }
   h+=`</div>`;
-  h+=`<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:10px;">`;
+  h+=`<div style="background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);border-radius:8px;padding:10px;">`;
   h+=`<div style="font-weight:700;color:var(--down);margin-bottom:6px;font-size:12px;">🛡️ 窗口失效应对</div>`;
   if(_miss2.length){
     h+=`<div style="font-size:11px;color:var(--dim);line-height:1.5;margin-bottom:6px;">近3个失效：${_miss2.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')}</div>`;
@@ -18425,7 +18425,7 @@ h+=`</div>`;
       series:[
         {name:'上证综指',type:'line',data:D.sh,showSymbol:false,lineStyle:{width:2.2,color:C_RED},itemStyle:{color:C_RED},yAxisIndex:1,
           markArea:{silent:true,data:
-            bearRuns.map(function(r){return [{xAxis:r[0],itemStyle:{color:'rgba(74,222,128,0.14)'}},{xAxis:r[1]}];})
+            bearRuns.map(function(r){return [{xAxis:r[0],itemStyle:{color:'rgba(38,106,154,0.14)'}},{xAxis:r[1]}];})
             .concat(sideRuns.map(function(r){return [{xAxis:r[0],itemStyle:{color:'rgba(245,158,11,0.12)'}},{xAxis:r[1]}];}))},
           markPoint:{silent:true,symbol:'circle',symbolSize:0.1,
             label:{show:true,fontSize:12,fontWeight:700,textBorderColor:'#14181e',textBorderWidth:3},
@@ -19276,7 +19276,7 @@ window.__renderV8CalToday();
     } catch(e) {
       console.error('[renderFinalRec] 错误:', e);
       var el=document.getElementById('finalRecBody');
-      if(el) el.innerHTML = '<div style="padding:14px;background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;">'+
+      if(el) el.innerHTML = '<div style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;">'+
         '<b>⚠️ Top3 渲染错误</b>(不是数据问题,是 JS 代码问题):<br>'+
         '<code style="display:block;margin-top:6px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;font-family:monospace;font-size:11px;white-space:pre-wrap;">'+
         (e && e.message ? e.message : String(e)) + '\n' +
@@ -19446,7 +19446,7 @@ window.__renderV8CalToday();
       h+='</div>';
     }
 
-    h+='<div style="margin-top:12px;padding:10px 13px;background:rgba(244,73,93,.07);border:1px solid rgba(244,73,93,.24);border-radius:9px;font-size:12px;color:var(--sub);line-height:1.7">';
+    h+='<div style="margin-top:12px;padding:10px 13px;background:rgba(239,83,80,.07);border:1px solid rgba(239,83,80,.24);border-radius:9px;font-size:12px;color:var(--sub);line-height:1.7">';
     h+='<b style="color:var(--up)">⚠️ 交易纪律：</b>止损价 = max(20日低点, 现价×0.9, 现价−ATR×2)；目标价按盈亏比 1.5 反推。<b>破止损无条件离场</b>，不摊平、不扛单、不追高。<br>📌 <b>建议持有≈5~10个交易日、等权分散5~10票</b>（2026-10-25 端到端组合层回放：次日就卖 H1 三口径全负，双边0.3%成本即杀手；净优势只在持有5~10日的滚动等权组合层出现，H10 回撤最低；铺20只以上无改善）。<b>勿日内、勿隔日</b>。';
     h+='</div>';
 
@@ -19460,7 +19460,7 @@ window.__renderV8CalToday();
     } catch(e) {
       console.error('[renderFinalCand] 错误:', e);
       var el=document.getElementById('finalCandBody');
-      if(el) el.innerHTML = '<div style="padding:14px;background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;">'+
+      if(el) el.innerHTML = '<div style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;">'+
         '<b>⚠️ 候选池渲染错误</b>(不是数据问题,是 JS 代码问题):<br>'+
         '<code style="display:block;margin-top:6px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;font-family:monospace;font-size:11px;white-space:pre-wrap;">'+
         (e && e.message ? e.message : String(e)) + '\n' +
@@ -19894,7 +19894,7 @@ window.__renderV8CalToday();
         //   两个共振容器（机游 / 北向）同步处理 —— 禁止某一路特立独行。
         try{
           var _TIP='<div id="a2LhbHistDegraded" style="margin:0 0 10px;padding:9px 12px;border-radius:8px;'
-            +'background:rgba(248,113,113),.12);border:1px solid rgba(248,113,113),.45);color:#ef9a9a;font-size:12px;line-height:1.7">'
+            +'background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.45);color:#ef9a9a;font-size:12px;line-height:1.7">'
             +'⚠️ 历史大表（1.8MB）多轮加载失败，当前<b>仅显示当日</b>龙虎榜数据（历史日期可能缺失）。'
             +'请 <b style="color:#38bdf8;cursor:pointer" onclick="location.reload()">刷新页面</b> 重试。</div>';
           ['jyCalContainer','northCalContainer'].forEach(function(_id){
