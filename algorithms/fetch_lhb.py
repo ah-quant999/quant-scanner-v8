@@ -137,10 +137,23 @@ def is_trading_day(date_str):
         #   实证：2026-09-28 16:2x 的 cn_fetch 那轮写下了空占位，
         #   而 17:00 另一条链从龙虎榜接口抓到 33 只 —— 同一天两套口径互相打架。
         #   正解：当天未完结 ⇒ 保守视为交易日 ⇒ main() 走「不写占位、只打日志」分支。
-        if _iso not in cal and _iso == datetime.date.today().strftime("%Y-%m-%d"):
+        if _iso in cal:
+            return True
+        # 🔴🔴 2026-11-02 一劳永逸根治（通用化 09-28 特例）：
+        #   新浪/东财交易日历只收录"已完结"日期，未来交易日/跨月切换时源尚未更新，
+        #   cal 里查不到目标日。旧 `return _iso in cal` 把"查不到"一律判非交易日
+        #   ⇒ main() 写 trading=False 空壳占位 ⇒ 共振日历该天整格空白。
+        #   09-28 只特判了 `_iso == today`，漏了「次日盘前回算前一天」「手动/定时回填历史」
+        #   等 target != today 但同样超出日历覆盖的场景（2026-11-02 即此例）。
+        #   正解（科学且保守）：目标日 > 日历已知最大日期 ⇒ 源未收录的未来交易日，
+        #   一律保守视为交易日，禁止写非交易日占位；真实休市（范围内缺席）仍返回 False。
+        if _iso > max(cal):
+            log(f"⚠️ {_iso} 超出交易日历覆盖上限({max(cal)})，保守视为交易日，禁止写非交易日占位")
+            return True
+        if _iso == datetime.date.today().strftime("%Y-%m-%d"):
             log(f"⚠️ 交易日历尚未收录今天 {_iso}（收盘前常态）⇒ 保守视为交易日，禁止写非交易日占位")
             return True
-        return _iso in cal
+        return False
     # 🔴 2026-09-25 阿狸咪·P0（trading-day-gate-predeps-fallback）：日历拉取失败时
     #   原为 `return True`（默认「是交易日」）⇒ 休市日（2026-09-25 中秋）被判为交易日，
     #   触发全量抓取且把 V8_DATA_DATE 标成休市日当天。改为回落零依赖静态权威日历：
