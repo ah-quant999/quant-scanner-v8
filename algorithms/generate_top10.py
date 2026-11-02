@@ -192,6 +192,16 @@ WINRATE_DEMOTE_LINE = 30.0
 WINRATE_DEMOTE_MIN_N = 3
 WINRATE_DEMOTE_RAW = 10.0
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-11-02 主人令·收益率提升核心因子：动量 / RPS（相对强度）
+#   回测证据(backtest_all_algos 因子实验室「L1 最强分位」)：动量因子 T+20 +3.2% / T+90 +12% /
+#   T+180 +26% / T+250 +46%，是当前真实能提升收益率的因子；而原 expected_return_term 在 HC 高信念
+#   子集内(sig_tuple 全员=1,1,*,*)返回同值、不分高下 ⇒ 新增本 RPS 项作为 HC 子集内的【主导区分项】，
+#   让「金钻+缠论」共振票里动量最强的真正排到前排。
+#   口径：个股 60/120 日区间收益率 → 候选池内横截面分位(0~1) → 合成 RPS；同源复用 _p5_percentile / _load_kline_full。
+#   回退：V8_RPS=0 关闭（仅保留 expected_return_term 跨组合区分）。
+RPS_TERM_MAX = 55.0
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-10-01 质量分时效/活跃度衰减辅助函数（根治「总这几只」）
@@ -1366,6 +1376,41 @@ def p5_prepass(codes):
     return out
 
 
+# ── 🔴 2026-11-02 主人令·收益率提升：RPS 动量预扫（与 p5_prepass 同源，复用 _load_kline_full / _p5_percentile）──
+_RPS_PCT = {}   # 候选池内分位缓存（main 入口一次预扫）
+
+
+def _rps_prepass(codes):
+    """候选池一次预扫：算个股 60/120 日动量(区间收益率) → 池内横截面分位 → 合成 RPS。
+    动量/RPS 是回测证明能提升收益率的核心因子（因子实验室 L1 最强分位 T+90 +12% / T+250 +46%）。
+    缺失/数据不足 121 根 K 线 ⇒ 该票记中性 0.5（不加不减，不硬造）。"""
+    global _RPS_PCT
+    raw60, raw120 = {}, {}
+    for c in codes:
+        try:
+            recs = _load_kline_full(c)
+            if len(recs) >= 121:
+                cl = [float(r["close"]) for r in recs]
+                if cl[-61] > 0:
+                    raw60[c] = cl[-1] / cl[-61] - 1.0
+                if cl[-121] > 0:
+                    raw120[c] = cl[-1] / cl[-121] - 1.0
+        except Exception:
+            continue
+    p60 = _p5_percentile(raw60)
+    p120 = _p5_percentile(raw120)
+    out = {}
+    for c in codes:
+        if c in p60 or c in p120:
+            s60 = p60.get(c, 0.5)
+            s120 = p120.get(c, 0.5)
+            out[c] = {"mom60": round(s60, 4), "mom120": round(s120, 4),
+                      "rps": round(0.5 * s60 + 0.5 * s120, 4)}
+    _RPS_PCT = out
+    print(f"  🚀 RPS 动量预扫：覆盖 {len(out)}/{len(codes)} 只（60d {len(p60)} · 120d {len(p120)}）")
+    return out
+
+
 def _migrate_old_top10_scores(hist_dir):
     """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
     保证回测与阈值口径一致。
@@ -1661,6 +1706,10 @@ def main():
     _p5_map = p5_prepass(_p5_codes)
     print(f"  🧪 P5 walk-forward 因子：池内分位覆盖 {len(_p5_map)}/{len(_p5_codes)} 只 · "
           f"启用 {[k for k, v in P5_ON.items() if v]}")
+    # 🔴 2026-11-02 主人令·收益率提升：RPS 动量预扫（同候选池）
+    _env_rps = os.environ.get("V8_RPS", "1").strip() != "0"
+    _rps_map = _rps_prepass(_p5_codes) if _env_rps else {}
+    print(f"  🚀 RPS 动量因子：{'启用' if _env_rps else '关闭(V8_RPS=0)'} · 覆盖 {len(_rps_map)}/{len(_p5_codes)} 只")
     for _k5 in P5_FALLBACK:
         _m5 = P5_META.get(_k5) or {}
         if P5_ON.get(_k5):
@@ -2108,6 +2157,13 @@ def main():
         exp_ret_term = expected_return_term(*sig_tuple)
         _raw_noform += exp_ret_term
         raw_total += exp_ret_term
+        # 🔴 2026-11-02 主人令·收益率提升核心：RPS 动量主导项（HC 子集内真正分高下）
+        #   回测证明动量因子 T+90 +12% / T+250 +46% 是当前能提升收益率的因子；
+        #   原 expected_return_term 在 HC 子集(sig_tuple 全员 1,1,*,* 同值)内失效 → 本项补位作主区分。
+        _rps_pct = (_RPS_PCT.get(raw_code) or {}).get("rps", 0.5)
+        rps_term = (_rps_pct - 0.5) * 2.0 * RPS_TERM_MAX
+        _raw_noform += rps_term
+        raw_total += rps_term
         # T+5 胜率（用于前端展示；改动15 从 win10 改 win5 —— T+10 胜率同样被 β 撑高：
         #   by_signal "1,1,0,0" win10=72.5% 但 win5 仅 48.1%，展示 T+10 会误导主人）
         _wr_rec = BT_BY_SIGNAL.get(f"{int(has_chan)},{int(sig_jinzuan)},{int(has_jigou)},{int(has_trend)}")
@@ -2179,6 +2235,7 @@ def main():
                 "quality": round(quality_effective, 1),
                 "backtest": score_backtest,
                 "winrate": round(wr_term, 1),
+                "rps": round(rps_term, 1),
                 "breakout": 5 if breakout_5d else 0,
                 "research": research_score,
                 "p4": p4_score,
