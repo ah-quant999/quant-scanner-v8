@@ -170,7 +170,9 @@ DELIST_DIMS = {
 #   主人要"收益率最高的股票能选出来"——故放大夹紧上限到 ±WINRATE_TERM_MAX(55)，
 #   使顶部高收益票的 term（约 +42 raw ≈ +32 分）真正拉开差距、压过其他因子的横截面 spread，
 #   让"历史信号后平均涨得最多"的票在因子榜/主站脱颖而出。无历史记录→0（中性，不惩罚无史可查的票）。
-WINRATE_WEIGHT = 1.0
+# 🔴 2026-11-02 主人令：winrate 不再承担主排序，降级为「置信微调」权重（原 1.0 → 0.2）。
+#   主排序改由预期前瞻收益率项 expected_return_term(±55) 承担（见 BT_BY_SIGNAL 后定义）。
+WR_CONF_WEIGHT = 0.2
 WINRATE_TERM_MAX = 55.0
 
 # ── 🔴 2026-10-23 主人令「收益最高+胜率最高做实」·P0-a 胜率 rank-fusion + P1 强制降级 ──
@@ -178,15 +180,17 @@ WINRATE_TERM_MAX = 55.0
 #   名次百分位做 rank-fusion 加项——两榜（因子分 vs 胜率名次）分歧时由胜率名次拉动排序，
 #   不再只靠 ±1 分 edge 微调。池内无胜率记录 → 中性 0.5（不加不减）。
 #   WR_FUSION_SPAN=15 raw（≈±11.5 分 @NORM_DIVISOR=130），与 wr_term(±20 raw) 同量级。
+#   🔴 2026-11-02 降级：winrate 已非主排序，fusion 跨度同步收窄到 5 raw（≈±3.8 分），仅作轻微名次微调。
 #   回退：V8_WR_RANK_FUSION=0 关闭 fusion 加项（wr_term 不受影响）。
-WR_FUSION_SPAN = 15.0
+WR_FUSION_SPAN = 5.0
 #   P1：因子分再高，只要个股历史 T+5 胜率 < WINRATE_DEMOTE_LINE%（样本 ≥ WINRATE_DEMOTE_MIN_N）
 #   就强制降级（扣 WINRATE_DEMOTE_RAW raw ≈ −23 分），并在产物标 winrate_demote=true；
 #   final_recommend 侧另有 Top3 硬闸（不因其他分高而回捞）。依据：佰维存储型事故
 #   （因子榜 Top1 但历史信号 T+5 胜率极低）。回退：V8_WR_DEMOTE=0 关闭。
+#   🔴 2026-11-02 降级：winrate 已非主排序，硬闸惩罚由 −30 收窄到 −10，仅作风险缓冲。
 WINRATE_DEMOTE_LINE = 30.0
 WINRATE_DEMOTE_MIN_N = 3
-WINRATE_DEMOTE_RAW = 30.0
+WINRATE_DEMOTE_RAW = 10.0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -532,6 +536,42 @@ try:
     BT_BY_SIGNAL = _bt2.get("by_signal", {})
 except Exception:
     BT_BY_SIGNAL = {}
+
+# 🔴 2026-11-02 主人令：排序主目标从「胜率」改为「预期前瞻收益率」
+#   原 winrate_term(±55) 是错误目标——高胜率≠高收益。实证（raw_data/backtest_expectancy.json）：
+#   combo '1,1,0,0'(禅+金钻共振) win5=38.6% 但 ret5=-2.67% / ret10=+1.05%（短空长多），
+#   且 2026-06~11 偏空窗口下全 16 组合前瞻收益均为负 → 选「收益率最高」=选「前瞻收益相对最好」的票。
+#   现以 by_signal 的 ret5/ret10 前瞻收益混合为中心化主项（±EXP_RET_TERM_MAX），
+#   让预期前瞻收益最高的票真正排到前排；winrate 降级为置信微调（见 WR_CONF_WEIGHT）。
+EXP_RET_BLEND_W5 = 0.5
+EXP_RET_BLEND_W10 = 0.5
+EXP_RET_TERM_MAX = 55.0
+
+def _exp_ret_raw(chan, jinzuan, jigou, trend):
+    """个股四信号组合 → 前瞻收益混合 raw(%)：0.5*ret5 + 0.5*ret10（by_signal）。缺失→0。"""
+    _rec = BT_BY_SIGNAL.get(f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}")
+    if not _rec:
+        return 0.0
+    _r5 = _num_or_none(_rec.get("ret5")) or 0.0
+    _r10 = _num_or_none(_rec.get("ret10")) or 0.0
+    return EXP_RET_BLEND_W5 * _r5 + EXP_RET_BLEND_W10 * _r10
+
+# 跨「有数据」的 16 组合中心化：最佳(收益最高)→+MAX，最差→-MAX，使前瞻收益成为主排序项且保留区分度。
+_EXP_RET_PRESENT = [f"{c},{j},{g},{t}" for c in (0, 1) for j in (0, 1) for g in (0, 1) for t in (0, 1)
+                    if f"{c},{j},{g},{t}" in BT_BY_SIGNAL]
+_EXP_RET_VALS = [_exp_ret_raw(*(int(x) for x in k.split(","))) for k in _EXP_RET_PRESENT]
+_EXP_RET_MIN = min(_EXP_RET_VALS) if _EXP_RET_VALS else 0.0
+_EXP_RET_MAX = max(_EXP_RET_VALS) if _EXP_RET_VALS else 0.0
+
+def expected_return_term(chan, jinzuan, jigou, trend):
+    """前瞻收益主项（raw 分，±EXP_RET_TERM_MAX，中心化到全组合）。组合无数据→0（中性，不惩罚）。"""
+    if f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}" not in BT_BY_SIGNAL:
+        return 0.0
+    if _EXP_RET_MAX == _EXP_RET_MIN:
+        return 0.0
+    _raw = _exp_ret_raw(chan, jinzuan, jigou, trend)
+    return max(-EXP_RET_TERM_MAX, min(EXP_RET_TERM_MAX,
+        (_raw - _EXP_RET_MIN) / (_EXP_RET_MAX - _EXP_RET_MIN) * 2.0 * EXP_RET_TERM_MAX - EXP_RET_TERM_MAX))
 
 def bt_excess5_for(chan, jinzuan, jigou, trend):
     """给定四信号布尔 (chan, jinzuan, jigou, trend) → walk-forward **T+5 收益**(%)；
@@ -2053,20 +2093,21 @@ def main():
         _h5 = (_wr_rec.get("horizons") or {}).get("5") or {}
         _wr_win5 = _num_or_none(_h5.get("win"))
         _wr_n5 = _num_or_none(_h5.get("n"))
-        _raw_noform += wr_term
-        raw_total += wr_term
+        # 🔴 2026-11-02 主人令：winrate 降级为置信微调（原 ±55 主项 → ×WR_CONF_WEIGHT=0.2 ≈ ±11 修正），
+        #   不再承担主排序。主排序交由下方预期前瞻收益项 expected_return_term。
+        _raw_noform += wr_term * WR_CONF_WEIGHT
+        raw_total += wr_term * WR_CONF_WEIGHT
 
-        # ── 回测反哺（P2；🔴 2026-09-20 改动15）：walk-forward 信号组合 **T+5** 修正 ──
-        # T+5 收益每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
-        # 旧版读 T+10 edge（被大盘 β 撑高）⇒ 8 个组合全为正分、无区分力；已换 T+5。
+        # ── 🔴 2026-11-02 预期前瞻收益率主项（替代原 winrate 主项，亦覆盖原 backtest T+5 edge 角色）──
+        #   用 by_signal 的 ret5/ret10 前瞻收益混合，跨「有数据」组合中心化到 ±EXP_RET_TERM_MAX(55)，
+        #   使「预期前瞻收益最高」的票真正排到前排。此即原 backtest 项的升级版（forward-return 信号仍在
+        #   _raw_noform 内，满足 C 类「收益信号不可漏」铁律），故下方不再单独累加 score_backtest，避免同信号重复计入。
         sig_tuple = (has_chan, sig_jinzuan, has_jigou, has_trend)
-        bt_ex5 = bt_excess5_for(*sig_tuple)
+        bt_ex5 = bt_excess5_for(*sig_tuple)          # 保留作展示（T+5 超额），不进 raw_total
         score_backtest = max(-10, min(10, round(bt_ex5)))
-        raw_total = raw_total + score_backtest
-        # 🔴 2026-10-01 修复（C 类补丁）：_raw_noform 必须含 backtest 分！
-        #   中性化循环后用 _raw_noform 重建 total；若漏掉 backtest(±10) 等于无意中
-        #   执行「B0 去 backtest」——回测已证 B0 显著变差(t=-2.06)，实现必须与回测一致。
-        _raw_noform += score_backtest
+        exp_ret_term = expected_return_term(*sig_tuple)
+        _raw_noform += exp_ret_term
+        raw_total += exp_ret_term
         # T+5 胜率（用于前端展示；改动15 从 win10 改 win5 —— T+10 胜率同样被 β 撑高：
         #   by_signal "1,1,0,0" win10=72.5% 但 win5 仅 48.1%，展示 T+10 会误导主人）
         _wr_rec = BT_BY_SIGNAL.get(f"{int(has_chan)},{int(sig_jinzuan)},{int(has_jigou)},{int(has_trend)}")
