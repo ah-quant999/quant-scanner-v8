@@ -345,9 +345,11 @@ CARD_DEFS = [
     {"id": "SECTOR_FUND_FLOW_TREND", "name": "板块资金趋势", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["summary", "sectors_in"], "heal_cat": "post_close", "raw_file": "sector_fund_flow_trend.json"},
     {"id": "CFFEX_POSITION", "name": "IF会员持仓择时", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["nlr", "posture"], "heal_cat": "post_close", "raw_file": "cffex_position.json"},  # data_date=T-1 为设计内（中金所当日定稿无抓取窗口，gen 代码注明）
     {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
+    {"id": "US_HK_MAP", "name": "隔夜美股强势", "page": "今日事件", "freq": "盘前1次(专链cn)", "max_age": 1440, "key_fields": ["data_date", "items"], "heal_cat": "us_hk_map", "raw_file": "us_hk_map.json", "producer": "cloud_fetch_v8.py --only US_HK_MAP"},  # 🆕 2026-11-02 一劳永逸（九宝令）：此前 CARD_DEFS 漏登记 ⇒ 永久假死(实测卡 10-31)；已从 cloud_fetch premarket 注册表移除("":""),改专链 v8_us_hk_map.yml([self-hosted,cn]) 承接，需独立 heal_cat
     {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
     {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
     {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "每日盘前1次(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
+    {"id": "FINAL_RECOMMEND_DATA", "name": "最终推荐·强势板块龙头股", "page": "最终推荐", "freq": "每日盘后(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_candidates", "market_regime"], "raw_file": "final_recommend.json", "producer": "algorithms/final_recommend.py"},  # 🆕 2026-11-02 一劳永逸（九宝令）：此前 CARD_DEFS 完全漏登记 ⇒ 不监控+自愈够不到 ⇒ 永久假死(实测卡 11-01)
     {"id": "maharo_insights", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
     {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "heal_cat": "experiments", "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
@@ -815,6 +817,7 @@ LOCAL_GEN = {
     'NATIONAL_TEAM':    ('v8/gen_national_team.py', 'data/NATIONAL_TEAM.js'),
     'SECTOR_YEAR_FLOW': ('v8/gen_sector_year_flow.py', 'data/SECTOR_YEAR_FLOW.js'),
 }
+US_HK_MAP_WORKFLOW = "v8_us_hk_map.yml"                 # 🆕 隔夜美股(专链·cn 自托管)：产出 data/US_HK_MAP.js（已从 cloud_fetch premarket 注册表移除，需独立派发）
 HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
 # 2026-08-11 漏洞 #1：自愈单次最多派发 N 个 workflow，防 runner 打爆/事件风暴
@@ -1168,6 +1171,43 @@ def _dispatch_dajijin():
         return False, f"派发异常: {e}", False
 
 
+def _dispatch_us_hk_map():
+    """经 GitHub API 派发 v8_us_hk_map（隔夜美股·cn 自托管），刷新 US_HK_MAP。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_dajijin。
+    🛡 2026-11-02 一劳永逸（九宝令）：US_HK_MAP 此前 CARD_DEFS 完全漏登记
+        ⇒ 健康胶囊不监控 + 自愈链够不到 ⇒ 永久假死（实测卡在 10-31）。
+       它已从 cloud_fetch_v8 premarket 注册表移除（"US_HK_MAP": ""），
+       改由专链 v8_us_hk_map.yml([self-hosted, cn]) 承接，故需独立派发分支。
+       cn runner 离线则跳过（防派发风暴），恢复后自愈立即补跑。
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    online, names = _cn_runner_available()
+    if not online:
+        return True, "cn 自托管 runner 全部离线，跳过 us_hk_map 派发（恢复后自愈自动补跑）", False
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    pending, since = _has_pending_run(US_HK_MAP_WORKFLOW, headers)
+    if pending:
+        return True, (f"已有排队中的 us_hk_map 运行(created {since})，"
+                      f"跳过派发（避免顶掉该 pending run）"), False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{US_HK_MAP_WORKFLOW}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 us_hk_map(隔夜美股·cn) (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+    except Exception as e:
+        return False, f"派发异常: {e}", False
+
+
 def _file_ut(path):
     """从 data/*.js 提取 update_time 字符串（用于判断本地生成器是否产出新数据）。"""
     try:
@@ -1514,6 +1554,9 @@ def self_heal(report):
             #   NATIONAL_TEAM / SECTOR_YEAR_FLOW 等纯本地卡，巡检直接本地跑生成器+推送真实数据，
             #   不再依赖会跳步骤的定时 workflow（此前同链 SECTOR_YEAR_FLOW 鲜新而 NATIONAL_TEAM 卡死即此因）。
             ok, dmsg, dispatched = _dispatch_local_gen(items)
+        elif cat == "us_hk_map":
+            # 🆕 2026-11-02 一劳永逸（九宝令）：隔夜美股专链(cn 自托管)独立派发
+            ok, dmsg, dispatched = _dispatch_us_hk_map()
         else:
             ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
         if ok:
