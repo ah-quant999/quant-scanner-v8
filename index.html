@@ -151,11 +151,11 @@ window.__domReadyFns=[];
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
-<script src="data/US_HK_MAP.js?v=be4180d653" defer></script>
+<script src="data/US_HK_MAP.js?v=f86e31bcf2" defer></script>
 <!-- 🚨 2026-09-23 主人令：大基金 增减持监控（暂未上架 > 观测类）。
      数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
-<script src="data/DAJIJIN_REDUCTION.js?v=bacd09a873" defer></script>
+<script src="data/DAJIJIN_REDUCTION.js?v=5356849c69" defer></script>
 <script src="data/INVEST_AVOID.js?v=951aa1e991" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（暂未上架›观测类；孤儿模块，全站零重复）。 -->
     <script src="data/SEVERE_SWING.js?v=0ca5cf4a5e" defer></script>
