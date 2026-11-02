@@ -5,11 +5,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# 经自托管 Windows 运行器构建静态站点并发币到 GitHub Pages。
-# 目的：绕开 GitHub 原生 "branch: main" 构建服务器（其持久化工作克隆含已删除的
-# docs/ops 超长名文件，git checkout 永远失败 -> Pages 长期 build errored）。
-# 本工作流用干净的运行器 checkout 当前 main，仅打包站点所需文件为制品，
-# 由 actions/deploy-pages 经 API 发布（不依赖中毒的构建服务器克隆）。
+# 经 GitHub 托管 ubuntu-latest 运行器构建静态站点并发币到 GitHub Pages。
+# 目的：
+#   ① 绕开 GitHub 原生 "branch: main" 构建服务器（其持久化工作克隆含已删除的
+#      docs/ops 超长名文件，git checkout 永远失败 -> Pages 长期 build errored）；
+#   ② 2026-11-02 事故根治：原 runs-on:[self-hosted,Windows] 依赖一台常驻自托管机，
+#      该机离线即导致 Pages 卡在旧版本、所有 main 推送只排队不部署
+#      （实测线上 19:13 CST 后冻结逾 1 小时，龙虎榜真实数据无法上线）。
+#      ubuntu-latest 为临时干净运行器，既避开中毒克隆、又始终可用，
+#      部署不再有单点故障（自托管机离线也不影响上线）。
+# 本工作流 checkout 当前 main，仅打包站点所需文件为制品，由 actions/deploy-pages 经 API 发布。
 permissions:
   contents: read
   pages: write
@@ -21,7 +26,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Windows]
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
