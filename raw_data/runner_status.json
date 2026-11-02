@@ -1,12 +1,13 @@
 {
-  "update_time": "2026-11-02 17:58:07",
+  "update_time": "2026-11-02 19:17:50",
   "status": "ok",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": false,
+    "worker": true,
     "details": [
-      "runner.listener"
+      "runner.listener",
+      "runner.worker"
     ]
   },
   "service": {
@@ -17,14 +18,14 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 2,
+    "scanned": 1,
     "message": "最近日志无错误"
   },
   "github": {
     "ok": true,
     "consecutive_failures": 0,
     "checkout_failures": 0,
-    "latest_run_id": 41400655929,
+    "latest_run_id": 41429413910,
     "latest_failed": false,
     "latest_status": "completed",
     "stuck_min": 0,
