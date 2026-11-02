@@ -1,19 +1,14 @@
 {
-"update_time": "2026-11-02 22:01:57",
-"total": 8015,
-"new_listings_count": 0,
-"delisted_count": 17,
-"new_listings": [],
-"delisted": [
-"00176 先机企业集团",
-"00845 恒盛地产",
+"update_time": "2026-11-03 07:15:53",
+"total": 8028,
+"new_listings_count": 13,
+"delisted_count": 0,
+"new_listings": [
 "00950 李氏大药厂",
 "00951 超威动力",
-"01101 华荣能源",
 "01787 山东黄金",
 "01788 国泰君安国际",
 "01789 爱康医疗",
-"02088 西王置业",
 "02230 羚邦集团",
 "02231 景业名邦集团",
 "02232 晶苑国际",
@@ -23,9 +18,10 @@
 "02586 多点数智",
 "02587 健康之路"
 ],
+"delisted": [],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8032,
-"fresh_universe": 8015
+"old_universe": 8015,
+"fresh_universe": 8028
 }

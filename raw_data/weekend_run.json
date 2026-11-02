@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-02 22:01:58",
-  "generated": "2026-11-02 22:01:58",
+  "update_time": "2026-11-03 07:15:56",
+  "generated": "2026-11-03 07:15:56",
   "period_start": "2026-10-26",
   "period_end": "2026-11-01",
   "stats": {
@@ -16,8 +16,8 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-11-02 19:56:02",
-      "size_kb": 46.4
+      "update_time": "2026-11-03 06:03:20",
+      "size_kb": 28.3
     },
     {
       "file": "top10_daily.json",
@@ -30,8 +30,8 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-11-02 16:53",
-      "size_kb": 107.5
+      "update_time": "2026-11-03 06:03",
+      "size_kb": 106.8
     },
     {
       "file": "final_recommend.json",
@@ -44,15 +44,15 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-11-02 21:45:12",
-      "size_kb": 2246.5
+      "update_time": "2026-11-03 07:03:00",
+      "size_kb": 2250.3
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-11-01 21:23:14",
-      "size_kb": 474.3
+      "update_time": "2026-11-03 03:58:00",
+      "size_kb": 456.2
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"

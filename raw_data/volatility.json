@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-02 21:45:48",
-  "update_date": "2026-11-02",
+  "update_time": "2026-11-03 07:03:37",
+  "update_date": "2026-11-03",
   "available": true,
   "indices": [
     {
@@ -77,7 +77,7 @@
   "composite": {
     "regime": "恐慌下行",
     "regime_code": "panic",
-    "regime_color": "#c62828",
+    "regime_color": "#ef5350",
     "avg_vol_20d": 25.53,
     "avg_vol_5d": 38.27,
     "avg_vol_trend_pct": 13.69,
