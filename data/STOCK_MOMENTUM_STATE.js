@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-02 15:58",
- "generated": "2026-11-02 15:58",
+ "update_time": "2026-11-02 16:08",
+ "generated": "2026-11-02 16:08",
  "meta": {
-  "generated": "2026-11-02 15:58",
+  "generated": "2026-11-02 16:08",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -11885,6 +11885,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.317,
       "price": 13.97,
       "category": "突破"
+     },
+     {
+      "code": "301073",
+      "name": "君亭酒店",
+      "change_pct": 4.762,
+      "price": 16.06,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -12484,6 +12491,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.317,
       "price": 13.97,
       "category": "短线选股"
+     },
+     {
+      "code": "301073",
+      "name": "君亭酒店",
+      "change_pct": 4.762,
+      "price": 16.06,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -12716,6 +12730,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宜宾纸业",
       "change_pct": 6.317,
       "price": 13.97,
+      "category": "强势股"
+     },
+     {
+      "code": "301073",
+      "name": "君亭酒店",
+      "change_pct": 4.762,
+      "price": 16.06,
       "category": "强势股"
      }
     ]
