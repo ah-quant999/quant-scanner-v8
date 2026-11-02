@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-11-02 17:00:05",
-  "run_start": "2026-11-02 16:51:09",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-11-02 22:02:39",
+  "run_start": "2026-11-02 20:41:11",
+  "ok": 17,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "generate_top10.py",
+      "reason": "退出码 1 | NameError: name 'EXP_RET_TERM_MAX' is not defined"
+    }
+  ],
   "skipped_by_time_gate": []
 }
