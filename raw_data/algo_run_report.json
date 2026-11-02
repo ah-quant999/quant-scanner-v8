@@ -1,34 +1,8 @@
 {
-  "update_time": "2026-11-01 16:10:57",
-  "run_start": "2026-11-01 14:21:30",
-  "ok": 30,
-  "fail": 3,
-  "failed_scripts": [
-    {
-      "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    },
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
-    },
-    {
-      "script": "factor_walkforward.py",
-      "reason": "退出码 1 | TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'"
-    }
-  ],
-  "skipped_by_time_gate": [
-    "fetch_fundamental_quality.py",
-    "fetch_stock_names.py",
-    "fetch_stock_quote_v8.py",
-    "fetch_sh_index_fib.py",
-    "fetch_inst_trade.py",
-    "fetch_sector_rs.py",
-    "fetch_lhb.py",
-    "fetch_orphan_suspension.py",
-    "fetch_orphan_market_alerts.py",
-    "fetch_orphan_nt_data.py",
-    "fetch_orphan_sector_fund_flow.py",
-    "fetch_weekend_run.py"
-  ]
+  "update_time": "2026-11-02 17:00:05",
+  "run_start": "2026-11-02 16:51:09",
+  "ok": 14,
+  "fail": 0,
+  "failed_scripts": [],
+  "skipped_by_time_gate": []
 }
