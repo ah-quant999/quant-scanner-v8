@@ -1,13 +1,15 @@
 {
-"update_time": "2026-11-03 20:19:19",
+"update_time": "2026-11-04 00:44:52",
 "total": 8029,
-"new_listings_count": 0,
+"new_listings_count": 1,
 "delisted_count": 0,
-"new_listings": [],
+"new_listings": [
+"001381 N皇冠"
+],
 "delisted": [],
-"meta_enriched": 0,
+"meta_enriched": 1,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8029,
+"old_universe": 8028,
 "fresh_universe": 8029
 }
