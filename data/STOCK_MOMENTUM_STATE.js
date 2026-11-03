@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-03 20:05",
- "generated": "2026-11-03 20:05",
+ "update_time": "2026-11-03 20:13",
+ "generated": "2026-11-03 20:13",
  "meta": {
-  "generated": "2026-11-03 20:05",
+  "generated": "2026-11-03 20:13",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -12186,27 +12186,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 9.962,
       "price": 8.72,
       "category": "突破"
-     },
-     {
-      "code": "002286",
-      "name": "保龄宝",
-      "change_pct": 5.611,
-      "price": 8.47,
-      "category": "突破"
-     },
-     {
-      "code": "600630",
-      "name": "龙头股份",
-      "change_pct": 9.984,
-      "price": 7.05,
-      "category": "突破"
-     },
-     {
-      "code": "603081",
-      "name": "大丰实业",
-      "change_pct": 4.753,
-      "price": 11.24,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -12365,27 +12344,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 9.962,
       "price": 8.72,
       "category": "短线选股"
-     },
-     {
-      "code": "002286",
-      "name": "保龄宝",
-      "change_pct": 5.611,
-      "price": 8.47,
-      "category": "短线选股"
-     },
-     {
-      "code": "600630",
-      "name": "龙头股份",
-      "change_pct": 9.984,
-      "price": 7.05,
-      "category": "短线选股"
-     },
-     {
-      "code": "603081",
-      "name": "大丰实业",
-      "change_pct": 4.753,
-      "price": 11.24,
-      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -12443,27 +12401,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "太阳电缆",
       "change_pct": 9.962,
       "price": 8.72,
-      "category": "强势股"
-     },
-     {
-      "code": "002286",
-      "name": "保龄宝",
-      "change_pct": 5.611,
-      "price": 8.47,
-      "category": "强势股"
-     },
-     {
-      "code": "600630",
-      "name": "龙头股份",
-      "change_pct": 9.984,
-      "price": 7.05,
-      "category": "强势股"
-     },
-     {
-      "code": "603081",
-      "name": "大丰实业",
-      "change_pct": 4.753,
-      "price": 11.24,
       "category": "强势股"
      }
     ]
