@@ -144,7 +144,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=5f4d87525c" defer></script>
 <script src="data/MARGIN_DATA.js?v=ba7dcf03d6" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=369e4d7cff" defer></script>
-<script src="data/IPO_DATA.js?v=04499849e4" defer></script>
+<script src="data/IPO_DATA.js?v=9955f47e14" defer></script>
     <script src="data/CRISIS_DATA.js?v=59677112da" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=e1c5c50042" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=79077cf140" defer></script>
@@ -1279,7 +1279,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=449ae7dbb0" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=99fab1f369" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=457a1f4246" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=d73c468ec0" defer></script>
 <script src="data/VOLATILITY.js?v=dcd556a2d2" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=51b8b19db8" defer></script>
@@ -2032,7 +2032,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=7fc85315e6" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=394da233eb" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=e145cda04c" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=bc589021a0" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=a06bee20a9" defer></script>
@@ -10704,11 +10704,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=04499849e4"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=9955f47e14"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=04499849e4';
+        return 'data/IPO_DATA.js?v=9955f47e14';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
