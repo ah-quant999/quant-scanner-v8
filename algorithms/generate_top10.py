@@ -23,6 +23,7 @@ import regime_filter
 
 # 🛡 2026-08-29 元模型升级：regime 驱动的行业风格微调
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import v8_date  # 统一交易日历：data_session_date 替代 datetime.now() 冒充今日（盘前自动回退到上一完成交易日）
 try:
     import v8_meta_model as _meta_model
 except Exception as _meta_err:
@@ -472,7 +473,7 @@ def quote_snapshot():
     global _QUOTE_SNAP_CACHE
     if _QUOTE_SNAP_CACHE is not None:
         return _QUOTE_SNAP_CACHE
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = v8_date.data_session_date()
     snap = {"date": None, "source": None, "map": {}}
 
     _sq = _load_js_obj("STOCK_QUOTE.js")
@@ -530,7 +531,7 @@ def stop_snapshot():
     global _STOP_SNAP_CACHE
     if _STOP_SNAP_CACHE is not None:
         return _STOP_SNAP_CACHE
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = v8_date.data_session_date()
     snap = {"date": None, "map": {}}
     _sd = _load_js_obj("STOCK_STOP_DATA.js")
     if str(_sd.get("update_time") or "")[:10] == today:
@@ -2540,7 +2541,7 @@ def main():
     max_score = max((s.get("total_score", 0) for s in scored), default=0)
     regime_summary = _meta_model.regime_summary() if _meta_model is not None else {}
     result = {
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": v8_date.data_session_date() + " " + datetime.now().strftime("%H:%M:%S"),
         "selection_mode": _SELECTION_MODE,
         "hc_cap": _hc_limit if _hc else None,
         "hc_count": len(scored) if _hc else None,
@@ -2589,7 +2590,7 @@ def main():
     try:
         hist_dir = os.path.join(DATA_DIR, "history")
         os.makedirs(hist_dir, exist_ok=True)
-        today_str = datetime.now().strftime("%Y-%m-%d")
+        today_str = v8_date.data_session_date()
         daily_file = os.path.join(hist_dir, f"top10_daily_{today_str.replace('-', '')}.json")
         with open(daily_file, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
