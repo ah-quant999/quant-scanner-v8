@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-04 01:16:28",
+  "update_time": "2026-11-04 02:01:06",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,15 +17,15 @@
     {
       "sector": "AI算力",
       "start": "09/16",
-      "end": "11/02",
+      "end": "11/03",
       "start_idx": 0,
-      "end_idx": 27,
-      "days": 28,
-      "hot_days": 26,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 294,
-      "ongoing": false
+      "total": 298,
+      "ongoing": true
     },
     {
       "sector": "其他",
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1823,
+      "total": 1821,
       "ongoing": true
     },
     {
@@ -50,7 +50,7 @@
       "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 431,
+      "total": 430,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 30,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 514,
+      "total": 518,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 29,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 261,
+      "total": 260,
       "ongoing": true
     },
     {
@@ -141,7 +141,7 @@
       "hot_days": 27,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 187,
+      "total": 189,
       "ongoing": true
     },
     {
@@ -193,20 +193,20 @@
       "hot_days": 6,
       "peak": 4,
       "peak_date": "10/29",
-      "total": 22,
+      "total": 23,
       "ongoing": true
     },
     {
       "sector": "地产链",
-      "start": "11/03",
+      "start": "11/04",
       "end": "11/04",
-      "start_idx": 28,
+      "start_idx": 29,
       "end_idx": 29,
-      "days": 2,
-      "hot_days": 2,
+      "days": 1,
+      "hot_days": 1,
       "peak": 4,
-      "peak_date": "11/03",
-      "total": 8,
+      "peak_date": "11/04",
+      "total": 4,
       "ongoing": true
     }
   ]
