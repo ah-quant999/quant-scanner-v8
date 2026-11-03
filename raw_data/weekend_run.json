@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-03 08:40:15",
-  "generated": "2026-11-03 08:40:15",
+  "update_time": "2026-11-03 18:25:24",
+  "generated": "2026-11-03 18:25:24",
   "period_start": "2026-10-26",
   "period_end": "2026-11-01",
   "stats": {
@@ -9,14 +9,20 @@
     "tracked_files": 6,
     "ok_files": 6,
     "missing_files": 0,
-    "latest_health": null
+    "latest_health": {
+      "ok": 104,
+      "warn": 0,
+      "fail": 19,
+      "total": 123,
+      "updated": "2026-10-09 11:15:58"
+    }
   },
   "freshness": [
     {
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-11-03 06:03:20",
+      "update_time": "2026-11-03 12:59:15",
       "size_kb": 28.3
     },
     {
@@ -30,7 +36,7 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-11-03 06:03",
+      "update_time": "2026-11-03 17:11",
       "size_kb": 106.8
     },
     {
@@ -45,14 +51,14 @@
       "label": "黄金池",
       "status": "ok",
       "update_time": "2026-11-03 08:24:26",
-      "size_kb": 2250.3
+      "size_kb": 1382.5
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-11-03 03:58:00",
-      "size_kb": 456.2
+      "update_time": "2026-11-03 08:24:27",
+      "size_kb": 456.6
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"

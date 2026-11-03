@@ -1,17 +1,31 @@
 {
-  "update_time": "2026-11-03 08:40:56",
-  "run_start": "2026-11-03 07:35:38",
-  "ok": 17,
-  "fail": 2,
+  "update_time": "2026-11-03 18:30:50",
+  "run_start": "2026-11-03 17:08:26",
+  "ok": 33,
+  "fail": 3,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
     },
     {
-      "script": "generate_top10.py",
-      "reason": "退出码 1 | NameError: name 'EXP_RET_TERM_MAX' is not defined"
+      "script": "gen_ff3_ranksum.py",
+      "reason": "退出码 1 | 数据日 2026-11-03 对齐率不足（1563/4323= 36% < 60%）——_wf_cache 新鲜度异常，保护性中止（末根分布 top5: 2026-10-21:2632, 2026-11-03:1563, 2026-10-27:73, 2026-10-26:28, 2026-10-29:21）"
+    },
+    {
+      "script": "factor_walkforward.py",
+      "reason": "退出码 1 | TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'"
     }
   ],
-  "skipped_by_time_gate": []
+  "skipped_by_time_gate": [
+    "backtest_expectancy.py",
+    "build_candidate_pool.py",
+    "generate_top10.py",
+    "backtest_tdx.py",
+    "export_optimized_strategy.py",
+    "calc_volatility_watch.py",
+    "gen_stock_stop.py",
+    "calc_sentiment_cycle.py",
+    "final_recommend.py"
+  ]
 }

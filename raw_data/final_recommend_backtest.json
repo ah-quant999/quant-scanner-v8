@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-01 16:10:52",
- "update_time": "2026-11-01 16:10:52",
+ "generated": "2026-11-03 18:30:45",
+ "update_time": "2026-11-03 18:30:45",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -26,13 +26,13 @@
  "signal_source": "raw_data/history/final_recommend_YYYYMMDD.json（算法链每日真实选股的 dated 快照归档 —— 真实信号流口径，非历史规则回放）",
  "attribution_rule": "update_time 小时 < 9 归前一自然日（与闸门 _NIGHT_CUT 同源）；同一入场日的多个归档版本只认最新版（旧版视为被刷新替代），杜绝周末/国庆重跑双计",
  "versions_total": 47,
- "versions_superseded": 17,
- "versions_no_entry": 2,
+ "versions_superseded": 18,
+ "versions_no_entry": 0,
  "signals_missing_kline": 1,
  "total_signals": 119,
  "signal_days": 28,
  "signal_date_range": "2026-09-04 ~ 2026-10-29",
- "kline_calendar_range": "2023-06-21 ~ 2026-10-30",
+ "kline_calendar_range": "2023-06-21 ~ 2026-11-03",
  "periods": {
   "1d": {
    "samples": 119,
@@ -45,8 +45,8 @@
    "best_return": 7.32,
    "worst_return": -10.97,
    "max_drawdown": -1.59,
-   "bench_avg_return": -0.287,
-   "bench_win_rate": 41.75,
+   "bench_avg_return": -0.3049,
+   "bench_win_rate": 41.42,
    "bench_days": 28
   },
   "2d": {
@@ -60,8 +60,8 @@
    "best_return": 10.89,
    "worst_return": -21.82,
    "max_drawdown": -3.63,
-   "bench_avg_return": -0.6612,
-   "bench_win_rate": 39.72,
+   "bench_avg_return": -0.6802,
+   "bench_win_rate": 39.21,
    "bench_days": 27
   },
   "3d": {
@@ -75,8 +75,8 @@
    "best_return": 10.79,
    "worst_return": -26.95,
    "max_drawdown": -5.47,
-   "bench_avg_return": -1.3447,
-   "bench_win_rate": 35.11,
+   "bench_avg_return": -1.3483,
+   "bench_win_rate": 34.58,
    "bench_days": 27
   },
   "5d": {
@@ -90,8 +90,8 @@
    "best_return": 13.31,
    "worst_return": -29.89,
    "max_drawdown": -9.31,
-   "bench_avg_return": -1.9112,
-   "bench_win_rate": 34.23,
+   "bench_avg_return": -1.9183,
+   "bench_win_rate": 33.48,
    "bench_days": 25
   },
   "10d": {
@@ -105,23 +105,23 @@
    "best_return": 21.13,
    "worst_return": -38.85,
    "max_drawdown": -15.83,
-   "bench_avg_return": -3.4306,
-   "bench_win_rate": 30.88,
+   "bench_avg_return": -3.4336,
+   "bench_win_rate": 29.52,
    "bench_days": 20
   },
   "20d": {
-   "samples": 52,
+   "samples": 53,
    "immature": false,
    "win": 3,
-   "loss": 49,
-   "win_rate": 5.8,
-   "avg_return": -20.65,
-   "median_return": -17.96,
+   "loss": 50,
+   "win_rate": 5.7,
+   "avg_return": -20.97,
+   "median_return": -18.06,
    "best_return": 13.56,
    "worst_return": -58.08,
-   "max_drawdown": -25.1,
-   "bench_avg_return": -7.3566,
-   "bench_win_rate": 24.46,
+   "max_drawdown": -25.44,
+   "bench_avg_return": -7.3377,
+   "bench_win_rate": 22.5,
    "bench_days": 12
   },
   "30d": {
