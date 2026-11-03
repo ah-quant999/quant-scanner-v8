@@ -2156,6 +2156,18 @@ def check_data_cards():
                 _mk = _recent_trading_mark(_n, *_cyc)
                 max_age = max(max_age, int((_n - _mk).total_seconds() / 60) + _REG_GRACE_MIN)
 
+            # 🛡 2026-11-03 一劳永逸（九宝令）：_LOW_FREQ_MAX_AGE 登记的低频产物（US_HK_MAP /
+            #   MARKET_THERMO 等）按自身红线放宽，不被「今日事件」盘前 180min 紧 cap 误杀。
+            #   根因：US_HK_MAP 由**专属链 v8_us_hk_map.yml**（双种子 05:35/08:15）产出，并非
+            #   08:25 premarket 批；盘前窗口(08:00-10:00) min(def_max,180) 会把「05:08 当日美股
+            #   收盘数据」（即便专链已跑、仅因内容同值 SKIP 未刷新时间戳）判 fail → self_heal 每
+            #   25 分钟狂派该专链（重试风暴：实测 5h 内 11 次、80% 失败）→ 既假告警又挤占 cn runner，
+            #   致主链路（FINAL_RECOMMEND/市场广度）饿死被取消 ⇒ 全站「2天前」陈旧。
+            #   本兜底把 max_age 抬到 _LOW_FREQ_MAX_AGE 红线（US_HK_MAP=3 天），仅放宽不收紧：
+            #   真·超 3 天未更新仍 fail，保留真故障可见性。与 check_all_data_files L2630 同源口径。
+            if d["id"] in _LOW_FREQ_MAX_AGE:
+                max_age = max(max_age, _LOW_FREQ_MAX_AGE[d["id"]])
+
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True
         # 注意：page 变量在下方才赋值，此处必须直接取 d["page"]，否则会误用上一轮循环的残留值
