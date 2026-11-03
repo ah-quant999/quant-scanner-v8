@@ -1,19 +1,19 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-04 05:48:54",
+  "generated": "2026-11-04 05:51:25",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
   "total_unique_stocks": 214,
-  "total_appearances": 631,
+  "total_appearances": 587,
   "kline_available": 214,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
  "periods": {
   "2026-09": {
-   "count": 419,
+   "count": 392,
    "leaders": [
     {
      "code": "301190",
@@ -902,7 +902,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002909",
      "name": "集泰股份",
      "date": "2026-09-21",
-     "count": 7,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -1462,7 +1462,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300741",
      "name": "华宝股份",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -1702,7 +1702,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002514",
      "name": "*ST宝馨",
      "date": "2026-09-21",
-     "count": 6,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -2022,7 +2022,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000993",
      "name": "闽东电力",
      "date": "2026-09-21",
-     "count": 9,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -2182,7 +2182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh920075",
      "name": "柏星龙",
      "date": "2026-09-21",
-     "count": 6,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -2262,7 +2262,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000523",
      "name": "红棉股份",
      "date": "2026-09-21",
-     "count": 8,
+     "count": 7,
      "categories": [
       "加速",
       "短线选股",
@@ -2582,7 +2582,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300943",
      "name": "春晖智控",
      "date": "2026-09-21",
-     "count": 7,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -2902,7 +2902,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002011",
      "name": "盾安环境",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -2982,7 +2982,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688656",
      "name": "浩欧博",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -3222,7 +3222,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301133",
      "name": "金钟股份",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -3382,7 +3382,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300691",
      "name": "联合光电",
      "date": "2026-09-21",
-     "count": 9,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -3462,7 +3462,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600712",
      "name": "南宁百货",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -3622,7 +3622,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600318",
      "name": "新力金融",
      "date": "2026-09-21",
-     "count": 6,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -3702,7 +3702,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300352",
      "name": "ST信源",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -3942,7 +3942,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000020",
      "name": "深华发Ａ",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -4342,7 +4342,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688719",
      "name": "爱科赛博",
      "date": "2026-09-21",
-     "count": 6,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -4662,7 +4662,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000428",
      "name": "华天酒店",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -4742,7 +4742,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301016",
      "name": "雷尔伟",
      "date": "2026-09-21",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -5222,7 +5222,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000829",
      "name": "天音控股",
      "date": "2026-09-21",
-     "count": 6,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -5302,7 +5302,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000816",
      "name": "智慧农业",
      "date": "2026-09-21",
-     "count": 5,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -5622,7 +5622,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300290",
      "name": "ST荣科",
      "date": "2026-09-22",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -6022,7 +6022,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601999",
      "name": "出版传媒",
      "date": "2026-09-22",
-     "count": 9,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -6182,7 +6182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605168",
      "name": "三人行",
      "date": "2026-09-22",
-     "count": 6,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -6262,7 +6262,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz001326",
      "name": "联域股份",
      "date": "2026-09-22",
-     "count": 6,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -6662,7 +6662,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000978",
      "name": "桂林旅游",
      "date": "2026-09-23",
-     "count": 4,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -7942,7 +7942,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605008",
      "name": "长鸿高科",
      "date": "2026-09-24",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -8022,7 +8022,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002819",
      "name": "东方中科",
      "date": "2026-09-24",
-     "count": 5,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -8182,7 +8182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002264",
      "name": "新 华 都",
      "date": "2026-09-24",
-     "count": 7,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -8822,7 +8822,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603421",
      "name": "鼎信通讯",
      "date": "2026-09-29",
-     "count": 3,
+     "count": 2,
      "categories": [
       "加速",
       "短线选股",
@@ -9142,7 +9142,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603886",
      "name": "元祖股份",
      "date": "2026-09-29",
-     "count": 6,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -9622,7 +9622,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688696",
      "name": "极米科技",
      "date": "2026-09-30",
-     "count": 9,
+     "count": 8,
      "categories": [
       "强势股",
       "短线选股",
@@ -10099,7 +10099,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-10": {
-   "count": 194,
+   "count": 183,
    "leaders": [
     {
      "code": "002343",
@@ -10988,7 +10988,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002702",
      "name": "海欣食品",
      "date": "2026-10-08",
-     "count": 5,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -11628,7 +11628,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000513",
      "name": "丽珠集团",
      "date": "2026-10-09",
-     "count": 5,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -11788,7 +11788,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603721",
      "name": "中广天择",
      "date": "2026-10-09",
-     "count": 8,
+     "count": 7,
      "categories": [
       "强势股",
       "短线选股",
@@ -12108,7 +12108,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300830",
      "name": "金现代",
      "date": "2026-10-09",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -12748,7 +12748,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002902",
      "name": "铭普光磁",
      "date": "2026-10-14",
-     "count": 3,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -12828,7 +12828,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600698",
      "name": "湖南天雁",
      "date": "2026-10-14",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -12908,7 +12908,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300992",
      "name": "泰福泵业",
      "date": "2026-10-14",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -13148,7 +13148,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605003",
      "name": "众望布艺",
      "date": "2026-10-15",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -13548,7 +13548,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300553",
      "name": "集智股份",
      "date": "2026-10-16",
-     "count": 5,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -13708,7 +13708,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603051",
      "name": "鹿山新材",
      "date": "2026-10-16",
-     "count": 6,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -14028,7 +14028,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600329",
      "name": "达仁堂",
      "date": "2026-10-19",
-     "count": 3,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -14668,7 +14668,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002518",
      "name": "科士达",
      "date": "2026-10-20",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -14988,7 +14988,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002201",
      "name": "九鼎新材",
      "date": "2026-10-21",
-     "count": 4,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -16348,7 +16348,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301376",
      "name": "致欧科技",
      "date": "2026-10-23",
-     "count": 3,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -17388,7 +17388,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301281",
      "name": "科源制药",
      "date": "2026-10-28",
-     "count": 3,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18026,14 +18026,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-11": {
-   "count": 18,
+   "count": 12,
    "leaders": [
     {
      "code": "300808",
      "symbol": "sz300808",
      "name": "久量股份",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "加速",
       "短线选股",
@@ -18193,7 +18193,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601098",
      "name": "中南传媒",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18273,7 +18273,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000532",
      "name": "华金资本",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18353,7 +18353,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002771",
      "name": "真视通",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18433,7 +18433,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603587",
      "name": "地素时尚",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18513,7 +18513,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002489",
      "name": "浙江永强",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18593,7 +18593,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600793",
      "name": "宜宾纸业",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18672,8 +18672,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "code": "002652",
      "symbol": "sz002652",
      "name": "扬子新材",
-     "date": "2026-11-04",
-     "count": 1,
+     "date": "2026-11-03",
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
@@ -18755,7 +18755,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300808",
      "name": "久量股份",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "加速",
       "短线选股",
@@ -18915,7 +18915,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601098",
      "name": "中南传媒",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -18995,7 +18995,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000532",
      "name": "华金资本",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -19075,7 +19075,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002771",
      "name": "真视通",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -19155,7 +19155,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603587",
      "name": "地素时尚",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -19235,7 +19235,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002489",
      "name": "浙江永强",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -19315,7 +19315,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600793",
      "name": "宜宾纸业",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 1,
      "categories": [
       "强势股",
       "短线选股",
@@ -19394,8 +19394,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "code": "002652",
      "symbol": "sz002652",
      "name": "扬子新材",
-     "date": "2026-11-04",
-     "count": 1,
+     "date": "2026-11-03",
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",
