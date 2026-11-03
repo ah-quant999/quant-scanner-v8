@@ -1,15 +1,16 @@
 {
-"update_time": "2026-11-04 00:44:52",
+"update_time": "2026-11-04 05:46:11",
 "total": 8029,
-"new_listings_count": 1,
+"new_listings_count": 0,
 "delisted_count": 0,
-"new_listings": [
-"001381 N皇冠"
-],
+"new_listings": [],
 "delisted": [],
-"meta_enriched": 1,
-"guard_tripped": false,
-"guard_reasons": [],
-"old_universe": 8028,
+"meta_enriched": 0,
+"guard_tripped": true,
+"guard_reasons": [
+"口径塌缩：fresh(8029) < old(9693) 的 90%",
+"单轮退市 1664 只 > 阈值 96 只（真实退市每日 0~5 只）"
+],
+"old_universe": 9693,
 "fresh_universe": 8029
 }
