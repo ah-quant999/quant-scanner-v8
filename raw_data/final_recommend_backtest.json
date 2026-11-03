@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-03 18:30:45",
- "update_time": "2026-11-03 18:30:45",
+ "generated": "2026-11-03 20:23:42",
+ "update_time": "2026-11-03 20:23:42",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -45,7 +45,7 @@
    "best_return": 7.32,
    "worst_return": -10.97,
    "max_drawdown": -1.59,
-   "bench_avg_return": -0.3049,
+   "bench_avg_return": -0.3046,
    "bench_win_rate": 41.42,
    "bench_days": 28
   },
@@ -60,8 +60,8 @@
    "best_return": 10.89,
    "worst_return": -21.82,
    "max_drawdown": -3.63,
-   "bench_avg_return": -0.6802,
-   "bench_win_rate": 39.21,
+   "bench_avg_return": -0.6808,
+   "bench_win_rate": 39.2,
    "bench_days": 27
   },
   "3d": {
@@ -75,7 +75,7 @@
    "best_return": 10.79,
    "worst_return": -26.95,
    "max_drawdown": -5.47,
-   "bench_avg_return": -1.3483,
+   "bench_avg_return": -1.3471,
    "bench_win_rate": 34.58,
    "bench_days": 27
   },
@@ -90,8 +90,8 @@
    "best_return": 13.31,
    "worst_return": -29.89,
    "max_drawdown": -9.31,
-   "bench_avg_return": -1.9183,
-   "bench_win_rate": 33.48,
+   "bench_avg_return": -1.9159,
+   "bench_win_rate": 33.5,
    "bench_days": 25
   },
   "10d": {
@@ -105,7 +105,7 @@
    "best_return": 21.13,
    "worst_return": -38.85,
    "max_drawdown": -15.83,
-   "bench_avg_return": -3.4336,
+   "bench_avg_return": -3.4284,
    "bench_win_rate": 29.52,
    "bench_days": 20
   },
@@ -120,8 +120,8 @@
    "best_return": 13.56,
    "worst_return": -58.08,
    "max_drawdown": -25.44,
-   "bench_avg_return": -7.3377,
-   "bench_win_rate": 22.5,
+   "bench_avg_return": -7.3374,
+   "bench_win_rate": 22.48,
    "bench_days": 12
   },
   "30d": {

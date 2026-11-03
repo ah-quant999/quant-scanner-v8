@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-03 07:35:38",
+  "update_time": "2026-11-03 17:55:50",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -10,53 +10,53 @@
   "sentiment_meta": {
     "phase": "狂热",
     "score": 85.0,
-    "delta_pct": 165.96,
+    "delta_pct": 0.0,
     "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "华为概念",
-        "type": "概念",
-        "net": 88.87
+        "name": "电力设备",
+        "type": "行业",
+        "net": 34.32
       },
       {
-        "name": "2026中报预增",
-        "type": "概念",
-        "net": 81.21
+        "name": "电池",
+        "type": "行业",
+        "net": 25.32
       },
       {
-        "name": "基金增仓",
+        "name": "茅指数",
         "type": "概念",
-        "net": 78.11
+        "net": 20.92
       },
       {
-        "name": "人工智能",
+        "name": "钠离子电池",
         "type": "概念",
-        "net": 72.16
+        "net": 18.16
       },
       {
-        "name": "AI应用",
+        "name": "宁组合",
         "type": "概念",
-        "net": 65.39
+        "net": 17.82
       }
     ],
     "top_out": [
       {
-        "name": "港口",
-        "type": "行业",
-        "net": -0.92
+        "name": "科创板做市股",
+        "type": "概念",
+        "net": -0.04
       },
       {
-        "name": "医疗耗材",
-        "type": "行业",
-        "net": -0.94
+        "name": "刀片电池",
+        "type": "概念",
+        "net": -0.14
       },
       {
-        "name": "水泥制造",
-        "type": "行业",
-        "net": -0.97
+        "name": "独家药品",
+        "type": "概念",
+        "net": -0.19
       }
     ]
   },
