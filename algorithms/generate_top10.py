@@ -448,7 +448,10 @@ def _winrate_term(code6):
     if not rec:
         return 0.0
     ws = rec.get("winrate_score") or 0.0
-    t = ws * WINRATE_WEIGHT
+    # 🔴 2026-11-04 根因修复（主人令·一劳永逸）：原引用未定义常量 WINRATE_WEIGHT 致脚本崩溃、
+    #   写不出终选输出。2026-11-02 主人令已把 winrate 降级为「置信微调」，权重常量即 WR_CONF_WEIGHT=0.2，
+    #   此处改用之（与 L2250 主流程一致），消除 NameError。
+    t = ws * WR_CONF_WEIGHT
     return max(-WINRATE_TERM_MAX, min(WINRATE_TERM_MAX, t))
 
 

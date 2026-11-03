@@ -546,6 +546,33 @@ SEQ_REF: dict[str, str] = {
 }
 
 
+def _gold_pool_fresh(root: str, day_s: str, run_day_s: str) -> bool:
+    """gold_pool 是否为「当日(目标数据日或实际运行日)」新鲜产出。
+
+    🔴 2026-11-04 主人令·终选冻结根治（与 小九 逃生门互补）：
+    根因：cn 采集批凌晨(05~07点)产出 gold_pool / LHB 等，时间戮 < FLOOR_TRADING(16,30)
+    → A 批被 check_ready 判「未就绪」；但 A 最新产物落后目标日仅 0~1 天(≤UPSTREAM_LAG_MAX=2)
+    → 小九 _escape_gate 不触发 → 闸门每轮只 return A → B(选股/generate_top10)/D(最终推荐)
+    永不被调度 → 终选输出 / 最终推荐冻在 11-01。
+    治：B 选股批只读取本地 raw_data/gold_pool.json（**不重采任何 cn 源**），gold_pool 当日鲜
+    即说明 cn 采集已成功、选股输入合格 ⇒ 可越过 A 的 16:30 门槛直接跑 B（与美IP runner 无关）。
+    gold_pool 陈旧(cn 采集失败) ⇒ 返回 False，维持原兜底(退回选 A 重采)，无副作用。
+    """
+    import json as _json
+    import os as _os
+    p = _os.path.join(root, "raw_data", "gold_pool.json")
+    if not _os.path.exists(p):
+        return False
+    try:
+        with open(p, encoding="utf-8") as _f:
+            d = _json.load(_f)
+        ut = d.get("update_time") or (d.get("meta") or {}).get("update_time") or ""
+        ds = ut[:10]
+        return ds in (day_s, run_day_s)
+    except Exception:
+        return False
+
+
 def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
                 kind: str = "trading", run_day: str | None = None):
     """返回 (是否就绪, '命中/总数', 明细)。
@@ -763,6 +790,11 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str
     if not ready["A"][0] and not explicit:
         _escape = _escape_gate(root, day_s)
 
+    # 🔴 2026-11-04 主人令·终选冻结根治：gold_pool 当日鲜判定（与小九逃生门互补）。
+    #   A 未就绪 仅因「凌晨打戳<16:30」而落后天数≤2 ⇒ 逃生门不触发；此处用 gold_pool 实际新鲜度
+    #   直接判定「选股输入是否已合格」，从而跳过 A、放行 B（详见循环内注释）。
+    _gp_fresh = _gold_pool_fresh(root, day_s, _run_day_s)
+
     # ── 0) 显式全链（人工应急全量补算）──────────────────────────────────────
     if explicit == "ALL":
         return ("ALL", True, "显式 ALL：应急全量补算（缺什么跑什么，由 run_algorithms 全链兜底）",
@@ -854,12 +886,22 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str
 
         # 🆕 前置就绪校验：前置未就绪 ⇒ 本批跳过（沿用陈旧上游只会算出假新鲜产物），
         #   但**继续看后面的批**，不遮蔽。
+        #   🔴 2026-11-04 补充：B 选股批的前置 A 若仅因「凌晨打戳<16:30」而判未就绪、
+        #      但 gold_pool 当日鲜（cn 采集已成功）→ 视为 A 对 B「等效就绪」，越过门槛放行 B，
+        #      不遮蔽后续批（B 只读本地 gold_pool，不重采 cn 源）。
         _pre = PREREQ.get(_s)
         if _pre and not ready[_pre][0]:
-            _skip_why[_s] = f"前置 {_pre} 未就绪({ready[_pre][1]})"
-            continue
+            if _s == "B" and _gp_fresh:
+                pass  # 越过 A 前置门槛：gold_pool 鲜 ⇒ 选股输入合格，放行 B
+            else:
+                _skip_why[_s] = f"前置 {_pre} 未就绪({ready[_pre][1]})"
+                continue
 
         # 原有放行逻辑（逃生门 + 正常）
+        # 🔴 2026-11-04 补充：A 未就绪 但 gold_pool 当日鲜 ⇒ **跳过 A**（不返回 A 重采，
+        #   美IP runner 上 A 重采 cn 源本就失败），让循环继续到 B，使选股批得以运行。
+        if _s == "A" and _gp_fresh:
+            continue
         if _s == "A" and _escape[0]:
             return ("B", True,
                     f"A 未就绪({ready['A'][1]})，但{_escape[1]}；"
@@ -880,12 +922,14 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str
         #   派发不足（自托管机失联 / GitHub cron 静默 / 接力推进器未触发）时，B 跑完后 D 永远等不到
         #   下一轮 → FINAL_RECOMMEND_DATA.js 滞留盘前版（本次事故：最终推荐冻结于 11-01，全站最关键的
         #   买卖决策卡停更一周）。
-        #   修法：盘后窗(hh>=18 选股合法)内，只要命中的是 B 或 D 且 D(最终推荐)仍未就绪，升级返回 "ALL"
+        #   修法：盘后窗(hh>=18 选股合法)内，**或** gold_pool 当日鲜(cn 采集已成功、选股输入合格)时，
+        #   只要命中的是 B 或 D 且 D(最终推荐)仍未就绪，升级返回 "ALL"
         #   （同一次 job 内 B→D→E 一气呵成），单次派发即补齐最终推荐，斩断「末批依赖额外派发」饿死链。
         #   A(采集)/盘中档 / D 已就绪 时维持原单批语义，零回归。
-        if _s in ("B", "D") and (not ready["D"][0]) and hh >= 18:
+        if _s in ("B", "D") and (not ready["D"][0]) and (hh >= 18 or _gp_fresh):
             return ("ALL", True,
-                    _reason_map[_s] + f"；D(最终推荐)未就绪⇒升级全链ALL(B→D→E)防末批饿死" + _extra + _ey,
+                    _reason_map[_s] + f"；D(最终推荐)未就绪⇒升级全链ALL(B→D→E)防末批饿死"
+                    + ("[gold_pool鲜·夜窗全链]" if _gp_fresh else "") + _extra + _ey,
                     day, kind, out())
         return (_s, True, _reason_map[_s] + _extra + _ey, day, kind, out())
 
