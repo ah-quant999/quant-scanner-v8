@@ -875,6 +875,18 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str
         _extra = ("；" + "、".join(f"{k} 跳过({v})" for k, v in _skip_why.items())) if _skip_why else ""
         # 🆕 显式让位留痕（见 §1）：让人工从 reason 立刻看出「我派的批没跑」及原因，可即时纠偏
         _ey = (f"；[{_explicit_yield}]" if _explicit_yield else "")
+        # 🛡 2026-11-03 一劳永逸（主人令「全面修复」）：根除「末批 D(最终推荐) 饿死」。
+        #   分阶流水线要求 A→B→D→E 各由一次独立派发触发；D 是末批，须 B 先就绪 + 再有一次派发来跑。
+        #   派发不足（自托管机失联 / GitHub cron 静默 / 接力推进器未触发）时，B 跑完后 D 永远等不到
+        #   下一轮 → FINAL_RECOMMEND_DATA.js 滞留盘前版（本次事故：最终推荐冻结于 11-01，全站最关键的
+        #   买卖决策卡停更一周）。
+        #   修法：盘后窗(hh>=18 选股合法)内，只要命中的是 B 或 D 且 D(最终推荐)仍未就绪，升级返回 "ALL"
+        #   （同一次 job 内 B→D→E 一气呵成），单次派发即补齐最终推荐，斩断「末批依赖额外派发」饿死链。
+        #   A(采集)/盘中档 / D 已就绪 时维持原单批语义，零回归。
+        if _s in ("B", "D") and (not ready["D"][0]) and hh >= 18:
+            return ("ALL", True,
+                    _reason_map[_s] + f"；D(最终推荐)未就绪⇒升级全链ALL(B→D→E)防末批饿死" + _extra + _ey,
+                    day, kind, out())
         return (_s, True, _reason_map[_s] + _extra + _ey, day, kind, out())
 
     # 所有非就绪 stage 都不可能回填？
