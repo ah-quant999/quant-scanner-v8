@@ -228,6 +228,7 @@ _TERM_OOS_KEYS = {
 }
 
 # 动态权重容器（main 启动时由 factor_oos_gate() 填充；评分循环读此而非写死常量）
+EXP_RET_TERM_MAX = 15.0  # 前移：消除 import 期 NameError（原定义晚于下方 _DYN 初始化，致 11-02 起每夜崩溃）
 _RPS_TERM_MAX_DYN = RPS_TERM_MAX
 _EXP_RET_TERM_MAX_DYN = EXP_RET_TERM_MAX
 _OOS_GATE_REPORT = {}
@@ -654,7 +655,6 @@ except Exception:
 #   主排序交由 RPS 动量项（S 级，用当下价格数据，非回测拟合参数）。
 EXP_RET_BLEND_W5 = 0.5
 EXP_RET_BLEND_W10 = 0.5
-EXP_RET_TERM_MAX = 15.0
 
 def _exp_ret_raw(chan, jinzuan, jigou, trend):
     """个股四信号组合 → 前瞻收益混合 raw(%)：0.5*ret5 + 0.5*ret10（by_signal）。缺失→0。"""
