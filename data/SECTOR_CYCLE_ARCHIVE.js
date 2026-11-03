@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-03 14:18:34
+// 最后更新：2026-11-03 14:28:42
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-03 14:18:34",
+  "update_time": "2026-11-03 14:28:42",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -188,14 +188,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "通信设备",
       "start": "10/21",
-      "end": "11/02",
+      "end": "11/03",
       "start_idx": 20,
-      "end_idx": 28,
-      "days": 9,
-      "hot_days": 7,
+      "end_idx": 29,
+      "days": 10,
+      "hot_days": 8,
       "peak": 4,
       "peak_date": "10/26",
-      "total": 25,
+      "total": 28,
       "ongoing": true
     },
     {
