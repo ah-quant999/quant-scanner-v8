@@ -1,0 +1,47 @@
+name: "🛡️ 投资避雷针 consolidate (cloud)"
+# 🔴 2026-11-04 一劳永逸根治：原 INVEST_AVOID 由 v8_morning_plan.yml 在 [self-hosted, cn] 跑，
+#   该 cn 自托管机自 2026-11-02 起宕机 ⇒ 投资避雷针卡冻在 11-02 15:16。
+#   gen_invest_avoid.py 纯读本地 data/*.js、不抓网、仅 stdlib，完全可在 GitHub 托管 ubuntu-latest 跑
+#   （与 v8_algo_cloud 同款根治：把 cn 单点故障移出关键数据链）。
+#   拆出独立云端工作流 ⇒ 与 cn 解耦，卡体每日可靠刷新。
+#   上游 6 源（DAJIJIN/SUSPENSION/MARKET_REGIME/RISK_GAUGE/MACRO_BRIEF/MARKET_ALERTS）
+#   仍由 cn_fetch 产出；若 cn 宕机导致某源滞后，本卡会如实标注各源 update_time（绝不伪造）。
+on:
+  schedule:
+    - cron: '55 23 * * *'   # 北京 07:55 每日（UTC 前一日 23:55）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-invest-avoid
+  cancel-in-progress: false
+
+jobs:
+  invest-avoid:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: "🧭 跑 gen_invest_avoid.py（产出 data/INVEST_AVOID.js）"
+        run: python v8/gen_invest_avoid.py
+      - name: "📤 推送 data/INVEST_AVOID.js（变化才推）"
+        run: |
+          git config user.name "v8-bot"
+          git config user.email "bot@quant-scanner-v8.local"
+          if git diff --quiet data/INVEST_AVOID.js; then
+            echo "INVEST_AVOID 内容无变化，跳过推送"
+          else
+            git add data/INVEST_AVOID.js
+            git commit -m "v8 invest_avoid: cloud consolidate $(date +'%Y-%m-%d %H:%M')"
+            git fetch origin main
+            git rebase origin/main || true
+            git push || echo "push 被其他链抢先（数据已更新），跳过"
+          fi

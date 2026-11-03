@@ -35,19 +35,46 @@ def clamp(v, lo, hi):
 def bj_now():
     return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
 
-# ── A. 宽基ETF净申购突变 ──────────────────────────────────────────────
+# ── A. 宽基ETF净申购突变（东财五分类为主，老源「宽基」分类兜底，防新文件上线竞态/缺失） ──
+# 🔴 2026-11-04 一劳永逸根治：原仅读 etf_subscription_eastmoney.js（新上线源），国家队活跃度(20:50)
+#   早于其首次落盘(次日03:45) 跑批 ⇒ load() 返 None ⇒ A 标「未就绪」、权重45%丢失 ⇒ 分从70+掉到46.5。
+#   现加：(1) 稳定 code 集识别宽基（防名称格式突变再翻车）；(2) 东财缺失/空 ⇒ 回落老源
+#   ETF_NET_SUBSCRIPTION.js 的「宽基」分类（始终存在），双源互备，永不再静默丢权重。
 KW_BROAD = ['沪深300','中证500','中证1000','50ETF','科创50','创业板','中证A500','中证2000',
             '300ETF','华夏300','500ETF','1000ETF','A500','科创综']
-a_val = None; a_detail = None; a_ready = False
+BROAD_CODES = {'588000','510050','510300','510500','512100','159915','510310','510330',
+               '512500','560010','588080','159919','510180','510880','515800','563000','561550','563300'}
+a_val = None; a_detail = None; a_ready = False; a_src = ''
 e = load('data/etf_subscription_eastmoney.js')
 if e:
     stock = (e.get('categories') or {}).get('股票型') or {}
     subs = stock.get('top_sub') or []
-    broad = [s for s in subs if any(k in (s.get('name') or '') for k in KW_BROAD)]
+    broad = [s for s in subs
+             if any(k in (s.get('name') or '') for k in KW_BROAD) or (s.get('code') in BROAD_CODES)]
     net = sum((s.get('d_amount_yi') or 0) for s in broad)
-    a_val = round(net, 1)
-    a_detail = '宽基净申购 %.1f 亿（%d 只宽基ETF）' % (net, len(broad))
-    a_ready = True
+    if broad:
+        a_val = round(net, 1)
+        a_detail = '宽基净申购 %.1f 亿（%d 只宽基ETF·东财五分类）' % (net, len(broad))
+        a_ready = True
+        a_src = 'eastmoney'
+# 兜底：东财五分类缺失/空 ⇒ 回落老源 ETF_NET_SUBSCRIPTION.js 的「宽基」分类（始终存在）
+if not a_ready:
+    leg = load('data/ETF_NET_SUBSCRIPTION.js')
+    if leg:
+        bcat = (leg.get('categories') or {}).get('宽基') or {}
+        bnet = bcat.get('net_amount_yi')
+        bsubs = bcat.get('top_sub') or []
+        if bnet is not None:
+            a_val = round(float(bnet), 1)
+            a_detail = '宽基净申购 %.1f 亿（兜底·老源宽基分类 %s 只）' % (a_val, bcat.get('count') or len(bsubs))
+            a_ready = True
+            a_src = 'legacy'
+        elif bsubs:
+            net = sum((s.get('d_amount_yi') or 0) for s in bsubs)
+            a_val = round(net, 1)
+            a_detail = '宽基净申购 %.1f 亿（兜底·老源宽基 top_sub）' % a_val
+            a_ready = True
+            a_src = 'legacy'
 
 # ── B. 大金融相对强度 ────────────────────────────────────────────────
 KW_FIN = ['银行','证券','保险','多元金融']
@@ -174,7 +201,7 @@ def _oneline():
 subs = []
 subs.append({
     'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,
-    'value':a_val,'unit':'亿','detail':a_detail or 'etf_subscription_eastmoney.js 未就绪',
+    'value':a_val,'unit':'亿','detail':a_detail or '宽基ETF数据源（东财/老源）均未就绪',
     'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪')))
 })
 subs.append({
