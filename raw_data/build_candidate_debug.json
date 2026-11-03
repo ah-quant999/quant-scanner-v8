@@ -1,5 +1,5 @@
 {
-  "DATA": "D:\\actions-runner-v8\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
+  "DATA": "/home/runner/work/quant-scanner-v8/quant-scanner-v8/algorithms/../out",
   "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": false,
@@ -10,12 +10,12 @@
     "stocks": 0
   },
   "source_dist": {
-    "主板成交前100": 149,
-    "创业板成交前100": 140,
-    "全市场流动性溢出": 347,
+    "主板成交前100": 143,
+    "创业板成交前100": 134,
+    "全市场流动性溢出": 346,
     "科创板成交前100": 100,
-    "港股成交前50": 85,
-    "因子优选": 112,
-    "外资研投": 125
+    "港股成交前50": 91,
+    "因子优选": 105,
+    "外资研投": 130
   }
 }

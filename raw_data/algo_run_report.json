@@ -1,7 +1,7 @@
 {
-  "update_time": "2026-11-04 00:47:02",
-  "run_start": "2026-11-03 22:32:39",
-  "ok": 41,
+  "update_time": "2026-11-04 02:38:51",
+  "run_start": "2026-11-04 00:55:45",
+  "ok": 16,
   "fail": 3,
   "failed_scripts": [
     {
@@ -13,12 +13,8 @@
       "reason": "退出码 1 | NameError: name 'WINRATE_WEIGHT' is not defined. Did you mean: 'INST_WEIGHT'?"
     },
     {
-      "script": "final_recommend.py",
-      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
-    },
-    {
-      "script": "factor_walkforward.py",
-      "reason": "退出码 1 | TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'"
+      "script": "refresh_stock_metadata.py",
+      "reason": "超时 >30min"
     }
   ],
   "skipped_by_time_gate": []
