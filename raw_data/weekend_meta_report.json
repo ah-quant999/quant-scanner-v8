@@ -1,9 +1,10 @@
 {
-"update_time": "2026-11-03 07:15:53",
-"total": 8028,
-"new_listings_count": 13,
+"update_time": "2026-11-03 08:40:14",
+"total": 8029,
+"new_listings_count": 14,
 "delisted_count": 0,
 "new_listings": [
+"001381 皇冠新材",
 "00950 李氏大药厂",
 "00951 超威动力",
 "01787 山东黄金",
@@ -23,5 +24,5 @@
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 8015,
-"fresh_universe": 8028
+"fresh_universe": 8029
 }
