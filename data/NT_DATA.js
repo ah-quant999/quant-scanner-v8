@@ -1,1 +1,1 @@
-window.NT_DATA = {"update_time":"2026-11-03 18:00","alerts":[{"type":"summary","severity":"low","message":"ETF监测中，0涨0跌","time":"18:00"}],"etfFlow":{"etfs":[],"summary":{"total":12,"valid":0,"up":0,"down":0,"alerts_count":0}},"calendar":[],"republish_time":"2026-11-03 18:59:08"};
+window.NT_DATA = {"update_time":"2026-11-03 19:32","alerts":[{"type":"summary","severity":"low","message":"ETF监测中，0涨0跌","time":"19:32"}],"etfFlow":{"etfs":[],"summary":{"total":12,"valid":0,"up":0,"down":0,"alerts_count":0}},"calendar":[],"republish_time":"2026-11-03 20:24:14"};
