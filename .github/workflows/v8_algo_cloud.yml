@@ -1214,29 +1214,19 @@ jobs:
   #   覆盖两类卡死：① 代码 bug 致 failure（如 11-03 WINRATE_WEIGHT NameError 连败 6 次）；
   #               ② 外部看门狗/提交推送误取消在跑 run（如 11-04 09:40 那次 31 分钟即被 cancelled）。
   #   限次 retry_count<2 防死循环；每次重派 ref=main 取最新代码，真故障最多 3 轮即停、转人工。
-  self_heal_redispatch:
-    name: "🩹 自愈重派(failure/cancelled→限次)"
-    needs: [algo]
-    if: >-
-      always() &&
-      (needs.algo.result == 'failure' || needs.algo.result == 'cancelled') &&
-      fromJSON(inputs.retry_count) < 2
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: read
-    steps:
-      - name: 计算下次 retry_count
-        id: calc
-        run: echo "next=$(( ${{ inputs.retry_count }} + 1 ))" >> "$GITHUB_OUTPUT"
-      - name: 重派全链(stage=ALL, 限次)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "algo 结果=${{ needs.algo.result }}，retry_count=${{ inputs.retry_count }} → 重派第 ${{ steps.calc.outputs.next }} 次"
-          curl -L -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Content-Type: application/json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_algo_cloud.yml/dispatches" \
-            -d '{"ref":"main","inputs":{"stage":"ALL","force_run":true,"bypass_time_gate":true,"chain_day":"","retry_count":"${{ steps.calc.outputs.next }}"}}'
+  self_heal_redispatch:
+    name: "🩹 自愈·重跑失败步骤(GITHUB_TOKEN 自带 actions:write, 无需 workflow scope)"
+    needs: [algo]
+    if: >-
+      always() &&
+      (needs.algo.result == 'failure' || needs.algo.result == 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: 重跑本 run 失败步骤(限一次, 防死循环)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "algo 结果=${{ needs.algo.result }} → 用 GITHUB_TOKEN 重跑失败步骤(rerun-failed-jobs, 无需 workflow scope)"
+          curl -L -X POST             -H "Accept: application/vnd.github+json"             -H "Authorization: Bearer ${GH_TOKEN}"             "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/rerun-failed-jobs"
