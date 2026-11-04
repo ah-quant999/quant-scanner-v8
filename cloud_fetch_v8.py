@@ -5668,6 +5668,34 @@ def main(category=None, only=None):
                     pass
         return []
 
+    def _fetch_880003_tencent(days=430):
+        """腾讯财经日K 回退源（云端 ubuntu 直连可达，通达信 880003 代码）。
+        返回 [(date, close, high, low), ...] 升序；失败返回 []。
+        腾讯顺序: [日期, 开, 收, 高, 低, 量, 额, ...] —— close=idx2 high=idx3 low=idx4。
+        """
+        for sym in ("880003", "sh880003", "sz880003"):
+            try:
+                r = _requests.get(
+                    "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+                    params={"param": "{},day,,,{},qfq".format(sym, days + 20)},
+                    headers=_EM_HEADERS, timeout=25)
+                j = r.json()
+                node = (j.get("data") or {}).get(sym) or {}
+                rows = node.get("qfqday") or node.get("day") or []
+                recs = []
+                for p in rows:
+                    try:
+                        recs.append((p[0], float(p[2]), float(p[3]), float(p[4])))
+                    except (ValueError, IndexError, TypeError):
+                        continue
+                if len(recs) >= 2:
+                    print(f"  [880003] 腾讯取数成功 sym={sym} {len(recs)} 根 "
+                          f"({recs[0][0]} ~ {recs[-1][0]})")
+                    return recs
+            except Exception as e:
+                print(f"  [880003] 腾讯 sym={sym} 失败: {e}")
+        return []
+
     def _fetch_880003_history(days=430):
         """通达信平均股价 880003 官方指数日K（主通道 pytdx 官方协议，东财兜底）。
         这是「平均股价」这个指标的官方本体；只读历史，不做任何估算。
@@ -5682,6 +5710,10 @@ def main(category=None, only=None):
         tdx = _fetch_880003_tdx(days)
         if tdx:
             return tdx
+        # 腾讯财经日K 回退（云端 ubuntu 直连可达，支持通达信 880003 代码）—— 2026-11-04 主人令根治
+        txc = _fetch_880003_tencent(days)
+        if txc:
+            return txc
         for secid in ("88.0003", "90.0003"):
             for _att in range(2):
                 try:
