@@ -2432,9 +2432,9 @@ def main():
     # 🔴 2026-10-26 主人令·高信念输出（仅金钻+缠论共振，不凑数、且全量吐出）：
     #   诊断(by_signal 1,1,0,0) 实证全市场唯一正 edge 组合：T+10 +4.64% / 胜率 61.9%（n=171）；
     #   jinzuan / jigou / trend 单维或负组合均负期望，旧逻辑却把它们顶进 TOP10 前排。
-    #   V8_HIGH_CONVICTION 默认开（"1"）：只在 scored 中保留「chan & jinzuan」共振票（金钻+缠论），
-    #   按 total_score 降序【全量输出】，V8_HC_CAP=0（默认）即不限只数——主人令「好票我就都要」；
-    #   共振数为 0 时自然空仓（坏行情不硬凑）。设 V8_HIGH_CONVICTION=0 回退传统 top20 评分口径。
+    # 🔴 2026-11-04 主人令「不强制双共振」：V8_HIGH_CONVICTION 默认改关（"0"）。
+    #   终选输出 = 金股池按因子综合评分(total_score)降序的 top20（收益率优先），不再强制「chan & jinzuan」共振。
+    #   设 V8_HIGH_CONVICTION=1 可回退高信念双共振模式（金钻+缠论，全量输出）。
     # 🔴 2026-10-30 根因修复：HC 重赋值前捕获真实金股池规模（非双共振子集），
     #   避免 total_scored 被误报为 54（双共振子集）而掩盖真实 800 池 → 主人误判「池子掉到45/冻住」。
     _pool_total = len(scored)
@@ -2456,7 +2456,7 @@ def main():
                 pass
     except Exception:
         pass
-    _hc = os.environ.get("V8_HIGH_CONVICTION", "1").strip() == "1"
+    _hc = os.environ.get("V8_HIGH_CONVICTION", "0").strip() == "1"
     _hc_cap = int(os.environ.get("V8_HC_CAP", "0"))
     _hc_limit = _hc_cap if _hc_cap > 0 else None  # None=全量
     _SELECTION_MODE = "top20_score"
@@ -2466,7 +2466,7 @@ def main():
                  and (s.get("breakdown", {}).get("signals", {}) or {}).get("chan")]
         # 🔴 2026-10-30 根因修复：双共振集内 total_score 几乎不可分(max 43.3/130、0只过80)，
         #   纯按总分排序导致 top-10 看似卡死。加次级键：优先新触发的高信念形态(form_A=金钻+缠论A形)，
-        #   其次连续共振天数，让新冒头的高信念票自然轮动到前排；不引入非双共振票(守住主人「只要 jinzuan+chan」规则)。
+        #   其次连续共振天数，让新冒头的高信念票自然轮动到前排；不引入非双共振票（HC 高信念模式专属逻辑，V8_HIGH_CONVICTION=1 时生效）。
         _reso.sort(key=lambda x: (
             -x["total_score"],
             -int(bool((x.get("breakdown", {}).get("signals", {}) or {}).get("form_A", False))),
@@ -2475,7 +2475,7 @@ def main():
         scored = _reso if _hc_limit is None else _reso[:_hc_limit]
         _SELECTION_MODE = "high_conviction_resonance"
         _cap_txt = f"前 {_hc_limit} 只" if _hc_limit else "全量"
-        print(f"  🎯 高信念模式（默认开）：金钻+缠论共振 {len(_reso)} 只 → 输出{_cap_txt}（不凑数，0 只即空仓）")
+        print(f"  🎯 高信念模式（V8_HIGH_CONVICTION=1 启用）：金钻+缠论共振 {len(_reso)} 只 → 输出{_cap_txt}（不凑数，0 只即空仓）")
 
     # 格式化为简洁输出（含完整评分明细）
     # 🔴 2026-10-23 晚主人令撤销「金池排除港股」：港股照常进因子榜，不排除。
