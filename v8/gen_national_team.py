@@ -12,7 +12,9 @@ v8/gen_national_team.py —— 「国家队活跃度」复合信号（盘后规�
   A. 宽基ETF净申购突变（45%）  ← ETF_SUBSCRIPTION_EASTMONEY.js（东财口径·股票型 top_sub 宽基净申购额；由 update_v8.py 派生）
   B. 大金融相对强度（35%）     ← SECTOR_RS.js（银行/证券/保险/多元金融 relative_5d 均值）
   C. 大金融资金净流入（20%）   ← SECTOR_FUND_FLOW.js（银行/证券 板块净流入合计）
-  D. 汇金持仓环比（未接入）    ← v8 无季报股东源 ⇒ 永远「未接入」，仅占位说明
+  D. 汇金持仓环比（0%·历史披露）← HUIJIN_HOLDINGS.js（fetch_huijin_holdings.py 抓东财股东增减持）；
+                             季报滞后约1-3月+（实测最新 2024Q2），仅作历史印证、不参与实时评分，
+                             卡面诚实灰标「历史披露」并标注滞后天数，绝不冒充实时信号。
 
 调度：.github/workflows/v8_national_team.yml 工作日 20:50 CST（GitHub Actions ubuntu-latest，
       Contents API 稳健推送）；18:20/19:20 两档盘后资金流链落盘后运行，上游未就绪则保留上版不写盘（宁缺勿错）。
@@ -125,6 +127,22 @@ if hj and hj.get('data_type') == 'real' and hj.get('latest_net_yi') is not None:
     if _pq and _qoq is not None:
         _tail = '，环比上季(%s) %s%.2f 亿股' % (_pq, '+' if _qoq >= 0 else '', _qoq)
     d_detail = '汇金股票披露%s %.2f 亿股（%s）%s · 披露口径滞后' % (_dir, abs(_ln), _lq, _tail)
+    # 🔴 2026-11-04 一劳永逸根治：汇金季报属法定义务披露，最新仅 2024Q2（滞后约 2 年），
+    #   原以「✅增持」绿色展示 ⇒ 与 A/B/C 今日实时信号并列，造成「当前活跃」的误读。
+    #   现诚实标注：披露季距今 >365 天 ⇒ 改中性「📜历史披露」灰标（前端不以 ✅/❌ 上色），
+    #   并显式标注滞后天数，杜绝把数年前的季报当实时托盘信号。权重仍 0%，不影响评分。
+    _d_stale_days = None
+    if _lq and len(_lq) >= 6:
+        try:
+            _qy = int(_lq[:4]); _qm = (int(_lq[5]) - 1) * 3 + 1   # "2024Q2" -> 2024-04
+            _qe = datetime.date(_qy, _qm, 1)
+            _d_stale_days = (bj_now().date() - _qe).days
+        except (ValueError, IndexError):
+            _d_stale_days = None
+    if _d_stale_days is not None and _d_stale_days > 365:
+        d_status = '📜历史披露'
+        d_detail = '汇金股票披露%s %.2f 亿股（%s·滞后约%d天）%s · 历史披露非实时' % (
+            _dir, abs(_ln), _lq, _d_stale_days, _tail)
     d_ready = True
 
 # ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
@@ -255,3 +273,4 @@ with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as
 print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/4' % (score, vtxt, out['ready_count']))
 for s in subs:
     print('  [%s] %s w%s %s val=%s %s' % (s['key'], s['name'], s['weight'], s['status'], s['value'], s['detail']))
+
