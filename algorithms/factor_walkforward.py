@@ -222,10 +222,15 @@ def stock_series(rows):
     o = [0.0] * n
     r = [0.0] * n
     for i in range(1, n):
-        pc = rows[i - 1]["close"]
-        if pc > 0:
-            o[i] = rows[i]["open"] / pc - 1.0
-            r[i] = rows[i]["close"] / pc - 1.0
+        # 🛡 2026-11-05 小九侧修复：kline_cache 缓存路径可能混入 null 行（11-04/11-05 两轮线上
+        #   TypeError: float+None 实锤，本地复现 26 个缓存文件含 volume/high/low:null）。
+        #   此处对齐 fetch 路径同文件的 `or 0` 口径；干净数据零行为变化。
+        pc = rows[i - 1].get("close")
+        oc = rows[i].get("open")
+        cc = rows[i].get("close")
+        if pc and oc is not None and cc is not None and pc > 0:
+            o[i] = oc / pc - 1.0
+            r[i] = cc / pc - 1.0
     return r, o
 
 
@@ -628,10 +633,13 @@ def make_prep(rows):
     """返回 {'f': {name: callable(i)->float|None}}。"""
     n = len(rows)
     r, o = stock_series(rows)
-    vol = [x["volume"] for x in rows]
-    close = [x["close"] for x in rows]
-    high = [x["high"] for x in rows]
-    low = [x["low"] for x in rows]
+    # 🛡 2026-11-05 小九侧修复：缓存路径 null 防御（对齐 fetch 路径 L101 `or 0` 口径）。
+    #   null 进 _psum/sum 即抛 float+None TypeError；干净数据零行为变化。
+    #   上游根治（refresh_kline_freshness / fetch_multiyear_kline 写出 null 行 + 26 个污染文件清理）待白天处理。
+    vol = [x.get("volume") or 0.0 for x in rows]
+    close = [x.get("close") or 0.0 for x in rows]
+    high = [x.get("high") or 0.0 for x in rows]
+    low = [x.get("low") or 0.0 for x in rows]
     ps_r, ps_o, ps_v = _psum(r), _psum(o), _psum(vol)
     ps2 = _psum([x * x for x in r])
     f = {}
