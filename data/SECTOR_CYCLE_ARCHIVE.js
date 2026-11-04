@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-04 09:42:37
+// 最后更新：2026-11-04 09:54:11
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-04 09:42:37",
+  "update_time": "2026-11-04 09:54:11",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -27,7 +27,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
     "11/04"
   ],
   "columns": 30,
-  "cycle_count": 14,
+  "cycle_count": 15,
   "cycles": [
     {
       "sector": "AI算力",
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1821,
+      "total": 1824,
       "ongoing": true
     },
     {
@@ -206,9 +206,22 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 29,
       "days": 7,
       "hot_days": 6,
-      "peak": 4,
-      "peak_date": "10/29",
-      "total": 24,
+      "peak": 5,
+      "peak_date": "11/04",
+      "total": 25,
+      "ongoing": true
+    },
+    {
+      "sector": "地产链",
+      "start": "11/04",
+      "end": "11/04",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "11/04",
+      "total": 3,
       "ongoing": true
     }
   ]
