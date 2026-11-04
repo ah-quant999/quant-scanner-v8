@@ -121,6 +121,11 @@ MUST_HAVE_CRON = {
     #   （cron 23 */2，alimi-cn 专属路由 label=cn-cn，Contents API 直推 hb_alimi.json，
     #   根治家机本地调度停摆 ⇒ HB_ALIMI 冻结 33h 假红灯）；入库时漏双登记 ⇒ [4/8] 红灯。
     "v8_alimi_heartbeat": "阿狸咪心跳GitHub派发(每2h·alimi-cn专属)",
+    # 2026-11-04 补登记（门禁 [4/8] 拦截补漏）：投资避雷针 consolidate 云端链。
+    #   原 INVEST_AVOID 由 v8_morning_plan 在 [self-hosted, cn] 跑，cn 自托管机 11-02 起宕机
+    #   ⇒ 卡冻 11-02；本链拆出到云端 ubuntu-latest（gen_invest_avoid.py 纯本地读、不抓网），
+    #   与 cn 解耦，每日 07:55 北京可靠刷新。建链时漏双登记 ⇒ build_deploy [4/8] 红灯阻断 deploy。
+    "v8_invest_avoid": "投资避雷针consolidate(云端ubuntu·每日07:55·解耦cn宕机)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
