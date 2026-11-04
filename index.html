@@ -16,7 +16,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "db1814b008";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
+    var BUILD = "0c98b25f24";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -13426,7 +13426,7 @@ function drawUpDownChart(){
 
   /* ---- 6. 市场宽度（52周新高） ---- */
   // 🏔 板块年度主力净流入累积表（2026-10-17 主人令「加」：自建·真实历史回填）
-  //   红=净流入、绿=净流出（全站红涨绿跌铁律）。列：今年(年初至今) / 近5日 / 近20日 / 去年全年。
+  //   红=净流入、绿=净流出（全站红涨绿跌铁律）。列：今年(近约121交易日) / 近5日 / 近20日 / 交易日。去年全年无接口数据，已整列删除。
   //   近5/20日=滚动增量窗（2026-10-19 主人令：只看总数看不出增减，增量才是边际信号）。
   function renderSectorYearFlow(d){
     var $b=$('sectorYearFlowBody'), $t=$('sectorYearFlowTime');
@@ -13439,10 +13439,8 @@ function drawUpDownChart(){
       return;
     }
     /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；口径说明降为胶囊后缀小字 */
-    if(window.setBadge) setBadge('sectorYearFlowTime','auto','',data.update_time||data.data_date||'','观测类 · 盘后口径（自建累积表'+(data.partial?'·接口受限':'')+'）');
-    else $t.textContent=(data.data_date||'')+(data.partial?' · 真实累计(覆盖区间·接口受限)':' · '+data.year+'年累计');
-    var _fmt=function(v){ if(v==null) return '—'; return (v>0?'+':'')+Number(v).toFixed(1)+'亿'; };
-    var _col=function(v){ return v==null?'var(--dim)':(v>=0?'var(--up)':'var(--down)'); };
+    if(window.setBadge) setBadge('sectorYearFlowTime','auto','',data.update_time||data.data_date||'','观测类 · 盘后口径（自建累积表'+(data.partial?'·仅约121交易日':'')+'）');
+    else $t.textContent=(data.data_date||'')+(data.partial?' · 真实累计(覆盖区间·仅约121交易日)':' · '+data.year+'年累计');
     var _chip=function(v){
       if(v==null) return '<span style="color:var(--dim)">—</span>';
       var c=v>=0?'var(--up)':'var(--down)';
@@ -13457,10 +13455,9 @@ function drawUpDownChart(){
     h+='<table style="width:100%;border-collapse:collapse;font-size:12.5px;">';
     h+='<thead><tr style="color:var(--dim);">'
       +'<th style="padding:5px 8px;text-align:left;">板块</th>'
-      +'<th style="padding:5px 8px;text-align:right;" title="东财板块资金流历史仅约121交易日(≈2026-05起)，非完整年初至今">'+data.year+' 近约半年*</th>'
+      +'<th style="padding:5px 8px;text-align:right;" title="东财板块资金流历史仅约121交易日(≈2026-05起)，非完整年初至今">'+data.year+' 约121交易日*</th>'
       +'<th style="padding:5px 8px;text-align:right;" title="近5个交易日主力净流入合计（滚动增量）">近5日</th>'
       +'<th style="padding:5px 8px;text-align:right;" title="近20个交易日主力净流入合计（滚动增量）">近20日</th>'
-      +'<th style="padding:5px 8px;text-align:right;" title="'+(data.partial?'去年全年接口受限，暂缺':'去年全年')+'">'+(data.partial?'去年*':'')+data.prev_year+' 全年</th>'
       +'<th style="padding:5px 8px;text-align:right;">交易日</th></tr></thead><tbody>';
     list.forEach(function(s, i){
       var _bg=i%2? 'rgba(0,0,0,.03)' : 'transparent';
@@ -13471,13 +13468,12 @@ function drawUpDownChart(){
       h+='<td style="padding:5px 8px;text-align:right;">'+_chip(s.cur)+'</td>';
       h+='<td style="padding:5px 8px;text-align:right;">'+_chip(s.d5)+'</td>';
       h+='<td style="padding:5px 8px;text-align:right;">'+_chip(s.d20)+'</td>';
-      h+='<td style="padding:5px 8px;text-align:right;color:'+_col(s.prev)+';">'+_fmt(s.prev)+'</td>';
       h+='<td style="padding:5px 8px;text-align:right;color:var(--dim);">'+Number(s.days||0)+'</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div>';
     var _foot='流入 Top10 + 流出 Top5（共 '+secs.length+' 板块）；单位亿元。近5日/近20日=滚动增量，看资金进退方向（总数是存量，增量才是边际信号）。';
-    if(data.partial){ _foot+=' <span style="color:var(--gold);">⚠️ 真实口径：东财板块资金流历史仅约121交易日(≈近半年)，「年初至今」实为近约半年；去年全年接口不可得，故留空(—)。</span>'; }
+    if(data.partial){ _foot+=' <span style="color:var(--gold);">⚠️ 真实口径：东财板块资金流历史仅约121交易日(≈近半年)，「年初至今」实为近约半年，非完整年度。</span>'; }
     h+='<div style="margin-top:6px;font-size:11px;color:var(--sub);">'+_foot+'</div>';
     $b.innerHTML=h;
   }
