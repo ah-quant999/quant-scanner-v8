@@ -389,7 +389,6 @@ concurrency:
   #   本链同病同治。`queue` 仅在 cancel-in-progress: false 时生效（本文件已满足）。
 
 
-  queue: max
 
 
 
