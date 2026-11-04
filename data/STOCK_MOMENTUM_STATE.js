@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-04 16:53",
- "generated": "2026-11-04 16:53",
+ "update_time": "2026-11-04 18:27",
+ "generated": "2026-11-04 18:27",
  "meta": {
-  "generated": "2026-11-04 16:53",
+  "generated": "2026-11-04 18:27",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12433,6 +12433,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "300413",
+      "name": "芒果超媒",
+      "change_pct": 7.914,
+      "price": 30.0,
+      "category": "突破"
+     },
+     {
       "code": "002988",
       "name": "豪美新材",
       "change_pct": 8.687,
@@ -12472,6 +12479,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "柏星龙",
       "change_pct": 3.242,
       "price": 14.65,
+      "category": "突破"
+     },
+     {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 13.577,
+      "price": 155.26,
       "category": "突破"
      },
      {
@@ -12542,6 +12556,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.79,
       "price": 39.43,
+      "category": "突破"
+     },
+     {
+      "code": "300315",
+      "name": "掌趣科技",
+      "change_pct": 13.122,
+      "price": 5.0,
       "category": "突破"
      },
      {
@@ -12683,6 +12704,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 8.379,
       "price": 57.3,
       "category": "突破"
+     },
+     {
+      "code": "000679",
+      "name": "大连友谊",
+      "change_pct": 9.97,
+      "price": 7.28,
+      "category": "突破"
+     },
+     {
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.072,
+      "price": 4.59,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -12705,6 +12740,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新朋股份",
       "change_pct": 3.601,
       "price": 6.33,
+      "category": "加速"
+     },
+     {
+      "code": "300413",
+      "name": "芒果超媒",
+      "change_pct": 7.914,
+      "price": 30.0,
       "category": "加速"
      },
      {
@@ -12747,6 +12789,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "柏星龙",
       "change_pct": 3.242,
       "price": 14.65,
+      "category": "加速"
+     },
+     {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 13.577,
+      "price": 155.26,
       "category": "加速"
      },
      {
@@ -12817,6 +12866,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.79,
       "price": 39.43,
+      "category": "加速"
+     },
+     {
+      "code": "300315",
+      "name": "掌趣科技",
+      "change_pct": 13.122,
+      "price": 5.0,
       "category": "加速"
      },
      {
@@ -12857,6 +12913,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300413",
+      "name": "芒果超媒",
+      "change_pct": 7.914,
+      "price": 30.0,
+      "category": "短线选股"
+     },
+     {
       "code": "002988",
       "name": "豪美新材",
       "change_pct": 8.687,
@@ -12896,6 +12959,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "柏星龙",
       "change_pct": 3.242,
       "price": 14.65,
+      "category": "短线选股"
+     },
+     {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 13.577,
+      "price": 155.26,
       "category": "短线选股"
      },
      {
@@ -12966,6 +13036,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.79,
       "price": 39.43,
+      "category": "短线选股"
+     },
+     {
+      "code": "300315",
+      "name": "掌趣科技",
+      "change_pct": 13.122,
+      "price": 5.0,
       "category": "短线选股"
      },
      {
@@ -13106,6 +13183,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "奥士康",
       "change_pct": 8.379,
       "price": 57.3,
+      "category": "短线选股"
+     },
+     {
+      "code": "000679",
+      "name": "大连友谊",
+      "change_pct": 9.97,
+      "price": 7.28,
+      "category": "短线选股"
+     },
+     {
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.072,
+      "price": 4.59,
       "category": "短线选股"
      }
     ],
@@ -13234,6 +13325,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "奥士康",
       "change_pct": 8.379,
       "price": 57.3,
+      "category": "强势股"
+     },
+     {
+      "code": "000679",
+      "name": "大连友谊",
+      "change_pct": 9.97,
+      "price": 7.28,
+      "category": "强势股"
+     },
+     {
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.072,
+      "price": 4.59,
       "category": "强势股"
      }
     ]
