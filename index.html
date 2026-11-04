@@ -2045,10 +2045,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/MOMENTUM_FILTER.js?v=85f2034c36" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=bedf0827cb" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
-    <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
-    <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
-    <script src="data/FF3_RANKSUM_TRACK.js?v=f35e38a08c" defer></script>
-    <script src="data/FF3_RANKSUM_BACKTEST.js?v=b7de069af2" defer></script>
+    <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三因子（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三因子已并入因子实验室主评分 P5（amt60/turntrend/ivol60 纯加分项、walk-forward 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -3273,8 +3270,7 @@ function fmtSigned(v){
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
       <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）子页 tab 随算法整支下架删除 -->
-      <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）选股策略子页 -->
-      <button class="st-tab" data-st="ff3" onclick="switchSt('ff3')">⚡ 资金异动 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
+      <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 tab 随算法整支下架删除 -->
       <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
            ⇒ 收益转化算法 / 回测 N 日胜率 / 每日 Top3 历史 三卡整组迁入本子页（原在「最终推荐·rec」）。 -->
       <button class="st-tab" data-st="track" onclick="switchSt('track')">📌 最终跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600;">选股→执行→复盘</span></button>
@@ -3337,26 +3333,7 @@ function fmtSigned(v){
 
 
 
-    <!-- ===== TAB 页面：资金异动三因子 FF3（第四支自研算法 · 🆕 2026-10-22 主人令「上」；数据源 data/FF3_RANKSUM_TRACK.js + data/FF3_RANKSUM_BACKTEST.js；三因子 turntrend/amt60/ivol60 均经因子实验室 walk-forward 验证 PASS） ===== -->
-    <div id="st-ff3" class="st-pane">
-      <div class="card" id="stFf3Card" style="border-left:4px solid #a855f7;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          ⚡ <span style="font-weight:700;font-size:14px;color:var(--txt);">资金异动三因子</span>
-          <span style="font-size:10px;font-weight:700;color:#a855f7;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">第四支自研算法</span>
-          <span class="fresh" id="ff3Time">—</span>
-        </div>
-        <div id="ff3Body"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚡ 资金异动三因子 加载中…</div></div>
-      </div>
-      <div class="card" id="ff3BackCard" style="border-left:4px solid #a855f7;margin-top:14px;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 资金异动三因子 · 回测 N 日（真实信号流）</span>
-          <span style="font-size:10px;font-weight:700;background:rgba(58,157,110,.12);color:#3a9d6e;border:1px solid rgba(58,157,110,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
-        </div>
-        <div class="note" id="ff3BackNote">加载中…</div>
-        <div id="ff3BackBody"></div>
-      </div>
-    </div><!--/st-ff3-->
-
+    <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 pane 随算法整支下架删除 -->
 
 
 
@@ -5541,7 +5518,7 @@ c.innerHTML = h;
   window.__STRATEGY_BACKTESTS = [
     // 2026-09-03 主人令：已下架策略（cockpit/allsite/hunter）整体从回测区退出，
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
-    // 2026-10-23 主人令：量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 6 支算法经真实信号流回测确认不达准绳（win_rate<45% / 样本不足 / 持有期衰减），整支下架删除（前端卡片 + 后端脚本 + 数据全部清除）；当前 active 主策略仅余 强势跟踪（FF3 资金异动三因子登记于选股策略子页，不在此主榜回测区）。
+    // 2026-10-23 主人令：量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 6 支算法经真实信号流回测确认不达准绳（win_rate<45% / 样本不足 / 持有期衰减），整支下架删除（前端卡片 + 后端脚本 + 数据全部清除）；当前 active 主策略仅余 强势跟踪（FF3 已于 2026-11-04 整支下架）。
     /* 🆕 2026-09-16 主人令「生命周期三个算法里明显高手的更好 ⇒ 改为强势跟踪」：
        原「高手强势股跟踪」升为本页正式策略卡，名称统一为「强势跟踪」。
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
@@ -6528,8 +6505,8 @@ c.innerHTML = h;
          「因子实验室」又是独立渲染 ⇒ 必然数成 4，与文案的 5 个名字打架。
          ⚠️ 将来增删本页策略：改这里 + 同步改下方 __renderBacktestSection 的渲染顺序。 */
       /* 🔴 2026-09-20 主人令：'因子实验室' 移出本页清单（非选股策略，不回测不展示）*/
-      /* 🗑 2026-10-23 主人令：低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 5 支新算法 + 量质双擎，7 个策略整支下架删除 ⇒ 本页策略清单仅余「强势跟踪」1 个（与下方渲染顺序一一对应；FF3 在选股策略子页）。 */
-      var _PAGE = ['强势跟踪'];  /* 🗑 2026-10-23 主人令：量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 6 支算法整支下架删除，本页策略清单仅余「强势跟踪」（FF3 资金异动三因子在选股策略子页，不在此主榜回测区） */
+      /* 🗑 2026-10-23 主人令：低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 5 支新算法 + 量质双擎，7 个策略整支下架删除 ⇒ 本页策略清单仅余「强势跟踪」1 个（与下方渲染顺序一一对应）。 */
+      var _PAGE = ['强势跟踪'];  /* 🗑 2026-10-23 主人令：量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 6 支算法整支下架删除，本页策略清单仅余「强势跟踪」 */
       pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(107,168,216,.10);color:#6ba8d8;border:1px solid rgba(107,168,216,.3);">📋 本页策略 '+_PAGE.length+' 个<span style="font-weight:400;color:var(--sub);font-size:10px;">（'+_PAGE.join(' · ')+'）</span></span>');
 
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span><span style="font-size:10px;font-weight:700;background:rgba(58,157,110,.12);color:#3a9d6e;border:1px solid rgba(58,157,110,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
@@ -6681,7 +6658,7 @@ c.innerHTML = h;
       };
       if(typeof _rbc === 'function'){
         /* 🔴 2026-10-12 主人令：双擎紧跟四量下方（四量 → 双擎 → 强势跟踪）
-           🗑 2026-10-23 主人令：量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 6 支算法整支下架删除，主榜回测区仅留强势跟踪（FF3 在选股策略子页） */
+           🗑 2026-10-23 主人令：量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 6 支算法整支下架删除，主榜回测区仅留强势跟踪 */
         html += _rbc(_pick(['strongtrack']));  /* 🗑 2026-10-23 主人令：其余 6 支算法整支下架删除，仅留强势跟踪；crds 已下架移出 */
       }
       if(typeof _rbc === 'function'){
@@ -14734,117 +14711,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(bodyEl) bodyEl.innerHTML = rh;
   };
 
-  /* ═══ 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3）子页渲染 ═══
-     数据源 window.FF3_RANKSUM_TRACK（归档信号每日 Top10 + 逐票前向跟踪；update_v8 由 raw_data/ff3_ranksum_track.json 发布）
-           window.FF3_RANKSUM_BACKTEST（主榜回测视图，method 口径说明）。
-     诚实铁律：未走满 T+N 的档一律显示「累积中」，绝不用 0 冒充；全站红涨绿跌口径。 */
-  window.renderFf3 = function(){
-    var host = document.getElementById('ff3Body');
-    if(!host) return;
-    function _e(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
-    function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#e0584b':'#2e9d6b'); }  // 涨红/跌绿
-    var T = window.FF3_RANKSUM_TRACK || {}, B = window.FF3_RANKSUM_BACKTEST || {};
-    var trk = T.tracked || [];
-    if(!trk.length){
-      if(!(window.__ff3Retry && window.__ff3Retry >= 15)){
-        window.__ff3Retry = (window.__ff3Retry || 0) + 1;
-        setTimeout(window.renderFf3, 700);
-      } else {
-        host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚡ 资金异动三因子 数据加载中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
-      }
-      return;
-    }
-    window.__ff3Retry = 0;
-    var ut = String(T.update_time || '').substring(0,16);
-    try{ if(typeof setBadge === 'function'){ setBadge('ff3Time','盘后','短线', T.update_time || ''); } else { var tb = document.getElementById('ff3Time'); if(tb) tb.textContent = ut ? ('更新于 '+ut) : '—'; } }catch(e){}
-    var DAYS = ['1','3','5','10','20'];
-    var h = '';
-    h += '<div class="note" style="line-height:1.75;margin-bottom:12px;">'
-       + '<b style="color:#a855f7;">⚡ 资金异动三因子（FF3）</b> · 第四支自研算法 —— '
-       + _e(B.method || '每日全市场按 turntrend(缩量) / amt60(低流动性) / ivol60(低波) 三因子降序秩和复合，选 Top10；次开买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）。')
-       + '</div>';
-    function _stat(label, val, sub, color){
-      return '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'
-           + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">'+label+'</div>'
-           + '<div style="font-size:22px;font-weight:800;color:'+(color||'var(--txt)')+';">'+val+'</div>'
-           + '<div style="font-size:10px;color:var(--dim);">'+sub+'</div></div>';
-    }
-    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;">';
-    h += _stat('🎯 累计信号', (T.total_signals || 0), '选股票数', '#a855f7');
-    h += _stat('📅 信号日数', (T.signal_days || 0), '逐日归档', '#6ba8d8');
-    h += _stat('🚀 跟踪起始', _e(T.track_start || '—'), '上线首日即建归档', 'var(--txt)');
-    h += _stat('⏳ 成熟样本', '0', 'T+20 未走满不计入', '#e2a93b');
-    h += '</div>';
-    h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;">'
-       + '<span class="ic">📋</span>归档信号 · 每日 Top5 <span style="font-size:11px;color:var(--sub);font-weight:400">按复合分降序（三因子秩和，越接近 3 越强）· 最新信号日置顶</span></h3>';
-    var _byDay = {};
-    trk.forEach(function(s){ var _k = s.signal_date || '—'; (_byDay[_k] = _byDay[_k] || []).push(s); });
-    var _days = Object.keys(_byDay).sort().reverse();
-    h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
-    h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-    h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
-       + '<th style="padding:6px;text-align:left;color:var(--sub);">#</th>'
-       + '<th style="padding:6px;text-align:left;color:var(--sub);">名称</th>'
-       + '<th style="padding:6px;text-align:left;color:var(--sub);">代码</th>'
-       + '<th style="padding:6px;text-align:left;color:var(--sub);">信号日</th>'
-       + '<th style="padding:6px;text-align:right;color:var(--sub);">复合分</th>'
-       + '<th style="padding:6px;text-align:right;color:var(--sub);">信号日收盘</th>';
-    DAYS.forEach(function(d){ h += '<th style="padding:6px;text-align:right;color:var(--sub);">T+'+d+'</th>'; });
-    h += '</tr></thead><tbody>';
-    var _NCOL = 6 + DAYS.length;
-    _days.forEach(function(day){
-      var _list = (_byDay[day]||[]).slice().sort(function(a,b){ return (Number(b.score||0)) - (Number(a.score||0)); });
-      h += '<tr style="background:rgba(168,85,247,.07);">'
-         + '<td colspan="'+_NCOL+'" style="padding:5px 6px;font-size:11px;font-weight:700;color:#a855f7;">📅 '+_e(day)
-         + ' <span style="color:var(--dim);font-weight:400;">· '+_list.length+' 只</span></td></tr>';
-      _list.forEach(function(s, i){
-        var ret = s.returns || {};
-        var im = s.immature || [];
-        h += '<tr style="border-bottom:1px solid rgba(169,158,141,.1);">';
-        h += '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>';
-        h += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_e(s.name || '')+'</td>';
-        h += '<td style="padding:6px;color:var(--sub);font-family:ui-monospace,Consolas,monospace;">'+_e(s.code || '')+'</td>';
-        h += '<td style="padding:6px;color:var(--sub);">'+_e(s.signal_date || '—')+'</td>';
-        h += '<td style="padding:6px;text-align:right;color:#a855f7;font-weight:700;">'+(s.score != null ? Number(s.score).toFixed(4) : '—')+'</td>';
-        h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.close != null ? Number(s.close).toFixed(2) : '—')+'</td>';
-        DAYS.forEach(function(d){
-          if(im.indexOf(d) >= 0){ h += '<td style="padding:6px;text-align:right;color:var(--dim);">累积中</td>'; }
-          else {
-            var v = ret[d];
-            if(v == null){ h += '<td style="padding:6px;text-align:right;color:var(--dim);">—</td>'; }
-            else { h += '<td style="padding:6px;text-align:right;color:'+_pl(v)+';">'+(v>=0?'+':'')+Number(v).toFixed(2)+'%</td>'; }
-          }
-        });
-        h += '</tr>';
-      });
-    });
-    h += '</tbody></table></div>';
-    host.innerHTML = h;
-    var bh = document.getElementById('ff3BackBody');
-    if(bh){
-      var byp = (B.summary && B.summary.by_period) || {};
-      var _keys = Object.keys(byp);
-      if(!_keys.length){
-        bh.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">📊 真实信号流回测：暂无成熟样本（跟踪未满 T+20，样本随交易日成熟累积，绝不用 0 冒充）。<br><span style="font-size:11px">'+_e(B.method || '')+'</span></div>';
-      } else {
-        var bt = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;"><thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
-               + '<th style="padding:6px;text-align:left;color:var(--sub);">持有期</th><th style="padding:6px;text-align:right;color:var(--sub);">样本</th><th style="padding:6px;text-align:right;color:var(--sub);">胜率</th><th style="padding:6px;text-align:right;color:var(--sub);">平均收益</th><th style="padding:6px;text-align:right;color:var(--sub);">最好</th><th style="padding:6px;text-align:right;color:var(--sub);">最差</th></tr></thead><tbody>';
-        _keys.sort(function(a,b){ return Number(a)-Number(b); }).forEach(function(k){
-          var s = byp[k];
-          bt += '<tr style="border-bottom:1px solid rgba(169,158,141,.1);">'
-              + '<td style="padding:6px;color:var(--txt);">T+'+_e(k)+'</td>'
-              + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.samples||0)+'</td>'
-              + '<td style="padding:6px;text-align:right;color:'+_pl((s.win_rate||0)-50)+';">'+(s.win_rate!=null?Number(s.win_rate).toFixed(1):'—')+'%</td>'
-              + '<td style="padding:6px;text-align:right;color:'+_pl(s.avg)+';">'+(s.avg!=null?(s.avg>=0?'+':'')+Number(s.avg).toFixed(2)+'%':'—')+'</td>'
-              + '<td style="padding:6px;text-align:right;color:'+_pl(s.best)+';">'+(s.best!=null?(s.best>=0?'+':'')+Number(s.best).toFixed(2)+'%':'—')+'</td>'
-              + '<td style="padding:6px;text-align:right;color:'+_pl(s.worst)+';">'+(s.worst!=null?(s.worst>=0?'+':'')+Number(s.worst).toFixed(2)+'%':'—')+'</td>'
-              + '</tr>';
-        });
-        bt += '</tbody></table></div>';
-        bh.innerHTML = bt;
-      }
-    }
-  };
+  /* 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页渲染块随算法整支下架删除 */
 
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
@@ -14868,7 +14735,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
        ✅ 2026-10-06 CN runner2号机的工程师：经审计确认 __renderLifecycleSection 仅余 L7052 一处活触发（switchSt 调度已于 2026-09-19 删），目标 #lifeBody 全站无 DOM 定义 ⇒ 函数体（原 L6006–L6301）与 L7052 调用已**彻底删净**，死代码从根消除。__renderStrongBreakout 此前已删净。 */
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
-    if(n==='ff3' && typeof window.renderFf3==='function') setTimeout(window.renderFf3, 30);  // 🆕 2026-10-22 主人令：资金异动三因子子页渲染调度
     // 2026-10-25 主人令：三卡迁入「📌 最终跟踪」子页 ⇒ 切入即按各自数据源重渲（懒加载不变）
     if(n==='track'){
       setTimeout(function(){ try{ window.__renderExecAlgo(); }catch(e){ console.warn('[track] exec', e); } }, 30);
@@ -14893,7 +14759,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist))&&!!window.GOLD_POOL;},  // 2026-09-11：金股池卡片并入 pool 子页，需 GOLD_POOL 就绪
       /* 🔴 2026-10-11 主人令「完全下架」：tc/crds 就绪判定随两策略下架移除 */
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
-      ff3:function(){return !!(window.FF3_RANKSUM_TRACK&&window.FF3_RANKSUM_TRACK.tracked&&window.FF3_RANKSUM_TRACK.tracked.length);},  // 🆕 2026-10-22 主人令：资金异动三因子子页就绪判定（FF3_RANKSUM_TRACK 注入到位）
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};
@@ -15044,7 +14909,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         + '<span title="selection_mode='+ (mode||'—') +'" style="background:#6ba8d81a;color:#6ba8d8;border:1px solid #6ba8d84d;border-radius:4px;padding:2px 7px;white-space:nowrap;">模式 '+modeTxt+'</span>'
         + (TD.hc_count != null ? pill('双共振 <b>'+TD.hc_count+'</b> 只','#e2a93b') : '')
         + (TD.total_scored != null ? pill('金股池 <b>'+TD.total_scored+'</b> 只','#b29bd9') : '')
-        + (TD.chan_source && TD.chan_source.stale ? pill('⚠ 缠论源陈旧'+TD.chan_source.stale_days+'天','#e0584b') : '')
+        + (TD.chan_source && TD.chan_source.stale ? pill('缠论源·手动源·非实时('+TD.chan_source.stale_days+'天前)','#64748b') : '')
         + '<span style="color:var(--dim);margin-left:auto;">金股池 → 因子综合评分降序（收益率优先）</span>'
         + '</div>';
     }
