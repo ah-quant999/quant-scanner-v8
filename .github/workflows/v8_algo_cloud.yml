@@ -639,36 +639,50 @@ jobs:
       #   三源全灭才 exit 1（此时确属真故障，必须显式失败而不是被 || true 掩盖）。
       - name: "📦 安装 A股依赖（官方 PyPI 优先 + 双镜像兜底 + 重试）"
         run: |
-          CORE="akshare pandas numpy requests baostock"
-          ok=0
-          for IDX in "https://pypi.org/simple" \
-                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
-                     "https://mirrors.aliyun.com/pypi/simple"; do
-            for TRY in 1 2; do
-              echo "=== pip install core [index=$IDX try=$TRY] ==="
-              if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
-                if python -c "import akshare, pandas, numpy, requests"; then
-                  echo "core deps OK via $IDX (try=$TRY)"
-                  ok=1
-                  break
-                fi
-                echo "!! pip 退出码 0 但 import 校验未通过，继续换源/重试"
-              fi
-              echo "!! [$IDX] 第 $TRY 次安装失败"
-            done
-            # 注：GitHub 的 run: 默认 `bash -e`，此处用显式 if 而非 `[ ... ] && break`，
-            # 避免依赖 `set -e` 对 && 列表首命令失败的豁免语义（易踩坑）。
-            if [ "$ok" = "1" ]; then break; fi
-          done
-          if [ "$ok" != "1" ]; then
-            echo "::error::核心依赖安装失败（官方 PyPI / 清华 / 阿里云 各试 2 次全灭）"
-            exit 1
-          fi
-          # mootdx 为可选依赖（本 workflow SKIP_MOOTDX=1 不使用），装不上不阻断
-          pip install -q --retries 2 --timeout 40 mootdx \
-            || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx \
-            || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
-          python -c "import akshare, pandas, numpy, requests; print('deps ready')"
+          # 🔧 2026-11-04 一劳永逸（主人令·最终推荐卡3天未刷新根治）：
+          #   核心依赖仅保留算法链 B/D/E 重建 FINAL 必需的轻量包（pandas/numpy/requests），安装可靠；
+          #   akshare/baostock 仅 A 批取数用（cn 自托管机已预装），云端 ubuntu 偶发安装失败→降级为可选非致命，
+          #   绝不再让取数依赖的偶发失败阻塞最终推荐重建。
+          REQUIRED="pandas numpy requests"
+          OPTIONAL="akshare baostock"
+          ok=0
+          for IDX in "https://pypi.org/simple" \
+                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
+                     "https://mirrors.aliyun.com/pypi/simple"; do
+            for TRY in 1 2; do
+              echo "=== pip install required [index=$IDX try=$TRY] ==="
+              if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $REQUIRED; then
+                if python -c "import pandas, numpy, requests"; then
+                  echo "core deps OK via $IDX (try=$TRY)"
+                  ok=1
+                  break
+                fi
+                echo "!! pip 退出码 0 但 import 校验未通过，继续换源/重试"
+              fi
+              echo "!! [$IDX] 第 $TRY 次安装失败"
+            done
+            if [ "$ok" = "1" ]; then break; fi
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::核心依赖安装失败（pandas/numpy/requests 官方/清华/阿里云 各试 2 次全灭）"
+            exit 1
+          fi
+          # 取数依赖：尽力安装，失败仅告警不阻断（重建 FINAL 不需要）
+          for IDX in "https://pypi.org/simple" \
+                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
+                     "https://mirrors.aliyun.com/pypi/simple"; do
+            if python -m pip install -q --retries 2 --timeout 90 -i "$IDX" $OPTIONAL 2>/dev/null; then
+              echo "optional deps (akshare/baostock) OK via $IDX"
+              break
+            fi
+            echo "!! optional deps 安装失败于 $IDX（非致命，继续）"
+          done
+          # mootdx 可选依赖（SKIP_MOOTDX=1 不使用），尽力安装不阻断
+          pip install -q --retries 2 --timeout 40 mootdx \
+            || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx \
+            || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
+          python -c "import pandas, numpy, requests; print('core deps ready')"
+          echo "akshare/baostock 为可选依赖：仅 A 批取数用，缺失不影响 B/D/E 算法链重建最终推荐"
 
       # 🔒 2026-09-10 主人令「一劳永逸·发现前面错了就该退回拒绝之后执行并紧急报告」：
       #   事故根因：stage 由「CST 小时盲猜」（16/17→A 18/19→B 20→D 21→E）。
