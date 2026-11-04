@@ -1,5 +1,11 @@
 name: Deploy v8 Site (self-hosted)
 
+# 🔴 2026-11-04 递归防护根治：数据管线 v8_build_deploy.yml 在把数据 commit 回 main 后，
+#   会显式 `gh workflow run deploy-v8-site.yml` 唤起本工作流。原因：GitHub 规定
+#   GITHUB_TOKEN(Actions 令牌) 的 push 不触发下游 push 类 workflow，导致数据更新后
+#   Pages 停在旧部署（如 WAVE_ELLIOTT.js 缺 update_time → 前端徽章显示"已加载"）。
+#   用 workflow_dispatch 绕过该限制，确保数据一落地即上线。
+
 on:
   push:
     branches: [main]
