@@ -16,30 +16,37 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "0c98b25f24";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
-    // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
-    //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
+    var BUILD = "0c98b25f24";   // 部署 commit 短 SHA（部署脚本第2次提交时替换为真实 tip，并与 v8_build.json 对齐）
     window.V8_BUILD_SHA = BUILD;
     var KEY = "v8_build_sha";
-    var REFRESHED = "v8_build_refreshed";   // 跨标签页共享：是否已为当前 BUILD 刷新过
+    var REFRESHED = "v8_build_refreshed";   // 跨标签页共享：是否已为某 BUILD 刷新过
+    // 旧版即时快检：本标签若已加载过不同 BUILD，补一次强刷（仅当无别的标签已处理）
     var cached = localStorage.getItem(KEY);
-    // 已是当前版本：无需任何动作（含已带 nocache=1 的情况），杜绝多标签重复刷新
-    if(cached === BUILD) return;
-    // BUILD 已变：先看是否已有别的标签页为这个 BUILD 刷新过（跨标签共享位）
-    if(localStorage.getItem(REFRESHED) === BUILD){
-      // 已有「担当标签」刷新过，本标签只静默同步版本号，不再 location.replace（修复：多标签批量自刷）
-      try{ localStorage.setItem(KEY, BUILD); }catch(e){}
-      return;
+    if(cached && cached !== BUILD && localStorage.getItem(REFRESHED) !== BUILD){
+      try{ localStorage.setItem(REFRESHED, BUILD); localStorage.setItem(KEY, BUILD); }catch(e){}
+      if(location.href.indexOf('nocache=1')<0){
+        var h0=location.href.split('#'), b0=h0[0], hs0=h0[1]?'#'+h0[1]:'', sp0=b0.indexOf('?')>=0?'&':'?';
+        location.replace(b0+sp0+'nocache=1'+hs0); return;
+      }
     }
-    // 本标签成为「刷新担当」：记下已为当前 BUILD 刷新，再 replace 自身一次
-    try{ localStorage.setItem(REFRESHED, BUILD); }catch(e){}
-    try{ localStorage.setItem(KEY, BUILD); }catch(e){}
-    if(location.href.indexOf('nocache=1')>=0) return;
-    var h = location.href.split('#');
-    var base = h[0];
-    var hash = h[1] ? '#' + h[1] : '';
-    var sep = base.indexOf('?')>=0 ? '&' : '?';
-    location.replace(base + sep + 'nocache=1' + hash);
+    // 🛡 一劳永逸破「鸡生蛋」缓存锁：始终拉取新鲜 manifest v8_build.json?_=Date.now()
+    // 即便浏览器缓存的是「不带此脚本的旧 index.html」，也能检测到新版 SHA 并自动强刷，
+    // 从此每次部署无需手动 Ctrl+F5。
+    var _ping=function(){
+      if(typeof fetch!=='function') return;
+      var url='v8_build.json?_='+Date.now();
+      fetch(url,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+        if(!j||!j.sha) return;
+        if(j.sha===BUILD){ try{localStorage.setItem(KEY,j.sha);}catch(e){} return; }
+        if(localStorage.getItem(REFRESHED)===j.sha) return; // 别的标签已处理
+        try{ localStorage.setItem(REFRESHED,j.sha); localStorage.setItem(KEY,j.sha); }catch(e){}
+        if(location.href.indexOf('nocache=1')>=0) return;
+        var h1=location.href.split('#'), b1=h1[0], hs1=h1[1]?'#'+h1[1]:'', sp1=b1.indexOf('?')>=0?'&':'?';
+        location.replace(b1+sp1+'nocache=1'+hs1);
+      }).catch(function(){});
+    };
+    _ping();
+    setInterval(_ping, 60000); // 页面常开时，部署后 60s 内自动跟上
   }catch(e){}
 })();
 </script>
@@ -16655,9 +16662,11 @@ window.__renderKeyNotices = function(){
     orderedCats.forEach(function(cat){
       var col = CATCOL[cat]||'#9ca3af';
       var active = (cat === window.__knCat);
-      var bg = active ? col+'33' : col+'1a';
-      var bd = active ? col+'cc' : col+'55';
-      h += '<span onclick="window.__knShowCat(\''+cat+'\')" style="cursor:pointer;font-size:12px;background:'+bg+';color:'+col+';border:1px solid '+bd+';border-radius:6px;padding:2px 8px;'+(active?'font-weight:700;box-shadow:inset 0 0 0 1px '+col+'55;':'')+'">'+_e(cat)+' · '+groups[cat].length+'</span>';
+      var bg = active ? col : 'transparent';
+      var bd = active ? col : col+'66';
+      var tx = active ? '#3d362e' : col;   // 选中=实心填充分类色+深字；未选中=描边+分类色字
+      var op = active ? 'font-weight:700;' : 'opacity:.55;';
+      h += '<span onclick="window.__knShowCat(\''+cat+'\')" style="cursor:pointer;font-size:12px;background:'+bg+';color:'+tx+';border:1px solid '+bd+';border-radius:6px;padding:2px 8px;'+op+'">'+_e(cat)+' · '+groups[cat].length+'</span>';
     });
     h += '</div>';
     // 列表：仅渲染当前激活分类对应的股票及公告名
