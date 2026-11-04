@@ -97,6 +97,11 @@ on:
         description: '数据日(YYYY-MM-DD，留空=今天)：指定以哪一天为数据日重跑，例 2026-09-18'
         type: string
         default: ''
+      # 🛡 2026-11-04 自愈闭环（主人令·一劳永逸）：failure/cancelled → 自动重派全链，限次防死循环
+      retry_count:
+        description: '自愈重派计数（内部用，勿手动填）：0=首次，≥2 停止重派'
+        type: number
+        default: 0
 
 permissions:
   contents: write
@@ -1204,3 +1209,34 @@ jobs:
             echo "::notice title=v8-algo-ok::${TGT} 批完成，产物核验通过（执行=${OUTCOME:-?}）"
           fi
           exit $RC
+
+  # 🛡 2026-11-04 自愈闭环（主人令·一劳永逸）：结果问责判 failure/cancelled → 自动 re-dispatch 全链（限次 2 次）
+  #   覆盖两类卡死：① 代码 bug 致 failure（如 11-03 WINRATE_WEIGHT NameError 连败 6 次）；
+  #               ② 外部看门狗/提交推送误取消在跑 run（如 11-04 09:40 那次 31 分钟即被 cancelled）。
+  #   限次 retry_count<2 防死循环；每次重派 ref=main 取最新代码，真故障最多 3 轮即停、转人工。
+  self_heal_redispatch:
+    name: "🩹 自愈重派(failure/cancelled→限次)"
+    needs: [algo]
+    if: >-
+      always() &&
+      (needs.algo.result == 'failure' || needs.algo.result == 'cancelled') &&
+      inputs.retry_count < 2
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: 计算下次 retry_count
+        id: calc
+        run: echo "next=$(( ${{ inputs.retry_count }} + 1 ))" >> "$GITHUB_OUTPUT"
+      - name: 重派全链(stage=ALL, 限次)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "algo 结果=${{ needs.algo.result }}，retry_count=${{ inputs.retry_count }} → 重派第 ${{ steps.calc.outputs.next }} 次"
+          curl -L -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_algo_cloud.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"stage":"ALL","force_run":true,"bypass_time_gate":true,"chain_day":"","retry_count":${{ steps.calc.outputs.next }}}}'
