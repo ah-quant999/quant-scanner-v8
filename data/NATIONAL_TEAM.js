@@ -1,7 +1,7 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-03",
-  "update_time": "2026-11-04 16:18:27",
-  "source_time": "2026-11-04 16:01",
+  "update_time": "2026-11-04 20:45:12",
+  "source_time": "2026-11-04 16:46",
   "score": 73.5,
   "verdict": "高活跃·国家队明确托盘",
   "verdict_color": "#ef5350",
@@ -44,8 +44,8 @@ window.NATIONAL_TEAM = {
       "ready": true,
       "value": 9.82,
       "unit": "亿股",
-      "detail": "汇金股票披露净增持 9.82 亿股（2024Q2），环比上季(2023Q4) +8.74 亿股 · 披露口径滞后",
-      "status": "✅增持",
+      "detail": "汇金股票披露净增持 9.82 亿股（2024Q2·滞后约947天），环比上季(2023Q4) +8.74 亿股 · 历史披露非实时",
+      "status": "📜历史披露",
       "freq": "季度"
     }
   ],
