@@ -16,7 +16,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "711269a7aa40f8dbda078a7a12f51751bf66a6c3";   // 部署 commit 短 SHA（部署脚本第2次提交时替换为真实 tip，并与 v8_build.json 对齐）
+    var BUILD = "0c98b25f24";   // 部署 commit 短 SHA（部署脚本第2次提交时替换为真实 tip，并与 v8_build.json 对齐）
     window.V8_BUILD_SHA = BUILD;
     var KEY = "v8_build_sha";
     var REFRESHED = "v8_build_refreshed";   // 跨标签页共享：是否已为某 BUILD 刷新过
@@ -29,21 +29,26 @@ html>
         location.replace(b0+sp0+'nocache=1'+hs0); return;
       }
     }
-    // 🛡 一劳永逸破「鸡生蛋」缓存锁：始终拉取新鲜 manifest v8_build.json?_=Date.now()
+    // 🛡 一劳永逸破「鸡生蛋」缓存锁：始终拉取新鲜 manifest v8_build.js?_=Date.now()
+    // （用 <script> 注入而非 fetch JSON：deploy 工作流只打包 *.js，.json 会被漏掉）
     // 即便浏览器缓存的是「不带此脚本的旧 index.html」，也能检测到新版 SHA 并自动强刷，
     // 从此每次部署无需手动 Ctrl+F5。
+    var _reload=function(sha){
+      if(!sha||sha===BUILD){ try{localStorage.setItem(KEY,sha||BUILD);}catch(e){} return; }
+      if(localStorage.getItem(REFRESHED)===sha) return; // 别的标签已处理
+      try{ localStorage.setItem(REFRESHED,sha); localStorage.setItem(KEY,sha); }catch(e){}
+      if(location.href.indexOf('nocache=1')>=0) return;
+      var h1=location.href.split('#'), b1=h1[0], hs1=h1[1]?'#'+h1[1]:'', sp1=b1.indexOf('?')>=0?'&':'?';
+      location.replace(b1+sp1+'nocache=1'+hs1);
+    };
+    var _s=null;
     var _ping=function(){
-      if(typeof fetch!=='function') return;
-      var url='v8_build.json?_='+Date.now();
-      fetch(url,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-        if(!j||!j.sha) return;
-        if(j.sha===BUILD){ try{localStorage.setItem(KEY,j.sha);}catch(e){} return; }
-        if(localStorage.getItem(REFRESHED)===j.sha) return; // 别的标签已处理
-        try{ localStorage.setItem(REFRESHED,j.sha); localStorage.setItem(KEY,j.sha); }catch(e){}
-        if(location.href.indexOf('nocache=1')>=0) return;
-        var h1=location.href.split('#'), b1=h1[0], hs1=h1[1]?'#'+h1[1]:'', sp1=b1.indexOf('?')>=0?'&':'?';
-        location.replace(b1+sp1+'nocache=1'+hs1);
-      }).catch(function(){});
+      if(_s && _s.parentNode) _s.parentNode.removeChild(_s);
+      _s=document.createElement('script');
+      _s.src='v8_build.js?_='+Date.now();
+      _s.onload=function(){ _reload(window.__V8_BUILD_SHA); };
+      _s.onerror=function(){};
+      document.head.appendChild(_s);
     };
     _ping();
     setInterval(_ping, 60000); // 页面常开时，部署后 60s 内自动跟上
