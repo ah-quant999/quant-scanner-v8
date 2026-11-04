@@ -5799,6 +5799,8 @@ def main(category=None, only=None):
             "ma30_ready": n >= 30,
             "ma60_ready": n >= 60,
             "kdj_k": kdj_k,
+            "source": "通达信880003(官方指数)",
+            "index_name": "平均股价(通达信880003官方指数)",
             "ma_caliber": "通达信880003(官方指数)",
             "history_days": len(hist),
             "history_880003": hist,
@@ -6167,7 +6169,7 @@ def main(category=None, only=None):
                     _old0 = json.loads(_hp0.read_text(encoding="utf-8"))
                     _osrc0 = str(_old0.get("source") or "") + str(_old0.get("index_name") or "")
                     _ohist0 = _old0.get("history") or []
-                    if "880003" in _osrc0 and len(_ohist0) > 1:
+                    if ("880003" in _osrc0 or _old0.get("history_880003")) and len(_ohist0) > 1:
                         print(f"  ⏸️ AVG_PRICE 口径保护：既有为 880003 真指数"
                               f"(history={len(_ohist0)} 条)，全A等权不覆盖，沿用原数据")
                         return _old0

@@ -720,7 +720,12 @@ def build_strategy(sentiment_label, health, anomalies, indices, etf_daily, conce
         s = f"指数方向不明但个股活跃、资金偏暖，可轻指数重个股，聚焦{sector_str}，关注{pick_str}，严格止损。"
         strategies.append({"text": s, "signal": "yellow"})
     else:
-        s = "当前市场方向不明或资金犹豫，建议保持观望或轻仓试错，严格止损纪律。"
+        # 平庸市：仍带当日主线板块/个股，避免每天重复同一句；并按情绪细分是否轻指数重个股
+        _tail = ""
+        if health.get("emotion", ("", ""))[1] == "green":
+            _tail = "，轻指数重个股"
+        s = (f"当前市场方向不明或资金犹豫，建议保持观望或轻仓试错，严格止损纪律{_tail}；"
+             f"可留意{sector_str}中相对抗跌标的，跟踪{pick_str}资金动向。")
         strategies.append({"text": s, "signal": "yellow"})
 
     # ETF 资金流向提示：仅列出真正属于科技/成长或宽基的赎回品种
