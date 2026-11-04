@@ -2649,6 +2649,20 @@ jobs:
 
 
 
+      - name: "🔄 保底同步 强势板块龙头股 fr_sectors（跟随最终 FINAL，杜绝新板块滞后一轮）"
+        id: fr_sync
+        if: steps.gate.outputs.proceed == 'true'
+        env:
+          NEODATA_TOKEN: ${{ secrets.NEODATA_TOKEN }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          python scripts/fetch_sector_leaders.py --fr-only
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:fr-sync(exit=$_v8_rc)::强势板块龙头股 fr_sectors 跟随重算失败（退出码 $_v8_rc）。前端「最终推荐·强势板块龙头股」卡或缺失新晋板块龙头股，下轮全量重算将补。"
+          fi
+
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
 
 
