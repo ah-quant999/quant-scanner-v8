@@ -221,18 +221,24 @@ def _oneline():
 subs = []
 subs.append({
     'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,
-    'value':a_val,'unit':'亿','detail':a_detail or '宽基ETF数据源（东财/老源）均未就绪',
-    'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪')))
+    'value':a_val,'unit':'亿',
+    'detail':((a_detail or '宽基ETF数据源（东财/老源）均未就绪') + '（T+1·上一交易日：东财ETF申赎披露滞后1日，基准日非陈旧）'),
+    'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪'))),
+    'freq':'T+1'
 })
 subs.append({
     'key':'B','name':'大金融相对强度','weight':W['B'],'ready':b_ready,
-    'value':b_val,'unit':'%','detail':b_detail or 'SECTOR_RS.js 未就绪',
-    'status':('✅强势' if (b_val is not None and b_val>1) else ('🟡中性' if (b_val is not None and b_val>=-1) else ('❌弱势' if b_val is not None else '—未就绪')))
+    'value':b_val,'unit':'%',
+    'detail':((b_detail or 'SECTOR_RS.js 未就绪') + '（T+1·上一交易日：板块相对强度为定稿收盘数据，滞后1日）'),
+    'status':('✅强势' if (b_val is not None and b_val>1) else ('🟡中性' if (b_val is not None and b_val>=-1) else ('❌弱势' if b_val is not None else '—未就绪'))),
+    'freq':'T+1'
 })
 subs.append({
     'key':'C','name':'大金融资金净流入','weight':W['C'],'ready':c_ready,
-    'value':c_val,'unit':'亿','detail':c_detail or 'SECTOR_FUND_FLOW.js 未就绪',
-    'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平')))
+    'value':c_val,'unit':'亿',
+    'detail':((c_detail or 'SECTOR_FUND_FLOW.js 未就绪') + '（T+0·当日盘后：板块资金流为收盘后数据）'),
+    'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平'))),
+    'freq':'T+0'
 })
 subs.append({
     'key':'D','name':'汇金持仓环比','weight':W['D'],'ready':d_ready,
@@ -240,8 +246,20 @@ subs.append({
     'status':d_status,'freq':'季度'
 })
 
+# ── 数据基准日滞后说明（防误读：T+1 子信号基准日=上一交易日，非陈旧） ──
+_lag_dd = (e.get('data_date') if e else None) or bj_now().strftime('%Y-%m-%d')
+_lag_days = None
+try:
+    _lag_days = (bj_now().date() - datetime.datetime.strptime(_lag_dd, '%Y-%m-%d').date()).days
+except ValueError:
+    _lag_days = None
+if _lag_days == 0:   _lag_note = '数据基准：当日（T+0）·非滞后'
+elif _lag_days == 1: _lag_note = '数据基准：上一交易日（T+1）·东财ETF申赎/板块强度为定稿数据，滞后1日属正常口径，非陈旧'
+elif _lag_days and _lag_days > 1: _lag_note = '数据基准：滞后 %d 日·上游尚未更新' % _lag_days
+else: _lag_note = '数据基准：T+1 口径（上一交易日为最新可得）'
 out = {
     'data_date': (e.get('data_date') if e else None) or bj_now().strftime('%Y-%m-%d'),
+    'lag_note': _lag_note,
     'update_time': bj_now().strftime('%Y-%m-%d %H:%M:%S'),
     'source_time': max(x for x in [(e or {}).get('update_time') or '',
                                    (rs or {}).get('update_time') or '',
