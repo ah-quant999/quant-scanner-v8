@@ -12605,7 +12605,7 @@ function drawUpDownChart(){
           {name:'艾略特波浪·深度分析', source:'WAVE_ELLIOTT', freq:'收盘后1次', slots:['19:15'], note:'大盘观测'},
 
           {name:'中信PE热力', source:'CITIC_PE_THERMO', freq:'收盘后1次', slots:['19:15'], note:'大盘观测'},
-          {name:'未来预测·牛转熊观测台(v8_market_thermo)', source:'MARKET_THERMO', freq:'交易日16:10', slots:['16:10'], note:'大盘观测·未来预测子TAB'},
+          {name:'未来预测·牛转熊观测台(v8_market_thermo)', source:'MARKET_THERMO', freq:'交易日16:10', maturity:'月频', slots:['16:10'], note:'大盘观测·未来预测子TAB'},
 
           {name:'斐波那契观测窗', source:'SH_FIB', freq:'收盘后1次', slots:['19:15'], note:'大盘观测'},
 
@@ -12663,7 +12663,7 @@ function drawUpDownChart(){
 
           {name:'概念资金热力图', source:'CONCEPT_RANKING', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'涨停概念追踪'},
 
-          {name:'行业树图·细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'行业涨跌 treemap'},
+          {name:'行业树图·细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', maturity:'盘中实时', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'行业涨跌 treemap'},
 
         ]
 
@@ -12675,12 +12675,12 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'板块资金趋势', source:'SECTOR_FUND_FLOW_TREND', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'收盘复盘+周期定位'},
+          {name:'板块资金趋势', source:'SECTOR_FUND_FLOW_TREND', freq:'收盘后1次', maturity:'T+1', slots:['1','7',':','3','0'], note:'收盘复盘+周期定位'},
 
           {name:'日监控·主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分+盘后定稿', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'ETF 主力净流入'},
 
           {name:'资金热度·净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['0','8',':','2','5'], note:'真实份额申赎'},
-          {name:'资金热度·东财五分类', source:'ETF_SUBSCRIPTION_EASTMONEY', freq:'每日盘前', slots:['0','8',':','2','5'], note:'股票/债券/货币/商品/跨境'},
+          {name:'资金热度·东财五分类', source:'ETF_SUBSCRIPTION_EASTMONEY', freq:'每日盘前', maturity:'T+1', slots:['0','8',':','2','5'], note:'股票/债券/货币/商品/跨境'},
 
           {name:'IF会员持仓择时', source:'CFFEX_POSITION', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'中金所持仓 T-1 披露'},
 
@@ -12790,7 +12790,7 @@ function drawUpDownChart(){
         cards:[
 
 
-          {name:'主升/启动板块·龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', slots:['21:45'], note:'观测类·板块龙头'},
+          {name:'主升/启动板块·龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', maturity:'T+1', slots:['21:45'], note:'观测类·板块龙头'},
 
 
 
@@ -12827,7 +12827,7 @@ function drawUpDownChart(){
 
 
           {name:'强势跟踪水源(v8_ima_strong_stock)', source:'IMA_STRONG_STOCK', freq:'工作日15:45', slots:['15:45'], note:'ima 短线情绪选股'},
-          {name:'国家队活跃度(v8_national_team)', source:'NATIONAL_TEAM', freq:'工作日20:50', slots:['20:50'], note:'盘后数据·托盘代理信号'},
+          {name:'国家队活跃度(v8_national_team)', source:'NATIONAL_TEAM', freq:'工作日20:50', maturity:'季频·汇金', slots:['20:50'], note:'盘后数据·托盘代理信号'},
 
           {name:'盘前预案(v8_morning_plan)', source:'MORNING_PLAN', freq:'工作日07:50', slots:['07:50'], note:'暂未上架·观测类·首卡'},
 
@@ -13194,7 +13194,7 @@ function drawUpDownChart(){
 
           '<td style="padding:5px 8px;border:1px solid var(--border);font-weight:600;">'+c.name+'</td>'+
 
-          '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);font-size:11px;white-space:nowrap;">'+c.freq+'</td>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);font-size:11px;white-space:nowrap;">'+c.freq+(c.maturity?(' <span style="border:1px solid rgba(178,155,217,.5);border-radius:4px;padding:0 3px;color:#b29bd9;">'+c.maturity+'</span>'):'')+'</td>'+
 
           '<td style="padding:5px 8px;border:1px solid var(--border);">'+slotsHtml+'</td>'+
 
