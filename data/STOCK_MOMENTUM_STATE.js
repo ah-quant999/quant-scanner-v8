@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-05 01:21",
- "generated": "2026-11-05 01:21",
+ "update_time": "2026-11-05 01:24",
+ "generated": "2026-11-05 01:24",
  "meta": {
-  "generated": "2026-11-05 01:21",
+  "generated": "2026-11-05 01:24",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12762,13 +12762,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300413",
-      "name": "芒果超媒",
-      "change_pct": 7.914,
-      "price": 30.0,
-      "category": "突破"
-     },
-     {
       "code": "002988",
       "name": "豪美新材",
       "change_pct": 8.687,
@@ -12885,13 +12878,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.79,
       "price": 39.43,
-      "category": "突破"
-     },
-     {
-      "code": "300315",
-      "name": "掌趣科技",
-      "change_pct": 13.122,
-      "price": 5.0,
       "category": "突破"
      },
      {
@@ -13047,13 +13033,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.072,
       "price": 4.59,
       "category": "突破"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 4.569,
-      "price": 23.8,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -13076,13 +13055,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新朋股份",
       "change_pct": 3.601,
       "price": 6.33,
-      "category": "加速"
-     },
-     {
-      "code": "300413",
-      "name": "芒果超媒",
-      "change_pct": 7.914,
-      "price": 30.0,
       "category": "加速"
      },
      {
@@ -13202,13 +13174,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.79,
       "price": 39.43,
-      "category": "加速"
-     },
-     {
-      "code": "300315",
-      "name": "掌趣科技",
-      "change_pct": 13.122,
-      "price": 5.0,
       "category": "加速"
      },
      {
@@ -13249,13 +13214,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300413",
-      "name": "芒果超媒",
-      "change_pct": 7.914,
-      "price": 30.0,
-      "category": "短线选股"
-     },
-     {
       "code": "002988",
       "name": "豪美新材",
       "change_pct": 8.687,
@@ -13372,13 +13330,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.79,
       "price": 39.43,
-      "category": "短线选股"
-     },
-     {
-      "code": "300315",
-      "name": "掌趣科技",
-      "change_pct": 13.122,
-      "price": 5.0,
       "category": "短线选股"
      },
      {
@@ -13533,13 +13484,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "扬子新材",
       "change_pct": 10.072,
       "price": 4.59,
-      "category": "短线选股"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 4.569,
-      "price": 23.8,
       "category": "短线选股"
      }
     ],
@@ -13682,13 +13626,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "扬子新材",
       "change_pct": 10.072,
       "price": 4.59,
-      "category": "强势股"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 4.569,
-      "price": 23.8,
       "category": "强势股"
      }
     ]
