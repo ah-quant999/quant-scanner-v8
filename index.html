@@ -188,7 +188,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=839769b766" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=f6e6f61caf" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=ec8f5a42e9" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1314,18 +1314,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=9c49ed9aa7" defer></script>
 <script src="data/W52_HIGH.js?v=5ed31637a0" defer></script>
 <!-- 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填） -->
-<script src="data/SECTOR_YEAR_FLOW.js?v=08bf6f9c34" defer></script>
+<script src="data/SECTOR_YEAR_FLOW.js?v=ead1f4f18a" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=80ec19fced" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=5cf1362b4b" defer></script>
 <script src="data/CFFEX_POSITION.js?v=d988ce37ab" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=1dda9ab1f5" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=4d8d597bb5" defer></script>
+<script src="data/RUNNER_STATUS.js?v=e6149ceb94" defer></script>
 <script src="data/HB_XIAOJIU.js?v=6071f5819a" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=229931371d" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d80dd9ebb0" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=1d151cc7f8" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=8af4015ee9" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e9f47c18cd" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=359f6344d4" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=18986e3e6b" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=1e62815987" defer></script>
@@ -2029,8 +2029,8 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/SENTIMENT_CYCLE.js?v=868cf2d54c" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=4476fc9fa5" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a60b386404" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=608c9d8fdd" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=58fc5af315" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=1d0ac57e5f" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=007fcc2d4f" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
@@ -16124,7 +16124,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=a60b386404');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=58fc5af315');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -16610,6 +16610,12 @@ window.__renderSevereSwing = function(){
 //   数据 window.KEY_NOTICES（data/KEY_NOTICES.js ← cloud_fetch_v8.py::f_key_notices() 盘前+盘后派发）。
 //   口径：当日巨潮公告按关键类别筛选（停复牌/重组/回购/业绩/增减持/风险警示/重大合同）。
 //   无数据 ⇒ 整卡 display:none（不产空壳卡）；600ms×30 自愈轮询（同 renderUnlisted 派发范式）。
+// 🆕 2026-11-04 主人令：胶囊点击切换分类（默认「重组并购」）
+window.__knShowCat = function(cat){
+  window.__knCat = cat;
+  var c = document.getElementById('keyNoticesCard');
+  if(c) window.__renderKeyNotices();
+};
 window.__renderKeyNotices = function(){
   try{
     var card = document.getElementById('keyNoticesCard');
@@ -16637,27 +16643,37 @@ window.__renderKeyNotices = function(){
     var CATCOL = {'停复牌':'#60a5fa','风险警示':'#ef5350','重组并购':'#a78bfa','回购':'#26a69a','业绩预告':'#fbbf24','股东增持':'#34d399','股东减持':'#ef5350','重大合同':'#38bdf8'};
     // 🔧 2026-11-01 主人令：公告按截图标签顺序固定排序（重组并购→停复牌→回购→风险警示→重大合同→股东增持→股东减持）
     var CAT_ORDER = ['重组并购','停复牌','回购','风险警示','重大合同','股东增持','股东减持'];
-    var h = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">';
     var groups = {};
     D.items.forEach(function(it){ (groups[it.cat]=groups[it.cat]||[]).push(it); });
     var orderedCats = CAT_ORDER.filter(function(c){ return groups[c]; })
       .concat(Object.keys(groups).filter(function(c){ return CAT_ORDER.indexOf(c)<0; }));
+    // 🆕 2026-11-04 主人令：胶囊可点击筛选，默认展示「重组并购」
+    var DEF_CAT = '重组并购';
+    if(!window.__knCat || !groups[window.__knCat]){
+      window.__knCat = groups[DEF_CAT] ? DEF_CAT : orderedCats[0];
+    }
+    var h = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">';
     orderedCats.forEach(function(cat){
       var col = CATCOL[cat]||'#9ca3af';
-      h += '<span style="font-size:12px;background:'+col+'1a;color:'+col+';border:1px solid '+col+'55;border-radius:6px;padding:2px 8px;">'+_e(cat)+' · '+groups[cat].length+'</span>';
+      var active = (cat === window.__knCat);
+      var bg = active ? col+'33' : col+'1a';
+      var bd = active ? col+'cc' : col+'55';
+      h += '<span onclick="window.__knShowCat(\''+cat+'\')" style="cursor:pointer;font-size:12px;background:'+bg+';color:'+col+';border:1px solid '+bd+';border-radius:6px;padding:2px 8px;'+(active?'font-weight:700;box-shadow:inset 0 0 0 1px '+col+'55;':'')+'">'+_e(cat)+' · '+groups[cat].length+'</span>';
     });
     h += '</div>';
+    // 列表：仅渲染当前激活分类对应的股票及公告名
     h += '<div style="display:flex;flex-direction:column;gap:6px;">';
-    orderedCats.forEach(function(cat){
-      groups[cat].forEach(function(it){
-        var col = CATCOL[cat]||'#9ca3af';
-        h += '<div style="border-left:3px solid '+col+';background:rgba(148,163,184,.05);border-radius:0 8px 8px 0;padding:6px 10px;">'
-           + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12.5px;font-weight:700;color:var(--txt);">'+_e(it.name)+'</span><span style="font-size:11px;color:'+col+';">'+_e(it.cat)+'</span></div>'
-           + '<div style="font-size:12px;color:var(--txt);margin-top:2px;">'+_e(it.title)+'</div></div>';
-      });
+    var acol = CATCOL[window.__knCat]||'#9ca3af';
+    (groups[window.__knCat]||[]).forEach(function(it){
+      h += '<div style="border-left:3px solid '+acol+';background:rgba(148,163,184,.05);border-radius:0 8px 8px 0;padding:6px 10px;">'
+         + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12.5px;font-weight:700;color:var(--txt);">'+_e(it.name)+'</span><span style="font-size:11px;color:'+acol+';">'+_e(it.cat)+'</span></div>'
+         + '<div style="font-size:12px;color:var(--txt);margin-top:2px;">'+_e(it.title)+'</div></div>';
     });
+    if(!(groups[window.__knCat]||[]).length){
+      h += '<div class="note" style="padding:8px;">该分类当日暂无公告</div>';
+    }
     h += '</div>';
-    h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;">&#x26A0;&#xFE0F; 当日巨潮公告按关键类别筛选，<b style="color:#fbbf24;">非投资建议</b>。</div>';
+    h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;">&#x1F446; 点击上方胶囊切换分类（默认「重组并购」）；当日巨潮公告按关键类别筛选，<b style="color:#fbbf24;">非投资建议</b>。</div>';
     body.innerHTML = h;
     if(window.setBadge) setBadge('keyNoticesFresh','auto','',D.update_time,'');
     else { var _fr=document.getElementById('keyNoticesFresh'); if(_fr) _fr.textContent='已更新 '+_e((D.update_time||'').slice(5,16)); }
