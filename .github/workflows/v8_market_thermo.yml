@@ -48,7 +48,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           # 2026-10-17 补 scripts/update_sw_index_cache.py（27年走势截断根因修复：行业日K缓存此前无人日更）
-          $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py', 'v8/fetch_raw_data_thermo.py', 'scripts/update_sw_index_cache.py')
+          $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py', 'v8/fetch_raw_data_thermo.py', 'scripts/update_sw_index_cache.py', 'scripts/refresh_market_valuation_cache.py')
           $headers = @{
             'User-Agent' = 'v8-market-thermo'
             'Accept'     = 'application/vnd.github.raw'
@@ -85,6 +85,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           python v8/fetch_raw_data_thermo.py
+
+      - name: "📈 月频估值表 market_valuation_cache.csv 自动补齐（akshare·月末补齐·治本 2026-11-05）"
+        shell: powershell
+        run: |
+          python scripts/refresh_market_valuation_cache.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[warn] 估值表补齐失败（宁旧勿错），继续后续步骤" -ForegroundColor Yellow
+          }
 
       - name: "🏭 日更申万一级行业日K缓存（31文件·截断根因修复 2026-10-17）"
         shell: powershell
@@ -144,7 +152,7 @@ jobs:
         if: steps.genaudit.outputs.outcome == 'success'
         shell: powershell
         env:
-          PUSH_FILES: "data/MARKET_THERMO.js"
+          PUSH_FILES: "data/MARKET_THERMO.js,raw_data/sw_index_daily_cache/market_valuation_cache.csv"
           GH_PAT: ${{ secrets.V8_GH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
