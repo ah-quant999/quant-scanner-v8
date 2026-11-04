@@ -5,16 +5,14 @@ v8/gen_national_team.py —— 「国家队活跃度」复合信号（盘后规�
 设计原则（主人铁律：绝不编造）：
   - 全部数值来自仓内真实数据源；
   - 任一子源缺失 ⇒ 该子项标「未接入/未就绪」，权重按比例重分给其余可用子项；
-  - 本指标是「国家队托盘」的代理推算，非汇金官方持仓披露（季报滞后 1-3 月），
-    卡面明确标注「代理·非实时」与「滞后说明」。
+  - 本指标是「国家队托盘」的代理推算，卡面明确标注「代理·非实时」与「T+1 滞后说明」。
+  - 汇金持仓环比（季报滞后约2年）胶囊已于 2026-11-04 应主人令移除：其权重本就 0%、与实时信号并列易误读，
+    留卡无增量信息；历史数据仍存于 data/HUIJIN_HOLDINGS.js，需要时单独调用。
 
 子信号（权重合计 100%，缺失项权重重分）：
   A. 宽基ETF净申购突变（45%）  ← ETF_SUBSCRIPTION_EASTMONEY.js（东财口径·股票型 top_sub 宽基净申购额；由 update_v8.py 派生）
   B. 大金融相对强度（35%）     ← SECTOR_RS.js（银行/证券/保险/多元金融 relative_5d 均值）
   C. 大金融资金净流入（20%）   ← SECTOR_FUND_FLOW.js（银行/证券 板块净流入合计）
-  D. 汇金持仓环比（0%·历史披露）← HUIJIN_HOLDINGS.js（fetch_huijin_holdings.py 抓东财股东增减持）；
-                             季报滞后约1-3月+（实测最新 2024Q2），仅作历史印证、不参与实时评分，
-                             卡面诚实灰标「历史披露」并标注滞后天数，绝不冒充实时信号。
 
 调度：.github/workflows/v8_national_team.yml 工作日 20:50 CST（GitHub Actions ubuntu-latest，
       Contents API 稳健推送）；18:20/19:20 两档盘后资金流链落盘后运行，上游未就绪则保留上版不写盘（宁缺勿错）。
@@ -109,41 +107,11 @@ if sf:
         c_detail = '大金融净流入 %.1f 亿（%s）' % (fin_net, ';'.join(hit))
         c_ready = True
 
-# ── D. 汇金持仓环比（中央汇金股票披露 · 东方财富 RPT_SHARE_HOLDER_INCREASE） ──
-# 源：data/HUIJIN_HOLDINGS.js（v8/fetch_huijin_holdings.py 产出）。
-# 口径：汇金自身法定义务披露的股票增减持 = 其股票持仓变动（ETF渠道不在此表，已归胶囊A）。
-# 该表披露滞后且稀疏（最新约 2024Q2），如实标注「披露口径·滞后」，绝不编造实时值。权重仍 0%（滞后不参与实时评分）。
+# ── D. 汇金持仓环比胶囊：已于 2026-11-04 应主人令移除 ──
+# 理由：汇金季报属法定义务披露，最新仅 2024Q2（滞后约 2 年），与 A/B/C 实时信号并列
+#   易误读为「当前活跃」；其权重本就 0%（不参与实时评分），留卡无增量信息。详见 HUIJIN_HOLDINGS.js
+#   历史数据仍保留于 raw_data，需要时可单独调用，不在此卡展示。
 d_val = None; d_detail = None; d_status = '—未接入'; d_ready = False
-hj = load('data/HUIJIN_HOLDINGS.js')
-if hj and hj.get('data_type') == 'real' and hj.get('latest_net_yi') is not None:
-    _ln = hj.get('latest_net_yi'); _lq = hj.get('latest_quarter') or '?'
-    _pq = hj.get('prev_quarter'); _qoq = hj.get('qoq_yi')
-    d_val = round(_ln, 2)
-    if _ln >= 0:
-        d_status = '✅增持'; _dir = '净增持'
-    else:
-        d_status = '❌减持'; _dir = '净减持'
-    _tail = ''
-    if _pq and _qoq is not None:
-        _tail = '，环比上季(%s) %s%.2f 亿股' % (_pq, '+' if _qoq >= 0 else '', _qoq)
-    d_detail = '汇金股票披露%s %.2f 亿股（%s）%s · 披露口径滞后' % (_dir, abs(_ln), _lq, _tail)
-    # 🔴 2026-11-04 一劳永逸根治：汇金季报属法定义务披露，最新仅 2024Q2（滞后约 2 年），
-    #   原以「✅增持」绿色展示 ⇒ 与 A/B/C 今日实时信号并列，造成「当前活跃」的误读。
-    #   现诚实标注：披露季距今 >365 天 ⇒ 改中性「📜历史披露」灰标（前端不以 ✅/❌ 上色），
-    #   并显式标注滞后天数，杜绝把数年前的季报当实时托盘信号。权重仍 0%，不影响评分。
-    _d_stale_days = None
-    if _lq and len(_lq) >= 6:
-        try:
-            _qy = int(_lq[:4]); _qm = (int(_lq[5]) - 1) * 3 + 1   # "2024Q2" -> 2024-04
-            _qe = datetime.date(_qy, _qm, 1)
-            _d_stale_days = (bj_now().date() - _qe).days
-        except (ValueError, IndexError):
-            _d_stale_days = None
-    if _d_stale_days is not None and _d_stale_days > 365:
-        d_status = '📜历史披露'
-        d_detail = '汇金股票披露%s %.2f 亿股（%s·滞后约%d天）%s · 历史披露非实时' % (
-            _dir, abs(_ln), _lq, _d_stale_days, _tail)
-    d_ready = True
 
 # ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
 # C 源 SECTOR_FUND_FLOW.js 必须为「今日收盘后（hour ≥ 15）」的盘后数据，否则整卡保留上版不写盘。
@@ -170,8 +138,8 @@ if not _sf_ok:
     print('⚠️ NATIONAL_TEAM: NT_FORCE=1 强制写盘（盘后资金流仍未就绪：%r）' % _sf_ut)
 
 # ── 权重重分 + 计分 ─────────────────────────────────────────────────
-W = {'A':45, 'B':35, 'C':20, 'D':0}
-ready = {'A':a_ready, 'B':b_ready, 'C':c_ready, 'D':d_ready}
+W = {'A':45, 'B':35, 'C':20}
+ready = {'A':a_ready, 'B':b_ready, 'C':c_ready}
 base = {'A':50 + (a_val or 0)/2, 'B':50 + (b_val or 0)*4, 'C':50 + (c_val or 0)/3}
 # 仅对就绪项计分；缺失项权重按比例分给就绪项
 tot_w = sum(W[k] for k in W if ready[k])
@@ -221,57 +189,33 @@ def _oneline():
 subs = []
 subs.append({
     'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,
-    'value':a_val,'unit':'亿',
-    'detail':((a_detail or '宽基ETF数据源（东财/老源）均未就绪') + '（T+1·上一交易日：东财ETF申赎披露滞后1日，基准日非陈旧）'),
-    'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪'))),
-    'freq':'T+1'
+    'value':a_val,'unit':'亿','detail':a_detail or '宽基ETF数据源（东财/老源）均未就绪',
+    'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪')))
 })
 subs.append({
     'key':'B','name':'大金融相对强度','weight':W['B'],'ready':b_ready,
-    'value':b_val,'unit':'%',
-    'detail':((b_detail or 'SECTOR_RS.js 未就绪') + '（T+1·上一交易日：板块相对强度为定稿收盘数据，滞后1日）'),
-    'status':('✅强势' if (b_val is not None and b_val>1) else ('🟡中性' if (b_val is not None and b_val>=-1) else ('❌弱势' if b_val is not None else '—未就绪'))),
-    'freq':'T+1'
+    'value':b_val,'unit':'%','detail':b_detail or 'SECTOR_RS.js 未就绪',
+    'status':('✅强势' if (b_val is not None and b_val>1) else ('🟡中性' if (b_val is not None and b_val>=-1) else ('❌弱势' if b_val is not None else '—未就绪')))
 })
 subs.append({
     'key':'C','name':'大金融资金净流入','weight':W['C'],'ready':c_ready,
-    'value':c_val,'unit':'亿',
-    'detail':((c_detail or 'SECTOR_FUND_FLOW.js 未就绪') + '（T+0·当日盘后：板块资金流为收盘后数据）'),
-    'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平'))),
-    'freq':'T+0'
-})
-subs.append({
-    'key':'D','name':'汇金持仓环比','weight':W['D'],'ready':d_ready,
-    'value':d_val,'unit':'亿股','detail':d_detail or 'v8 无季报十大股东源 ⇒ 未接入（季报滞后1-3月，无法实时）',
-    'status':d_status,'freq':'季度'
+    'value':c_val,'unit':'亿','detail':c_detail or 'SECTOR_FUND_FLOW.js 未就绪',
+    'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平')))
 })
 
-# ── 数据基准日滞后说明（防误读：T+1 子信号基准日=上一交易日，非陈旧） ──
-_lag_dd = (e.get('data_date') if e else None) or bj_now().strftime('%Y-%m-%d')
-_lag_days = None
-try:
-    _lag_days = (bj_now().date() - datetime.datetime.strptime(_lag_dd, '%Y-%m-%d').date()).days
-except ValueError:
-    _lag_days = None
-if _lag_days == 0:   _lag_note = '数据基准：当日（T+0）·非滞后'
-elif _lag_days == 1: _lag_note = '数据基准：上一交易日（T+1）·东财ETF申赎/板块强度为定稿数据，滞后1日属正常口径，非陈旧'
-elif _lag_days and _lag_days > 1: _lag_note = '数据基准：滞后 %d 日·上游尚未更新' % _lag_days
-else: _lag_note = '数据基准：T+1 口径（上一交易日为最新可得）'
 out = {
     'data_date': (e.get('data_date') if e else None) or bj_now().strftime('%Y-%m-%d'),
-    'lag_note': _lag_note,
     'update_time': bj_now().strftime('%Y-%m-%d %H:%M:%S'),
     'source_time': max(x for x in [(e or {}).get('update_time') or '',
                                    (rs or {}).get('update_time') or '',
-                                   (sf or {}).get('update_time') or '',
-                                   (hj or {}).get('update_time') or '']),
+                                   (sf or {}).get('update_time') or '']),
     'score': score,
     'verdict': vtxt,
     'verdict_color': vcol,
-    'ready_count': sum(1 for k in ['A','B','C','D'] if ready[k]),
+    'ready_count': sum(1 for k in ['A','B','C'] if ready[k]),
     'subs': subs,
-    'method': '4 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%；汇金持仓环比权重0%（季报披露滞后1-3月，不参与实时评分，仅作定性印证）。',
-    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后；汇金持仓环比取自东方财富股东增减持披露（中央汇金投资有限责任公司），属法定义务披露、口径滞后且稀疏，如实标注，不构成交易建议。',
+    'method': '3 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%。汇金持仓环比胶囊已于 2026-11-04 移除（季报滞后约2年、权重0%、无增量信息）。',
+    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后，如实标注，不构成交易建议。',
     'oneline': _oneline()
 }
 
@@ -288,7 +232,7 @@ if _prev_st and _prev_st == out['source_time']:
 with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as f:
     f.write('window.NATIONAL_TEAM = ' + json.dumps(out, ensure_ascii=False, indent=2) + ';')
 
-print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/4' % (score, vtxt, out['ready_count']))
+print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/3' % (score, vtxt, out['ready_count']))
 for s in subs:
     print('  [%s] %s w%s %s val=%s %s' % (s['key'], s['name'], s['weight'], s['status'], s['value'], s['detail']))
 
