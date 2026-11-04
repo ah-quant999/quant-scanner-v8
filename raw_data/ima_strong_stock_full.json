@@ -1,13 +1,13 @@
 {
-  "fetched_at": "2026-11-03 19:43:00",
+  "fetched_at": "2026-11-04 19:43:00",
   "fetched_tz": "CST+8",
-  "title": "短线情绪选股 2026-11-03",
-  "media_id": "note_85134884db3b8b9fc366f1c5dcf8fab3_75232854661149437500816604757970",
+  "title": "短线情绪选股 2026-11-04",
+  "media_id": "note_cls1_85134884db3b8b9fc366f1c5dcf8fab3_75236480762646357500816604757970",
   "kb_id": "ima_kb_gmergquh",
   "kb_name": "顺势交易",
   "kb_creator": "梧谷枫灯",
   "folder_id": "folder_7507701210837524",
   "folder_name": "短线情绪选股",
   "channel": "member-full-text-snapshot",
-  "note": "19:40 兜底班（小九机）ima 连接器 fetch_media_content 代取全文落盘（2026-11-03 19:43，自动化 28124499 执行）。KB_ID 沿用实测可用库 ima_kb_gmergquh（名称「顺势交易」，creator 梧谷枫灯）；folder folder_7507701210837524 不变。今日笔记「短线情绪选股 2026-11-03」15:51 发布，已排除「短线情绪选股竞价校验 2026-11-03」系列（非本卡水源）。任务步骤3指定的 7500816604757970 库本次返回「knowledge_base_id 无效」，实测有效库为 ima_kb_gmergquh（与本地 meta 一致）。"
+  "note": "19:40 兜底班（小九机）ima 连接器 fetch_media_content 代取全文落盘（2026-11-04 19:43，自动化 28124499 执行）。KB_ID 沿用实测可用库 ima_kb_gmergquh（名称「顺势交易」，creator 梧谷枫灯）；folder folder_7507701210837524 不变。今日笔记「短线情绪选股 2026-11-04」15:38 发布，已排除「短线情绪选股竞价校验 2026-11-04」系列（非本卡水源）。任务步骤3指定的 7500816604757970 库本次仍返回「knowledge_base_id 无效」，实测有效库为 ima_kb_gmergquh（与本地 meta 一致）。"
 }
