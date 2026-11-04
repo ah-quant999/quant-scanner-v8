@@ -77,7 +77,12 @@ on:
 
 permissions:
   contents: write
-  actions: read   # v8_health_check.py 查 /actions/runners 需要此权限；不加则 401
+  # 🔴 2026-11-04 根因修复：由 read → write。
+  #   原因：本工作流用 GITHUB_TOKEN 把数据 commit 回 main，GitHub 递归防护使该 push
+  #   不会触发下游 push 类工作流 deploy-v8-site.yml → Pages 停在旧部署
+  #   （WAVE_ELLIOTT.js 缺 update_time 等）→ 前端徽章显示"已加载"。
+  #   需要 actions:write 才能在本工作流末尾用 workflow_dispatch 显式唤起部署（见末尾步）。
+  actions: write   # write 含 read：v8_health_check.py 查 /actions/runners 仍可用；并支持显式唤起部署
 
 concurrency:
   # 🛡 2026-08-31 一劳永逸根治「构建部署永不成功 / 持续 cancelled」：
@@ -727,6 +732,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python .github/scripts/pages_post_publish_healthcheck.py
+
+      - name: "🚀 触发 Pages 部署（数据已回写 main，显式唤起 deploy-v8-site.yml）"
+        # 🔴 2026-11-04 根因修复：v8_build_deploy 用 GITHUB_TOKEN 把数据 commit 回 main，
+        #   GitHub 递归防护使该 push 不会触发下游 push 类工作流 deploy-v8-site.yml
+        #   → Pages 停在旧部署（WAVE_ELLIOTT.js 缺 update_time 等）→ 前端徽章显示"已加载"。
+        #   用 workflow_dispatch 显式唤起部署（不受 push 链限制），确保数据一落地即上线。
+        #   仅构建成功(success)才唤起；失败也不阻断本工作流（|| echo 兜底）。
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run deploy-v8-site.yml --ref main || echo "⚠️ 部署唤起失败（非致命，可手动 dispatch 或等下次 push）"
 
   # ══════════════════════════════════════════════════════════════════════
   # 🛡 盘中链首跑探活（P1 · 2026-09-18 主人令）
