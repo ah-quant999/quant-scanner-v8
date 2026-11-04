@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-04 15:43:02",
+  "update_time": "2026-11-05 01:27:31",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,8 +9,8 @@
   "items": [],
   "sentiment_meta": {
     "phase": "高潮",
-    "score": 68.0,
-    "delta_pct": 0.0,
+    "score": 75.0,
+    "delta_pct": 143.75,
     "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
     "source": "LIMIT_UP_HEATMAP"
   },
@@ -19,44 +19,44 @@
       {
         "name": "基金减仓",
         "type": "概念",
-        "net": 294.74
+        "net": 329.68
       },
       {
         "name": "电子",
         "type": "行业",
-        "net": 293.72
+        "net": 312.63
       },
       {
         "name": "半导体概念",
         "type": "概念",
-        "net": 261.37
+        "net": 278.61
       },
       {
         "name": "2026中报预增",
         "type": "概念",
-        "net": 258.52
+        "net": 277.27
       },
       {
         "name": "国产芯片",
         "type": "概念",
-        "net": 215.37
+        "net": 232.45
       }
     ],
     "top_out": [
       {
-        "name": "医药流通",
+        "name": "基础建设",
         "type": "行业",
-        "net": -1.37
+        "net": -1.24
       },
       {
-        "name": "汽车",
+        "name": "品牌化妆品",
         "type": "行业",
-        "net": -1.38
+        "net": -1.29
       },
       {
-        "name": "其他塑料制品",
+        "name": "清洁小家电",
         "type": "行业",
-        "net": -1.44
+        "net": -1.31
       }
     ]
   },

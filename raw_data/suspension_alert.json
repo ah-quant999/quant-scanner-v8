@@ -1,52 +1,46 @@
 {
-  "update_time": "2026-11-04 17:39:46",
+  "update_time": "2026-11-05 03:29:00",
   "suspended": [
     {
       "code": "688496",
       "name": "*ST清越",
-      "days": 54,
+      "days": 55,
       "reason": "刊登重要公告"
     },
     {
       "code": "002717",
       "name": "*ST岭南",
-      "days": 22,
+      "days": 23,
       "reason": "刊登重要公告"
-    },
-    {
-      "code": "601326",
-      "name": "秦港股份",
-      "days": 14,
-      "reason": "拟筹划重大资产重组"
     },
     {
       "code": "688121",
       "name": "*ST卓然",
-      "days": 6,
+      "days": 7,
       "reason": "刊登重要公告"
     },
     {
       "code": "000831",
       "name": "中国稀土",
-      "days": 2,
+      "days": 3,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "002129",
       "name": "TCL中环",
-      "days": 2,
+      "days": 3,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "002623",
       "name": "亚玛顿",
-      "days": 1,
+      "days": 2,
       "reason": "刊登重要公告"
     },
     {
-      "code": "000972",
-      "name": "中基健康",
-      "days": 1,
+      "code": "300237",
+      "name": "ST美晨",
+      "days": 0,
       "reason": "刊登重要公告"
     }
   ],
