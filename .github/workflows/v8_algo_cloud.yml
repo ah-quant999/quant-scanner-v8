@@ -100,8 +100,8 @@ on:
       # 🛡 2026-11-04 自愈闭环（主人令·一劳永逸）：failure/cancelled → 自动重派全链，限次防死循环
       retry_count:
         description: '自愈重派计数（内部用，勿手动填）：0=首次，≥2 停止重派'
-        type: number
-        default: 0
+        type: string
+        default: '0'
 
 permissions:
   contents: write
