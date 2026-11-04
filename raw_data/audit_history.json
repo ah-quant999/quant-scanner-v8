@@ -4020,5 +4020,43 @@
     "message": "INVEST_AVOID.js 更新于 2天前 15:16；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-11-05",
+  "time": "04:55:18",
+  "tz": "Asia/Shanghai",
+  "overall": "ok",
+  "summary": {
+   "ok": 113,
+   "warn": 4,
+   "fail": 0,
+   "limited": 1,
+   "info": 1,
+   "other": 0,
+   "total": 119
+  },
+  "warn_items": [
+   {
+    "id": "runner_local",
+    "name": "runner 本地检测",
+    "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·CN runner1"
+   },
+   {
+    "id": "runner_github",
+    "name": "runner GitHub API 检测",
+    "message": "cn_fetch 最新一次失败（非 checkout，连续 0 次），最新 run 卡住 50 分钟（本地状态: runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15"
+   },
+   {
+    "id": "runner",
+    "name": "self-hosted runner",
+    "message": "runner 本地检测:warn-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数"
+   },
+   {
+    "id": "final_enter_stale",
+    "name": "最终推荐入选日期",
+    "message": "未找到 enter_date 字段，无法判断入选新鲜度"
+   }
+  ],
+  "fail_items": []
  }
 ]
