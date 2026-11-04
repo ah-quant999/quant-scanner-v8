@@ -40,7 +40,9 @@ OUT_DIR = ROOT / "out"
 ALGO_DIR = ROOT / "algorithms"
 
 CST = timezone(timedelta(hours=8))
-PYTHON = "C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
+# 2026-11-04 治本：不再硬编码他机绝对路径（旧值 C:/Users/Administrator/... 本机不存在，
+# 曾致 P0-4 自愈分支 FileNotFoundError 崩溃）；动态取当前运行解释器，跨机可用。
+PYTHON = sys.executable
 
 # 外资研投 token 文件
 ZSXQ_TOKEN_FILE = ROOT / "data" / "zsxq_token.json"
