@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 179
+  next_id_seq: 180
 items:
   - id: logic-page-section-protocol-1026
     owner: shared（阿狸咪的工程师落码 · 小九接入）
@@ -10290,3 +10290,28 @@ items:
       AGENTS.md 含「top3 稳定性红线」第 8 条；automation v8-top3-stability-watch 已 ACTIVE。
     updated_by: 小九机AI
     updated: "2026-11-01 09:40"
+
+  - id: factor-walkforward-typeerror-1105
+    owner: 小九的工程师（白天主力修复）· 阿狸咪的工程师（夜间观察复判）
+    priority: P1
+    status: todo
+    created: 2026-11-05
+    title: factor_walkforward.py 连续 2 轮 TypeError(float+NoneType) 待根因修复
+    what: >
+      v8_algo_cloud 连续两份 algo_run_report 复现（update_time 2026-11-04 18:10:39 与
+      2026-11-05 01:10:46）：factor_walkforward.py 退出码 1，栈帧
+      TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'。
+      同轮 final_recommend.py 亦退出码 1（自述提示「排查因子榜输入快照
+      raw_data/top10_daily.json 是否被旧数据覆盖」），data/FINAL_RECOMMEND_DATA.js
+      data_date 卡 2026-11-03 —— 两故障疑同源（因子榜/Top10 快照某列 None 污染）。
+      第 1 轮的 factor_lab_gen 退出1 第 2 轮已消失（偶发），walkforward 两轮均在（非偶发）。
+    fix: >
+      根因层修 algorithms/factor_walkforward.py：定位 float + None 相加点，对上游因子
+      缺值做显式 None 过滤/缺值策略（禁裸 try 吞错），并回溯定位哪一因子列自何时混入 None；
+      一并核对 final_recommend.py 所报 Top10 快照覆盖问题是否同根。
+    verify_how: >
+      连续 ≥2 轮 v8_algo_cloud 新 algo_run_report 的 failed_scripts 不含 factor_walkforward.py，
+      且 data/FACTOR_WALKFORWARD.js / raw_data/factor_walkforward.json 的 update_time 前进；
+      转 done 需附新 report 证据（verified_at）。
+    updated_by: 阿狸咪的工程师
+    updated: "2026-11-05 02:11"
