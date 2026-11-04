@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-04 23:59",
- "generated": "2026-11-04 23:59",
+ "update_time": "2026-11-05 00:05",
+ "generated": "2026-11-05 00:05",
  "meta": {
-  "generated": "2026-11-04 23:59",
+  "generated": "2026-11-05 00:05",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 30,
+  "total_days": 31,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -12409,6 +12409,335 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-11-04",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 10.0,
+      "price": 14.3,
+      "category": "突破"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 4.319,
+      "price": 24.88,
+      "category": "突破"
+     },
+     {
+      "code": "002811",
+      "name": "郑中设计",
+      "change_pct": 8.241,
+      "price": 18.52,
+      "category": "突破"
+     },
+     {
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 4.615,
+      "price": 6.8,
+      "category": "突破"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 5.344,
+      "price": 5.52,
+      "category": "突破"
+     },
+     {
+      "code": "600734",
+      "name": "*ST实达",
+      "change_pct": 9.77,
+      "price": 1.91,
+      "category": "突破"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 3.558,
+      "price": 16.59,
+      "category": "突破"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 3.976,
+      "price": 24.32,
+      "category": "突破"
+     },
+     {
+      "code": "600698",
+      "name": "湖南天雁",
+      "change_pct": 3.846,
+      "price": 6.75,
+      "category": "突破"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 4.573,
+      "price": 5.26,
+      "category": "突破"
+     },
+     {
+      "code": "002100",
+      "name": "天康生物",
+      "change_pct": 3.019,
+      "price": 8.19,
+      "category": "突破"
+     },
+     {
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 4.447,
+      "price": 10.57,
+      "category": "突破"
+     },
+     {
+      "code": "000679",
+      "name": "大连友谊",
+      "change_pct": 9.967,
+      "price": 6.62,
+      "category": "突破"
+     },
+     {
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.026,
+      "price": 4.17,
+      "category": "突破"
+     },
+     {
+      "code": "002300",
+      "name": "太阳电缆",
+      "change_pct": 9.962,
+      "price": 8.72,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 10.0,
+      "price": 14.3,
+      "category": "加速"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 4.319,
+      "price": 24.88,
+      "category": "加速"
+     },
+     {
+      "code": "002811",
+      "name": "郑中设计",
+      "change_pct": 8.241,
+      "price": 18.52,
+      "category": "加速"
+     },
+     {
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 4.615,
+      "price": 6.8,
+      "category": "加速"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 5.344,
+      "price": 5.52,
+      "category": "加速"
+     },
+     {
+      "code": "600734",
+      "name": "*ST实达",
+      "change_pct": 9.77,
+      "price": 1.91,
+      "category": "加速"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 3.558,
+      "price": 16.59,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 10.0,
+      "price": 14.3,
+      "category": "短线选股"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 4.319,
+      "price": 24.88,
+      "category": "短线选股"
+     },
+     {
+      "code": "002811",
+      "name": "郑中设计",
+      "change_pct": 8.241,
+      "price": 18.52,
+      "category": "短线选股"
+     },
+     {
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 4.615,
+      "price": 6.8,
+      "category": "短线选股"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 5.344,
+      "price": 5.52,
+      "category": "短线选股"
+     },
+     {
+      "code": "600734",
+      "name": "*ST实达",
+      "change_pct": 9.77,
+      "price": 1.91,
+      "category": "短线选股"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 3.558,
+      "price": 16.59,
+      "category": "短线选股"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 3.976,
+      "price": 24.32,
+      "category": "短线选股"
+     },
+     {
+      "code": "600698",
+      "name": "湖南天雁",
+      "change_pct": 3.846,
+      "price": 6.75,
+      "category": "短线选股"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 4.573,
+      "price": 5.26,
+      "category": "短线选股"
+     },
+     {
+      "code": "002100",
+      "name": "天康生物",
+      "change_pct": 3.019,
+      "price": 8.19,
+      "category": "短线选股"
+     },
+     {
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 4.447,
+      "price": 10.57,
+      "category": "短线选股"
+     },
+     {
+      "code": "000679",
+      "name": "大连友谊",
+      "change_pct": 9.967,
+      "price": 6.62,
+      "category": "短线选股"
+     },
+     {
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.026,
+      "price": 4.17,
+      "category": "短线选股"
+     },
+     {
+      "code": "002300",
+      "name": "太阳电缆",
+      "change_pct": 9.962,
+      "price": 8.72,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 3.976,
+      "price": 24.32,
+      "category": "强势股"
+     },
+     {
+      "code": "600698",
+      "name": "湖南天雁",
+      "change_pct": 3.846,
+      "price": 6.75,
+      "category": "强势股"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 4.573,
+      "price": 5.26,
+      "category": "强势股"
+     },
+     {
+      "code": "002100",
+      "name": "天康生物",
+      "change_pct": 3.019,
+      "price": 8.19,
+      "category": "强势股"
+     },
+     {
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 4.447,
+      "price": 10.57,
+      "category": "强势股"
+     },
+     {
+      "code": "000679",
+      "name": "大连友谊",
+      "change_pct": 9.967,
+      "price": 6.62,
+      "category": "强势股"
+     },
+     {
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.026,
+      "price": 4.17,
+      "category": "强势股"
+     },
+     {
+      "code": "002300",
+      "name": "太阳电缆",
+      "change_pct": 9.962,
+      "price": 8.72,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-05",
    "categories": {
     "突破": [
      {
