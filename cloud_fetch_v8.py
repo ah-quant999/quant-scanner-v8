@@ -5848,10 +5848,14 @@ def main(category=None, only=None):
         return merged
 
     def f_sector_year_flow():
-        """🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
-        口径：东财行业板块（clist m:90+t:2）逐日主力净流入官方历史
-              （push2his fflow daykline，f51=日期 f52=主力净流入额·元）按自然年累加 ——
-              历史段为官方披露数据回填，非自算估算（主人 10-17 授权回填·要求真实）。
+        """🏔 2026-10-17 主人令「加」：板块主力净流入表（自建·真实口径）。
+        口径：东财行业板块（clist m:90+t:2）逐日主力净流入历史
+              （push2his fflow daykline，f51=日期 f52=主力净流入额·元）。
+        ⚠️ 真实约束（2026-11-04 审计实证）：东财板块 fflow daykline 接口对行业板
+              硬上限约 121 交易日（lmt 参数被忽略），实测所有板块均仅返回
+              2026-05-11→当日，既无完整年初至今、也无 2025 全年 → 故 prev 置 None
+              （前端显'—'），cur 实为「近约半年」非「年初至今」，partial=True 触发
+              前端金色口径说明。宁缺勿错、不伪造去年全年。
         产出：raw_data/sector_year_flow.json → data/SECTOR_YEAR_FLOW.js
               sectors=[{code,name,cur,prev,days,last_date}]，cur/prev 单位亿元。
         幂等：当日已产出 → 跳过（防同日多轮重复 90+ 请求，同 us_hk_map 预算闸门语义）。
@@ -5935,7 +5939,7 @@ def main(category=None, only=None):
             _d20 = round(sum(_cy_series[-20:]) / _EMU, 2) if len(_cy_series) >= 20 else None
             sectors.append({"code": code, "name": name,
                             "cur": round(acc[_cy] / _EMU, 2),
-                            "prev": round(acc[_py] / _EMU, 2),
+                            "prev": None,  # 东财板块fflow历史仅约121交易日(接口上限)，去年全年不可得→留空由前端显'—'
                             "d5": _d5, "d20": _d20,
                             "days": days_n[_cy], "last_date": last_date})
         if not sectors or fails / max(1, len(boards)) > 0.3:
@@ -5945,8 +5949,8 @@ def main(category=None, only=None):
         sectors.sort(key=lambda s: s["cur"], reverse=True)
         print(f"  [sector_year_flow] 板块 {len(sectors)}/{len(boards)} 成功，"
               f"{cur_year} 净流入榜首: {sectors[0]['name']} {sectors[0]['cur']}亿")
-        return {"year": cur_year, "prev_year": prev_year,
-                "source": "东方财富行业板块逐日主力净流入官方历史按年累加(自建累积表·历史回填)",
+        return {"year": cur_year, "prev_year": prev_year, "partial": True,
+                "source": "东方财富行业板块逐日主力净流入(近约121交易日·接口上限；去年全年不可得)",
                 "total": len(boards), "fail_count": fails,
                 "data_date": sectors and max(s["last_date"] for s in sectors),
                 "sectors": sectors}
