@@ -120,7 +120,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=4dd8beeed7" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=616513cc5c" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=794083ac6b" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=fbe96f2eb2" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=65f14102b0" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=384534b18c" defer></script>
@@ -1279,7 +1279,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=26dbfc1e4e" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=5db0ec85a3" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=78490eb56c" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=3a5a79f1e7" defer></script>
 <script src="data/VOLATILITY.js?v=a4a1f1d8d2" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=f94dbf825c" defer></script>
@@ -19840,7 +19840,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=0d5ea575e4', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=2ab8df76e2', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=0102ea0913', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=1d797b072a', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
