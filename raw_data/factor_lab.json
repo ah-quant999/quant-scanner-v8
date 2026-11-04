@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-05 02:32:16",
+  "update_time": "2026-11-05 05:37:52",
   "data_date": "2026-11-04",
   "meta": {
     "data_date": "2026-11-04",
@@ -436,18 +436,6 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sh.600715",
-        "name": "文投控股",
-        "close": 2.47,
-        "close_date": "2026-11-04",
-        "liquid": true,
-        "abn": 1.816,
-        "factor_at": -1.8162,
-        "roe_ttm": null,
-        "size_proxy": 2737610784.6,
-        "asof_ym": "2026-11"
-      },
-      {
         "code": "sz.000930",
         "name": "中粮科技",
         "close": 5.88,
@@ -494,6 +482,18 @@
         "roe_ttm": null,
         "size_proxy": 1310078827.3,
         "asof_ym": "2026-10"
+      },
+      {
+        "code": "sz.300311",
+        "name": "任子行",
+        "close": 6.32,
+        "close_date": "2026-09-14",
+        "liquid": true,
+        "abn": 1.476,
+        "factor_at": -1.4756,
+        "roe_ttm": null,
+        "size_proxy": 2344174346.5,
+        "asof_ym": "2026-09"
       }
     ]
   },

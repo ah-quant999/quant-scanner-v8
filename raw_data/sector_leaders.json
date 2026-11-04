@@ -1,19 +1,19 @@
 {
-  "update_time": "2026-11-04 03:55",
-  "republish_time": "2026-11-04 18:08:55",
-  "data_date": "2026-11-03",
+  "update_time": "2026-11-04 23:58",
+  "republish_time": "2026-11-05 07:26:06",
+  "data_date": "2026-11-04",
   "rule_ver": 2,
   "top_n": 5,
   "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
   "phase": "主升+启动",
-  "sector_count": 11,
+  "sector_count": 14,
   "sectors": [
     {
       "name": "白酒",
       "bk": "BK1277",
       "phase": "主升",
-      "pct_5d": 9.62,
-      "pct_20d": 14.73,
+      "pct_5d": 10.38,
+      "pct_20d": 9.71,
       "cons_count": 20,
       "leaders": [
         {
@@ -58,8 +58,8 @@
       "name": "影视院线",
       "bk": "BK1222",
       "phase": "主升",
-      "pct_5d": 7.11,
-      "pct_20d": 9.67,
+      "pct_5d": 5.5,
+      "pct_20d": 13.06,
       "cons_count": 18,
       "leaders": [
         {
@@ -104,8 +104,8 @@
       "name": "游戏",
       "bk": "BK1046",
       "phase": "主升",
-      "pct_5d": 4.41,
-      "pct_20d": 5.38,
+      "pct_5d": 4.67,
+      "pct_20d": 8.4,
       "cons_count": 24,
       "leaders": [
         {
@@ -150,8 +150,8 @@
       "name": "机场航运",
       "bk": "BK0420",
       "phase": "启动",
-      "pct_5d": 5.16,
-      "pct_20d": 3.08,
+      "pct_5d": 6.26,
+      "pct_20d": 2.31,
       "cons_count": 14,
       "leaders": [
         {
@@ -193,57 +193,11 @@
       "match": "alias:exact"
     },
     {
-      "name": "饮料制造",
-      "bk": null,
-      "phase": "启动",
-      "pct_5d": 4.28,
-      "pct_20d": -2.87,
-      "cons_count": 20,
-      "leaders": [
-        {
-          "code": "605198",
-          "name": "安德利",
-          "price": 53.21,
-          "chg": 4.33,
-          "main_net": null
-        },
-        {
-          "code": "603156",
-          "name": "养元饮品",
-          "price": 33.85,
-          "chg": 2.89,
-          "main_net": null
-        },
-        {
-          "code": "601579",
-          "name": "会稽山",
-          "price": 21.74,
-          "chg": 1.54,
-          "main_net": null
-        },
-        {
-          "code": "000729",
-          "name": "燕京啤酒",
-          "price": 11.29,
-          "chg": 1.07,
-          "main_net": null
-        },
-        {
-          "code": "000523",
-          "name": "红棉股份",
-          "price": 2.89,
-          "chg": 1.05,
-          "main_net": null
-        }
-      ],
-      "match": "ths"
-    },
-    {
       "name": "旅游及酒店",
       "bk": null,
       "phase": "启动",
-      "pct_5d": 3.96,
-      "pct_20d": -3.43,
+      "pct_5d": 3.47,
+      "pct_20d": -4.26,
       "cons_count": 20,
       "leaders": [
         {
@@ -288,8 +242,8 @@
       "name": "保险",
       "bk": "BK0474",
       "phase": "启动",
-      "pct_5d": 3.77,
-      "pct_20d": -0.81,
+      "pct_5d": 3.33,
+      "pct_20d": -2.2,
       "cons_count": 5,
       "leaders": [
         {
@@ -331,11 +285,241 @@
       "match": "norm"
     },
     {
+      "name": "光伏设备",
+      "bk": "BK1031",
+      "phase": "启动",
+      "pct_5d": 3.18,
+      "pct_20d": -6.58,
+      "cons_count": 67,
+      "leaders": [
+        {
+          "code": "920770",
+          "name": "艾能聚",
+          "price": 11.92,
+          "chg": 29.99,
+          "main_net": 111495649.0
+        },
+        {
+          "code": "301697",
+          "name": "贝特利",
+          "price": 25.42,
+          "chg": 20.02,
+          "main_net": 158381136.0
+        },
+        {
+          "code": "301658",
+          "name": "首航新能",
+          "price": 25.4,
+          "chg": 19.98,
+          "main_net": 131281141.0
+        },
+        {
+          "code": "300751",
+          "name": "迈为股份",
+          "price": 142.05,
+          "chg": 17.19,
+          "main_net": 161910763.0
+        },
+        {
+          "code": "688516",
+          "name": "奥特维",
+          "price": 42.95,
+          "chg": 13.23,
+          "main_net": -844168.0
+        }
+      ],
+      "match": "exact"
+    },
+    {
+      "name": "港口航运",
+      "bk": null,
+      "phase": "启动",
+      "pct_5d": 2.31,
+      "pct_20d": -2.21,
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "603162",
+          "name": "海通发展",
+          "price": 10.73,
+          "chg": 3.17,
+          "main_net": null
+        },
+        {
+          "code": "600026",
+          "name": "中远海能",
+          "price": 18.8,
+          "chg": 2.84,
+          "main_net": null
+        },
+        {
+          "code": "000582",
+          "name": "北部湾港",
+          "price": 8.42,
+          "chg": 2.68,
+          "main_net": null
+        },
+        {
+          "code": "601975",
+          "name": "招商南油",
+          "price": 3.74,
+          "chg": 1.91,
+          "main_net": null
+        },
+        {
+          "code": "000520",
+          "name": "凤凰航运",
+          "price": 3.48,
+          "chg": 1.75,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
+    {
+      "name": "饮料制造",
+      "bk": null,
+      "phase": "启动",
+      "pct_5d": 2.24,
+      "pct_20d": -6.1,
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "605198",
+          "name": "安德利",
+          "price": 53.21,
+          "chg": 4.33,
+          "main_net": null
+        },
+        {
+          "code": "603156",
+          "name": "养元饮品",
+          "price": 33.85,
+          "chg": 2.89,
+          "main_net": null
+        },
+        {
+          "code": "601579",
+          "name": "会稽山",
+          "price": 21.74,
+          "chg": 1.54,
+          "main_net": null
+        },
+        {
+          "code": "000729",
+          "name": "燕京啤酒",
+          "price": 11.29,
+          "chg": 1.07,
+          "main_net": null
+        },
+        {
+          "code": "000523",
+          "name": "红棉股份",
+          "price": 2.89,
+          "chg": 1.05,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
+    {
+      "name": "证券",
+      "bk": "BK0473",
+      "phase": "启动",
+      "pct_5d": 2.13,
+      "pct_20d": -2.71,
+      "cons_count": 48,
+      "leaders": [
+        {
+          "code": "002945",
+          "name": "华林证券",
+          "price": 16.02,
+          "chg": 7.01,
+          "main_net": 213959563.0
+        },
+        {
+          "code": "000712",
+          "name": "锦龙股份",
+          "price": 8.45,
+          "chg": 2.05,
+          "main_net": -11004099.0
+        },
+        {
+          "code": "600155",
+          "name": "华创云信",
+          "price": 5.52,
+          "chg": 2.03,
+          "main_net": -9250713.0
+        },
+        {
+          "code": "000728",
+          "name": "国元证券",
+          "price": 7.08,
+          "chg": 1.87,
+          "main_net": -11404630.0
+        },
+        {
+          "code": "300059",
+          "name": "东方财富",
+          "price": 19.2,
+          "chg": 1.8,
+          "main_net": 475959584.0
+        }
+      ],
+      "match": "norm"
+    },
+    {
+      "name": "贸易",
+      "bk": "BK0484",
+      "phase": "启动",
+      "pct_5d": 1.85,
+      "pct_20d": -5.07,
+      "cons_count": 14,
+      "leaders": [
+        {
+          "code": "601061",
+          "name": "中信金属",
+          "price": 9.61,
+          "chg": 3.89,
+          "main_net": 1847943.0
+        },
+        {
+          "code": "600058",
+          "name": "五矿发展",
+          "price": 8.65,
+          "chg": 3.35,
+          "main_net": 13134031.0
+        },
+        {
+          "code": "002183",
+          "name": "怡 亚 通",
+          "price": 3.74,
+          "chg": 1.91,
+          "main_net": -5382802.0
+        },
+        {
+          "code": "002072",
+          "name": "凯瑞德",
+          "price": 6.06,
+          "chg": 1.85,
+          "main_net": 1170708.0
+        },
+        {
+          "code": "600725",
+          "name": "云维股份",
+          "price": 2.97,
+          "chg": 0.68,
+          "main_net": 1312891.0
+        }
+      ],
+      "match": "norm"
+    },
+    {
       "name": "食品加工制造",
       "bk": null,
       "phase": "启动",
-      "pct_5d": 2.2,
-      "pct_20d": 0.55,
+      "pct_5d": 1.73,
+      "pct_20d": -0.64,
       "cons_count": 20,
       "leaders": [
         {
@@ -380,8 +564,8 @@
       "name": "公路铁路运输",
       "bk": "BK0421",
       "phase": "启动",
-      "pct_5d": 1.96,
-      "pct_20d": 2.12,
+      "pct_5d": 1.63,
+      "pct_20d": 1.54,
       "cons_count": 36,
       "leaders": [
         {
@@ -423,57 +607,11 @@
       "match": "alias:exact"
     },
     {
-      "name": "港口航运",
-      "bk": null,
-      "phase": "启动",
-      "pct_5d": 1.88,
-      "pct_20d": -1.83,
-      "cons_count": 20,
-      "leaders": [
-        {
-          "code": "603162",
-          "name": "海通发展",
-          "price": 10.73,
-          "chg": 3.17,
-          "main_net": null
-        },
-        {
-          "code": "600026",
-          "name": "中远海能",
-          "price": 18.8,
-          "chg": 2.84,
-          "main_net": null
-        },
-        {
-          "code": "000582",
-          "name": "北部湾港",
-          "price": 8.42,
-          "chg": 2.68,
-          "main_net": null
-        },
-        {
-          "code": "601975",
-          "name": "招商南油",
-          "price": 3.74,
-          "chg": 1.91,
-          "main_net": null
-        },
-        {
-          "code": "000520",
-          "name": "凤凰航运",
-          "price": 3.48,
-          "chg": 1.75,
-          "main_net": null
-        }
-      ],
-      "match": "ths"
-    },
-    {
       "name": "中药",
       "bk": "BK1040",
       "phase": "启动",
-      "pct_5d": 1.56,
-      "pct_20d": -3.3,
+      "pct_5d": 1.55,
+      "pct_20d": -3.64,
       "cons_count": 66,
       "leaders": [
         {
@@ -561,47 +699,47 @@
       "match": "norm"
     },
     {
-      "name": "公路铁路运输",
-      "bk": "BK0421",
-      "cons_count": 36,
+      "name": "光伏设备",
+      "bk": "BK1031",
+      "cons_count": 67,
       "leaders": [
         {
-          "code": "002357",
-          "name": "富临运业",
-          "price": 9.98,
-          "chg": 4.28,
-          "main_net": 2138677.0
+          "code": "920770",
+          "name": "艾能聚",
+          "price": 11.92,
+          "chg": 29.99,
+          "main_net": 111495649.0
         },
         {
-          "code": "601107",
-          "name": "四川成渝",
-          "price": 6.95,
-          "chg": 3.27,
-          "main_net": -3016660.0
+          "code": "301697",
+          "name": "贝特利",
+          "price": 25.42,
+          "chg": 20.02,
+          "main_net": 158381136.0
         },
         {
-          "code": "601333",
-          "name": "广深铁路",
-          "price": 3.19,
-          "chg": 1.92,
-          "main_net": 2073305.0
+          "code": "301658",
+          "name": "首航新能",
+          "price": 25.4,
+          "chg": 19.98,
+          "main_net": 131281141.0
         },
         {
-          "code": "900914",
-          "name": "锦在线B",
-          "price": 0.42,
-          "chg": 1.71,
-          "main_net": 0.0
+          "code": "300751",
+          "name": "迈为股份",
+          "price": 142.05,
+          "chg": 17.19,
+          "main_net": 161910763.0
         },
         {
-          "code": "600611",
-          "name": "大众交通",
-          "price": 3.89,
-          "chg": 1.57,
-          "main_net": 9121607.0
+          "code": "688516",
+          "name": "奥特维",
+          "price": 42.95,
+          "chg": 13.23,
+          "main_net": -844168.0
         }
       ],
-      "match": "alias:exact"
+      "match": "exact"
     },
     {
       "name": "医疗服务",
@@ -819,6 +957,49 @@
       "match": "alias:exact"
     },
     {
+      "name": "港口航运",
+      "bk": null,
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "603162",
+          "name": "海通发展",
+          "price": 10.73,
+          "chg": 3.17,
+          "main_net": null
+        },
+        {
+          "code": "600026",
+          "name": "中远海能",
+          "price": 18.8,
+          "chg": 2.84,
+          "main_net": null
+        },
+        {
+          "code": "000582",
+          "name": "北部湾港",
+          "price": 8.42,
+          "chg": 2.68,
+          "main_net": null
+        },
+        {
+          "code": "601975",
+          "name": "招商南油",
+          "price": 3.74,
+          "chg": 1.91,
+          "main_net": null
+        },
+        {
+          "code": "000520",
+          "name": "凤凰航运",
+          "price": 3.48,
+          "chg": 1.75,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
+    {
       "name": "游戏",
       "bk": "BK1046",
       "cons_count": 24,
@@ -948,90 +1129,47 @@
       "match": "exact"
     },
     {
-      "name": "食品加工制造",
-      "bk": null,
-      "cons_count": 20,
+      "name": "风电设备",
+      "bk": "BK1032",
+      "cons_count": 31,
       "leaders": [
         {
-          "code": "603777",
-          "name": "来伊份",
-          "price": 14.5,
+          "code": "603248",
+          "name": "锡华科技",
+          "price": 18.0,
           "chg": 10.02,
-          "main_net": null
+          "main_net": 37006893.0
         },
         {
-          "code": "002626",
-          "name": "金达威",
-          "price": 18.12,
-          "chg": 5.9,
-          "main_net": null
+          "code": "603092",
+          "name": "德力佳",
+          "price": 41.34,
+          "chg": 8.9,
+          "main_net": 17573495.0
         },
         {
-          "code": "603517",
-          "name": "绝味食品",
-          "price": 11.45,
-          "chg": 4.66,
-          "main_net": null
+          "code": "002487",
+          "name": "大金重工",
+          "price": 32.42,
+          "chg": 8.21,
+          "main_net": 83982968.0
         },
         {
-          "code": "600186",
-          "name": "XD莲花控",
-          "price": 8.58,
-          "chg": 4.38,
-          "main_net": null
+          "code": "301232",
+          "name": "飞沃科技",
+          "price": 77.09,
+          "chg": 6.79,
+          "main_net": 8776318.0
         },
         {
-          "code": "603755",
-          "name": "日辰股份",
-          "price": 27.78,
-          "chg": 3.5,
-          "main_net": null
+          "code": "603063",
+          "name": "禾望电气",
+          "price": 21.5,
+          "chg": 6.02,
+          "main_net": 23483345.0
         }
       ],
-      "match": "ths"
-    },
-    {
-      "name": "饮料制造",
-      "bk": null,
-      "cons_count": 20,
-      "leaders": [
-        {
-          "code": "605198",
-          "name": "安德利",
-          "price": 53.21,
-          "chg": 4.33,
-          "main_net": null
-        },
-        {
-          "code": "603156",
-          "name": "养元饮品",
-          "price": 33.85,
-          "chg": 2.89,
-          "main_net": null
-        },
-        {
-          "code": "601579",
-          "name": "会稽山",
-          "price": 21.74,
-          "chg": 1.54,
-          "main_net": null
-        },
-        {
-          "code": "000729",
-          "name": "燕京啤酒",
-          "price": 11.29,
-          "chg": 1.07,
-          "main_net": null
-        },
-        {
-          "code": "000523",
-          "name": "红棉股份",
-          "price": 2.89,
-          "chg": 1.05,
-          "main_net": null
-        }
-      ],
-      "match": "ths"
+      "match": "exact"
     }
   ],
   "nomatch_count": 0,
@@ -1039,5 +1177,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-04 18:08:55 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-05 07:26:06 跟随 FINAL 重算(一劳永逸)"
 }
