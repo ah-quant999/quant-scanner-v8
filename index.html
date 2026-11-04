@@ -15919,7 +15919,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // ═══ 🏛️ 2026-10-21 主人令：「国家队活跃度」复合信号卡（暂未上架·盘前预案之后）═══
     //   数据 window.NATIONAL_TEAM（data/NATIONAL_TEAM.js ← v8/gen_national_team.py，工作日 20:50 盘后派发）。
     //   口径：3 子信号加权代理推算（宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%），
-    //         缺失子项权重按比例重分；汇金季报环比 v8 无源 ⇒ 永远「未接入」仅占位说明。
+    //         缺失子项权重按比例重分；汇金季报环比（0%·历史披露）：HUIJIN_HOLDINGS.js 真实抓东财股东增减持，
+    //         但披露滞后（实测最新 2024Q2），卡面以灰标「历史披露」诚实展示，不参与实时评分。
     //   无数据 ⇒ 整卡 display:none（不产空壳卡）；600ms×30 自愈轮询（同 __renderMorningPlan 范式）。
     window.__renderNationalTeam = function(){
       try{
@@ -15954,10 +15955,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           var _s2=D.subs[_i]; var _st=String(_s2.status||'');
           if(_st.indexOf('✅')===0) _pos.push(_e(_s2.name));
           else if(_st.indexOf('❌')===0) _neg.push(_e(_s2.name)+'弱势');
+          else if(_st.indexOf('历史披露')>=0 || _st.indexOf('📜')===0) { /* 历史披露·中性，不参与多空合成 */ }
           else _neg.push(_e(_s2.name)+'未就绪');
         }
         var _ready=(D.ready_count||0);
-        var _regime = (_ready<3) ? ('托底合力不完整（'+_ready+'/3就绪），缺乏系统性增量') : '托底信号较完整';
+        var _regime = (_ready<3) ? ('托底合力不完整（'+_ready+'/'+(D.subs?D.subs.length:3)+'就绪），缺乏系统性增量') : '托底信号较完整';
         var _act = (D.verdict==='中性') ? '按regime防守为主，待宽基ETF申购突变或汇金数据接入再加仓' : ((Number(D.score)>60)?'回调中系统性暴跌概率低、仓位可放宽':'宜收紧防守');
         var _ntAna = '国家队'+_e(D.verdict)+'（'+sc+'）：'+(_pos.length?('正向 '+_pos.join('、')+'；'):'无正向信号；')+_regime+'，'+_act+'。';
 
@@ -15965,7 +15967,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px;">'
            + '<div style="font-size:34px;font-weight:800;color:' + vc + ';line-height:1;">' + sc + '</div>'
            + '<div><div style="font-size:15px;font-weight:700;color:' + vc + ';">' + _e(D.verdict) + '</div>'
-           + '<div style="font-size:11px;color:var(--dim);">0-100 加权分 · 子信号就绪 ' + (D.ready_count||0) + '/3</div></div>'
+           + '<div style="font-size:11px;color:var(--dim);">0-100 加权分 · 子信号就绪 ' + (D.ready_count||0) + '/' + (D.subs?D.subs.length:3) + '</div></div>'
            + '<div style="flex:1;min-width:240px;font-size:11.5px;color:var(--dim);line-height:1.7;border-left:2px solid ' + vc + ';padding-left:10px;"><b style="color:#fbbf24;">&#x1F4CC; 解读：</b><span style="color:var(--txt);">' + _ntAna + '</span></div></div>'
         + '<div style="font-size:12px;color:var(--sub);line-height:1.85;margin:2px 0 8px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">'
         + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>regime 参考非买点信号——国家队活跃 + 指数回调 ⇒ 系统性暴跌概率低、仓位可放宽；静默 + 高位 ⇒ 收紧防守。</div>'
