@@ -1,24 +1,20 @@
 {
-  "update_time": "2026-11-04 18:10:39",
-  "run_start": "2026-11-04 15:43:02",
+  "update_time": "2026-11-05 01:10:46",
+  "run_start": "2026-11-04 22:34:04",
   "ok": 40,
-  "fail": 5,
+  "fail": 4,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
     },
     {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "退出码 1 | logout success!"
-    },
-    {
       "script": "scripts/fetch_multiyear_kline.py",
       "reason": "超时 >40min"
     },
     {
-      "script": "backtest_tdx.py",
-      "reason": "退出码 1 | TypeError: unsupported format string passed to NoneType.__format__"
+      "script": "final_recommend.py",
+      "reason": "退出码 1 |    → 请修复后重跑（或排查因子榜输入快照 raw_data/top10_daily.json 是否被旧数据覆盖）。"
     },
     {
       "script": "factor_walkforward.py",

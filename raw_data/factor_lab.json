@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-11-04 08:03:18",
-  "data_date": "2026-11-03",
+  "update_time": "2026-11-04 23:43:34",
+  "data_date": "2026-11-04",
   "meta": {
-    "data_date": "2026-11-03",
+    "data_date": "2026-11-04",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 1033,
-    "n_at_valid": 1535,
+    "n_universe": 1038,
+    "n_at_valid": 1543,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -268,18 +268,6 @@
         "asof_ym": "2026-11"
       },
       {
-        "code": "sz.300346",
-        "name": "南大光电",
-        "close": 47.59,
-        "close_date": "2026-10-08",
-        "liquid": true,
-        "abn": 0.017,
-        "factor_at": -0.0165,
-        "roe_ttm": null,
-        "size_proxy": 48967575751.2,
-        "asof_ym": "2026-10"
-      },
-      {
         "code": "sh.600096",
         "name": "云天化",
         "close": 24.75,
@@ -373,6 +361,18 @@
         "factor_at": -0.0176,
         "roe_ttm": null,
         "size_proxy": 3018420017.0,
+        "asof_ym": "2026-11"
+      },
+      {
+        "code": "sh.688552",
+        "name": "航天南湖",
+        "close": 30.36,
+        "close_date": "2026-11-02",
+        "liquid": true,
+        "abn": 0.018,
+        "factor_at": -0.0177,
+        "roe_ttm": null,
+        "size_proxy": 5247599889.5,
         "asof_ym": "2026-11"
       }
     ],
