@@ -1902,17 +1902,54 @@ def main():
     #   SECTOR_LEADERS 重算 ⇒ 新晋强板块次日卡面仍显示『上游字典尚未收录』」的时序 race。
     #   调用 scripts/fetch_sector_leaders.py --fr-only（仅刷新 fr_sectors、不碰 sectors、不复跑全量网络）；
     #   与回测/历史同哲学：try/except 包裹，失败绝不影响 D 批主产物；轻网络。
+    # 🔴 2026-11-05 主人令「一劳永逸修复」：原 try/except 把 --fr-only 失败**静默吞掉**
+    #   （"已忽略，不影响主产物"）→ 云端网络瞬断时 --fr-only 崩了也不报错，fr_sectors 保持旧版
+    #   （不含新晋强板块）→ 前端「强势板块龙头股」卡显示「上游字典尚未收录」空壳，
+    #   要等下一轮全量重算才补（2026-11-04 18:08 实测 5 个新板块整轮空缺）。
+    #   根治：重试 3 次容忍东财/同花顺瞬时抖动 + 写盘后覆盖校验；失败**显式 ::error 告警**，
+    #   绝不再静默，杜绝"新板块龙头股没自动生成"再现。
     try:
         import subprocess as _sp
+        import time as _ftime
+        import json as _fjson
+        import io as _fio
         _fsl = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                             "scripts", "fetch_sector_leaders.py")
-        _r = _sp.run([sys.executable, _fsl, "--fr-only"],
-                     capture_output=True, text=True, timeout=300)
-        if _r.returncode == 0:
-            print("[ok] fr_sectors 已跟随最新 FINAL 重算（--fr-only）")
+        _ok = False
+        _last_tail = ""
+        for _attempt in range(1, 4):
+            try:
+                _r = _sp.run([sys.executable, _fsl, "--fr-only"],
+                             capture_output=True, text=True, timeout=300)
+                if _r.returncode == 0:
+                    _ok = True
+                    break
+                _last_tail = (_r.stderr or _r.stdout or "")[-400:]
+                print("  [warn] fr_sectors --fr-only 第%d次返回非零: %s" % (_attempt, _last_tail))
+            except Exception as _re:
+                _last_tail = "%s: %s" % (_re.__class__.__name__, _re)
+                print("  [warn] fr_sectors --fr-only 第%d次异常: %s" % (_attempt, _last_tail))
+            if _attempt < 3:
+                _ftime.sleep(3 * _attempt)
+        if _ok:
+            try:
+                def _rdjs(_p):
+                    _t = _fio.open(_p, encoding="utf-8", errors="ignore").read()
+                    _i = _t.find("{"); _j = _t.rfind("}")
+                    return _fjson.loads(_t[_i:_j + 1]) if _i >= 0 and _j > _i else None
+                _fr2 = _rdjs(os.path.join(DATA, "FINAL_RECOMMEND_DATA.js"))
+                _names = [str(x) for x in ((_fr2 or {}).get("strong_sectors") or []) if x]
+                _sl2 = _rdjs(os.path.join(DATA, "SECTOR_LEADERS.js"))
+                _fset = set(str(x.get("name")) for x in ((_sl2 or {}).get("fr_sectors") or []) if x.get("name"))
+                _miss = [n for n in _names if n not in _fset]
+                if _miss:
+                    print("::error title=v8-fr-coverage::fr_sectors 漏覆盖 %d 个新晋强板块: %s（fetch_sector_leaders 兜底链未兜住，请排查）" % (len(_miss), "、".join(_miss[:10])))
+                else:
+                    print("[ok] fr_sectors 已跟随最新 FINAL 重算（--fr-only），覆盖 %d 个强板块 ✓" % len(_names))
+            except Exception as _ve:
+                print("  [warn] fr_sectors 覆盖校验跳过: %s" % _ve)
         else:
-            _tail = (_r.stderr or _r.stdout or "")[-400:]
-            print("[warn] fr_sectors 跟随重算返回非零（已忽略，不影响主产物）: " + _tail)
+            print("::error title=v8-fr-only-fail::fr_sectors 跟随重算 3 次均失败（末次: %s）。本轮强板块龙头股或滞后，下轮全量重算将补；常见因=云端东财/同花顺瞬时不可达。" % _last_tail[-300:])
     except Exception as e:
         print(f"[warn] fr_sectors 跟随重算 skipped: {e.__class__.__name__}: {e}")
 
