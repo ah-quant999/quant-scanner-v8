@@ -573,6 +573,41 @@ def _gold_pool_fresh(root: str, day_s: str, run_day_s: str) -> bool:
         return False
 
 
+def _top10_stale(root: str, day_s: str, run_day_s: str) -> bool:
+    """B 核心产物 TOP10_DAILY 是否已陈旧（数据日距最新产出 > 1 天）。
+
+    🔴 2026-11-04 兜底触发（主人令·按建议科学处理·终选冻结根治收尾）：
+    作为「选股产物新鲜度」的**结果信号**，与 gold_pool 新鲜度互补。当 TOP10_DAILY
+    已陈旧(>1天) 且 gold_pool 当日鲜(选股输入合格) 时，无论当前档位与 A 状态，
+    强制补跑 B（必要时升级 ALL 补齐 D），斩断「B 被饿」最后一环。
+    解析 data/TOP10_DAILY.js（JS 赋值式，需正则提取 update_time）。
+    """
+    import os as _os
+    import re as _re
+    from datetime import date as _date
+    p = _os.path.join(root, "data", "TOP10_DAILY.js")
+    if not _os.path.exists(p):
+        return True  # 产物缺失 ⇒ 视为陈旧（需补跑）
+    try:
+        with open(p, encoding="utf-8") as _f:
+            txt = _f.read()
+        m = _re.search(r'["\']?update_time["\']?\s*[:=]\s*["\']([^"\']+)["\']', txt)
+        if not m:
+            return True
+        ds = m.group(1)[:10]
+        try:
+            td = _date.fromisoformat(day_s)
+        except Exception:
+            td = _date.fromisoformat(run_day_s)
+        try:
+            od = _date.fromisoformat(ds)
+        except Exception:
+            return True
+        return (td - od).days > 1
+    except Exception:
+        return True
+
+
 def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
                 kind: str = "trading", run_day: str | None = None):
     """返回 (是否就绪, '命中/总数', 明细)。
@@ -863,6 +898,23 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str
     #   → 该 stage 不可能回填 → 跳过；四个非就绪 stage 全不可能 → 返回 NONE（等本日起点）。
     _is_backfill = (day != (now.date() if hh >= _NIGHT_CUT
                                   else now.date() - dt.timedelta(days=1)))
+    # 🔴 2026-11-04 兜底触发（主人令·按建议科学处理·终选冻结根治收尾）：
+    #   现状：gold_pool 当日鲜 ⇒ §3 会越过 A 门槛放行 B。但残留风险是
+    #   「gold_pool 连续多轮不鲜 → B 每轮被判回 A 重采(美IP 失败) → B 饿 ~1 天」，
+    #   且 _gp_fresh 判定遇边角偏差也会漏放行。此处加**结果驱动**显式兜底：
+    #   以「B 核心产物 TOP10_DAILY 已陈旧(>1天)」为第一判据 + gold_pool 当日鲜(选股输入合格)为第二判据，
+    #   非回填模式下，无论当前档位与 A 状态，强制补跑 B（D 未就绪则升级 ALL 补齐最终推荐），
+    #   把「等下一轮调度」缩短为「本轮立即」，斩断「B 被饿」最后一环。
+    if (not ready["B"][0]) and (not _is_backfill) and _gp_fresh \
+            and _top10_stale(root, day_s, _run_day_s):
+        if (not ready["D"][0]) and (hh >= 18 or _gp_fresh):
+            return ("ALL", True,
+                    "兜底触发：TOP10_DAILY 已陈旧(>1天) 且 gold_pool 已鲜 → "
+                    "升级全链 ALL(B→D→E) 强制补跑选股与最终推荐",
+                    day, kind, out())
+        return ("B", True,
+                "兜底触发：TOP10_DAILY 已陈旧(>1天) 且 gold_pool 已鲜 → 强制补跑选股批 B",
+                day, kind, out())
     _stages_to_try = ["A", "B", "D", "E"]
     # 🔴🔴 2026-09-17 一劳永逸（主人令「看板一大片红灯」· 小九）：解「串行遮蔽」。
     #   旧行为：`for _s in [...]: if ready: continue; ... return` —— 遇**第一个**未就绪即 return。
