@@ -88,10 +88,11 @@ jobs:
 
       - name: "📈 月频估值表 market_valuation_cache.csv 自动补齐（akshare·月末补齐·治本 2026-11-05）"
         shell: powershell
+        continue-on-error: true
         run: |
           python scripts/refresh_market_valuation_cache.py
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "[warn] 估值表补齐失败（宁旧勿错），继续后续步骤" -ForegroundColor Yellow
+            Write-Host "[warn] valuation cache refill failed (keep old, prefer stale over error), continue" -ForegroundColor Yellow
           }
 
       - name: "🏭 日更申万一级行业日K缓存（31文件·截断根因修复 2026-10-17）"
