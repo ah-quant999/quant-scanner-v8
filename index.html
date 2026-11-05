@@ -2406,6 +2406,13 @@ window.STRATEGY_WALKFORWARD = {
       <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
+    <!-- 投资避雷针·新闻语料量化（2026-11-05 主人令：自「暂未上架·综合研判」区迁入今日事件页，置于打新速览卡下方；
+         渲染仍走 window.__renderInvestAvoid（数据缺失时 600ms×40 自愈重试），switchSec('td') 进入时触发） -->
+    <div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #ef5350;">
+      <h3><span class="ic">&#x1F6AB;</span>投资避雷针 &#183; 新闻语料量化（轻量） · <span class="fresh" id="investAvoidFresh">&#x2014;</span></h3>
+      <div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div>
+    </div>
+
     <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
     <div class="card">
       <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
@@ -8952,12 +8959,13 @@ function switchSec(sec,el){
     }, 80);
   }
   // 2026-08-30：今日事件 tab 今日解禁/业绩预告切 tab 时重绘
-  // 🆕 2026-11-05 主人令：重要公告速览卡迁入今日事件页，进入时触发渲染（600ms×30 自愈轮询在函数内）
+  // 🆕 2026-11-05 主人令：重要公告速览卡+投资避雷针卡迁入今日事件页，进入时触发渲染（自愈重试在函数内）
   if(sec==='td'){
     setTimeout(function(){
       try{ window.renderTodayEventRestricted(window.RESTRICTED_RELEASE || {}); }catch(e){}
       try{ window.renderTodayEventForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
       try{ window.__renderKeyNotices(); }catch(e){}
+      try{ window.__renderInvestAvoid(); }catch(e){}
     }, 80);
   }
   // 2026-09-12 主人令：宏观观测页（原暂未上架·宏观类迁入）
@@ -15933,7 +15941,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderInvestAvoid', '__renderComprehensiveSynthesis', '__renderSevereSwing'];
+      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis', '__renderSevereSwing'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
@@ -16092,13 +16100,10 @@ h += '<div id="marketStateCard" style="margin:14px 0 0;border-top:1px solid var(
    + '<span id="marketStateFresh">&#x2014;</span>'
    + '</div>'
    + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>';
-// ── 投资避雷针 ──
-h += '<div id="investAvoidCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#ef5350;">&#x1F6AB; 投资避雷针 &#183; 新闻语料量化（轻量）</span>'
-   + '<span id="investAvoidFresh">&#x2014;</span>'
-   + '</div>'
-   + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>';
+// 🗑 2026-11-05 主人令：投资避雷针·新闻语料量化整卡迁往「今日事件」页（打新速览卡下方）——
+//   卡壳改静态 HTML 随 sec-td 输出（见上方今日事件 section），本处旧复合卡内 section 删除；
+//   渲染函数 __renderInvestAvoid 原样保留（下方脚本块），switchSec('td') 进入时触发。
+//   综合解析卡不受影响（其 votes 直读 window.INVEST_AVOID，不依赖本 section DOM）。
 // 🗑️ 2026-10-28 主人令：大基金 增减持监控卡删除（与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图；数据源 DAJIJIN_REDUCTION 保留供投资避雷针消费，v8_dajijin_fetch 定时任务保留）。
 // ── 板块年度主力净流入 ──
 h += '<div id="sectorYearFlowCard" style="display:none;margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
@@ -16367,7 +16372,8 @@ window.__renderMarketState = function(){
   setTimeout(function(){ try{ if(window.__renderComprehensiveSynthesis) window.__renderComprehensiveSynthesis(); }catch(e){} }, 0);
 };
 
-// ═══ 🚫 2026-10-27 主人令：投资避雷针 · 新闻语料量化（轻量）（暂未上架·观测类顶部，评审中）═══
+// ═══ 🚫 2026-10-27 主人令：投资避雷针 · 新闻语料量化（轻量）═══
+//   🆕 2026-11-05 主人令：整卡自「暂未上架·综合研判」区迁入「今日事件」页（打新速览卡下方）。
 //   聚合「不要买哪些股」：大基金减持(DAJIJIN_REDUCTION) + 停牌/*ST(SUSPENSION_ALERT) + 规避板块(MARKET_REGIME)
 //   + 环境风险(RISK_GAUGE/MACRO_BRIEF危机分) + 新闻语料轻量(MACRO_BRIEF标签要闻 + MARKET_ALERTS综述)。
 //   轻量版：消费现有标签化要闻，非逐条新闻 NLP；盘前并入 producer 见 v8/gen_invest_avoid.py（待接线 08:40 任务）。

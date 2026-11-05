@@ -10363,3 +10363,28 @@ items:
       2026-11-05 09:40 线上 Pages 硬抓复核通过（HEAD=6ac97b8d0a 发布后）：sec-td 静态卡在位（今日事件详情 2263 行 → 公告卡 2269 行 → 今日解禁 2277 行）、旧 h+= 壳 0、switchSec 触发在位、派发名单已清、KEY_NOTICES.js HTTP 200 且 update_time=2026-11-05 09:15:45 ⇒ 转 done（verified_at 2026-11-05 09:40，小九机AI）。
     updated_by: 小九机AI
     updated: "2026-11-05 09:40"
+
+  - id: invest-avoid-move-td-1105
+    owner: 小九机AI
+    priority: P2
+    status: pending-verify
+    created: 2026-11-05
+    title: 投资避雷针·新闻语料量化卡迁页：暂未上架·综合研判区 → 今日事件（打新速览卡下方）
+    note: >
+      2026-11-05 主人令（截图两连：投资避雷针卡 → 移到今日事件页打新速览卡下方）。
+      整卡迁页仅动 index.html 一个文件：①今日事件 sec-td 打新速览卡之后新增静态卡壳
+      （investAvoidCard/investAvoidFresh/investAvoidBody，id 不变，h3 头按本页卡风格统一）；
+      ②暂未上架综合研判复合卡内旧 section（h+= 块）删除；③观测类派发名单 __ulRenderPane
+      移除 __renderInvestAvoid（防无容器空跑）；④switchSec('td') 分支补 __renderInvestAvoid
+      触发（数据缺失时函数内 600ms×40 自愈重试兜底）。渲染函数原样保留；
+      综合解析卡不受影响（其 votes 直读 window.INVEST_AVOID，不依赖本 section DOM）。
+      主人盘中令「高频更新+自动刷新盯住」：迁卡为纯静态 HTML，站内自动整页刷新
+      （盘中 15 分钟 + __v8LiveDataProbe 数据变化即刷）后照常渲染，零干扰。
+    verify_how: >
+      离线门禁 15/15 全绿（净树=origin/main TIP + 本次改动，结论绑本次推送 HEAD）；
+      31 个 inline script new Function 0 错；investAvoidCard 全文仅 1 处卡壳定义（sec-td 静态）
+      ＋渲染器引用；旧复合卡内 section 0 残留；派发名单已无 __renderInvestAvoid。
+      待 CI build_deploy 发布后线上 Pages 硬抓（今日事件页避雷针卡在位且位于打新速览之后、
+      暂未上架综合卡无残留、盘中自动刷新后仍渲染）即转 done。
+    updated_by: 小九机AI
+    updated: "2026-11-05 09:45"
