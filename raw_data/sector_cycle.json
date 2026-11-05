@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-05 04:55:38",
+  "update_time": "2026-11-05 09:44:09",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "11/05"
   ],
   "columns": 30,
-  "cycle_count": 16,
+  "cycle_count": 18,
   "cycles": [
     {
       "sector": "AI算力",
@@ -24,7 +24,7 @@
       "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 295,
+      "total": 296,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1878,
+      "total": 1837,
       "ongoing": true
     },
     {
@@ -50,7 +50,7 @@
       "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 439,
+      "total": 434,
       "ongoing": true
     },
     {
@@ -76,7 +76,7 @@
       "hot_days": 27,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 281,
+      "total": 279,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 30,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 537,
+      "total": 526,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 29,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 260,
+      "total": 259,
       "ongoing": true
     },
     {
@@ -141,7 +141,7 @@
       "hot_days": 28,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 196,
+      "total": 188,
       "ongoing": true
     },
     {
@@ -193,7 +193,7 @@
       "hot_days": 7,
       "peak": 6,
       "peak_date": "11/04",
-      "total": 32,
+      "total": 29,
       "ongoing": true
     },
     {
@@ -204,9 +204,9 @@
       "end_idx": 29,
       "days": 2,
       "hot_days": 2,
-      "peak": 3,
-      "peak_date": "11/04",
-      "total": 6,
+      "peak": 8,
+      "peak_date": "11/05",
+      "total": 11,
       "ongoing": true
     },
     {
@@ -217,9 +217,35 @@
       "end_idx": 29,
       "days": 2,
       "hot_days": 2,
-      "peak": 4,
-      "peak_date": "11/04",
-      "total": 8,
+      "peak": 5,
+      "peak_date": "11/05",
+      "total": 9,
+      "ongoing": true
+    },
+    {
+      "sector": "半导体",
+      "start": "11/05",
+      "end": "11/05",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 6,
+      "peak_date": "11/05",
+      "total": 6,
+      "ongoing": true
+    },
+    {
+      "sector": "固态电池",
+      "start": "11/05",
+      "end": "11/05",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "11/05",
+      "total": 3,
       "ongoing": true
     }
   ]
