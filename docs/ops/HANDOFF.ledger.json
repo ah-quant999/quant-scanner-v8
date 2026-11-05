@@ -252,7 +252,7 @@
   "key-notices-move-td-1105",
   "invest-avoid-move-td-1105"
  ],
- "updated": "2026-11-05 09:45",
+ "updated": "2026-11-05 09:57",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径) (2026-10-22 小九：+intraday-first-batch-gate-1022 +ci-streak-fail-rootcause-1022 +ff3-composite-walkforward-1022；next_id_seq/max_next_id_seq 162→163；线上失配哈希按不盲改原则保留原值)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -407,7 +407,7 @@
   "intraday-morning-blackout-fix-1028": "a596afcadee0484f",
   "intraday-schedule-morning-absent": "8217dd5243e8a763",
   "intraday-snapshot-schedule-deregistered-again-0929": "da86a739fbefb980",
-  "invest-avoid-move-td-1105": "cf288024cd2c111c",
+  "invest-avoid-move-td-1105": "907c276d5cce139e",
   "invest-avoid-selfheal-1029e": "42529bcc0a0f9ec8",
   "iron-rules-strengthen-1030": "fcb16ad48b318276",
   "key-notices-move-td-1105": "dd723a71d9bff156",

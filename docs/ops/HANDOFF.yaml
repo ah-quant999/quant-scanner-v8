@@ -10367,7 +10367,7 @@ items:
   - id: invest-avoid-move-td-1105
     owner: 小九机AI
     priority: P2
-    status: pending-verify
+    status: done
     created: 2026-11-05
     title: 投资避雷针·新闻语料量化卡迁页：暂未上架·综合研判区 → 今日事件（打新速览卡下方）
     note: >
@@ -10385,6 +10385,8 @@ items:
       31 个 inline script new Function 0 错；investAvoidCard 全文仅 1 处卡壳定义（sec-td 静态）
       ＋渲染器引用；旧复合卡内 section 0 残留；派发名单已无 __renderInvestAvoid。
       待 CI build_deploy 发布后线上 Pages 硬抓（今日事件页避雷针卡在位且位于打新速览之后、
-      暂未上架综合卡无残留、盘中自动刷新后仍渲染）即转 done。
+      2026-11-05 09:55 线上 Pages 硬抓复核通过（HEAD=ad96d390a3 发布后）：sec-td 静态卡在位
+      （打新速览 2391 行 → 避雷针卡 2411 行）、旧复合卡 section 0 残留、switchSec 触发在位、
+      派发名单已清、INVEST_AVOID.js HTTP 200 ⇒ 转 done（verified_at 2026-11-05 09:55，小九机AI）。
     updated_by: 小九机AI
-    updated: "2026-11-05 09:45"
+    updated: "2026-11-05 09:55"
