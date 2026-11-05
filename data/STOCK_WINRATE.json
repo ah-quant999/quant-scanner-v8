@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-05 05:39:46",
+ "update_time": "2026-11-05 21:52:44",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -21020,47 +21020,47 @@
      "avg_shrunk": -2.77
     },
     "3": {
-     "n": 35,
-     "win": 5.7,
-     "avg": -7.81,
-     "med": -7.89,
+     "n": 37,
+     "win": 5.4,
+     "avg": -8.13,
+     "med": -10.37,
      "best": 2.65,
      "worst": -24.22,
-     "win_shrunk": 15.6,
-     "avg_shrunk": -6.07
+     "win_shrunk": 14.9,
+     "avg_shrunk": -6.4
     },
     "5": {
-     "n": 34,
+     "n": 37,
      "win": 0.0,
-     "avg": -11.75,
-     "med": -10.16,
+     "avg": -12.12,
+     "med": -10.31,
      "best": -0.94,
-     "worst": -24.76,
-     "win_shrunk": 11.4,
-     "avg_shrunk": -9.08
+     "worst": -28.41,
+     "win_shrunk": 10.6,
+     "avg_shrunk": -9.54
     },
     "10": {
-     "n": 28,
-     "win": 3.6,
-     "avg": -19.1,
-     "med": -19.12,
+     "n": 32,
+     "win": 3.1,
+     "avg": -20.6,
+     "med": -19.44,
      "best": 2.24,
-     "worst": -30.74,
-     "win_shrunk": 15.8,
-     "avg_shrunk": -14.07
+     "worst": -36.99,
+     "win_shrunk": 14.3,
+     "avg_shrunk": -15.69
     },
     "20": {
-     "n": 9,
+     "n": 16,
      "win": 0.0,
-     "avg": -35.29,
-     "med": -36.71,
+     "avg": -38.42,
+     "med": -40.49,
      "best": -3.66,
      "worst": -45.36,
-     "win_shrunk": 26.3,
-     "avg_shrunk": -16.72
+     "win_shrunk": 19.2,
+     "avg_shrunk": -23.65
     }
    },
-   "winrate_score": -106.03,
+   "winrate_score": -113.73,
    "rank": 341
   },
   {
