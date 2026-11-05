@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-06 00:31",
-  "republish_time": "2026-11-06 05:57:34",
+  "republish_time": "2026-11-06 07:33:57",
   "data_date": "2026-11-05",
   "rule_ver": 2,
   "top_n": 5,
@@ -2355,51 +2355,8 @@
       "match": "alias:exact"
     }
   ],
-  "fr_count": 12,
+  "fr_count": 11,
   "fr_sectors": [
-    {
-      "name": "保险",
-      "bk": "BK0474",
-      "cons_count": 5,
-      "leaders": [
-        {
-          "code": "601336",
-          "name": "新华保险",
-          "price": 52.93,
-          "chg": 0.78,
-          "main_net": 5224968.0
-        },
-        {
-          "code": "601601",
-          "name": "中国太保",
-          "price": 31.9,
-          "chg": 0.73,
-          "main_net": -2604100.0
-        },
-        {
-          "code": "601318",
-          "name": "中国平安",
-          "price": 54.35,
-          "chg": 0.63,
-          "main_net": 52392304.0
-        },
-        {
-          "code": "601319",
-          "name": "中国人保",
-          "price": 7.41,
-          "chg": 0.41,
-          "main_net": -6497328.0
-        },
-        {
-          "code": "601628",
-          "name": "中国人寿",
-          "price": 35.85,
-          "chg": 0.14,
-          "main_net": 16683200.0
-        }
-      ],
-      "match": "norm"
-    },
     {
       "name": "光伏设备",
       "bk": "BK1031",
@@ -2439,49 +2396,6 @@
           "price": 14.3,
           "chg": 19.97,
           "main_net": 146083789.0
-        }
-      ],
-      "match": "exact"
-    },
-    {
-      "name": "农产品加工",
-      "bk": "BK1256",
-      "cons_count": 28,
-      "leaders": [
-        {
-          "code": "002086",
-          "name": "东方海洋",
-          "price": 3.61,
-          "chg": 10.06,
-          "main_net": 251518336.0
-        },
-        {
-          "code": "002286",
-          "name": "保龄宝",
-          "price": 8.96,
-          "chg": 6.16,
-          "main_net": 21824757.0
-        },
-        {
-          "code": "920273",
-          "name": "一致魔芋",
-          "price": 16.09,
-          "chg": 5.51,
-          "main_net": 1311066.0
-        },
-        {
-          "code": "300138",
-          "name": "晨光生物",
-          "price": 13.13,
-          "chg": 4.21,
-          "main_net": 1258359.0
-        },
-        {
-          "code": "300268",
-          "name": "佳沃食品",
-          "price": 9.78,
-          "chg": 3.6,
-          "main_net": 1022338.0
         }
       ],
       "match": "exact"
@@ -2573,47 +2487,90 @@
       "match": "exact"
     },
     {
-      "name": "旅游及酒店",
-      "bk": null,
-      "cons_count": 20,
+      "name": "教育",
+      "bk": "BK0740",
+      "cons_count": 17,
       "leaders": [
         {
-          "code": "000428",
-          "name": "华天酒店",
-          "price": 3.82,
-          "chg": 10.09,
-          "main_net": null
+          "code": "300688",
+          "name": "创业黑马",
+          "price": 29.71,
+          "chg": 10.73,
+          "main_net": 2484002.0
         },
         {
-          "code": "301073",
-          "name": "君亭酒店",
-          "price": 17.01,
-          "chg": 5.65,
-          "main_net": null
+          "code": "300010",
+          "name": "ST豆神",
+          "price": 4.19,
+          "chg": 8.27,
+          "main_net": -20178944.0
         },
         {
-          "code": "300859",
-          "name": "西域旅游",
-          "price": 22.71,
-          "chg": 5.19,
-          "main_net": null
+          "code": "300492",
+          "name": "华图山鼎",
+          "price": 20.45,
+          "chg": 6.57,
+          "main_net": -717247.0
         },
         {
-          "code": "000978",
-          "name": "桂林旅游",
-          "price": 6.3,
-          "chg": 4.48,
-          "main_net": null
+          "code": "605098",
+          "name": "行动教育",
+          "price": 54.75,
+          "chg": 5.23,
+          "main_net": -3725106.0
         },
         {
-          "code": "002707",
-          "name": "众信旅游",
-          "price": 5.38,
-          "chg": 4.06,
-          "main_net": null
+          "code": "600661",
+          "name": "昂立教育",
+          "price": 8.1,
+          "chg": 3.85,
+          "main_net": -2828180.0
         }
       ],
-      "match": "ths"
+      "match": "exact"
+    },
+    {
+      "name": "文化传媒",
+      "bk": "BK0486",
+      "cons_count": 100,
+      "leaders": [
+        {
+          "code": "300071",
+          "name": "福石控股",
+          "price": 4.55,
+          "chg": 20.05,
+          "main_net": 427199571.0
+        },
+        {
+          "code": "301171",
+          "name": "易点天下",
+          "price": 34.47,
+          "chg": 12.28,
+          "main_net": 393771210.0
+        },
+        {
+          "code": "601929",
+          "name": "吉视传媒",
+          "price": 2.5,
+          "chg": 10.13,
+          "main_net": 194339948.0
+        },
+        {
+          "code": "600986",
+          "name": "浙文互联",
+          "price": 7.65,
+          "chg": 10.07,
+          "main_net": 276972708.0
+        },
+        {
+          "code": "002343",
+          "name": "慈文传媒",
+          "price": 8.89,
+          "chg": 10.02,
+          "main_net": 237488707.0
+        }
+      ],
+      "match": "alias:exact"
     },
     {
       "name": "机场航运",
@@ -2702,44 +2659,44 @@
       "match": "norm"
     },
     {
-      "name": "电网设备",
-      "bk": "BK0457",
+      "name": "电池",
+      "bk": "BK1033",
       "cons_count": 100,
       "leaders": [
         {
-          "code": "002309",
-          "name": "中利集团",
-          "price": 2.92,
-          "chg": 10.19,
-          "main_net": 115037079.0
+          "code": "300438",
+          "name": "鹏辉能源",
+          "price": 44.72,
+          "chg": 11.97,
+          "main_net": 293601216.0
         },
         {
-          "code": "000533",
-          "name": "顺钠股份",
-          "price": 9.77,
-          "chg": 10.02,
-          "main_net": 89313763.0
+          "code": "688353",
+          "name": "华盛锂电",
+          "price": 75.44,
+          "chg": 11.43,
+          "main_net": 15083698.0
         },
         {
-          "code": "001393",
-          "name": "维通利",
-          "price": 40.91,
-          "chg": 10.0,
-          "main_net": 67702327.0
+          "code": "688499",
+          "name": "利元亨",
+          "price": 47.6,
+          "chg": 10.21,
+          "main_net": 12397835.0
         },
         {
-          "code": "300265",
-          "name": "通光线缆",
-          "price": 9.99,
-          "chg": 7.88,
-          "main_net": -39627553.0
+          "code": "001283",
+          "name": "豪鹏科技",
+          "price": 57.46,
+          "chg": 9.03,
+          "main_net": 24516063.0
         },
         {
-          "code": "300933",
-          "name": "中辰股份",
-          "price": 6.11,
-          "chg": 7.19,
-          "main_net": 29467477.0
+          "code": "301292",
+          "name": "海科新源",
+          "price": 48.36,
+          "chg": 8.63,
+          "main_net": 29808614.0
         }
       ],
       "match": "exact"
@@ -2788,6 +2745,49 @@
       "match": "norm"
     },
     {
+      "name": "能源金属",
+      "bk": "BK1015",
+      "cons_count": 12,
+      "leaders": [
+        {
+          "code": "002192",
+          "name": "融捷股份",
+          "price": 50.28,
+          "chg": 6.3,
+          "main_net": 164499269.0
+        },
+        {
+          "code": "002460",
+          "name": "赣锋锂业",
+          "price": 39.33,
+          "chg": 6.27,
+          "main_net": 175440704.0
+        },
+        {
+          "code": "002240",
+          "name": "盛新锂能",
+          "price": 21.15,
+          "chg": 6.07,
+          "main_net": 163233222.0
+        },
+        {
+          "code": "603799",
+          "name": "华友钴业",
+          "price": 33.9,
+          "chg": 5.61,
+          "main_net": 251790560.0
+        },
+        {
+          "code": "002738",
+          "name": "中矿资源",
+          "price": 38.33,
+          "chg": 5.16,
+          "main_net": 136277017.0
+        }
+      ],
+      "match": "exact"
+    },
+    {
       "name": "贵金属",
       "bk": "BK0732",
       "cons_count": 13,
@@ -2829,49 +2829,6 @@
         }
       ],
       "match": "exact"
-    },
-    {
-      "name": "贸易",
-      "bk": "BK0484",
-      "cons_count": 14,
-      "leaders": [
-        {
-          "code": "000151",
-          "name": "中成股份",
-          "price": 9.97,
-          "chg": 4.95,
-          "main_net": 40296698.0
-        },
-        {
-          "code": "002183",
-          "name": "怡 亚 通",
-          "price": 3.88,
-          "chg": 3.74,
-          "main_net": 14196683.0
-        },
-        {
-          "code": "002072",
-          "name": "凯瑞德",
-          "price": 6.19,
-          "chg": 2.15,
-          "main_net": -3734276.0
-        },
-        {
-          "code": "000701",
-          "name": "厦门信达",
-          "price": 6.04,
-          "chg": 1.68,
-          "main_net": -2526116.0
-        },
-        {
-          "code": "600287",
-          "name": "苏豪时尚",
-          "price": 4.56,
-          "chg": 1.33,
-          "main_net": -1271493.0
-        }
-      ],
-      "match": "norm"
     }
   ],
   "nomatch_count": 0,
@@ -2879,5 +2836,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-06 05:57:34 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-06 07:33:57 跟随 FINAL 重算(一劳永逸)"
 }
