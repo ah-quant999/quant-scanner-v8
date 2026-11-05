@@ -10485,3 +10485,33 @@ items:
       NATIONAL_TEAM.js 出现 4 subs 且线上卡面 4 胶囊在位后转 done。
     updated_by: 小九机AI
     updated: "2026-11-05 11:25"
+  - id: algoraw-mass403-crosslayer-block-1106
+    owner: shared（小九：裁决/落码 api_push_raw.py · 阿狸咪的工程师：已定性取证）
+    priority: P0
+    status: doing
+    created: 2026-11-06
+    title: 算法链链尾批量推送撞 GitHub 403 次级限流 ⇒ raw 层停更 ⇒ 跨层一致性门禁阻断 build_deploy
+    note: >
+      2026-11-06 04:20 阿狸咪的工程师巡检定性（取证：#2917/#2918 job 日志 + build_deploy #13781-13784 日志）。
+      【现象】算法链链尾推送 raw 层大面积 HTTP 403：#2917（11-05 22:45-23:49，结论 success=假绿）373 个文件
+      上传失败、#2918（11-05 23:54-11-06 02:57）485 个（单文件重试 8 次均 403），含 raw_data/market_regime.json、
+      sector_recommendation.json、top10_daily.json、kline_cache 大部、_wf_cache、甚至 index.html blob。
+      生成器本身全部正常（market_regime.py 02:00:09 ok、sector_recommendation.py ok）——纯推送层故障。
+      【后果】raw 层自 11-05 停更（market_regime ut=2026-11-05T03:27:33、sector_recommendation ut=2026-11-05T06:31:22），
+      data 层较新 ⇒ build_deploy 跨层一致性守卫判「真错位 2 项」自 11-06 03:08 起连拦 4 轮（#13781-#13784 全部
+      step[14] 失败），data 写回 main 主通路降级；线上 TOP10_DAILY 停在 11-05 01:13 档（22:02 档被 00:22 build_deploy
+      fast-forward retry 回退后未恢复）。[10/10] 锚点审计本身已转绿（563f5405b 修复生效，与本案无关）。
+      【根因定性】api_push_raw.py 每轮链尾把数百文件（含全量 kline_cache/_wf_cache 缓存）逐个 Contents API 直推，
+      撞 GitHub 次级限流（403 secondary rate limit）；algo×3 在途 + cn_fetch 每时 + build_deploy 每 ~15min 的并发
+      推送密度加剧。守卫拦截行为正确（它拦得对），病灶在推送层。
+      【修复方向（待小九裁决/落码）】①链尾推送瘦身：kline_cache/_wf_cache 等缓存类不进链尾全量推送（低频或变更检测）；
+      ②限流感知：403/429 读 Retry-After 退避 + 指数退避抖动 + 批量分窗；③失败文件记账、下一轮差量补推；
+      ④门禁保留不动。
+      【在途】#2919 in_progress（step9），其链尾推送若成功可临时解围，但结构性问题必复发；#2920/#2921 排队中
+      （同组堆积只报告不派发）。
+    verify_how: >
+      下一算法链 run 日志中「本轮上传失败」清单=0（或个位数且不含 market_regime/sector_recommendation/top10_daily）；
+      远端 raw_data/market_regime.json 与 sector_recommendation.json update_time 前进至 11-06+；
+      build_deploy step[14] 跨层校验放行、连红止于 4 轮。三条件同批满足方可转 done。
+    updated_by: 阿狸咪的工程师
+    updated: "2026-11-06 04:37"
