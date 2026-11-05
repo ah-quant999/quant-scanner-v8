@@ -5,8 +5,8 @@
     --bg:#0a0e17; --bg2:#0e1422; --card:#131b2e; --card2:#172238;
     --border:#243150; --border2:#2e3d63;
     --txt:#e6edf7; --sub:#93a4c4; --dim:#5f7099;
-    --cyan:#38bdf8; --purple:#a78bfa; --gold:#fbbf24; --pink:#f472b6;
-    --up:#ef5350; --down:#26a69a;
+    --cyan:#41c9ff; --purple:#c084fc; --gold:#ffd024; --pink:#ff7ac2;
+    --up:#ff5252; --down:#26d9c2;
     --lock:#5f7099;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -40,7 +40,7 @@
   .obs-tab:hover{color:#fff}
   .obs-tab[data-obs="macro"].active{color:#34d399;border-bottom-color:#34d399;text-shadow:0 0 8px rgba(52,211,153,.5)}
   .obs-tab[data-obs="market"].active{color:#c8a2e8;border-bottom-color:#c8a2e8;text-shadow:0 0 8px rgba(200,162,232,.5)}
-  .obs-tab[data-obs="future"].active{color:#fbbf24;border-bottom-color:#fbbf24;text-shadow:0 0 8px rgba(251,191,36,.5)}
+  .obs-tab[data-obs="future"].active{color:#ffd024;border-bottom-color:#ffd024;text-shadow:0 0 8px rgba(255,208,36,0.68)}
 
   main{padding:22px 20px 60px;max-width:1320px;margin:0 auto;overflow:visible}
   section{display:none;animation:fade .25s ease}
@@ -52,7 +52,7 @@
   .st-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
   .st-tab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);transition:.15s}
   .st-tab:hover{border-color:var(--cyan);color:var(--txt)}
-  .st-tab.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:var(--cyan);color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.35)}
+  .st-tab.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:var(--cyan);color:#fff;box-shadow:0 0 0 1px rgba(65,201,255,0.51)}
   .st-pane{display:none}
   .st-pane.active{display:block}
   .sec-head .tag{font-size:12px;color:var(--dim)}
@@ -109,8 +109,8 @@
   .etf-row:last-child{border:0}
   .etf-row span{color:var(--sub)}
 .etf-row .pct{width:46px;text-align:right;font-weight:600}
-.etf-row .pct.up{color:#ef5350}
-.etf-row .pct.down{color:#26a69a}
+.etf-row .pct.up{color:#ff5252}
+.etf-row .pct.down{color:#26d9c2}
 .etf-row .subtotal{font-size:11px;color:var(--dim);padding:6px 0 0;border-top:1px solid var(--border);margin-top:4px;display:flex;justify-content:space-between}
 .etf-spark{display:inline-block;width:16px;height:4px;border-radius:2px;margin-left:4px;vertical-align:middle}
   .etf-row b{font-variant-numeric:tabular-nums}
@@ -141,20 +141,20 @@
   .limit-up-analysis{font-size:12px;line-height:1.7;margin-bottom:10px;padding:8px 10px;background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;color:var(--sub)}
   .limit-up-analysis b{color:var(--txt)}
   .lu-h0{background:transparent;color:var(--dim)}
-  .lu-h1{background:rgba(239,83,80,.12);color:#ff8a80}
-  .lu-h2{background:rgba(239,83,80,.28);color:#ff5252;font-weight:600}
-  .lu-h3{background:rgba(239,83,80,.48);color:#fff;font-weight:700}
-  .lu-h4{background:rgba(239,83,80,.68);color:#fff;font-weight:700}
-  .lu-h5{background:rgba(239,83,80,.88);color:#fff;font-weight:700}
+  .lu-h1{background:rgba(255,82,82,0.25);color:#ff8a80}
+  .lu-h2{background:rgba(255,82,82,0.44);color:#ff5252;font-weight:600}
+  .lu-h3{background:rgba(255,82,82,0.66);color:#fff;font-weight:700}
+  .lu-h4{background:rgba(255,82,82,0.68);color:#fff;font-weight:700}
+  .lu-h5{background:rgba(255,82,82,0.88);color:#fff;font-weight:700}
   /* 🌊 2026-09-15 主人令：退潮日标注（青蓝冷色，与金色「启动日」一眼区分）——
        前一日仍 ≥3 只涨停、当日骤降到 ≤1 ⇒ 这天是这轮热度的退潮日。
        退潮标记只保留 5 个交易日，之后自动退出（不长期挂着误导）。 */
-  .limit-up-content .lu-ebb{box-shadow:inset 0 0 0 2px #38bdf8;border-radius:4px}
+  .limit-up-content .lu-ebb{box-shadow:inset 0 0 0 2px #41c9ff;border-radius:4px}
   /* 🛡 2026-10-19 主人令一劳永逸：前导「未启动」合并格 —— 板块首信号之前的全 0 列
      不再逐列显示近不可见的「·」（观感＝板块前面空一大片），改为单格标注「MM/DD 起」；
      colspan 精确占位，与表头日期列仍逐列对齐，合/势统计口径不变。 */
   .limit-up-content td.lu-pre{text-align:center;color:var(--dim);font-size:10px;letter-spacing:.5px;background:rgba(148,163,184,.06);border-radius:4px;white-space:nowrap;overflow:hidden}
-  .limit-up-legend .lu-legend-ebb{border:2px solid #38bdf8;color:#7dd3fc;padding:1px 6px}
+  .limit-up-legend .lu-legend-ebb{border:2px solid #41c9ff;color:#7dd3fc;padding:1px 6px}
   /* 🗂 卡底「历史折叠」（2026-09-15 主人令：让历史可查） */
   .lu-fold-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);
     background:var(--bg2);color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
@@ -178,32 +178,32 @@
   .lu-tl-name{width:84px;min-width:84px;text-align:right;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lu-tl-track{position:relative;flex:1;height:15px;background:rgba(255,255,255,.035);border-radius:3px;overflow:hidden}
   .lu-tl-bar{position:absolute;top:0;height:15px;border-radius:3px;font-size:9px;line-height:15px;text-align:center;color:#fff;overflow:hidden;white-space:nowrap}
-  .lu-tl-bar.on{background:rgba(56,189,248,.62)}
+  .lu-tl-bar.on{background:rgba(65,201,255,0.8)}
   .lu-tl-bar.off{background:rgba(148,163,184,.30);color:var(--sub)}
   .lu-tl-bar.pulse{background:rgba(245,158,11,.50)}
   .lu-tl-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:1px;padding-left:92px}
   /* 📊 统计层徽章：平均周期 / 当前位置（红＝已超历史均值，金＝均值附近，蓝＝仍在初期，灰＝已退潮） */
   .lu-stat-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;white-space:nowrap}
-  .lu-stat-over{background:rgba(239,83,80,.22);color:#ff8a80}
-  .lu-stat-near{background:rgba(245,158,11,.20);color:#fbbf24}
-  .lu-stat-early{background:rgba(56,189,248,.18);color:#7dd3fc}
+  .lu-stat-over{background:rgba(255,82,82,0.36);color:#ff8a80}
+  .lu-stat-near{background:rgba(245,158,11,.20);color:#ffd024}
+  .lu-stat-early{background:rgba(65,201,255,0.32);color:#7dd3fc}
   .lu-stat-done{background:rgba(148,163,184,.16);color:var(--dim)}
 
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .limit-up-analysis b{color:var(--txt)}
   .lu-h0{background:transparent;color:var(--dim)}
-  .lu-h1{background:rgba(239,83,80,.12);color:#ff8a80}
-  .lu-h2{background:rgba(239,83,80,.28);color:#ff5252;font-weight:600}
-  .lu-h3{background:rgba(239,83,80,.48);color:#fff;font-weight:700}
-  .lu-h4{background:rgba(239,83,80,.68);color:#fff;font-weight:700}
-  .lu-h5{background:rgba(239,83,80,.88);color:#fff;font-weight:700}
+  .lu-h1{background:rgba(255,82,82,0.25);color:#ff8a80}
+  .lu-h2{background:rgba(255,82,82,0.44);color:#ff5252;font-weight:600}
+  .lu-h3{background:rgba(255,82,82,0.66);color:#fff;font-weight:700}
+  .lu-h4{background:rgba(255,82,82,0.68);color:#fff;font-weight:700}
+  .lu-h5{background:rgba(255,82,82,0.88);color:#fff;font-weight:700}
 
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .sf-block{border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border)}
   .sf-block:last-child{margin-bottom:0}
-  .sf-block-hot{background:linear-gradient(135deg,rgba(24,95,165,.18),rgba(56,189,248,.08));border-left:4px solid #38bdf8}
-  .sf-block-close{background:linear-gradient(135deg,rgba(153,60,29,.14),rgba(251,191,36,.06));border-left:4px solid #fb923c}
-  .sf-block-trend{background:linear-gradient(135deg,rgba(83,74,183,.16),rgba(167,139,250,.08));border-left:4px solid #a78bfa}
+  .sf-block-hot{background:linear-gradient(135deg,rgba(24,95,165,.18),rgba(65,201,255,0.21));border-left:4px solid #41c9ff}
+  .sf-block-close{background:linear-gradient(135deg,rgba(153,60,29,.14),rgba(255,208,36,0.19));border-left:4px solid #fb923c}
+  .sf-block-trend{background:linear-gradient(135deg,rgba(83,74,183,.16),rgba(192,132,252,0.21));border-left:4px solid #c084fc}
   .sf-block-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
   .sf-block-hot .sf-block-title{color:#7dd3fc}
   .sf-block-close .sf-block-title{color:#fdba74}
@@ -217,12 +217,12 @@
   .sf-line b{font-weight:700}
   .sf-tagline{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
   .sf-tag{font-size:13px;padding:4px 9px;border-radius:4px}
-  .sf-tag-in{background:rgba(239,83,80,.14);color:#ff8a95}
+  .sf-tag-in{background:rgba(255,82,82,0.27);color:#ff8a95}
   .sf-tag-out{background:rgba(31,209,123,.14);color:#7ee0a0}
-  .sf-tag-new{background:rgba(56,189,248,.14);color:#7dd3fc}
-  .sf-tag-rotate{background:rgba(251,191,36,.14);color:#fcd34d}
+  .sf-tag-new{background:rgba(65,201,255,0.27);color:#7dd3fc}
+  .sf-tag-rotate{background:rgba(255,208,36,0.27);color:#fcd34d}
   .sf-tag-rebound{background:rgba(251,146,60,.14);color:#fdba74}
-  .sf-caution{padding:9px 11px;background:rgba(251,191,36,.10);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;margin-bottom:10px;font-size:14px;line-height:1.8;color:#fde68a}
+  .sf-caution{padding:9px 11px;background:rgba(255,208,36,0.23);border-left:3px solid #ffd024;border-radius:0 8px 8px 0;margin-bottom:10px;font-size:14px;line-height:1.8;color:#fde68a}
   .sf-status-table{width:100%;font-size:13px;border-collapse:collapse;line-height:1.8}
   .sf-status-table th{background:var(--bg2);color:var(--dim);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border)}
   .sf-status-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center}
@@ -250,7 +250,7 @@
   .fl-pane.active{display:block;animation:fade .2s ease}
   .fl-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:6px 0}
   .fl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px;transition:.15s}
-  .fl-card:hover{border-color:rgba(56,189,248,.5)}
+  .fl-card:hover{border-color:rgba(65,201,255,0.68)}
   .fl-card-pass{border-left:3px solid #22c55e}
   .fl-card-head{display:flex;justify-content:space-between;align-items:center;gap:4px}
   .fl-card-name{font-size:12px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
@@ -258,11 +258,11 @@
   .fl-card-metric{font-size:13px;font-weight:700}
   .fl-card-sub{font-size:10px;color:var(--dim)}
   .fl-badge{font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(148,163,184,.15);color:var(--dim);white-space:nowrap}
-  .fl-pass{background:rgba(34,197,94,.18);color:#26a69a}
+  .fl-pass{background:rgba(34,197,94,.18);color:#26d9c2}
   .fl-sec-label{font-size:12px;font-weight:700;color:var(--txt);margin:10px 0 4px;display:flex;align-items:center;gap:6px}
   .fl-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
   .fl-dot-pass{background:#22c55e}
-  .fl-dot-weak{background:#ef5350}
+  .fl-dot-weak{background:#ff5252}
   .fl-toggle{padding:6px 10px;border-radius:6px;background:var(--bg2);color:var(--sub);font-size:12px;cursor:pointer;display:inline-block;margin:6px 0;border:1px solid var(--border)}
   .fl-toggle:hover{border-color:var(--cyan);color:var(--txt)}
   .fl-collapsed{display:none}
@@ -320,13 +320,13 @@
   .v8cal-day.dim{opacity:.4}
   .v8cal-event{font-size:11px;line-height:1.4;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px}
   .v8cal-event .ck{font-size:10px;color:#0d6e2a;background:#a5d6a7;padding:0 3px;border-radius:2px;font-weight:700}
-  .v8cal-event.imp{background:rgba(239,83,80,.15);color:#ff8a80;border-left:3px solid #ef5350}
+  .v8cal-event.imp{background:rgba(255,82,82,0.28);color:#ff8a80;border-left:3px solid #ff5252}
   .v8cal-event.cb{background:rgba(21,101,192,.15);color:#64b5f6;border-left:3px solid #1565c0}
-  .v8cal-event.data{background:rgba(251,191,36,.15);color:#fbbf24;border-left:3px solid #fbbf24}
+  .v8cal-event.data{background:rgba(255,208,36,0.28);color:#ffd024;border-left:3px solid #ffd024}
   .v8cal-event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid #43a047}
   .v8cal-event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid #9c27b0}
   .v8cal-event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid #42a5f5}
-  .v8cal-event.hk{background:rgba(239,83,80,.15);color:#ef9a9a;border-left:3px solid #ef5350}
+  .v8cal-event.hk{background:rgba(255,82,82,0.28);color:#ef9a9a;border-left:3px solid #ff5252}
   .v8cal-event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid #ff9800}
   .v8cal-event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid #e91e63}
   .v8cal-event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid #673ab7}
@@ -447,10 +447,10 @@
   .ph-macro-section-v2{font-size:11px;font-weight:700;color:var(--cyan);padding:4px 8px;background:var(--bg2);margin-top:6px;border-radius:4px;letter-spacing:.3px}
   .ph-macro-table-v2 .v2-name{font-weight:600;color:var(--txt);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
   .ph-macro-table-v2 .v2-freq{font-size:9.5px;padding:0 4px;border-radius:3px;background:var(--bg2);color:var(--dim);border:1px solid var(--border);font-weight:500}
-  .ph-macro-table-v2 .v2-freq.realtime{background:rgba(56,189,248,.12);color:#38bdf8;border-color:rgba(56,189,248,.3)}
-  .ph-macro-table-v2 .v2-freq.daily{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.3)}
-  .ph-macro-table-v2 .v2-freq.weekly{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.3)}
-  .ph-macro-table-v2 .v2-freq.monthly{background:rgba(244,114,182,.12);color:#f472b6;border-color:rgba(244,114,182,.3)}
+  .ph-macro-table-v2 .v2-freq.realtime{background:rgba(65,201,255,0.25);color:#41c9ff;border-color:rgba(65,201,255,0.46)}
+  .ph-macro-table-v2 .v2-freq.daily{background:rgba(192,132,252,0.25);color:#c084fc;border-color:rgba(192,132,252,0.46)}
+  .ph-macro-table-v2 .v2-freq.weekly{background:rgba(255,208,36,0.25);color:#ffd024;border-color:rgba(255,208,36,0.46)}
+  .ph-macro-table-v2 .v2-freq.monthly{background:rgba(255,122,194,0.25);color:#ff7ac2;border-color:rgba(255,122,194,0.46)}
   .ph-macro-table-v2 .v2-val{font-size:14px;font-weight:700;color:var(--txt);white-space:nowrap;line-height:1.3}
   .ph-macro-table-v2 .v2-arrow{font-size:11px;margin-left:4px;white-space:nowrap;line-height:1.3}
   .ph-macro-table-v2 .v2-range{font-size:10.5px;color:var(--sub);line-height:1.45;display:inline}
@@ -460,10 +460,10 @@
   .ph-macro-table-v2 .v2-abov::before{content:"· ⚠ ";opacity:.8}
   .ph-macro-table-v2 .v2-status{font-size:9.5px;padding:0 5px;border-radius:3px;margin-left:4px;display:inline-block;font-weight:500;line-height:1.4;vertical-align:middle}
   .ph-macro-table-v2 .v2-status.fresh{background:rgba(31,209,123,.15);color:#4ade80}
-  .ph-macro-table-v2 .v2-status.stale{background:rgba(251,191,36,.15);color:#fbbf24}
+  .ph-macro-table-v2 .v2-status.stale{background:rgba(255,208,36,0.28);color:#ffd024}
   .ph-macro-table-v2 .v2-pos-above{color:var(--up);font-weight:700}
   .ph-macro-table-v2 .v2-pos-below{color:var(--down);font-weight:700}
-  .ph-macro-table-v2 .v2-pos-normal{color:#38bdf8;font-weight:700}
+  .ph-macro-table-v2 .v2-pos-normal{color:#41c9ff;font-weight:700}
   @media(max-width:720px){.ph-dim{flex-direction:column}}
 
   /* 三重共识 / 历史追踪（选股策略 tab） */
@@ -475,22 +475,22 @@
   .tp-board{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
   .tp-badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700}
   .tp-badge.cons{background:var(--purple);color:#0a0e17}
-  .tp-badge.near{background:rgba(251,191,36,.16);color:var(--gold)}
+  .tp-badge.near{background:rgba(255,208,36,0.3);color:var(--gold)}
   .tp-meta{font-size:12px;color:var(--sub);margin-top:5px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .tp-score{font-size:20px;font-weight:800;color:var(--purple);line-height:1}
   .tp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible}
   .tp-tag{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--bg2);color:var(--sub);flex-shrink:0}
-  .tp-tag.ind{background:rgba(56,189,248,.14);color:var(--cyan)}
+  .tp-tag.ind{background:rgba(65,201,255,0.27);color:var(--cyan)}
   .tp-tag.sec{background:rgba(31,209,123,.12);color:var(--down)}
-  .tp-tag.con{background:rgba(251,191,36,.14);color:var(--gold)}
+  .tp-tag.con{background:rgba(255,208,36,0.27);color:var(--gold)}
   .tp-detail{font-size:11px;color:var(--sub);margin-top:6px}
   .tp-track{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:11px;color:var(--sub)}
   .tp-track b{color:var(--txt)}
-  .tp-catalyst{display:inline-block;font-size:10px;font-weight:600;border-radius:4px;padding:1px 6px;margin:3px 4px 0 0;background:rgba(251,191,36,.14);color:var(--gold)}
+  .tp-catalyst{display:inline-block;font-size:10px;font-weight:600;border-radius:4px;padding:1px 6px;margin:3px 4px 0 0;background:rgba(255,208,36,0.27);color:var(--gold)}
   .tp-catalyst.ok{background:rgba(31,209,123,.14);color:var(--down)}
-  .tp-catalyst.weak{background:rgba(239,83,80,.14);color:var(--up)}
+  .tp-catalyst.weak{background:rgba(255,82,82,0.27);color:var(--up)}
   .tp-alert{padding:8px 12px;border-radius:6px;margin-bottom:8px;font-size:12px}
-  .tp-alert.warn{background:rgba(251,191,36,.1);color:var(--gold);border-left:3px solid var(--gold)}
+  .tp-alert.warn{background:rgba(255,208,36,0.23);color:var(--gold);border-left:3px solid var(--gold)}
   .tp-alert.good{background:rgba(31,209,123,.1);color:var(--down);border-left:3px solid var(--down)}
   .tp-cluster-row{display:flex;align-items:center;gap:10px;padding:6px 0}
   .tp-cluster-bar{height:18px;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--cyan));min-width:4px}
@@ -511,8 +511,8 @@
 
       .rc-tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
       .rc-tab-btn{padding:8px 18px;border-radius:10px;font-size:13px;cursor:pointer;border:1px solid #243150;background:#0f1a2e;color:#93a4c4;transition:.2s;font-weight:500}
-      .rc-tab-btn:hover{border-color:#38bdf8;color:#cfe3ff}
-      .rc-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
+      .rc-tab-btn:hover{border-color:#41c9ff;color:#cfe3ff}
+      .rc-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#41c9ff;color:#fff;box-shadow:0 0 0 1px rgba(65,201,255,0.56)}
       .rc-pane{display:none}
       .rc-pane.active{display:block}
 
@@ -521,20 +521,20 @@
       .cal-title{font-size:14px;font-weight:700;color:var(--txt)}
       .cal-meta{font-size:11px;color:var(--dim)}
       .cal-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--sub);font-size:11px;cursor:pointer;transition:.15s;user-select:none}
-      .cal-nav-btn:hover{border-color:#38bdf8;color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3)}
+      .cal-nav-btn:hover{border-color:#41c9ff;color:#41c9ff;box-shadow:0 0 0 1px rgba(65,201,255,0.46)}
       .cal-nav-btn:active{transform:scale(.94)}
       .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;overflow:hidden}
       .cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
       .cal-head span{text-align:center;font-size:12px;font-weight:700;color:var(--dim);padding:4px 0}
       .cal-head span.weekend{color:var(--gold)}
       .cal-cell{min-height:90px;border:1px solid var(--border);border-radius:6px;padding:4px 5px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg2);font-size:11px;line-height:1.25}
-      .cal-cell:hover{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3);z-index:2}
-      .cal-cell.today{border-color:#38bdf8;border-width:2px;background:rgba(56,189,248,.08)}
+      .cal-cell:hover{border-color:#41c9ff;box-shadow:0 0 0 1px rgba(65,201,255,0.46);z-index:2}
+      .cal-cell.today{border-color:#41c9ff;border-width:2px;background:rgba(65,201,255,0.21)}
       .cal-cell.empty{background:transparent;border-color:transparent;cursor:default;min-height:20px}
       .cal-cell.empty:hover{border-color:transparent;box-shadow:none}
       .cal-date-num{font-size:15px;font-weight:700;color:var(--sub);margin-bottom:2px;display:flex;justify-content:space-between;align-items:baseline}
       .cal-date-num .dow{font-size:10px;font-weight:500;color:var(--dim)}
-      .cal-cell.today .cal-date-num{color:#38bdf8}
+      .cal-cell.today .cal-date-num{color:#41c9ff}
       .cal-cell.has-data .cal-date-num{color:var(--txt)}
       .cal-net{font-size:13px;font-weight:700;line-height:1.3}
       .cal-sub{font-size:11px;color:var(--dim);margin-top:1px;line-height:1.3}
@@ -610,9 +610,9 @@
 
       .op-tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
       .op-tab-btn{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #243150;background:#0f1a2e;color:#93a4c4;transition:.15s}
-      .op-tab-btn:hover{border-color:#38bdf8;color:#cfe3ff}
-      .op-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
-      .ul-tab.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
+      .op-tab-btn:hover{border-color:#41c9ff;color:#cfe3ff}
+      .op-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#41c9ff;color:#fff;box-shadow:0 0 0 1px rgba(65,201,255,0.56)}
+      .ul-tab.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#41c9ff;color:#fff;box-shadow:0 0 0 1px rgba(65,201,255,0.56)}
       .op-tab-time{font-size:10px;font-weight:500;color:var(--sub);margin-left:6px;white-space:nowrap}
       .op-tab-pane{display:none}
       .op-tab-pane.active{display:block}
@@ -629,10 +629,10 @@
   .lg-table th,.lg-table td{padding:7px 10px;border:1px solid var(--border);text-align:left}
   .lg-table th{background:var(--card2);color:var(--dim);font-weight:600}
   .lg-box{padding:12px 14px;border-radius:10px;margin:10px 0;line-height:1.8}
-  .lg-box.red{background:rgba(239,83,80,0.08);border-left:3px solid var(--up)}
-  .lg-box.gold{background:rgba(251,191,36,0.08);border-left:3px solid var(--gold)}
-  .lg-box.cyan{background:rgba(56,189,248,0.08);border-left:3px solid var(--cyan)}
-  .lg-box.purple{background:rgba(167,139,250,0.08);border-left:3px solid var(--purple)}
+  .lg-box.red{background:rgba(255,82,82,0.21);border-left:3px solid var(--up)}
+  .lg-box.gold{background:rgba(255,208,36,0.21);border-left:3px solid var(--gold)}
+  .lg-box.cyan{background:rgba(65,201,255,0.21);border-left:3px solid var(--cyan)}
+  .lg-box.purple{background:rgba(192,132,252,0.21);border-left:3px solid var(--purple)}
 
 
   /* 子 Tab */
@@ -645,7 +645,7 @@
 
   /* Top3 卡片 */
   .fr-card{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:12px;position:relative;overflow:visible}
-  .fr-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#fbbf24,#f59e0b)}
+  .fr-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#ffd024,#f59e0b)}
   .fr-card.r2::before{background:linear-gradient(180deg,#94a3b8,#64748b)}
   .fr-card.r3::before{background:linear-gradient(180deg,#c2833f,#92400e)}
 
@@ -653,11 +653,11 @@
   .fr-rank{font-size:22px;line-height:1;flex-shrink:0}
   .fr-name{font-size:18px;font-weight:800;color:var(--txt);flex-shrink:0;overflow:visible;min-width:max-content}
   .fr-code{font-size:13px;color:var(--sub);font-weight:600;font-family:ui-monospace,Menlo,monospace;flex-shrink:0}
-  .fr-tag{font-size:10px;padding:1px 8px;border-radius:6px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600;white-space:nowrap;flex-shrink:0}
-  .fr-tag.ind{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
-  .fr-tag.horizon-s{background:rgba(239,83,80,.12);color:var(--up);border-color:rgba(239,83,80,.25)}
+  .fr-tag{font-size:10px;padding:1px 8px;border-radius:6px;background:rgba(65,201,255,0.25);color:#41c9ff;border:1px solid rgba(65,201,255,0.39);font-weight:600;white-space:nowrap;flex-shrink:0}
+  .fr-tag.ind{background:rgba(192,132,252,0.25);color:#c084fc;border-color:rgba(192,132,252,0.39)}
+  .fr-tag.horizon-s{background:rgba(255,82,82,0.25);color:var(--up);border-color:rgba(255,82,82,0.39)}
   .fr-tag.horizon-m{background:rgba(31,209,123,.12);color:#4ade80;border-color:rgba(31,209,123,.25)}
-  .fr-tag.horizon-d{background:rgba(251,191,36,.12);color:var(--gold);border-color:rgba(251,191,36,.25)}
+  .fr-tag.horizon-d{background:rgba(255,208,36,0.25);color:var(--gold);border-color:rgba(255,208,36,0.39)}
 
   /* 买入评分紧跟标题，左对齐 */
   .fr-score{display:inline-flex;align-items:baseline;gap:4px;font-size:12px;color:var(--sub);margin-left:2px}
@@ -665,12 +665,12 @@
   .fr-enter{font-size:12px;color:var(--dim);white-space:nowrap}
 
   .fr-chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;overflow:visible}
-  .fr-chip{font-size:11px;padding:2px 9px;border-radius:7px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600;flex-shrink:0}
-  .fr-chip.con{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
-  .fr-chip.src{background:rgba(34,211,238,.12);color:#22d3ee;border-color:rgba(34,211,238,.25)}
+  .fr-chip{font-size:11px;padding:2px 9px;border-radius:7px;background:rgba(65,201,255,0.25);color:#41c9ff;border:1px solid rgba(65,201,255,0.39);font-weight:600;flex-shrink:0}
+  .fr-chip.con{background:rgba(192,132,252,0.25);color:#c084fc;border-color:rgba(192,132,252,0.39)}
+  .fr-chip.src{background:rgba(37,229,255,0.25);color:#25e5ff;border-color:rgba(37,229,255,0.39)}
 
   .fr-signals{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;overflow:visible}
-  .fr-sig{font-size:11px;padding:3px 9px;border-radius:7px;background:rgba(239,83,80,.12);color:var(--up);border:1px solid rgba(239,83,80,.25);font-weight:600}
+  .fr-sig{font-size:11px;padding:3px 9px;border-radius:7px;background:rgba(255,82,82,0.25);color:var(--up);border:1px solid rgba(255,82,82,0.39);font-weight:600}
 
   .fr-sector{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin:8px 0;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
   .fr-sector span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}

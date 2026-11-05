@@ -10424,3 +10424,24 @@ items:
       verified_at 2026-11-05 10:40，小九机AI。
     updated_by: 小九机AI
     updated: "2026-11-05 10:40"
+
+  - id: vivid-colors-boost-1105
+    owner: 小九机AI
+    priority: P2
+    status: pending-verify
+    created: 2026-11-05
+    title: 全站彩色标识二次提亮（色相提饱和+透明度抬升+发光增强，对标主人提供的鲜艳参照图）
+    note: >
+      2026-11-05 主人令（截图三连：「颜色还是难看！不够亮！要像图3这么鲜艳亮丽！」）。
+      上一轮只抬 alpha 不动色相，观感仍暗淡。本轮全局变换：①7 语义色 hex 提饱和提亮度
+      （绿 #26a69a→#26d9c2、红 #ef5350→#ff5252、紫 #a78bfa→#c084fc、蓝 #38bdf8→#41c9ff、
+      金 #fbbf24→#ffd024、青 #22d3ee→#25e5ff、粉 #f472b6→#ff7ac2，红涨绿跌铁律色相不变）；
+      ②同色 rgba 246 处透明度按档抬升（.17/.18→.30/.32、.34→.50、.45→.63 级）；
+      ③chip/pill/盘面观测行 8 处拼接后缀增强（bg 33→47/2e→42、边 88→b3/82→ad、
+      行底 1e→30、行边 73→99、发光 99→aa/4d→66）；④v8_main.css 同步 44 hex+67 rgba、
+      缓存戳 ?v=521f53d3a2。index 共 548 hex+246 rgba 替换，旧色残留 0。
+    verify_how: >
+      CI 发布后线上 Pages 硬抓：index.html 新色命中且旧色 0 残留、v8_main.css 新戳可达
+      且 --up/--down 新值生效。通过即转 done。
+    updated_by: 小九机AI
+    updated: "2026-11-05 10:45"
