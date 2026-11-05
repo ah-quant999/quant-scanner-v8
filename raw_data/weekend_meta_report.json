@@ -1,16 +1,13 @@
 {
-"update_time": "2026-11-04 18:07:19",
+"update_time": "2026-11-06 05:51:46",
 "total": 9691,
 "new_listings_count": 0,
-"delisted_count": 2,
+"delisted_count": 0,
 "new_listings": [],
-"delisted": [
-"02950 阿尔法企业股权",
-"08573 中华节能（旧）"
-],
+"delisted": [],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 9693,
+"old_universe": 9691,
 "fresh_universe": 9691
 }
