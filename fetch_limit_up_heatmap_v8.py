@@ -696,10 +696,20 @@ def generate():
             for _name in _all_names:
                 _row = []
                 for _dd in _merged:
-                    if _dd in _new_by_date and _name in _new_by_date[_dd]:
-                        _row.append(_new_by_date[_dd][_name])
+                    _nv = _new_by_date.get(_dd, {}).get(_name)
+                    _ov = _old_by_date.get(_dd, {}).get(_name, 0)
+                    # 🔴 2026-11-05 主人令「这卡的记录丢了！找回」一劳永逸根治：
+                    #   东财历史池全量重建对部分板块会失真（11-01~11-03 cn机停摆后 raw json
+                    #   损坏触发重建，实测：地产链10月33家被抹成0、军工整板块44家消失，
+                    #   而机器人等板块重叠列完全一致 ⇒ 失真是板块级的，不可信新值0）。
+                    #   同日期冲突改「旧值非零优先」：旧值=每日真实累积记录；
+                    #   新值非0（当日真抓到）才覆盖，新值0且旧值非0时保留旧值。
+                    if _nv:
+                        _row.append(_nv)
+                    elif _ov:
+                        _row.append(_ov)
                     else:
-                        _row.append(_old_by_date.get(_dd, {}).get(_name, 0))
+                        _row.append(_nv if _nv is not None else 0)
                 _merged_sectors.append({"name": _name, "data": _row})
             _added = len(_merged) - len(new_dates)
             if _added > 0:
