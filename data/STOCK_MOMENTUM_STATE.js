@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-05 15:47",
- "generated": "2026-11-05 15:47",
+ "update_time": "2026-11-05 16:53",
+ "generated": "2026-11-05 16:53",
  "meta": {
-  "generated": "2026-11-05 15:47",
+  "generated": "2026-11-05 16:53",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -13061,6 +13061,27 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.398,
       "price": 10.92,
       "category": "突破"
+     },
+     {
+      "code": "603098",
+      "name": "森特股份",
+      "change_pct": 10.01,
+      "price": 10.77,
+      "category": "突破"
+     },
+     {
+      "code": "601021",
+      "name": "春秋航空",
+      "change_pct": 5.68,
+      "price": 45.4,
+      "category": "突破"
+     },
+     {
+      "code": "301073",
+      "name": "君亭酒店",
+      "change_pct": 5.652,
+      "price": 17.01,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -13499,6 +13520,27 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.398,
       "price": 10.92,
       "category": "短线选股"
+     },
+     {
+      "code": "603098",
+      "name": "森特股份",
+      "change_pct": 10.01,
+      "price": 10.77,
+      "category": "短线选股"
+     },
+     {
+      "code": "601021",
+      "name": "春秋航空",
+      "change_pct": 5.68,
+      "price": 45.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "301073",
+      "name": "君亭酒店",
+      "change_pct": 5.652,
+      "price": 17.01,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -13710,6 +13752,27 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "真视通",
       "change_pct": 4.398,
       "price": 10.92,
+      "category": "强势股"
+     },
+     {
+      "code": "603098",
+      "name": "森特股份",
+      "change_pct": 10.01,
+      "price": 10.77,
+      "category": "强势股"
+     },
+     {
+      "code": "601021",
+      "name": "春秋航空",
+      "change_pct": 5.68,
+      "price": 45.4,
+      "category": "强势股"
+     },
+     {
+      "code": "301073",
+      "name": "君亭酒店",
+      "change_pct": 5.652,
+      "price": 17.01,
       "category": "强势股"
      }
     ]
