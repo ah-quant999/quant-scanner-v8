@@ -573,7 +573,7 @@ def _gold_pool_fresh(root: str, day_s: str, run_day_s: str) -> bool:
         return False
 
 
-def _top10_stale(root: str, day_s: str, run_day_s: str) -> bool:
+def _top10_stale(root: str, day_s: str, run_day_s: str, strict: bool = False) -> bool:
     """B 核心产物 TOP10_DAILY 是否已陈旧（数据日距最新产出 > 1 天）。
 
     🔴 2026-11-04 兜底触发（主人令·按建议科学处理·终选冻结根治收尾）：
@@ -603,6 +603,11 @@ def _top10_stale(root: str, day_s: str, run_day_s: str) -> bool:
             od = _date.fromisoformat(ds)
         except Exception:
             return True
+        if strict:
+            # 🔴 2026-11-05 前置兜底口径：产出数据日严格早于目标数据日（停昨日）即算陈旧
+            #   —— 「停昨日 16:52、今天 16:52 应出新」的场景日历差恰=1 天，旧 (>1天) 判据
+            #   永不命中 ⇒ 16:30-18:00 窗口两个兜底全哑火（本日事故主因）。
+            return od < td
         return (td - od).days > 1
     except Exception:
         return True
@@ -873,6 +878,31 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str
             return (explicit, False,
                     f"⛔ 显式 {explicit} 但前置 {pre} 未就绪({ready[pre][1]}) —— 拒绝执行，"
                     f"否则会用陈旧数据算出假新鲜产物", day, kind, out())
+
+    # ── 1.5) 收盘后前置兜底（2026-11-05 主人令「终选/最终推荐别是链路又断了」根治）──
+    #   【病灶】盘后链起点 START_TRADING=(18,0)。18:00 前的唤醒轮（云 cron 16:40 档 /
+    #     推进器 17:10/17:40 档）一律被 §2 时间闸推入回填模式 → A/B/E 回填不可能
+    #     → NONE 空转 ⇒ 终选输出/最终推荐滞留昨日 16:52 版，要等 18:10 档才开跑
+    #     （B 批实测 84min ⇒ 约 19:35 才出新）。而昨日 16:52 那批恰是兜底分支侥幸
+    #     跑出的，给主人造成「每天 16:52 该出」的预期——观感=「链路断了」。
+    #   【修法】与 11-04 主人令兜底**同判据**，仅把生效窗口从「18:00 后」提前到
+    #     「收盘 16:30 后」：gold_pool 当日鲜（选股输入合格）+ TOP10_DAILY 仍停昨日
+    #     （>1 天陈旧）⇒ 立即放行 B（D 未就绪则升级 ALL）。16:30 硬下限保证绝不
+    #     抢跑半日数据（收盘前仍按原起点等待）；显式 stage 人工意图不受影响。
+    _pre_bf = (not explicit and kind == "trading" and hh >= 16
+               and (hh, mm) >= (16, 30)
+               and (not ready["B"][0]) and _gp_fresh
+               and _top10_stale(root, day_s, _run_day_s, strict=True))
+    if _pre_bf:
+        if not ready["D"][0]:
+            return ("ALL", True,
+                    "前置兜底（16:30-18:00 收盘后窗口）：TOP10_DAILY 停昨日且 gold_pool 当日鲜"
+                    " → 升级全链 ALL（B→D→E）立即补跑终选与最终推荐",
+                    day, kind, out())
+        return ("B", True,
+                "前置兜底（16:30-18:00 收盘后窗口）：TOP10_DAILY 停昨日且 gold_pool 当日鲜"
+                " → 立即补跑选股批 B（D 批由下一轮按产物联动跟进）",
+                day, kind, out())
 
     # ── 2) 时间闸：盘后链起点（交易日 18:00 = START_TRADING / T+1 日 08:00 = START_T1；
     #   🔴 2026-09-11 修正：此处原写「交易日 16:00」是过时口径（起点常量已改 18:00），--force 跳过）────
