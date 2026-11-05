@@ -290,6 +290,47 @@ def fetch_realtime():
     except:
         return {}, {}
 
+def _append_latest_close(history, spot_data):
+    """消指数日K源（baostock/akshare 日K）天然 T+1~T+3 滞后：用实时 spot 的当日收盘补最后一根，
+    使 history[-1] 跟到最新交易日 → calc_down_stats 的 days_down / 总跌幅 每日递增、
+    current.date 跟新，彻底消除「计数卡几天才跳变」的观感。
+    仅在「历史末日 < 今天 且 今日为交易日 且 已过收盘(>=15:00)」时补，避免重复行 / 周末 / 盘中实时价污染。
+    """
+    if not history:
+        return history
+    try:
+        today = datetime.now()
+        today_str = today.strftime("%Y-%m-%d")
+        last_d = str(history[-1].get("date", ""))
+        if not last_d:
+            return history
+        try:
+            lag = (today - datetime.strptime(last_d, "%Y-%m-%d")).days
+        except Exception:
+            return history
+        if lag <= 0:
+            return history  # 数据源已最新，无需补
+        if today.weekday() >= 5:
+            return history  # 周末无交易，不补
+        if today.hour < 15:
+            return history  # 未收盘，spot 为盘中实时价，不污日K
+        close = float(spot_data.get("index") or 0)
+        if close <= 0:
+            return history
+        chg = float(spot_data.get("change_pct") or 0)
+        preclose = close / (1 + chg / 100.0) if chg != 0 else close
+        row = {
+            "date": today_str, "open": round(preclose, 2), "high": round(max(close, preclose), 2),
+            "low": round(min(close, preclose), 2), "close": round(close, 2),
+            "volume": 0, "preclose": round(preclose, 2), "pctChg": round(chg, 2),
+        }
+        if history[-1].get("date") != today_str:
+            history.append(row)
+            print(f"  ✓ 消滞后：补当日收盘 {today_str} close={close}（原末日 {last_d}，滞后 {lag} 天）")
+    except Exception as e:
+        print(f"  ⚠️ 补当日收盘失败（跳过，不影响主流程）: {e}")
+    return history
+
 def calc_down_stats(history):
     if not history or len(history) < 5:
         return {"days_down":0,"total_pct":0,"total_points":0,"avg_pct":0,"peak_date":"","peak_close":0,"current_close":0}
@@ -431,7 +472,7 @@ def build_fib_json(windows, index_data, history):
         "days_down": down['days_down'], "total_pct": down['total_pct'],
         "total_points": down['total_points'], "avg_pct": down['avg_pct'],
         "peak_date": down['peak_date'], "peak_close": down['peak_close'],
-        "date": today_str, "mode": mode,
+        "date": (history[-1]["date"] if history else today_str), "mode": mode,
     }
     
     judgement = {
@@ -504,6 +545,10 @@ def main():
     print(f"  📊 获取K线...")
     sh_history = fetch_index_history('sh.000001', 120)
     sz_history = fetch_index_history('sz.399001', 120)
+    # 🔴 2026-11-05 一劳永逸修复「斐波那契锚点滞后」：指数日K源 T+1~T+3 滞后致
+    #   history[-1] 停在数日前 → days_down/总跌幅/下一天数卡几天才跳变。用当日收盘补最后一根。
+    sh_history = _append_latest_close(sh_history, sh_data)
+    sz_history = _append_latest_close(sz_history, sz_data)
     print(f"  ✓ 上证{len(sh_history)}天, 深证{len(sz_history)}天")
     
     for code, _windows_static, history, out_path, idx_data, label in [
