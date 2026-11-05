@@ -10315,3 +10315,27 @@ items:
       转 done 需附新 report 证据（verified_at）。
     updated_by: 阿狸咪的工程师
     updated: "2026-11-05 02:11"
+  - id: dark-restore-ff3-purge-email-dedup-1105
+    owner: 小九机AI
+    priority: P0
+    status: pending-verify
+    created: 2026-11-05
+    title: 主站底色恢复深色系 + FF3退役彻底清理 + 图1重复邮件一劳永逸修复（三合一）
+    note: >
+      2026-11-05 主人令三合一（commit 3acce92c09）。①撤销 db1814b008 马卡龙浅色系：
+      v8_main.css 整体回退深色（--bg:#0a0e17 · 红涨绿跌铁律色 --up:#ef5350/--down:#26a69a 复位）
+      ＋ index.html 约1200处硬编码色值 1:1 反向映射回深色（hex 777 处 + rgba 家族 441 处
+      ＋ 黑→白 Overlay 27 处，全部经新旧直方图校验归零），v8_main.css 缓存戳换 ?v=31e3158b39。
+      ②FF3 退役收尾：8 孤儿文件远端删除 ＋ NOLOST_IGNORE.json 8 路径登记（防 nolost 自愈复活）
+      ＋ .gitignore 兜底（防 git add -A 从双机持久树回灌）。③图1「第一批盘中数据未上齐」重复邮件：
+      根因＝v8_send_alert.py 的 _dedup_mark() 定义后从未被调用（12h 同源去重永不落盘），
+      补发送成功后 _dedup_mark(fp) 调用；intraday_first_batch_gate.py 增末轮宽限复查
+      （防「脚本退出早于数据上线」误报）。推送通道＝git pack 原子 fast-forward
+      （临时索引+commit-tree，免疫此前 API 建树 422 BadObjectState 竞态）。
+    verify_how: >
+      离线门禁 15/15 全绿（[2/8] 31 inline 0 错、[10/10] 标记 49/49、[12/12] 调用点 178 全定义）；
+      远端 HEAD=3acce92c09 实测：FF3 8 文件 ls-tree 全 0、NOLOST_IGNORE 8 路径全在、
+      v8_main.css 变量深色、index.html 马卡龙残色 0/深色命中 412、_dedup_mark(fp) 调用在位、
+      缓存戳 ?v=31e3158b39。待 CI build_deploy 发布后线上 Pages 硬抓复核（深色生效）即转 done。
+    updated_by: 小九机AI
+    updated: "2026-11-05 08:10"
