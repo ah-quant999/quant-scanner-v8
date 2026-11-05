@@ -10428,7 +10428,7 @@ items:
   - id: vivid-colors-boost-1105
     owner: 小九机AI
     priority: P2
-    status: pending-verify
+    status: done
     created: 2026-11-05
     title: 全站彩色标识二次提亮（色相提饱和+透明度抬升+发光增强，对标主人提供的鲜艳参照图）
     note: >
@@ -10443,5 +10443,10 @@ items:
     verify_how: >
       CI 发布后线上 Pages 硬抓：index.html 新色命中且旧色 0 残留、v8_main.css 新戳可达
       且 --up/--down 新值生效。通过即转 done。
+      2026-11-05 11:05 线上硬抓复核通过（HEAD=a6f981872c 发布后，CI success）：index 新色
+      命中（26d9c2×72 / ff5252×139 / c084fc×66 / 41c9ff×102 / ffd024×156 / 25e5ff×14）、
+      旧色残留全 0、css 新戳 521f53d3a2 可达且 :root --up:#ff5252 / --down:#26d9c2 /
+      --cyan:#41c9ff / --purple:#c084fc / --gold:#ffd024 / --pink:#ff7ac2 生效 ⇒
+      转 done（verified_at 2026-11-05 11:05，小九机AI）。
     updated_by: 小九机AI
-    updated: "2026-11-05 10:45"
+    updated: "2026-11-05 11:05"
