@@ -10,6 +10,19 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+# 🔴 2026-11-05 一劳永逸（主人令「主站数据还是12点多的，自动刷新也没了」根因修复）：
+#   【病灶】Pages 部署此前只靠 push 事件触发。云端抓取链推 main 的 commit 是
+#     github-actions[bot]（GITHUB_TOKEN）—— GitHub 反递归设计规定 GITHUB_TOKEN 产生的
+#     push **不触发任何 workflow**（11-04 WAVE_ELLIOTT 卡版同病灶，当时只加手动 dispatch
+#     兜底未根治）⇒ 11-05 实测：数据 12:48 起持续进 main（13:29/13:42/13:48 三笔 cn fetch
+#     皆成功），Pages 冻结在 13:21 旧版本 ⇒ 主站数据卡 12:4x、HEALTH_CHECK 不变 ⇒
+#     前端「数据变化即刷」探测永不命中，主人看到「自动刷新也没了」。
+#   【修法】部署与推送者解耦：定时保底把 main 当前内容原子发布上线。
+#     盘中每 15 分钟（数据档 20 分钟节奏 ⇒ 任一批次 ≤15 分钟必上线）+ 盘外每小时兜底。
+#     部署为原子替换（actions/deploy-pages），无新数据时重复发布无害。push 触发保留。
+  schedule:
+    - cron: '*/15 1-8 * * 1-5'    # CN 交易日 09:00-16:59 每 15 分钟
+    - cron: '23 0,9-23 * * *'     # 盘外时段每小时一次（CN 08:23 / 17:23-次日07:23）
 
 # 经 GitHub 托管 ubuntu-latest 运行器构建静态站点并发币到 GitHub Pages。
 # 目的：
