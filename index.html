@@ -200,7 +200,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=c44bb70cb4" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=b0d2be6884" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=81f2288157" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1335,9 +1335,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=801334e431" defer></script>
 <script src="data/HB_XIAOJIU.js?v=6f2a82a5f2" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=73a222655c" defer></script>
-<script src="data/HEALTH_CHECK.js?v=97186bf367" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=a379a83189" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=1ca3a51962" defer></script>
+<script src="data/HEALTH_CHECK.js?v=cb6cb839ca" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=9a614f0621" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=6af1a15918" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=f3b4a409a3" defer></script>
@@ -2038,13 +2038,13 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=ca97197a87" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=17a7c60223" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=33de0e1d06" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=57a6bce77e" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2fcef6953b" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=dd7d697670" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b4a8b6a901" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=4c14a823be" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=c6d52d75af" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=d000f91d0e" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三因子（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三因子已并入因子实验室主评分 P5（amt60/turntrend/ivol60 纯加分项、walk-forward 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -2764,23 +2764,21 @@ window.STRATEGY_WALKFORWARD = {
              故只有样本 <5 条才是真正不可用；5~19 条会走有效窗口给出真档位，
              不会落到本分支。文案带上「满20后转亚」提示，主人知道会持续升档。 */
           if(!_verdict){ _ovTxt='⏳ 均线积累中 '+_hd+'/5日（满15/20日自动升档）'; _ovClr='var(--gold)'; }
-          h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(255,208,36,0.10);border:1.5px solid rgba(255,208,36,0.68);font-size:11.5px;font-weight:700;color:'+_ovClr+';">📊 超买超卖 '+_ovTxt+'</span>';
+          // 🔴 2026-11-06 主人令：删除「超买超卖」胶囊（用户明确「把超买超卖那胶囊删除」）。
           // 🔴 2026-10-22 一劳永逸修（主人截图「undefinedundefined」）：
           //   原 h+=_ma30Seg / h+=_kdjSeg 写在**声明之前** ⇒ JS 的 `var` 只提升声明不提升赋值
           //   ⇒ 两变量此刻为 undefined ⇒ 字符串拼接出字面量「undefinedundefined」。
           //   修法：把两段**构造块整体上移到使用点之前**，使用点仍留在胶囊之后、
           //         flex 行 </div> 之前 ⇒ 视觉顺序与布局均不变。
           var _kdjSeg='';
-          // 🛡 一劳永逸（2026-11-05 主人多次投诉「KDJ的K值又没了」根因修复）：
-          // 权威 kdj_k（880003 官方日K真值）依赖 cn-IP 受限源，频繁取不到→整条 KDJ 消失。
-          // 取不到时回退到真实「等权」参照 kdj_k_eq（本卡平均股价日K的 KDJ-K，真值），
-          // 保证 KDJ K 永不断更；仅标签 .官方 / .等权 区分口径，数值均为真实计算。
+          // 🔴 2026-11-06 主人令：KDJ K 取本卡平均股价日K序列的真值 kdj_k_eq（即在 history.avg_price 日K上算的 KDJ-K），
+          //   不再挂「·等权」标签（它就是这张卡真实日K的KDJ K，非另行重算）；880003 官方源(kdj_k)可取时优先用并标·官方。
           var _usingAuth=(ap.kdj_k!=null);
           var _kkRaw=_usingAuth?ap.kdj_k:(ap.kdj_k_eq!=null?ap.kdj_k_eq:null);
           if(_kkRaw!=null){
             var _kk=Number(_kkRaw);
             var _kc=_kk>=50?'var(--up)':'var(--down)';
-            var _kCal=(_usingAuth && ap.ma_caliber && ap.ma_caliber.indexOf('880003')>=0)?'·官方':'·等权';
+            var _kCal=(_usingAuth && ap.ma_caliber && ap.ma_caliber.indexOf('880003')>=0)?'·官方':'';
             _kdjSeg=' <span style="color:var(--dim);font-size:12px;">KDJ</span> <span style="font-size:12px;color:'+_kc+';font-weight:700;">K '+_kk.toFixed(1)+_kCal+'</span>';
           }
           var _ma30Seg='';
@@ -16018,7 +16016,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=57a6bce77e');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=dd7d697670');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -16027,7 +16025,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=2fcef6953b');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=b4a8b6a901');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
