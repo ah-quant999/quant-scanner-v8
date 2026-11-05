@@ -10,9 +10,15 @@ v8/gen_national_team.py —— 「国家队活跃度」复合信号（盘后规�
     留卡无增量信息；历史数据仍存于 data/HUIJIN_HOLDINGS.js，需要时单独调用。
 
 子信号（权重合计 100%，缺失项权重重分）：
-  A. 宽基ETF净申购突变（45%）  ← ETF_SUBSCRIPTION_EASTMONEY.js（东财口径·股票型 top_sub 宽基净申购额；由 update_v8.py 派生）
-  B. 大金融相对强度（35%）     ← SECTOR_RS.js（银行/证券/保险/多元金融 relative_5d 均值）
-  C. 大金融资金净流入（20%）   ← SECTOR_FUND_FLOW.js（银行/证券 板块净流入合计）
+  A. 宽基ETF净申购突变（40%）  ← ETF_SUBSCRIPTION_EASTMONEY.js（东财口径·股票型 top_sub 宽基净申购额；由 update_v8.py 派生）
+  B. 大金融相对强度（30%）     ← SECTOR_RS.js（银行/证券/保险/多元金融 relative_5d 均值）
+  C. 大金融资金净流入（15%）   ← SECTOR_FUND_FLOW.js（银行/证券 板块净流入合计）
+  D. 宽基ETF放量异动（15%）    ← raw_data/broad_etf_volume.json（cloud_fetch_v8 f_broad_etf_volume·post_close 档：
+                                  6 只头部宽基ETF 当日成交额/前20日均额 取最大倍数；仅大盘下跌日计护盘分，
+                                  非下跌日按中性 50。push2his 为 cn-IP 硬约束源，17:20 selfhosted 落盘 →
+                                  本生成器 20:50 消费；缺文件/过期 ⇒ D 未就绪、权重自动重分，不影响 A/B/C）
+  （2026-11-05 主人令「找可靠新数据源，能说明国家队活跃度的」：D 路即「下跌日宽基ETF放量」——
+    国家队护盘的经典公开指纹，数据可日频验证、无披露滞后；权重从 A/B/C 各让 5/5/5 而来。）
 
 调度：.github/workflows/v8_national_team.yml 工作日 20:50 CST（GitHub Actions ubuntu-latest，
       Contents API 稳健推送）；18:20/19:20 两档盘后资金流链落盘后运行，上游未就绪则保留上版不写盘（宁缺勿错）。
@@ -107,11 +113,25 @@ if sf:
         c_detail = '大金融净流入 %.1f 亿（%s）' % (fin_net, ';'.join(hit))
         c_ready = True
 
-# ── D. 汇金持仓环比胶囊：已于 2026-11-04 应主人令移除 ──
-# 理由：汇金季报属法定义务披露，最新仅 2024Q2（滞后约 2 年），与 A/B/C 实时信号并列
-#   易误读为「当前活跃」；其权重本就 0%（不参与实时评分），留卡无增量信息。详见 HUIJIN_HOLDINGS.js
-#   历史数据仍保留于 raw_data，需要时可单独调用，不在此卡展示。
-d_val = None; d_detail = None; d_status = '—未接入'; d_ready = False
+# ── D. 宽基ETF放量异动（护盘指纹，2026-11-05 主人令新接入）──────────
+# 口径见文档头。仅大盘下跌日放量计护盘分（50 + (ratio-1)*33，ratio≥2.5≈满分），
+#   非下跌日按中性 50 计（放量不判护盘，不编造语义）；数据缺失/过期 ⇒ 未就绪重分权。
+d_val = None; d_detail = None; d_ready = False; d_base = None; d_down = None
+bv = load('raw_data/broad_etf_volume.json')
+# 跨零点口径与下方盘后闸门一致（GitHub schedule 拖过零点时按「昨日」判定，见闸门注释）
+_nt_dt0 = bj_now()
+_d_today = (_nt_dt0 - datetime.timedelta(days=1)).strftime('%Y-%m-%d') if _nt_dt0.hour < 7 else _nt_dt0.strftime('%Y-%m-%d')
+if bv and bv.get('ratio_max') and bv.get('data_date') == _d_today:
+    d_val = round(float(bv['ratio_max']), 2)
+    d_down = bool(bv.get('down_day'))
+    d_base = (50 + (d_val - 1) * 33.0) if d_down else 50.0
+    d_detail = '%s 当日成交 %.1f 亿 = 20日均 %.2f×（%s）' % (
+        bv.get('ratio_etf') or '宽基ETF',
+        float(bv.get('amount_max_yi') or 0), d_val,
+        '大盘%s' % (('跌 %.2f%%' % bv['index_chg_pct']) if bv.get('index_chg_pct') is not None else '下跌日') if d_down else '非下跌日·放量不判护盘')
+    if bv.get('ok_count'):
+        d_detail += '，覆盖 %d/6 只' % int(bv['ok_count'])
+    d_ready = True
 
 # ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
 # C 源 SECTOR_FUND_FLOW.js 必须为「今日收盘后（hour ≥ 15）」的盘后数据，否则整卡保留上版不写盘。
@@ -138,13 +158,13 @@ if not _sf_ok:
     print('⚠️ NATIONAL_TEAM: NT_FORCE=1 强制写盘（盘后资金流仍未就绪：%r）' % _sf_ut)
 
 # ── 权重重分 + 计分 ─────────────────────────────────────────────────
-W = {'A':45, 'B':35, 'C':20}
-ready = {'A':a_ready, 'B':b_ready, 'C':c_ready}
-base = {'A':50 + (a_val or 0)/2, 'B':50 + (b_val or 0)*4, 'C':50 + (c_val or 0)/3}
+W = {'A':40, 'B':30, 'C':15, 'D':15}  # 2026-11-05 主人令：接入 D 路（宽基ETF放量），A/B/C 各让 5 分
+ready = {'A':a_ready, 'B':b_ready, 'C':c_ready, 'D':d_ready}
+base = {'A':50 + (a_val or 0)/2, 'B':50 + (b_val or 0)*4, 'C':50 + (c_val or 0)/3, 'D':(d_base if d_base is not None else 50)}
 # 仅对就绪项计分；缺失项权重按比例分给就绪项
 tot_w = sum(W[k] for k in W if ready[k])
 score = 0.0
-for k in ['A','B','C']:
+for k in ['A','B','C','D']:
     if ready[k]:
         score += clamp(base[k], 10, 100) * (W[k]/tot_w if tot_w else 0)
 score = round(score, 1) if tot_w else None
@@ -174,6 +194,11 @@ def _oneline():
         else:            parts.append('大金融中性')
     if c_val is not None:
         parts.append('大金融资金净%s %.1f 亿' % ('流入' if c_val > 0 else '流出', abs(c_val)))
+    if d_val is not None:
+        if d_down and d_val >= 2:   parts.append('宽基ETF放量 %.2f×＝疑似托盘进场' % d_val)
+        elif d_down and d_val >= 1.3: parts.append('下跌日宽基ETF温和放量 %.2f×' % d_val)
+        elif d_down:               parts.append('下跌日宽基ETF未显著放量 %.2f×' % d_val)
+        else:                      parts.append('非下跌日·放量信号中性 %.2f×' % d_val)
     if not parts:
         return '数据未就绪。'
     tail = ''
@@ -203,18 +228,25 @@ subs.append({
     'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平')))
 })
 
+subs.append({
+    'key':'D','name':'宽基ETF放量异动','weight':W['D'],'ready':d_ready,
+    'value':d_val,'unit':'×','detail':d_detail or 'broad_etf_volume.json 缺失/过期（post_close 档未落盘）',
+    'status':(('✅放量护盘' if (d_down and d_val>=2) else ('🟡温和放量' if (d_down and d_val>=1.3) else ('❌缩量' if d_down else '🟡中性'))) if (d_ready and d_val is not None) else '—未就绪')
+})
+
 out = {
     'data_date': (e.get('data_date') if e else None) or bj_now().strftime('%Y-%m-%d'),
     'update_time': bj_now().strftime('%Y-%m-%d %H:%M:%S'),
     'source_time': max(x for x in [(e or {}).get('update_time') or '',
                                    (rs or {}).get('update_time') or '',
-                                   (sf or {}).get('update_time') or '']),
+                                   (sf or {}).get('update_time') or '',
+                                   (bv or {}).get('update_time') or '']),
     'score': score,
     'verdict': vtxt,
     'verdict_color': vcol,
-    'ready_count': sum(1 for k in ['A','B','C'] if ready[k]),
+    'ready_count': sum(1 for k in ['A','B','C','D'] if ready[k]),
     'subs': subs,
-    'method': '3 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%。汇金持仓环比胶囊已于 2026-11-04 移除（季报滞后约2年、权重0%、无增量信息）。',
+    'method': '4 子信号加权（缺失项权重重分）；宽基ETF净申购40% + 大金融相对强度30% + 大金融资金净流入15% + 宽基ETF放量异动15%（2026-11-05 主人令新接入：下跌日头部宽基ETF成交额/20日均额，护盘公开指纹）。汇金持仓环比胶囊已于 2026-11-04 移除（季报滞后约2年、权重0%、无增量信息）。',
     'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后，如实标注，不构成交易建议。',
     'oneline': _oneline()
 }
@@ -232,7 +264,7 @@ if _prev_st and _prev_st == out['source_time']:
 with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as f:
     f.write('window.NATIONAL_TEAM = ' + json.dumps(out, ensure_ascii=False, indent=2) + ';')
 
-print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/3' % (score, vtxt, out['ready_count']))
+print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/4' % (score, vtxt, out['ready_count']))
 for s in subs:
     print('  [%s] %s w%s %s val=%s %s' % (s['key'], s['name'], s['weight'], s['status'], s['value'], s['detail']))
 

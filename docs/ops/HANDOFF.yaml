@@ -10450,3 +10450,29 @@ items:
       转 done（verified_at 2026-11-05 11:05，小九机AI）。
     updated_by: 小九机AI
     updated: "2026-11-05 11:05"
+
+  - id: national-team-4th-sub-1105
+    owner: 小九机AI
+    priority: P1
+    status: pending-verify
+    created: 2026-11-05
+    title: 国家队活跃度卡新增第 4 路数值监控「宽基ETF放量异动」（主人令：找可靠新数据源）
+    note: >
+      2026-11-05 主人令（对「没有第 4 路现成数值源可加」结论的追加工单：去找可靠的新数据源，
+      不要乱加）。选定 D 路＝「宽基ETF放量异动」：下跌日头部宽基ETF 成交额相对 20 日均额
+      突增，是国家队护盘的经典公开指纹（券商金工研报通用口径），日频、可验证、无披露滞后。
+      数据源：东财 push2his 日K（与 880003 同接口同参数族，小九机 cn IP 实测 6/6 通）。
+      实现：①cloud_fetch_v8.py 新增 f_broad_etf_volume（6 只宽基ETF 510300/510050/510330/
+      510310/159919/588000 当日成交额÷前20日均额取最大倍数 + 上证指数当日涨跌判定，
+      三表登记齐·post_close 档 cn-IP 硬约束·失败软失败不阻断·<3/6 成功不落盘宁缺勿错）；
+      ②gen_national_team.py 接入 D 子信号（w15%，仅下跌日计护盘分 50+(ratio-1)*33，
+      非下跌日中性 50 不编造语义；权重 A45/B35/C20→A40/B30/C15；缺文件/过期自动重分权
+      不影响 A/B/C）；③index.html 口径注释/_ready 硬编码/运维页登记 3 处同步。
+      时序：17:20 selfhosted post_close 落 raw_data/broad_etf_volume.json → 20:50 云端
+      生成器消费 → 卡面今晚起 4 胶囊（前端已动态列，无需再改）。
+    verify_how: >
+      ①函数级实测 6/6 OK（ratio_max=1.203 科创50）；②生成器全链冒烟 ready=4/4、D 胶囊
+      语义正确（测试产物已回滚不入库）；③净树门禁 15/15；④待今晚 20:50 首个正式批
+      NATIONAL_TEAM.js 出现 4 subs 且线上卡面 4 胶囊在位后转 done。
+    updated_by: 小九机AI
+    updated: "2026-11-05 11:25"

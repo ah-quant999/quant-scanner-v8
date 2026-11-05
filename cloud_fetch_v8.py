@@ -107,6 +107,9 @@ VAR_TO_RAW = {
     # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
     #   本表必须登记：否则 save() 取不到 fname 会直接 return，raw 永不落盘。
     "SECTOR_YEAR_FLOW": "sector_year_flow.json",
+    # 🏛 2026-11-05 主人令「找可靠新数据源」：宽基ETF放量异动（国家队护盘指纹·D 路源）。
+    #   本表必须登记：否则 save() 取不到 fname 会直接 return，raw 永不落盘。
+    "BROAD_ETF_VOLUME": "broad_etf_volume.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -207,6 +210,11 @@ CATEGORY_MAP = {
     # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。同源 push2his fflow daykline
     #   ⇒ 与 AVG_PRICE_880003 同属 cn-IP 硬约束，挂 post_close（selfhosted 17:20 常规班覆盖）。
     "SECTOR_YEAR_FLOW": "post_close",
+    # 🏛 2026-11-05：宽基ETF放量异动（国家队 D 路源）—— push2his 日K（6 只头部宽基ETF + 上证指数），
+    #   与 AVG_PRICE_880003 同属 cn-IP 硬约束，挂 post_close（selfhosted 17:20 常规班拿当日全天
+    #   定稿成交额；云端境外轮失败为软失败不阻断，同既有语义）。消费方 v8/gen_national_team.py
+    #   20:50 读 raw_data/broad_etf_volume.json（时序：17:20 落盘 → 20:50 生成，无竞态）。
+    "BROAD_ETF_VOLUME": "post_close",
     "OVERSEAS_MARKETS": "premarket,intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：盘前档随08:25盘前cron刷新（日经/KOSPI 08:00先于A股开盘，2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」）+ 盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：注释写「盘后数据页」却只在盘前抓 —— 语义错配。
@@ -5847,6 +5855,95 @@ def main(category=None, only=None):
                             encoding="utf-8")
         return merged
 
+    def f_broad_etf_volume():
+        """🏛 2026-11-05 主人令「找可靠新数据源，能说明国家队活跃度的」：
+        宽基ETF放量异动 —— 国家队护盘的经典公开指纹（下跌日头部宽基ETF成交额突增）。
+
+        口径：6 只头部宽基ETF（510300/510050/510330/510310/159919/588000）当日成交额 ÷
+              其前 20 日均额，取最大倍数 ratio_max；同时记录上证指数当日涨跌 down_day
+              （仅下跌日的放量才具护盘语义，非下跌日由消费方按中性处理）。
+        数据源：东财 push2his 日K（与 fetch_avg_price.py 880003 同接口同参数族，cn IP 已实测 6/6 通）。
+        消费方：v8/gen_national_team.py 的 D 子信号（w15%）。
+        失败语义：任一 ETF 拉 3 次；成功数 <3 ⇒ 返回 {} 不洗空（宁缺勿错）；
+                  全断 ⇒ {}，gen_national_team 侧 D 标未就绪、权重自动重分。
+        """
+        import time as _t
+        EM_URL = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+        ETF6 = [("1.510300", "沪深300ETF华泰柏瑞"), ("1.510050", "上证50ETF华夏"),
+                ("1.510330", "沪深300ETF华夏"), ("1.510310", "沪深300ETF易方达"),
+                ("0.159919", "沪深300ETF嘉实"), ("1.588000", "科创50ETF华夏")]
+        _h = {"User-Agent": "Mozilla/5.0", "Referer": "https://quote.eastmoney.com/",
+              "Accept": "application/json,text/plain,*/*"}
+
+        def _kline(secid, lmt=30):
+            prm = {"secid": secid, "fields1": "f1,f2,f3,f4,f5,f6",
+                   "fields2": "f51,f52,f53,f54,f55,f56,f57",
+                   "klt": "101", "fqt": "1", "beg": "0", "end": "20500101",
+                   "lmt": str(lmt), "ut": "fa5fd1943c7b386f172d6893dbfba1a9",
+                   "_": str(int(_t.time() * 1000))}
+            for _try in range(3):
+                try:
+                    r = requests.get(EM_URL, params=prm, headers=_h, timeout=15)
+                    r.raise_for_status()
+                    ks = ((r.json() or {}).get("data") or {}).get("klines") or []
+                    if ks:
+                        return ks
+                except Exception as _e:
+                    print("  [BROAD_ETF_VOLUME] %s try%d fail: %s" % (secid, _try + 1, _e))
+                _t.sleep(1.5)
+            return []
+
+        rows = []
+        for secid, name in ETF6:
+            ks = _kline(secid)
+            _t.sleep(0.4)
+            if len(ks) < 21:
+                print("  [BROAD_ETF_VOLUME] %s %s K线不足(%d) 跳过" % (secid, name, len(ks)))
+                continue
+            try:
+                _amts = []
+                for _ln in ks:
+                    _pp = _ln.split(",")
+                    if len(_pp) >= 7:
+                        _amts.append((_pp[0], float(_pp[6])))
+                if len(_amts) < 21:
+                    continue
+                amt = _amts[-1][1]
+                base = sum(a for _d, a in _amts[-21:-1]) / 20.0
+                if base <= 0 or not (0.05 <= amt / base <= 30):
+                    continue  # 倍数离群（停牌/口径突变）→ 弃该只
+                rows.append({"code": secid.split(".")[1], "name": name,
+                             "date": _amts[-1][0], "amount_yi": round(amt / 1e8, 2),
+                             "base20_yi": round(base / 1e8, 2), "ratio": round(amt / base, 3)})
+            except Exception as _e:
+                print("  [BROAD_ETF_VOLUME] %s parse fail: %s" % (secid, _e))
+        if len(rows) < 3:
+            print("  [BROAD_ETF_VOLUME] 成功仅 %d/6 只（<3）→ 不落盘（宁缺勿错）" % len(rows))
+            return {}
+        best = max(rows, key=lambda x: x["ratio"])
+        # 上证指数当日涨跌（判「下跌日」；拉 3 根足够）
+        down_day = None; idx_chg = None; idx_date = None
+        iks = _kline("1.000001", 3)
+        if len(iks) >= 2:
+            _pp0 = iks[-1].split(","); _pp1 = iks[-2].split(",")
+            if len(_pp0) >= 3 and len(_pp1) >= 3:
+                try:
+                    _c0, _c1 = float(_pp0[2]), float(_pp1[2])
+                    idx_chg = round((_c0 / _c1 - 1) * 100, 2)
+                    idx_date = _pp0[0]
+                    down_day = _c0 < _c1
+                except ValueError:
+                    pass
+        out = {"update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+               "data_date": best["date"], "down_day": down_day,
+               "index_chg_pct": idx_chg, "index_date": idx_date,
+               "ratio_max": best["ratio"], "ratio_etf": "%s(%s)" % (best["name"], best["code"]),
+               "amount_max_yi": best["amount_yi"], "base20_max_yi": best["base20_yi"],
+               "ok_count": len(rows), "etfs": rows}
+        print("  [BROAD_ETF_VOLUME] %s 放量 %s× down_day=%s ok=%d/6" %
+              (out["ratio_etf"], out["ratio_max"], down_day, len(rows)))
+        return out
+
     def f_sector_year_flow():
         """🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
         口径：东财行业板块（clist m:90+t:2）逐日主力净流入官方历史
@@ -6389,6 +6486,7 @@ def main(category=None, only=None):
         ("ETF_NET_SUBSCRIPTION", f_etf_net_subscription),  # 2026-09-11 主人 P1：真实份额申赎（上交所日环比）
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
         ("SECTOR_YEAR_FLOW", f_sector_year_flow),  # 🛠 2026-10-19 补注册：三表登记齐但漏本表⇒任务永不执行(149行注释警告的假修复同族)；并启 近5/20日增量列(主人10-19令)
+        ("BROAD_ETF_VOLUME", f_broad_etf_volume),  # 🏛 2026-11-05 主人令：宽基ETF放量异动（国家队 D 路源）——三表登记齐（本行+产物表+档位表），漏一即静默不跑（10-19 假修复同族教训）
         ("AVG_PRICE_DATA", f_avg_price),
         ("AVG_PRICE_880003", f_avg_price_880003),
         ("INDEX_QUOTES", f_index_quotes),

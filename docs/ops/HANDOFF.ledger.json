@@ -252,9 +252,10 @@
   "key-notices-move-td-1105",
   "invest-avoid-move-td-1105",
   "fr-leaders-coverage-selfheal-1105",
-  "vivid-colors-boost-1105"
+  "vivid-colors-boost-1105",
+  "national-team-4th-sub-1105"
  ],
- "updated": "2026-11-05 11:02",
+ "updated": "2026-11-05 11:21",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径) (2026-10-22 小九：+intraday-first-batch-gate-1022 +ci-streak-fail-rootcause-1022 +ff3-composite-walkforward-1022；next_id_seq/max_next_id_seq 162→163；线上失配哈希按不盲改原则保留原值)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -442,6 +443,7 @@
   "main-history-truncated-by-cloudbot-1016": "4891e911fa426d71",
   "market-alerts-subprocess-timeout": "4927391e217eb9b9",
   "namefix-10cards-restore-1001": "d4f650fb6518f9b0",
+  "national-team-4th-sub-1105": "2fb727f81b68cce3",
   "nolost-protocol-v2-1026": "bae5e33a6cab6dd1",
   "north-fund-dead-source-fix": "325473156a53d8b1",
   "obs-27y-tail-visibility-1017": "d7f218ebe042c27e",
