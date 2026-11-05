@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-05 17:19",
- "generated": "2026-11-05 17:19",
+ "update_time": "2026-11-05 17:30",
+ "generated": "2026-11-05 17:30",
  "meta": {
-  "generated": "2026-11-05 17:19",
+  "generated": "2026-11-05 17:30",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -13089,6 +13089,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.161,
       "price": 8.96,
       "category": "突破"
+     },
+     {
+      "code": "603600",
+      "name": "永艺股份",
+      "change_pct": 5.044,
+      "price": 11.87,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -13555,6 +13562,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.161,
       "price": 8.96,
       "category": "短线选股"
+     },
+     {
+      "code": "603600",
+      "name": "永艺股份",
+      "change_pct": 5.044,
+      "price": 11.87,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -13794,6 +13808,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "保龄宝",
       "change_pct": 6.161,
       "price": 8.96,
+      "category": "强势股"
+     },
+     {
+      "code": "603600",
+      "name": "永艺股份",
+      "change_pct": 5.044,
+      "price": 11.87,
       "category": "强势股"
      }
     ]
