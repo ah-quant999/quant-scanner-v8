@@ -165,6 +165,12 @@ items:
       需由小九在其原发布机恢复 dd689 为可用唯一入口（映射疑挂最初发布机，本机/小九机常规工具无法寻址重发）。
       2026-10-22 原始固化口径保留：该地址为「九宝一站式导航」门户/主站，逻辑详解为其内板块；
       逻辑详解真源为私有母版 E:/Nutstore/v8_logic_private/logic.full.html。
+      【2026-11-05 17:45 进展】白天 AI 增补逻辑详解 6 处时违反 AGENTS.md 第④条：重发布 jiubao-nav-hub
+      并误称「权威链接」（恰是本条目撤销的 10-27 误判方向），17:45 自查发现认错。
+      实测：本机 deploy 工具按目录绑定应用记录（genie 仅 wbapp_XEmOlmxGhmvj33Wj6riWZ2=jiubao-nav-hub），
+      无法寻址 dd689（Last-Modified 2026-10-13，挂最初发布机）。
+      最新版（783029B, md5 d942f793）已在 nav-site 目录 + 冷备份 E:/v8_logic_private/logic.full.html。
+      恢复 dd689 需原发布机「设置—数据管理—应用」重发或阿狸咪夜班处理。
     verify_how: >
       直连 dd689 地址返回 815KB 真身（非 stub），且内容含最新止损三口径 + 治理横幅；主人可正常打开。
     updated: "2026-10-27 11:38"
@@ -181,6 +187,9 @@ items:
       ② 下线/弃用遗留多余地址——jiabao-nav-hub（小九 10-27 误建）、yield-methodology（AI 早前发）；
       ③ 逻辑详解真源仍以坚果云 E:/Nutstore/v8_logic_private/logic.full.html 为准，恢复后确保 dd689 线上真身=母版一致
       （含止损三口径 + 治理横幅）；④ 全程禁止再创建任何新 workbuddy.host 地址。
+      【2026-11-05 17:45】本机坚果云双挂载点（/e/Nutstore、/e/我的坚果云）均无 v8_logic_private，
+      实际自愈源=E:/v8_logic_private/logic.full.html（已同步 11-05 最新版）。
+      jiubao-nav-hub 暂缓下线：铁律顺序=①恢复 dd689→②下线多余地址；当前它是唯一内容最新入口，dd689 恢复后即下线。
     verify_how: >
       仅 dd689 一个地址可访问且内容最新；jiabao-nav-hub / yield-methodology 已停用或重定向至 dd689；
       坚果云母版 md5 与 dd689 线上一致。
