@@ -77,3 +77,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v4
+        with:
+          # 🔴 2026-11-05 根治「Getting Pages deployment status failed」403：
+          #   GITHUB_TOKEN 属 installation 级限流（1500/h 全仓工作流共享），盘中高峰被耗尽后
+          #   状态轮询 403 ⇒ 部署实际已发布却被判 failure。改用 V8_GH_TOKEN（用户级 5000/h 独立配额）。
+          token: ${{ secrets.V8_GH_TOKEN }}
