@@ -200,7 +200,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=c44bb70cb4" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=b0d2be6884" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=81f2288157" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1335,9 +1335,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=801334e431" defer></script>
 <script src="data/HB_XIAOJIU.js?v=6f2a82a5f2" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=73a222655c" defer></script>
-<script src="data/HEALTH_CHECK.js?v=97186bf367" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=a379a83189" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=1ca3a51962" defer></script>
+<script src="data/HEALTH_CHECK.js?v=cb6cb839ca" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=9a614f0621" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=6af1a15918" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=f3b4a409a3" defer></script>
@@ -2038,13 +2038,13 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=ca97197a87" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=17a7c60223" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=33de0e1d06" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=57a6bce77e" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2fcef6953b" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=dd7d697670" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b4a8b6a901" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=4c14a823be" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=c6d52d75af" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=d000f91d0e" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三因子（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三因子已并入因子实验室主评分 P5（amt60/turntrend/ivol60 纯加分项、walk-forward 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -3431,24 +3431,6 @@ function fmtSigned(v){
         </summary>
         <div id="finalHistBody" style="padding:12px 4px 2px;"><div class="note">展开加载…</div></div>
       </details>
-
-      <!-- 🔴 2026-10-26 主人令·风险闸（回撤 / 估值 / 行业）：把执行卡里「真实生效」的三道闸在这里透明展示，便于主人审核 -->
-      <div class="card" id="riskGateCard" style="margin-top:16px;border-left:4px solid #ff5252;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">🛡️ 风险闸 · 回撤 / 估值 / 行业（执行卡已据此真实缩放仓位）</span>
-          <span style="font-size:10px;font-weight:700;background:rgba(255,82,82,0.10);color:#ff5252;border:1px solid rgba(255,82,82,0.63);padding:1px 7px;border-radius:10px;">三闸真实生效</span>
-        </div>
-        <div id="riskGateHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">🛡️ 风险闸加载中…</div></div>
-      </div>
-
-      <!-- 🔴 2026-10-26 主人令·策略级 Walk-Forward：把「因子清账 + 胜率加权」组合拿到历史每日快照上做样本外稳定性验证 -->
-      <div class="card" id="wfCard" style="margin-top:16px;border-left:4px solid #22c55e;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">📐 策略级 Walk-Forward（因子清账 + 胜率加权 · 样本外稳定性）</span>
-          <span style="font-size:10px;font-weight:700;background:rgba(52,211,153,.12);color:#22c55e;border:1px solid rgba(52,211,153,.3);padding:1px 7px;border-radius:10px;">非收益率 OOS</span>
-        </div>
-        <div id="wfHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">📐 策略级 walk-forward 加载中…</div></div>
-      </div>
 
     </div>
   </section>
@@ -7474,85 +7456,7 @@ c.innerHTML = h;
   // ═════════════════════════════════════════════════════════════════════════
   window.__EXEC = { RISK_PCT: 1.0, MAX_W: 20, MIN_W: 2, POOL_MAX: 60, TRAIL: 0.08, N: 3 };
   window.__exRetry = 0;
-  // 🔴 2026-10-26 主人令·风险闸透明展示卡（回撤 / 估值 / 行业）：与执行卡同一套输入，便于主人审核三闸是否真实生效
-  window.__renderRiskGate = function(){
-    var host = document.getElementById('riskGateHost');
-    if(!host) return;
-    var RG = window.RISK_GUARD || {};
-    var VP = window.VALUATION_PERCENTILE || {};
-    var D = window.TOP10_DAILY || {};
-    var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
-    var _f = function(v,d){ var n=Number(v); if(!isFinite(n)) return '—'; return n.toFixed(d==null?2:d); };
-    var vpStrat = VP.strategy || {};
-    var vpDef = (typeof vpStrat.defensive_ratio==='number') ? vpStrat.defensive_ratio : 1.0;
-    var vpMult = Math.max(0.4, Math.min(1.0, vpDef));
-    var exp = D.industry_exposure || [];
-    var overCap = exp.filter(function(x){ return x.pct > 30; });
-    function cell(title, val, sub, color){
-      return '<div style="flex:1;min-width:150px;background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.16);border-radius:8px;padding:9px 11px;">'
-        + '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">'+title+'</div>'
-        + '<div style="font-size:15px;font-weight:800;color:'+(color||'var(--txt)')+';">'+val+'</div>'
-        + (sub?('<div style="font-size:10px;color:var(--dim);margin-top:2px;line-height:1.4;">'+sub+'</div>'):'')
-        + '</div>';
-    }
-    var h = '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + cell('① 回撤闸', '×'+_f((typeof RG.multiplier==='number'?RG.multiplier:1.0),2), '档位：'+_e(RG.tier||'正常')+' ｜ 最大回撤 '+( (typeof RG.max_drawdown==='number')?(_f(RG.max_drawdown*100,2)+'%'):'—' ), (RG.tier&&RG.tier!=='正常')?'#ff5252':'#22c55e')
-      + cell('② 估值防御', '×'+_f(vpMult,2), '指数 PE 分位 → 防御比例 '+( (typeof vpDef==='number')?_f(vpDef,2):'—' )+' ｜ 信号 '+_e(vpStrat.signal||vpStrat.overall||'—'), (vpMult<1.0)?'#ff5252':'#22c55e')
-      + cell('③ 行业上限', '≤30%', 'Top20 行业集中度'+(overCap.length?('：⚠️ '+overCap.map(function(x){return x.industry+' '+_f(x.pct,0)+'%';}).join('、')):'：无超载'), overCap.length?'#ff5252':'#22c55e')
-      + '</div>';
-    h += '<div style="font-size:11px;color:var(--dim);line-height:1.7;">'
-      + '数据源：回撤闸= data/RISK_GUARD.js（risk_guard.py 读账户净值序列算最大回撤，未接入则 ×1.00 不降杠杆）；'
-      + '估值= data/VALUATION_PERCENTILE.js（指数级 PE 分位→防御比例，个股级 PE 分位数据源暂未接入）；'
-      + '行业= data/TOP10_DAILY.js 的 industry_exposure（generate_top10.py 落盘，执行卡据此约束同行业≤30%）。'
-      + '<br>以上三闸在执行卡「收益转化算法」中已真实作用于每只建议仓位（仓位 = 风险预算 ÷ 止损距离 × 回撤闸 × 估值防御，再受行业上限收缩）。';
-    if(RG.note){ h += '<br><span style="color:var(--sub);">回撤闸备注：'+_e(RG.note)+'</span>'; }
-    h += '</div>';
-    host.innerHTML = h;
-  };
 
-  // 🔴 2026-10-26 主人令·策略级 Walk-Forward 展示卡：把「因子清账 + 胜率加权」组合拿到历史每日快照上做样本外稳定性验证
-  window.__renderWalkForward = function(){
-    var host = document.getElementById('wfHost');
-    if(!host) return;
-    var W = window.STRATEGY_WALKFORWARD || {};
-    if(!W.rows){
-      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">📐 策略级 walk-forward 数据未到位（data/STRATEGY_WALKFORWARD.js）· 待算法链下一轮更新</div>';
-      return;
-    }
-    var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
-    var _f = function(v,d){ var n=Number(v); if(!isFinite(n)) return '—'; return n.toFixed(d==null?2:d); };
-    var isW = W.is_window||{}, oosW = W.oos_window||{};
-    var h = '<div style="font-size:11.5px;line-height:1.9;color:var(--sub);margin-bottom:8px;">'
-      + '方法：按日期升序切分，<b>IS</b>=前 '+_f(W.is_ratio*100,0)+'% 快照（校准窗，'+ (isW.n||0) +' 日）｜ <b>OOS</b>=后 '+(100-W.is_ratio*100).toFixed(0)+'% 快照（验证窗，'+(oosW.n||0)+' 日）。'
-      + '历史快照自带推荐清单+行业+得分但【无已实现盈亏】，故以「选股方法的稳定性/集中度一致性」为 OOS 代理（非收益率 OOS）。'
-      + '</div>';
-    h += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">';
-    function cell(title, isv, oosv, goodWhenLow){
-      var delta = (typeof isv==='number'&&typeof oosv==='number') ? (oosv-isv) : null;
-      var col = '#94a3b8';
-      if(delta!==null){ col = (goodWhenLow? (delta<=0?'#22c55e':'#ff5252') : (delta>=0?'#22c55e':'#ff5252')); }
-      return '<div style="flex:1;min-width:130px;background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.16);border-radius:8px;padding:8px 10px;">'
-        + '<div style="font-size:10px;color:var(--dim);">'+title+'</div>'
-        + '<div style="font-size:12px;margin-top:2px;">IS <b>'+_f(isv,3)+'</b> ｜ OOS <b style="color:'+col+'">'+_f(oosv,3)+'</b></div>'
-        + (delta!==null?('<div style="font-size:9.5px;color:'+col+';">Δ '+(delta>=0?'+':'')+_f(delta,3)+'</div>'):'') + '</div>';
-    }
-    h += cell('重合度(稳定性↑)', isW.overlap_ratio, oosW.overlap_ratio, true)
-       + cell('行业HHI(集中度↓)', isW.industry_hhi, oosW.industry_hhi, true)
-       + cell('最大行业%(≤30)', isW.max_industry_pct, oosW.max_industry_pct, true)
-       + cell('平均得分', isW.avg_final_score, oosW.avg_final_score, false)
-       + '</div>';
-    h += '<div style="font-size:12px;font-weight:700;color:'+(W.stable?'#22c55e':'#ff5252')+';">结论：'+_e(W.verdict)+'</div>';
-    // 最近 8 日滚动指标
-    var rows = (W.rolling||[]).slice(-8);
-    h += '<div style="margin-top:8px;font-size:10.5px;color:var(--dim);">最近 '+rows.length+' 日滚动（重合度% / 最大行业%）：</div>';
-    h += '<div style="font-size:10.5px;color:var(--sub);line-height:1.7;margin-top:3px;">';
-    rows.forEach(function(r){
-      h += _e(r.date.slice(4))+'：重合 '+_f(r.overlap_ratio*100,0)+'% ｜ 最大行业 '+_f(r.max_industry_pct,0)+'%<br>';
-    });
-    h += '</div>';
-    h += '<div style="margin-top:8px;font-size:10px;color:var(--dim);">数据源：'+_e(W.source)+' ｜ 更新 '+_e(W.update_time)+'</div>';
-    host.innerHTML = h;
-  };
 
   window.__renderExecAlgo = function(){
     var host = document.getElementById('execAlgoHost');
@@ -14767,8 +14671,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 2026-10-25 主人令：三卡迁入「📌 最终跟踪」子页 ⇒ 切入即按各自数据源重渲（懒加载不变）
     if(n==='track'){
       setTimeout(function(){ try{ window.__renderExecAlgo(); }catch(e){ console.warn('[track] exec', e); } }, 30);
-      setTimeout(function(){ try{ window.__renderRiskGate(); }catch(e){ console.warn('[track] riskGate', e); } }, 40);
-      setTimeout(function(){ try{ window.__renderWalkForward(); }catch(e){ console.warn('[track] wf', e); } }, 50);
       setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[track] backtest', e); } }, 60);
       if(window.__finalHistRendered){ try{ window.renderFinalHist(); }catch(e){} }
     }
@@ -16016,7 +15918,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=57a6bce77e');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=dd7d697670');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -16025,7 +15927,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=2fcef6953b');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=b4a8b6a901');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
