@@ -126,6 +126,10 @@ MUST_HAVE_CRON = {
     #   ⇒ 卡冻 11-02；本链拆出到云端 ubuntu-latest（gen_invest_avoid.py 纯本地读、不抓网），
     #   与 cn 解耦，每日 07:55 北京可靠刷新。建链时漏双登记 ⇒ build_deploy [4/8] 红灯阻断 deploy。
     "v8_invest_avoid": "投资避雷针consolidate(云端ubuntu·每日07:55·解耦cn宕机)",
+    # 2026-11-05 小九补登记（主人令「一劳永逸」）：强板块龙头股覆盖自愈链——
+    #   FINAL（云端产出连不上东财）换板块后 --fr-only 在云端必败，本链在 cn runner
+    #   四检查点覆盖检查+就地重算+推送（详见 .github/workflows/v8_fr_leaders_followup.yml 头注）。
+    "v8_fr_leaders_followup": "强板块龙头股覆盖自愈(工作日08:10/09:05/09:25+周六08:10·cn runner)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────

@@ -1,0 +1,163 @@
+# 九宝量化 v8.0 — 强板块龙头股覆盖自愈（cn runner）
+#
+# 🔴 2026-11-05 主人令「一劳永逸修复」：『最终推荐·强势板块龙头股』卡反复出现
+#   「本轮新晋板块，龙头股名单下轮自动生成（上游字典尚未收录）」占位。
+#   根因链（2026-11-05 实测）：
+#     ① FINAL_RECOMMEND 由云端算法链（ubuntu，境外 IP）产出 —— 结构性连不上东财 push2；
+#     ② final_recommend.py 落盘 FINAL 后虽挂链 --fr-only 重算 fr_sectors，但云端跑它
+#        东财/腾讯全断 ⇒ 失败（旧版静默吞掉）⇒ fr_sectors 停留旧名单（今日 07:25 批实测：
+#        光伏设备/港口航运/风电设备 3 新晋板块整早盘空缺）；
+#     ③ 前端按 FINAL.strong_sectors 渲染 ⇒ 新晋板块查无龙头 ⇒ 占位提示。
+#   根治：本自愈工作流跑在 [self-hosted, cn]（小九单位机 · 中国 IP，东财可达），
+#     每交易日 FINAL 落地后 3 个时点 + 周六 1 检查点做覆盖检查（scripts/fr_coverage_check.py）：
+#       覆盖齐全 → exit 0 零动作零推送（不触发任何重建）；
+#       有缺失   → scripts/fetch_sector_leaders.py --fr-only 就地重算 → 复检 →
+#                   card_need_push 逐字节比对 → api_put_file 推送（仅 2 个数据文件，
+#                   409 冲突自重试，绝不 force、绝不覆盖他人提交）。
+#     与 final_recommend.py 内已落地的「--fr-only 重试 3 次 + 覆盖校验 + ::error 显式告警」
+#     互补：那是「失败必响」，本链是「响了必有人修」——闭环自此完整。
+#
+# 安全铁律（与 v8_morning_plan.yml 同步）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx（cn runner 系统级拦截，会挂 job）；
+#   2. 严禁 git clone/fetch（cn runner 到 github.com:443 被连接重置），源码同步走 Contents API；
+#   3. run 块全部 ASCII（cn runner 为 Windows + GBK，中文只出现在 YAML 注释/name 里）；
+#   4. 推送前 card_need_push 逐字节比对，内容相同即 SKIP（防空提交触发全量重建 ~8min）。
+name: "🔁 v8 强板块龙头股覆盖自愈 (cn runner)"
+
+on:
+  schedule:
+    - cron: '10 0 * * 1-5'   # 08:10 CST 工作日（隔夜链 FINAL 通常 07:5x 落地后第一检查点）
+    - cron: '5 1 * * 1-5'    # 09:05 CST 工作日（开盘前兜底第二检查点，晚到 FINAL 也接住）
+    - cron: '25 1 * * 1-5'   # 09:25 CST 工作日（开盘前末班检查点）
+    - cron: '10 0 * * 6'     # 周六 08:10 CST（周末手动跑批可能更新 FINAL）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-fr-leaders-followup
+  cancel-in-progress: false
+
+jobs:
+  followup:
+    runs-on: [self-hosted, cn]
+    # safe-delete 批量删除守卫阈值必须显式设 2000（cn runner 为 Windows，不设则吃默认 50）。
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      # cn runner（Windows）默认 GBK —— 脚本打印中文会 UnicodeEncodeError('gbk') 崩链。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    timeout-minutes: 20
+    steps:
+      - name: "📝 同步源码与数据（Contents API · 同域，避开 raw 302）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repo = 'ah-quant999/quant-scanner-v8'
+          $headers = @{
+            'User-Agent'    = 'v8-fr-leaders-followup'
+            'Accept'        = 'application/vnd.github+json'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          # [ascii] Do NOT use `Accept: application/vnd.github.raw`: it 302-redirects to
+          #   raw.githubusercontent.com, which may be wholly unreachable => guaranteed failure.
+          $files = @(
+            'scripts/fetch_sector_leaders.py',
+            'scripts/fr_coverage_check.py',
+            'scripts/api_put_file.py',
+            'scripts/card_need_push.py',
+            'scripts/normalize_eol.py',
+            'data/FINAL_RECOMMEND_DATA.js',
+            'data/SECTOR_LEADERS.js',
+            'raw_data/sector_leaders.json',
+            'raw_data/em_boards_cache.json',
+            'raw_data/em_members_cache.json',
+            'raw_data/ths_industry_cache.json'
+          )
+          foreach ($f in $files) {
+            $url = "https://api.github.com/repos/$repo/contents/$f`?ref=main"
+            try {
+              $r = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 60 -Method Get
+              $b64 = ($r.content -replace "\s", "")
+              $bytes = [Convert]::FromBase64String($b64)
+              $dir = Split-Path $f -Parent
+              if ($dir) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+              [System.IO.File]::WriteAllBytes($f, $bytes)
+              Write-Host "[ok] fetched $f ($($bytes.Length) bytes)"
+            } catch {
+              if ($f -like 'raw_data/*') {
+                # [ascii] optional caches: missing just means fresh fetch / no retained lock
+                Write-Host "[warn] optional cache miss $f : $_" -ForegroundColor Yellow
+              } else {
+                Write-Host "[fatal] required file fetch failed: $f" -ForegroundColor Red
+                exit 1
+              }
+            }
+          }
+          if (-not (Test-Path 'scripts/fetch_sector_leaders.py')) {
+            Write-Host "[fatal] generator not present; chain cannot continue" -ForegroundColor Red
+            exit 1
+          }
+
+      - name: "🔍 覆盖检查（齐全即零动作收工）"
+        id: check
+        shell: powershell
+        run: |
+          python scripts/fr_coverage_check.py
+          $code = $LASTEXITCODE
+          $needfix = '0'
+          if ($code -eq 0) {
+            Write-Host "covered, nothing to do"
+          } elseif ($code -eq 42) {
+            Write-Host "NEED_FIX detected => self-heal will run"
+            $needfix = '1'
+          } else {
+            Write-Host "::error title=v8-fr-coverage-check::coverage check failed (exit $code)"
+            exit 1
+          }
+          "needfix=$needfix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding ascii
+
+      - name: "🛠 自愈重算 --fr-only（仅缺口时）"
+        if: steps.check.outputs.needfix == '1'
+        shell: powershell
+        run: |
+          python scripts/fetch_sector_leaders.py --fr-only
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error title=v8-fr-only-fail::--fr-only self-heal failed on cn runner (see log above)"
+            exit 1
+          }
+
+      - name: "✅ 复检覆盖（不齐即显式报错，绝不静默）"
+        if: steps.check.outputs.needfix == '1'
+        shell: powershell
+        run: |
+          python scripts/fr_coverage_check.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error title=v8-fr-coverage::self-heal ran but coverage still incomplete (exit $LASTEXITCODE) - upstream dicts may be down, check fetch_sector_leaders log"
+            exit 1
+          }
+
+      - name: "📤 推送（逐字节比对 · 仅 2 个数据文件）"
+        if: steps.check.outputs.needfix == '1'
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          foreach ($f in @('data/SECTOR_LEADERS.js', 'raw_data/sector_leaders.json')) {
+            $out = python scripts/card_need_push.py $f | Out-String
+            Write-Host $out
+            if ($out -match 'NEED_PUSH=1') {
+              python scripts/api_put_file.py $f "data(sector-leaders): fr coverage self-heal followup (cn runner)"
+              if ($LASTEXITCODE -ne 0) {
+                Write-Host "::error title=v8-fr-push-fail::api_put_file failed for $f"
+                exit 1
+              }
+              Write-Host "[ok] pushed $f"
+            } else {
+              Write-Host "[skip] $f identical to remote"
+            }
+          }
+

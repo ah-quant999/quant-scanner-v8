@@ -10390,3 +10390,32 @@ items:
       派发名单已清、INVEST_AVOID.js HTTP 200 ⇒ 转 done（verified_at 2026-11-05 09:55，小九机AI）。
     updated_by: 小九机AI
     updated: "2026-11-05 09:55"
+
+  - id: fr-leaders-coverage-selfheal-1105
+    owner: 小九机AI
+    priority: P1
+    status: pending-verify
+    created: 2026-11-05
+    title: 强势板块龙头股「上游字典尚未收录」占位一劳永逸修复（就地重算+cn 自愈闭环）
+    note: >
+      2026-11-05 主人令（截图四连：最终推荐·强势板块龙头股卡内光伏设备/港口航运/风电设备
+      仍显「本轮新晋板块，龙头股名单下轮自动生成（上游字典尚未收录）」）。根因链实测：
+      FINAL_RECOMMEND（07:25 批）由云端算法链产出而云端结构性连不上东财 push2 ⇒
+      挂链 --fr-only 失败（旧版静默吞）⇒ fr_sectors 停 02:30 旧名单 ⇒ 前端按
+      strong_sectors 渲染查无龙头 ⇒ 占位。修复三层：①今晨 10:03 已落地的
+      final_recommend.py「--fr-only 重试3次+覆盖校验+::error 显式告警」（失败必响）；
+      ②小九机就地 --fr-only 重算（cn IP，tencent 名单兜底）12/12 全覆盖，推送
+      08f360e79e（data/SECTOR_LEADERS.js + raw_data/sector_leaders.json，republish
+      10:16:13）修今日卡面；③新建自愈工作流 .github/workflows/v8_fr_leaders_followup.yml
+      （[self-hosted, cn]，08:10/09:05/09:25 CST 工作日 + 周六 08:10 四检查点）：
+      scripts/fr_coverage_check.py 覆盖检查 → 齐全 exit 0 零动作零推送 / 有缺口就地
+      --fr-only 重算 → 复检 → card_need_push 字节比对 → api_put_file 推送仅 2 数据文件。
+      「失败必响」+「响了必有人修」闭环自此完整。
+    verify_how: >
+      ①就地重算验证：重算后 fr_sectors 12/12 与 FINAL.strong_sectors 全覆盖且 leaders
+      非空（光伏设备 63 只/港口航运 20 只/风电设备 31 只），fr_coverage_check exit 0；
+      ②自愈链验证：待 CI 发布后线上 Pages 硬抓三板块龙头在位；workflow_dispatch 手动
+      触发一次跑通（covered → 零推送）或人为缺口路径；③门禁 15/15 全绿（净树=origin/main
+      TIP+本次改动）。待以上齐备转 done。
+    updated_by: 小九机AI
+    updated: "2026-11-05 10:20"
