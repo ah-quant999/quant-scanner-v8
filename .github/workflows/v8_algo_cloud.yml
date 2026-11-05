@@ -486,7 +486,9 @@ jobs:
 
       TZ: Asia/Shanghai
 
-
+      # 🔴 2026-11-06 一劳永逸（选股池卡旧根治）：api_push_raw.py 改优先 V8_GH_TOKEN（PAT·5000/h 独立配额），
+      #   注入全 job 覆盖算法链步与链尾推送步，杜绝 installation 1500/h 共享配额 403。
+      V8_GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 

@@ -30,9 +30,15 @@ except Exception:
 
 API = "https://api.github.com"
 REPO = os.environ.get("GITHUB_REPO", "ah-quant999/quant-scanner-v8")
-TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+# 🔴 2026-11-06 一劳永逸（主人令·紧急修复·选股池卡旧根治）：
+#   原只认 GITHUB_TOKEN（installation 级 1500/h 共享配额）—— 全仓 schedule 延迟导致十几个 run
+#   连环跑、每个上传数百文件，配额被榨干 ⇒ api_push_raw 整批 HTTP 403（实测 373 文件上传失败、
+#   raw_data/top10_daily.json 传不上去 ⇒ 选股池新鲜数据生成了却落不了地、线上一直卡 11-04/11-05 旧值）。
+#   改为【优先 V8_GH_TOKEN（用户级 PAT，5000/h 独立配额）】，回退 GITHUB_TOKEN / GH_TOKEN。
+#   与 2026-11-05 deploy-pages 同款 403 根因同源，同一 PAT 解决。
+TOKEN = os.environ.get("V8_GH_TOKEN") or os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
 if not TOKEN:
-    print("❌ 缺少 GITHUB_TOKEN"); sys.exit(1)
+    print("❌ 缺少 V8_GH_TOKEN / GITHUB_TOKEN"); sys.exit(1)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
