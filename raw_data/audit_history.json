@@ -4058,5 +4058,28 @@
    }
   ],
   "fail_items": []
+ },
+ {
+  "date": "2026-11-06",
+  "time": "05:10:46",
+  "tz": "Asia/Shanghai",
+  "overall": "ok",
+  "summary": {
+   "ok": 117,
+   "warn": 1,
+   "fail": 0,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 119
+  },
+  "warn_items": [
+   {
+    "id": "final_enter_stale",
+    "name": "最终推荐入选日期",
+    "message": "未找到 enter_date 字段，无法判断入选新鲜度"
+   }
+  ],
+  "fail_items": []
  }
 ]
