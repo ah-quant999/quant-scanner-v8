@@ -130,6 +130,10 @@ MUST_HAVE_CRON = {
     #   FINAL（云端产出连不上东财）换板块后 --fr-only 在云端必败，本链在 cn runner
     #   四检查点覆盖检查+就地重算+推送（详见 .github/workflows/v8_fr_leaders_followup.yml 头注）。
     "v8_fr_leaders_followup": "强板块龙头股覆盖自愈(工作日08:10/09:05/09:25+周六08:10·cn runner)",
+    # 2026-11-05 阿狸咪的工程师补登记（门禁 [4/8] 拦截补漏）：小九 5bcb3f5fd「Pages 部署与
+    #   推送者解耦·定时保底部署」给 deploy-v8-site 挂 cron（交易日 09:00-16:59 每15分 +
+    #   盘外每小时保底）漏双登记 ⇒ build_deploy [4/8] 15:05 起连红阻断 deploy。
+    "deploy-v8-site": "Pages 定时保底部署(交易日09:00-16:59每15分+盘外每小时)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
