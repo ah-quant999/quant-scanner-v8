@@ -10515,3 +10515,17 @@ items:
       build_deploy step[14] 跨层校验放行、连红止于 4 轮。三条件同批满足方可转 done。
     updated_by: 阿狸咪的工程师
     updated: "2026-11-06 04:37"
+
+    alimi_evidence_20261106_0650: >-
+      2026-11-06 06:50 阿狸咪的工程师巡检补证（取证：#2920 job 日志逐行，非 run conclusion）。
+      ① 403 病灶未愈：#2920（11-06 04:34-05:59 CST）链尾推送 111 个文件「8 次均失败 HTTP 403」跳过
+      （102 个 raw_data/kline_cache/<code>.json、8 个 raw_data 直属 json、1 个 raw_data/history/），失败量趋势
+      #2917=373 → #2918=485 → #2920=111（收敛但未归零）。verify_how 第 1 条未满足，本 item 维持 doing。
+      ② build_deploy 恢复绿属「他方旁路解围」非自愈：market_regime/sector_recommendation raw 层已被他方推送救活
+      （双 ut=2026-11-06T05:34），跨层门禁只盯这两文件 ⇒ #13790-#13795 全绿（连红止于 4 轮）；kline_cache 子面仍被限流吃掉。
+      ③ ⚠️ 新形态候选（与本案分账，勿混）：#2920 结论 failure 但推送步 success，红灯在 step[19] 问责——
+      闸门 reason=「A 就绪(13/13) B 未就绪(5/7) → 跑选股批」按『缺什么跑什么』放行，问责步 --recheck 同源判
+      ready_ok_B=false ⇒ 判「假成功」exit 1；而产物完整性闸本身 ✅（候选池/金股池 11-06 05:27 新产、TOP10 本日新鲜
+      20 条）。即：**闸门放行路径与问责判据结构性自相矛盾，走该路径的 run 必红**。待 #2921-#2924 队列消化后复核
+      是否复发；复发则另行挂账 P1。
+      ④ TOP10_DAILY 仍 11-05 05:33 档 20 条（22:02 档未恢复），待 B 批在队列 run 中重产。
