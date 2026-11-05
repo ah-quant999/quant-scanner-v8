@@ -19352,20 +19352,11 @@ window.__renderV8CalToday();
     }
     window._safeArr(mainStocks).forEach(function(s,i){ h+=stockCard(s,i); });
 
-    // ── 2026-08-13 双轨排名：共振最强（独立于上方分数最强）──
-    var cons = window._safeArr(consStocks);
-    var _consCodes = cons.map(function(s){return String(s.code).replace(/[^0-9]/g,'');}).sort().join(',');
-    var _mainCodes = window._safeArr(mainStocks).map(function(s){return String(s.code).replace(/[^0-9]/g,'');}).sort().join(',');
-    if(cons.length && _consCodes !== _mainCodes){
-      h+='<div style="margin-top:16px;padding:10px 14px;background:rgba(192,132,252,0.2);border:1px solid rgba(192,132,252,0.63);border-radius:10px;">';
-      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
-      h+='<span style="font-size:15px;font-weight:800;color:#c084fc">🔗 共振最强 · Top'+cons.length+'</span>';
-      h+='<span style="font-size:11px;color:var(--dim)">多策略交叉验证优先，抗单一策略失效</span>';
-      h+='</div>';
-      cons.forEach(function(s,i){ h+=stockCard(s,i); });
-      h+='</div>';
-    }
-    // ── end 双轨 ──
+    // 🔴 2026-11-06 主人令·一劳永逸：删除「双轨排名·共振最强」紫色堆叠容器。
+    //   共振信息已随每只个股卡的 chip（🔗 共振 N 源 / 金钻+缠论共振）展示，无需再叠一层；
+    //   最终推荐·rec 面板现仅保留单一「分数最强 Top5」列表，杜绝两层堆叠视觉。
+    //   （原逻辑：cons=共振最强集，仅当与 mainStocks 不同才叠显示 → 今日两集相异故出现两层；现已整体移除）
+
 
     if(allStocks && allStocks.length){
       h+='<div style="margin-top:12px;padding:10px 12px;background:rgba(65,201,255,0.21);border:1px solid rgba(65,201,255,0.36);border-radius:9px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">';
