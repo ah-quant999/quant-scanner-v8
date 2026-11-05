@@ -14934,7 +14934,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         + '<span title="selection_mode='+ (mode||'—') +'" style="background:#41c9ff1a;color:#41c9ff;border:1px solid #41c9ff4d;border-radius:4px;padding:2px 7px;white-space:nowrap;">模式 '+modeTxt+'</span>'
         + (TD.hc_count != null ? pill('双共振 <b>'+TD.hc_count+'</b> 只','#ffd024') : '')
         + (TD.total_scored != null ? pill('金股池 <b>'+TD.total_scored+'</b> 只','#c084fc') : '')
-        + (TD.chan_source && TD.chan_source.stale ? pill('缠论源·手动源·非实时('+TD.chan_source.stale_days+'天前)','#64748b') : '')
         + '<span style="color:var(--dim);margin-left:auto;">金股池 → 因子综合评分降序（收益率优先）</span>'
         + '</div>';
     }
