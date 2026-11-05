@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-06 04:31",
- "generated": "2026-11-06 04:31",
+ "update_time": "2026-11-06 04:37",
+ "generated": "2026-11-06 04:37",
  "meta": {
-  "generated": "2026-11-06 04:31",
+  "generated": "2026-11-06 04:37",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12944,13 +12944,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "688036",
-      "name": "传音控股",
-      "change_pct": 9.513,
-      "price": 64.35,
-      "category": "突破"
-     },
-     {
       "code": "301227",
       "name": "森鹰窗业",
       "change_pct": 5.013,
@@ -12993,6 +12986,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 5.932,
+      "price": 164.47,
+      "category": "突破"
+     },
+     {
       "code": "688656",
       "name": "浩欧博",
       "change_pct": 7.637,
@@ -13025,13 +13025,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "凯盛新能",
       "change_pct": 3.644,
       "price": 7.11,
-      "category": "突破"
-     },
-     {
-      "code": "688775",
-      "name": "影石创新",
-      "change_pct": 6.919,
-      "price": 110.8,
       "category": "突破"
      },
      {
@@ -13243,27 +13236,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.398,
       "price": 10.92,
       "category": "突破"
-     },
-     {
-      "code": "603098",
-      "name": "森特股份",
-      "change_pct": 10.01,
-      "price": 10.77,
-      "category": "突破"
-     },
-     {
-      "code": "601021",
-      "name": "春秋航空",
-      "change_pct": 5.68,
-      "price": 45.4,
-      "category": "突破"
-     },
-     {
-      "code": "301073",
-      "name": "君亭酒店",
-      "change_pct": 5.652,
-      "price": 17.01,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -13300,13 +13272,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "郑中设计",
       "change_pct": 7.02,
       "price": 21.8,
-      "category": "加速"
-     },
-     {
-      "code": "688036",
-      "name": "传音控股",
-      "change_pct": 9.513,
-      "price": 64.35,
       "category": "加速"
      },
      {
@@ -13349,6 +13314,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "柏星龙",
       "change_pct": 3.276,
       "price": 15.13,
+      "category": "加速"
+     },
+     {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 5.932,
+      "price": 164.47,
       "category": "加速"
      },
      {
@@ -13417,13 +13389,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688036",
-      "name": "传音控股",
-      "change_pct": 9.513,
-      "price": 64.35,
-      "category": "短线选股"
-     },
-     {
       "code": "301227",
       "name": "森鹰窗业",
       "change_pct": 5.013,
@@ -13466,6 +13431,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 5.932,
+      "price": 164.47,
+      "category": "短线选股"
+     },
+     {
       "code": "688656",
       "name": "浩欧博",
       "change_pct": 7.637,
@@ -13501,13 +13473,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688775",
-      "name": "影石创新",
-      "change_pct": 6.919,
-      "price": 110.8,
-      "category": "短线选股"
-     },
-     {
       "code": "300352",
       "name": "ST信源",
       "change_pct": 3.433,
@@ -13715,27 +13680,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "真视通",
       "change_pct": 4.398,
       "price": 10.92,
-      "category": "短线选股"
-     },
-     {
-      "code": "603098",
-      "name": "森特股份",
-      "change_pct": 10.01,
-      "price": 10.77,
-      "category": "短线选股"
-     },
-     {
-      "code": "601021",
-      "name": "春秋航空",
-      "change_pct": 5.68,
-      "price": 45.4,
-      "category": "短线选股"
-     },
-     {
-      "code": "301073",
-      "name": "君亭酒店",
-      "change_pct": 5.652,
-      "price": 17.01,
       "category": "短线选股"
      }
     ],
@@ -13748,13 +13692,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "688775",
-      "name": "影石创新",
-      "change_pct": 6.919,
-      "price": 110.8,
-      "category": "强势股"
-     },
-     {
       "code": "300352",
       "name": "ST信源",
       "change_pct": 3.433,
@@ -13962,27 +13899,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "真视通",
       "change_pct": 4.398,
       "price": 10.92,
-      "category": "强势股"
-     },
-     {
-      "code": "603098",
-      "name": "森特股份",
-      "change_pct": 10.01,
-      "price": 10.77,
-      "category": "强势股"
-     },
-     {
-      "code": "601021",
-      "name": "春秋航空",
-      "change_pct": 5.68,
-      "price": 45.4,
-      "category": "强势股"
-     },
-     {
-      "code": "301073",
-      "name": "君亭酒店",
-      "change_pct": 5.652,
-      "price": 17.01,
       "category": "强势股"
      }
     ]
