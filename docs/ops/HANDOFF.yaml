@@ -10318,7 +10318,7 @@ items:
   - id: dark-restore-ff3-purge-email-dedup-1105
     owner: 小九机AI
     priority: P0
-    status: pending-verify
+    status: done
     created: 2026-11-05
     title: 主站底色恢复深色系 + FF3退役彻底清理 + 图1重复邮件一劳永逸修复（三合一）
     note: >
@@ -10337,5 +10337,29 @@ items:
       远端 HEAD=3acce92c09 实测：FF3 8 文件 ls-tree 全 0、NOLOST_IGNORE 8 路径全在、
       v8_main.css 变量深色、index.html 马卡龙残色 0/深色命中 412、_dedup_mark(fp) 调用在位、
       缓存戳 ?v=31e3158b39。待 CI build_deploy 发布后线上 Pages 硬抓复核（深色生效）即转 done。
+      2026-11-05 09:05 线上 Pages 硬抓复核通过：深色变量/彩色提亮/国家队动态列全部在位，
+      Pages 实抓无马卡龙残色 ⇒ 转 done（verified_at 2026-11-05 09:05，小九机AI）。
     updated_by: 小九机AI
-    updated: "2026-11-05 08:10"
+    updated: "2026-11-05 09:05"
+
+  - id: key-notices-move-td-1105
+    owner: 小九机AI
+    priority: P2
+    status: pending-verify
+    created: 2026-11-05
+    title: 重要公告速览卡迁页：暂未上架·观测类 → 今日事件（今日事件详情卡下方）
+    note: >
+      2026-11-05 主人令（截图两连：公告卡 → 移到今日事件页今日事件详情卡下方）。
+      整卡迁页仅动 index.html 一个文件：①今日事件 sec-td 今日事件详情卡之后新增静态卡壳
+      （keyNoticesCard/keyNoticesFresh/keyNoticesBody，id 与样式不变）；②暂未上架
+      renderUnlisted 的 h+= 旧卡壳删除；③观测类派发名单 __ulRenderPane 移除 __renderKeyNotices
+      （防无容器空跑）；④switchSec('td') 分支补 __renderKeyNotices 触发（默认页=最终推荐，
+      进今日事件必经 switchSec ⇒ 全覆盖；数据 defer 未就位时函数内 600ms×30 自愈轮询兜底）。
+      渲染函数 __renderKeyNotices / 胶囊切换 __knShowCat 原样保留。无 CSS/数据/workflow 改动。
+    verify_how: >
+      离线门禁 15/15 全绿（净树=origin/main TIP + 本次改动，结论绑本次推送 HEAD）；
+      31 个 inline script new Function 0 错；keyNoticesCard 全文仅 1 处卡壳定义（sec-td 静态）
+      ＋渲染器引用；旧 h+= 卡壳 0 残留；派发名单已无 __renderKeyNotices。
+      待 CI build_deploy 发布后线上 Pages 硬抓（今日事件页公告卡在位、暂未上架页无残留）即转 done。
+    updated_by: 小九机AI
+    updated: "2026-11-05 09:05"
