@@ -136,7 +136,7 @@ window.__domReadyFns=[];
     <script src="data/DO_NOT_DELETE.js?v=65f14102b0" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=28de21041c" defer></script>
-    <script src="data/GOLD_POOL.js?v=2e53f4d554" defer></script>
+    <script src="data/GOLD_POOL.js?v=77ca87af3f" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
@@ -1284,7 +1284,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SZ_FIB.js?v=4bb77d09f6" defer></script>
 <script src="data/SECTOR_RS.js?v=9b74aa6340" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=66242a2697" defer></script>
-<script src="data/INST_TRADE.js?v=33b126551b" defer></script>
+<script src="data/INST_TRADE.js?v=9b0a3630ae" defer></script>
 <script src="data/NORTH_FUND.js?v=74d519332c" defer></script>
 <script src="data/MARKET_ALERTS.js?v=336f37e529" defer></script>
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=ca02bfec50" defer></script>
@@ -1296,27 +1296,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/VOLATILITY.js?v=63f996398b" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=b421d47129" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=c5bb8f522b" defer></script>
-<script src="data/CANDIDATE.js?v=84513edfff" defer></script>
+<script src="data/CANDIDATE.js?v=0d7a946c0b" defer></script>
 
     <script src="data/STOCK_STOP_DATA.js?v=314b633e73" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=32514115a6" defer></script>
 <script src="data/EXPERIMENT.js?v=f1073e4925" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=38e854c06d" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=812c14260e" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=d0c9a41131" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=40d48bba27" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=220ad9a906" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=d0c9a41131" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=eedbd663fa" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=5f08e0aeaa" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=41efcb05b5" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=5bc5fed59c" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=d273cd697a" defer></script>
-    <script src="data/FACTOR_LAB_BACKTEST.js?v=05303e34e5" defer></script>
+    <script src="data/FACTOR_LAB_BACKTEST.js?v=c52be008ba" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=1a84fe059d" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=71a7e15444" defer></script>
+    <script src="data/FACTOR_LAB.js?v=f0cad10ba1" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=b6baef4869" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=4b7b310b8d" defer></script>
@@ -1331,7 +1331,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=01aa3e456a" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=5f9f0d09b9" defer></script>
 <script src="data/CFFEX_POSITION.js?v=9b72786ad4" defer></script>
-<script src="data/FUNDAMENTAL_QUALITY.js?v=085b6d77bd" defer></script>
+<script src="data/FUNDAMENTAL_QUALITY.js?v=f10e477771" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=5a96862bce" defer></script>
 <script src="data/HB_XIAOJIU.js?v=5050b59f53" defer></script>
@@ -2032,12 +2032,12 @@ window.STRATEGY_WALKFORWARD = {
     </script>
     <!-- 🔧 2026-09-30 23:0x CN runner2号机的工程师：补 INDEX_VALUE_FRAMEWORK 注入（建卡漏注入=恒 undefined
          ⇒ 卡上「最新价/门控/120日中枢/短长趋势」四列全为「—」，而线上文件本身有数据）。 -->
-    <script src="data/INDEX_VALUE_FRAMEWORK.js?v=3c7170b836" defer></script>
+    <script src="data/INDEX_VALUE_FRAMEWORK.js?v=e60292e678" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <!-- 🆕 2026-09-19 主人令（CN runner2号机的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
-    <script src="data/FACTOR_WALKFORWARD.js?v=7e44519355" defer></script>
+    <script src="data/FACTOR_WALKFORWARD.js?v=ca97197a87" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=e157554e44" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=7ec65d7a21" defer></script>
