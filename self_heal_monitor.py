@@ -625,6 +625,36 @@ def _invest_avoid_cap_min(n=None):
     return cap
 
 
+def _invest_avoid_remote_update_time():
+    """云复核（2026-11-05 根因修复）：工作树不是权威源，本机 data/*.js 副本可能落后远端 main
+    （实测：远端 15:15 已由 CI 推新版，本机副本仍停在昨日 ⇒ 本地误判陈旧 → 无效自愈循环：
+    重产落盘被静默回退 → commit 无变更失败）。故本地判 stale 时先取远端 main 的 update_time；
+    API 失败/无 token 返回 None（退回本地判定，行为与旧版一致）。token 只读入内存，禁打印/禁落盘。"""
+    try:
+        import base64 as _b64
+        import urllib.request as _ur
+        tok = ""
+        for _name in ("v8_gh_pat", "v8_gh_token.txt"):
+            _p = Path.home() / ".workbuddy" / _name
+            if _p.exists():
+                tok = _p.read_text(encoding="utf-8", errors="ignore").strip()
+                if tok:
+                    break
+        if not tok:
+            return None
+        _req = _ur.Request(
+            "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/data/INVEST_AVOID.js?ref=main",
+            headers={"Authorization": "token " + tok, "User-Agent": "self_heal_monitor",
+                     "Accept": "application/vnd.github+json"})
+        with _ur.urlopen(_req, timeout=20) as _r:
+            _d = json.loads(_r.read().decode("utf-8"))
+        _c = _b64.b64decode(_d.get("content", "")).decode("utf-8", errors="replace")
+        _i, _j = _c.index("{"), _c.rindex("}") + 1
+        return json.loads(_c[_i:_j]).get("update_time")
+    except Exception:
+        return None
+
+
 def check_invest_avoid():
     if not INVEST_AVOID_FILE.exists():
         return False, None, 99999, "FILE_MISSING"
@@ -639,6 +669,16 @@ def check_invest_avoid():
         age_min = (now_cst() - dt).total_seconds() / 60
         cap = _invest_avoid_cap_min(n=now_cst())
         stale = age_min > cap
+        if stale:
+            # 云复核：远端 main 已新鲜 ⇒ 本地副本陈旧属同步滞后，判 OK 且不触发自愈（防无效循环）
+            rts = _invest_avoid_remote_update_time()
+            if rts:
+                rdt = (_hc_parse_time(rts) if (_HC_AVAILABLE and isinstance(rts, str)) else None)
+                if rdt is not None:
+                    rage = (now_cst() - rdt).total_seconds() / 60
+                    if rage <= cap:
+                        return True, rts, rage, (f"本地副本陈旧(update_time={ts})但云复核远端main已新鲜"
+                                                 f"(update_time={rts}, age={rage:.0f}min<=cap{cap:.0f}min)，不触发自愈")
         return (not stale), ts, age_min, f"update_time={ts}, age={age_min:.0f}min, cap={cap:.0f}min"
     except Exception as e:
         return False, None, 99999, "解析错误: " + str(e)
