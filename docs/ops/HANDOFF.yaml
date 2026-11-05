@@ -10394,7 +10394,7 @@ items:
   - id: fr-leaders-coverage-selfheal-1105
     owner: 小九机AI
     priority: P1
-    status: pending-verify
+    status: done
     created: 2026-11-05
     title: 强势板块龙头股「上游字典尚未收录」占位一劳永逸修复（就地重算+cn 自愈闭环）
     note: >
@@ -10417,5 +10417,10 @@ items:
       ②自愈链验证：待 CI 发布后线上 Pages 硬抓三板块龙头在位；workflow_dispatch 手动
       触发一次跑通（covered → 零推送）或人为缺口路径；③门禁 15/15 全绿（净树=origin/main
       TIP+本次改动）。待以上齐备转 done。
+      2026-11-05 10:40 三项全过转 done：①线上 Pages 硬抓 HEAD=ea2ffeaa30 发布后三板块龙头
+      在位（光伏设备 迈为股份+20.00% 等、港口航运 凤凰航运、风电设备 大金重工+9.99%，
+      republish 10:16:13）；②自愈工作流首跑 run 41956498267 success 且零推送（covered 路径，
+      其后仅 stock-quote 无关提交）；③门禁 15/15 全绿 ×2 轮 + [4/8] 双登记补齐。
+      verified_at 2026-11-05 10:40，小九机AI。
     updated_by: 小九机AI
-    updated: "2026-11-05 10:20"
+    updated: "2026-11-05 10:40"
