@@ -630,7 +630,10 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
       ⇒ 问责判据 `c[0]==day` 永不满足 ⇒ `ready_ok_B=false` ⇒ run 必 RC=1 假红。
       修正：当 `run_day` 与 `day` 不同（即「为过去段首补跑/重跑」）时，允许产物戳落在
       run_day 也判 OK。**交易日 run_day==day，语义完全不变**；本修正只对「运行日≠数据日」
-      的假日/补跑场景生效，且仍以 floor 时刻门槛守门（不会把陈旧产物放过）。
+      的假日/补跑/凌晨补跑场景生效。
+      ⚠️ 2026-11-06 根治（TOP10_DAILY 长期冻结）：运行日产物=本轮刚重算产出、天然新鲜，
+      故越过 floor 时刻门槛直接判 OK；**仅数据日产物仍须达 floor（≥16:30）守门**，
+      陈旧数据日产物不会被放过（杜绝假成功护栏不变）。
     """
     spec = READY_SPEC[stage]
     need = spec["need"]
@@ -643,8 +646,12 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
     for it in spec["items"]:
         r = read_ut(root, it)
         ok = bool(r and any(
-            ((c[0] == day) or (_run_day_tol and c[0] == run_day))
-            and (c[1], c[2]) >= floor
+            # 数据日产物：须达盘后门槛，防拿盘中/盘前陈旧数据当已就绪（杜绝假成功核心护栏）
+            (c[0] == day and (c[1], c[2]) >= floor)
+            # 运行日产物：=本轮刚重算产出，天然新鲜 → 越过盘后时刻门槛。
+            # 修复「凌晨/休市段第2天 运行日≠数据日 时，产物戳落在运行日但 <16:30
+            #   ⇒ ready_ok_* 永 false ⇒ 问责假红、阻断推送」的死循环（TOP10_DAILY 长期冻结主因）。
+            or (_run_day_tol and c[0] == run_day)
             for c in _cand(r)))
         # 🔴 2026-10-31 一劳永逸（主人令·最终推荐"假新鲜"根治）：
         #   D 批主产物 FINAL_RECOMMEND_DATA.js 此前只认 update_time(生成时间) 判就绪，
