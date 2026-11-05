@@ -243,6 +243,18 @@ def main():
             print("  ⏳ 等待 %ds 后复检…" % args.wait)
             time.sleep(args.wait)
     print("❌ 守门未通过：%d 轮复检后第一批仍未齐" % args.rounds)
+    # 🔴 2026-11-05 主人令·一劳永永逸补充（自动化记忆连续多轮登记的「脚本退出早于数据上线」根因）：
+    #   主站数据常在脚本退出后 1~2 轮内回补（11-04 实测 14:00~14:15 全 7 张越线，比脚本退出 13:43 晚约 20~30 分钟），
+    #   直接判红会触发误报告警。末轮宽限复查：再等一段（≤120s）后查一次，若已达标则降级为通过、不发告警。
+    grace = min(args.wait, 120)
+    print("  ⏳ 末轮宽限复查（%ds）…" % grace)
+    time.sleep(grace)
+    ok2, rows2 = check(cutoff)
+    if ok2:
+        print("✅ 宽限复查达标（≥%s）→ 不告警，守门通过" % cutoff.strftime("%H:%M"))
+        for var, label, ts in optional_rows():
+            print("  · %-24s %-16s %s" % (var, label, ts))
+        return 0
     return 3
 
 

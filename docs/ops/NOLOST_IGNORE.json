@@ -1,1 +1,15 @@
-{"_readme":"有意删除、不参与自愈的受保护路径（NOLOST_IGNORE）。删受保护文件前必须先登记，否则守卫会补回。","reason":"初始化","updated":"2026-10-26 09:00","paths":[]}
+{
+  "_readme": "有意删除、不参与自愈的受保护路径（NOLOST_IGNORE）。删受保护文件前必须先登记，否则守卫会补回。",
+  "reason": "2026-11-05 主人令·FF3 退役彻底清理：独立 FF3 策略整支下架，以下 8 个孤儿文件不再被任何脚本生成/引用（全仓 .py 仅剩 update_v8.py 一处注释，无调用；logic.html / index.html 已无 FF3 引用），故永久退出守卫保护。",
+  "updated": "2026-11-05 05:02",
+  "paths": [
+    "algorithms/gen_ff3_ranksum.py",
+    "algorithms/ff3_upgrade_backtest.py",
+    "data/FF3_RANKSUM_TRACK.js",
+    "data/FF3_RANKSUM_BACKTEST.js",
+    "raw_data/ff3_ranksum_history.json",
+    "raw_data/ff3_ranksum_track.json",
+    "raw_data/ff3_ranksum_backtest.json",
+    "raw_data/ff3_upgrade_backtest_report.json"
+  ]
+}

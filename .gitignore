@@ -84,3 +84,17 @@ logic.full.html
 
 # 🔧 2026-10-30 清理令：raw_data 每日快照仅留本地安全网，不再提交进 git（防 280MB 臃肿，raw_data 可云端重生）
 backup/raw_data_backup_*.tar.gz
+
+# 🗑 2026-11-05 主人令·FF3 退役彻底清理：独立 FF3 策略整支下架，以下 8 个孤儿文件/数据
+#   已从远端删除、且不再被任何脚本生成或引用（全仓 .py 仅 update_v8.py 一处注释、无调用；
+#   logic.html / index.html 已无 FF3 引用）。加入忽略，防止 `git add -A` 类工作流
+#   （v8_algo_intraday_lite / v8_cleanup）把双机持久工作树里的陈旧副本回灌仓库。
+#   同时 docs/ops/NOLOST_IGNORE.json 已登记，nolost 守卫不再自愈复活（尤其 algorithms/ 下 2 个 .py）。
+algorithms/gen_ff3_ranksum.py
+algorithms/ff3_upgrade_backtest.py
+data/FF3_RANKSUM_TRACK.js
+data/FF3_RANKSUM_BACKTEST.js
+raw_data/ff3_ranksum_history.json
+raw_data/ff3_ranksum_track.json
+raw_data/ff3_ranksum_backtest.json
+raw_data/ff3_upgrade_backtest_report.json

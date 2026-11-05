@@ -272,6 +272,14 @@ def send_alert(subject, body, config=None, level=None):
         server.quit()
         print(f"[{datetime.now()}] [INFO] 告警邮件已发送: {subject_tagged}")
         _trace(subject_tagged, body, level, "SENT")
+        # 🔴 2026-11-05 主人令·一劳永逸修复（图1 重复邮件根因）：
+        #   `_dedup_mark()` 自 2026-10-08 定义后**从未被调用** ⇒ `.workbuddy/v8_alert_dedup.json`
+        #   永不落盘 ⇒ `_dedup_allowed()` 恒返回 True ⇒ 同源去重形同虚设，同一未达标事件每轮都发新邮件。
+        #   此处补调用：发信成功后立即落盘去重指纹，确保 12h 内同源告警只发一次。
+        try:
+            _dedup_mark(fp)
+        except Exception:
+            pass
         return True
     except Exception as e:
         print(f"[{datetime.now()}] [ERROR] 邮件发送失败: {e}")
