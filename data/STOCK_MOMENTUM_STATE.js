@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-06 02:33",
- "generated": "2026-11-06 02:33",
+ "update_time": "2026-11-06 02:51",
+ "generated": "2026-11-06 02:51",
  "meta": {
-  "generated": "2026-11-06 02:33",
+  "generated": "2026-11-06 02:51",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12972,13 +12972,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300133",
-      "name": "华策影视",
-      "change_pct": 7.025,
-      "price": 10.36,
-      "category": "突破"
-     },
-     {
       "code": "920075",
       "name": "柏星龙",
       "change_pct": 3.276,
@@ -13098,13 +13091,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300251",
-      "name": "光线传媒",
-      "change_pct": 3.171,
-      "price": 12.69,
-      "category": "突破"
-     },
-     {
       "code": "000428",
       "name": "华天酒店",
       "change_pct": 10.086,
@@ -13172,13 +13158,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "芯能科技",
       "change_pct": 4.167,
       "price": 8.0,
-      "category": "突破"
-     },
-     {
-      "code": "002881",
-      "name": "美格智能",
-      "change_pct": 7.172,
-      "price": 44.53,
       "category": "突破"
      },
      {
@@ -13250,13 +13229,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.68,
       "price": 45.4,
       "category": "突破"
-     },
-     {
-      "code": "301073",
-      "name": "君亭酒店",
-      "change_pct": 5.652,
-      "price": 17.01,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -13321,13 +13293,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "闽东电力",
       "change_pct": 3.469,
       "price": 12.23,
-      "category": "加速"
-     },
-     {
-      "code": "300133",
-      "name": "华策影视",
-      "change_pct": 7.025,
-      "price": 10.36,
       "category": "加速"
      },
      {
@@ -13438,13 +13403,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300133",
-      "name": "华策影视",
-      "change_pct": 7.025,
-      "price": 10.36,
-      "category": "短线选股"
-     },
-     {
       "code": "920075",
       "name": "柏星龙",
       "change_pct": 3.276,
@@ -13564,13 +13522,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300251",
-      "name": "光线传媒",
-      "change_pct": 3.171,
-      "price": 12.69,
-      "category": "短线选股"
-     },
-     {
       "code": "000428",
       "name": "华天酒店",
       "change_pct": 10.086,
@@ -13641,13 +13592,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "002881",
-      "name": "美格智能",
-      "change_pct": 7.172,
-      "price": 44.53,
-      "category": "短线选股"
-     },
-     {
       "code": "300128",
       "name": "锦富技术",
       "change_pct": 3.535,
@@ -13715,13 +13659,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春秋航空",
       "change_pct": 5.68,
       "price": 45.4,
-      "category": "短线选股"
-     },
-     {
-      "code": "301073",
-      "name": "君亭酒店",
-      "change_pct": 5.652,
-      "price": 17.01,
       "category": "短线选股"
      }
     ],
@@ -13804,13 +13741,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "300251",
-      "name": "光线传媒",
-      "change_pct": 3.171,
-      "price": 12.69,
-      "category": "强势股"
-     },
-     {
       "code": "000428",
       "name": "华天酒店",
       "change_pct": 10.086,
@@ -13881,13 +13811,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "002881",
-      "name": "美格智能",
-      "change_pct": 7.172,
-      "price": 44.53,
-      "category": "强势股"
-     },
-     {
       "code": "300128",
       "name": "锦富技术",
       "change_pct": 3.535,
@@ -13955,13 +13878,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春秋航空",
       "change_pct": 5.68,
       "price": 45.4,
-      "category": "强势股"
-     },
-     {
-      "code": "301073",
-      "name": "君亭酒店",
-      "change_pct": 5.652,
-      "price": 17.01,
       "category": "强势股"
      }
     ]
