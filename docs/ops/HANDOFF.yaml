@@ -10345,7 +10345,7 @@ items:
   - id: key-notices-move-td-1105
     owner: 小九机AI
     priority: P2
-    status: pending-verify
+    status: done
     created: 2026-11-05
     title: 重要公告速览卡迁页：暂未上架·观测类 → 今日事件（今日事件详情卡下方）
     note: >
@@ -10360,6 +10360,6 @@ items:
       离线门禁 15/15 全绿（净树=origin/main TIP + 本次改动，结论绑本次推送 HEAD）；
       31 个 inline script new Function 0 错；keyNoticesCard 全文仅 1 处卡壳定义（sec-td 静态）
       ＋渲染器引用；旧 h+= 卡壳 0 残留；派发名单已无 __renderKeyNotices。
-      待 CI build_deploy 发布后线上 Pages 硬抓（今日事件页公告卡在位、暂未上架页无残留）即转 done。
+      2026-11-05 09:40 线上 Pages 硬抓复核通过（HEAD=6ac97b8d0a 发布后）：sec-td 静态卡在位（今日事件详情 2263 行 → 公告卡 2269 行 → 今日解禁 2277 行）、旧 h+= 壳 0、switchSec 触发在位、派发名单已清、KEY_NOTICES.js HTTP 200 且 update_time=2026-11-05 09:15:45 ⇒ 转 done（verified_at 2026-11-05 09:40，小九机AI）。
     updated_by: 小九机AI
-    updated: "2026-11-05 09:05"
+    updated: "2026-11-05 09:40"
