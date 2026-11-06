@@ -39,8 +39,8 @@ concurrency:
 
 jobs:
   morning-plan:
-    runs-on: [self-hosted, cn]
-    # safe-delete 批量删除守卫阈值必须显式设 2000（cn runner 为 Windows，不设则吃默认 50）。
+    runs-on: ubuntu-latest   # 2026-11-06 主人令「云端优先」：本链只读 main 已推送 data/*.js + 东财取数（v8_cn_fetch_cloud 已证东财云端可达），无中国 IP 硬依赖 → 迁云端省本机算力/token。
+    # safe-delete 批量删除守卫阈值仍显式设 2000（Windows/cn 场景保险；云端 ubuntu 为 no-op）。
     env:
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
       # cn runner（Windows）默认 GBK —— 脚本打印中文会 UnicodeEncodeError('gbk') 崩链。
