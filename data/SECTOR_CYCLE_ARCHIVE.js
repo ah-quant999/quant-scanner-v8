@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-06 10:35:10
+// 最后更新：2026-11-06 10:48:48
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-06 10:35:10",
+  "update_time": "2026-11-06 10:48:48",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -27,7 +27,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
     "11/06"
   ],
   "columns": 30,
-  "cycle_count": 20,
+  "cycle_count": 21,
   "cycles": [
     {
       "sector": "AI算力",
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1845,
+      "total": 1849,
       "ongoing": true
     },
     {
@@ -234,7 +234,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 8,
       "peak": 6,
       "peak_date": "11/04",
-      "total": 34,
+      "total": 35,
       "ongoing": true
     },
     {
@@ -287,6 +287,19 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "peak": 6,
       "peak_date": "11/05",
       "total": 9,
+      "ongoing": true
+    },
+    {
+      "sector": "军工",
+      "start": "11/06",
+      "end": "11/06",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "11/06",
+      "total": 3,
       "ongoing": true
     }
   ]
