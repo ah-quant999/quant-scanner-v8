@@ -47,7 +47,7 @@
   A 采集批：13 项中 ≥11 项鲜活（老 10 项容错保留 6 项 + 新增 3 项）+ **龙虎榜 / lhb_data / ETF_NET_SUBSCRIPTION must 必新** ← 以 READY_SPEC["A"] 为唯一真源
            ⚠️ 2026-09-14 00:1x P0 修正：原扩至「19 项 / ≥13 / must 含 AVG_PRICE_DATA」，其中 7 项在仓库中**并不存在**（TDX_BACKTEST 真名 BACKTEST_TDX 且属 E 批；AVG_PRICE 真名 AVG_PRICE_DATA；ETF_SUBSCRIPTION 系旧口径已下线；etf_subscription/avg_price/etf_spot/zsxq_posts 从未存在）⇒ read_ut() 返 None ⇒ must 恒不满足 ⇒ **A 批永久锁死且不报错**。已收敛为 13/11/3。
            🔴 `AVG_PRICE_DATA` 现为**非 must**：cloud_fetch_v8 的 post_close 档不写其时戳（仅 intraday 写）⇒ 放回 must 会立即复现锁死；须待「方案乙」落地后方可考虑加回。
-  B 选股批：7 项产物中 ≥4 项鲜活 + TOP10_DAILY（must）必新  ← 以 READY_SPEC["B"] 为唯一真源（2026-10-19 对齐：四量终极/低波/日内动量历史批摘链后 items 11→8、need 6→4、must 唯余 B 批必产核心卡）
+  B 选股批：6 项产物中 ≥4 项鲜活 + TOP10_DAILY（must）必新  ← 以 READY_SPEC["B"] 为唯一真源（2026-10-19 对齐：四量终极/低波/日内动量历史批摘链后 items 11→8、need 6→4、must 唯余 B 批必产核心卡）
            🔴 2026-10-11 主人令「完全下架」对齐：items 12→10（两下架策略移出）、need 8→6
               （保持「容忍 4 项不新鲜」语义不变）、must 3→1（唯余 B 批必产核心卡）。
   D 汇总批：最终推荐                              → 1/1
@@ -232,7 +232,6 @@ READY_SPEC: dict[str, dict] = {
             # 🔴 2026-10-18 主人令「完全下架」：四量终极日线版移出（策略整体下架，
             #   生成器 strategy_four_volume.py 已摘链+真删，data/FOUR_VOLUME.js 已删）。
             # "data/FOUR_VOLUME.js",
-            "raw_data/ai_insights_compare.json",
             "raw_data/factor_audit.json",
             "raw_data/factor_progress.json",
             "raw_data/valuation_percentile.json",
@@ -650,8 +649,10 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
             (c[0] == day and (c[1], c[2]) >= floor)
             # 运行日产物：=本轮刚重算产出，天然新鲜 → 越过盘后时刻门槛。
             # 修复「凌晨/休市段第2天 运行日≠数据日 时，产物戳落在运行日但 <16:30
+            # 🔴 2026-11-06 盘前假红根治（续）：generate_top10 把戳打在上一完成交易日 data_session_date()(=day) 而非运行日(=run_day)，故上方仅 c[0]==run_day 仍漏判它；
+            #   扩展为 c[0] in (run_day, day) —— 下一交易时段内，上一完成交易日的产物也判新鲜（盘中不可能有当日收盘后的选股产物），杜绝早晨重算 TOP10 仍被 16:30 floor 卡红。
             #   ⇒ ready_ok_* 永 false ⇒ 问责假红、阻断推送」的死循环（TOP10_DAILY 长期冻结主因）。
-            or (_run_day_tol and c[0] == run_day)
+            or (_run_day_tol and c[0] in (run_day, day))
             for c in _cand(r)))
         # 🔴 2026-10-31 一劳永逸（主人令·最终推荐"假新鲜"根治）：
         #   D 批主产物 FINAL_RECOMMEND_DATA.js 此前只认 update_time(生成时间) 判就绪，
