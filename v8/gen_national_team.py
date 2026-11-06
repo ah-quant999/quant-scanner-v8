@@ -231,7 +231,14 @@ subs.append({
 subs.append({
     'key':'D','name':'宽基ETF放量异动','weight':W['D'],'ready':d_ready,
     'value':d_val,'unit':'×','detail':d_detail or 'broad_etf_volume.json 缺失/过期（post_close 档未落盘）',
-    'status':(('✅放量护盘' if (d_down and d_val>=2) else ('🟡温和放量' if (d_down and d_val>=1.3) else ('❌缩量' if d_down else '🟡中性'))) if (d_ready and d_val is not None) else '—未就绪')
+    # 2026-11-06 主人令·一劳永逸修复：下跌日 ratio∈[1.0,1.3) 原误标「❌缩量」——
+    #   但 ratio>1 即「放量(扩张)」而非「缩量(萎缩)」，标签与真实数据/计分公式矛盾（伪造语义）。
+    #   现按真实口径分级：>=2 放量护盘 / >=1.3 温和放量 / >=1.0 略放量 / <1.0 真缩量；非下跌日中性。
+    'status':(('✅放量护盘' if (d_down and d_val>=2)
+               else ('🟡温和放量' if (d_down and d_val>=1.3)
+                     else ('🟡略放量' if (d_down and d_val>=1.0)
+                           else ('❌缩量' if d_down else '🟡中性'))))
+              if (d_ready and d_val is not None) else '—未就绪')
 })
 
 out = {
