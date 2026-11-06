@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-06 14:40:10
+// 最后更新：2026-11-06 14:59:51
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-06 14:40:10",
+  "update_time": "2026-11-06 14:59:51",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -253,14 +253,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "地产链",
       "start": "11/04",
-      "end": "11/05",
+      "end": "11/06",
       "start_idx": 27,
-      "end_idx": 28,
-      "days": 2,
-      "hot_days": 2,
+      "end_idx": 29,
+      "days": 3,
+      "hot_days": 3,
       "peak": 5,
       "peak_date": "11/05",
-      "total": 9,
+      "total": 13,
       "ongoing": true
     },
     {
