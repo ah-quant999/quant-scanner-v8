@@ -10534,3 +10534,66 @@ items:
       20 条）。即：**闸门放行路径与问责判据结构性自相矛盾，走该路径的 run 必红**。待 #2921-#2924 队列消化后复核
       是否复发；复发则另行挂账 P1。
       ④ TOP10_DAILY 仍 11-05 05:33 档 20 条（22:02 档未恢复），待 B 批在队列 run 中重产。
+
+
+  - id: gate-falsered-rootfix-1106
+    owner: shared（小九：落码 v8_stage_gate.py · 阿狸咪：接收）
+    priority: P1
+    status: done
+    created: 2026-11-06
+    title: 选股批次 B 就绪判据「盘前假红」根治——摘除已下线孤儿项 + 放行窗口扩至(运行日,链数据日)
+    note: >
+      2026-11-06 小九机落码并净室推上 main（commit d5a02e67，blob f8ba3187ca，逐字节自验）。
+      【根因】READY_SPEC["B"] 含已下线孤儿 raw_data/ai_insights_compare.json（2026-09-15 主人令全链下线，永不产出）
+      导致 B 就绪恒 5/7；且 generate_top10 把 update_time 打在 data_session_date()(=上一完成交易日) 而非运行日，
+      被 check_ready 的 16:30 floor 误判 STALE，导致早晨重算的 TOP10 被卡红、选股推不上去、主站停在「昨天盘前」。
+      【修法】①摘除孤儿项（B 规格 7项→6项）；②放行串扩为 c[0] in (run_day, day) 含链数据日；③注释补全根治说明。
+      【验证】mock read_ut(TOP10=("2026-11-05",8,58),其余当天) 下 check_ready ready=True/6/6（原版 False）；
+      被云端 bot 原子提交重提后 blob 内容仍一致（f8ba3187ca），修复在 main 存活。
+      另注：本修复同时根治了 handoff item algoraw-mass403-crosslayer-block-1106 第③点挂账的「闸门放行与问责自相矛盾」候选。
+    verify_how: >
+      grep origin/main v8_stage_gate.py：孤儿命中=0 且含 "in (run_day, day)"；下一算法链 run 的 step19 问责不再因 B 假红判「假成功」。
+    verified_at: "2026-11-06 17:30"
+    updated_by: 小九机AI
+    updated: "2026-11-06 17:30"
+
+  - id: deploy-pages-freeze-rootfix-1106
+    owner: shared（小九：落码 deploy-v8-site.yml · 阿狸咪：接收）
+    priority: P1
+    status: done
+    created: 2026-11-06
+    title: 盘中 Pages 部署冻结根治——deploy-v8-site 增 workflow_run 触发器，数据刷新链一跑完即自动发布
+    note: >
+      2026-11-06 小九机落码并净室推上 main（commit 3506f00c，blob 90dba85e50）。
+      【根因】主站 Pages 最后成功部署停在 13:27，盘中数据推上 main 却永不发布。三重叠加：
+      ① deploy-v8-site 触发源 push(被 GITHUB_TOKEN 反递归不触发下游)+schedule(今日盘中哑火)；
+      ② build_deploy 的「触发 Pages」步交易时段设计性跳过；③ 数据刷新由 bot 推 main 不触发下游。
+      【修法】增 workflow_run 触发器，监听 STOCK_QUOTE / cn_fetch云端 / cn抓取应急 / 盘中算法追踪 四条刷新链，
+      任一 completed 即自动发布 Pages；schedule/push/dispatch 保留作冗余兜底。
+      【验证】手动派发 STOCK_QUOTE 刷新 → 自动级联触发 deploy-v8-site(success) → Pages 从 14:46 推进 15:03；
+      blob 内容经 bot 原子提交重提后仍一致（90dba85e50）。
+    verify_how: >
+      grep origin/main deploy-v8-site.yml 含 "workflow_run:"；后续任一条刷新链 run 完成后 Pages 必重发（不再依赖哑火 schedule）。
+    verified_at: "2026-11-06 17:30"
+    updated_by: 小九机AI
+    updated: "2026-11-06 17:30"
+
+  - id: sentinel-hasarun-failopen-1106
+    owner: 小九机（本地系统脚本 · 阿狸咪机需各自同步）
+    priority: P1
+    status: done
+    created: 2026-11-06
+    title: 本地兜底哨兵 has_active_run 加固——pending 不再阻断 + fail-closed→fail-open + 派发节流缓存
+    note: >
+      2026-11-06 小九机修 C:/Users/Administrator/.workbuddy/scripts/v8_intraday_sentinel.py（不在 v8 仓，无需推仓）。
+      【根因】今天 GitHub schedule 盘中哑火 → cn_fetch/STOCK_QUOTE 根触发断 → 本地哨兵本应兜底却失灵：
+      has_active_run 把 pending/queued(排队中,不产生数据)也算活跃 + API 异常时 fail-closed 返回 True，
+      导致今天队列异常(run 卡 pending 堆积)时哨兵每 20 分误判「有活跃run」→ 永久跳过派发 → STOCK_QUOTE 盘中零刷新。
+      【修法】①has_active_run 只认 in_progress 为真活跃；②fail-closed→fail-open(API 抖动时持续兜底)；
+      ③新增本地派发节流缓存(每 workflow 10min)防风暴；④4 处派发点前加节流闸门。
+      【验证】mock 场景4(读不到+pending,即今天根因)→ 真派发；场景5(10min内二次)→ 节流跳过；场景6(in_progress+陈旧)→ 防互踩。
+    verify_how: >
+      明天开盘观察 STOCK_QUOTE 是否每 ~10min 持续刷新不再空窗；阿狸咪机(夜间)按双机协议同步本脚本。
+    verified_at: "2026-11-06 17:30"
+    updated_by: 小九机AI
+    updated: "2026-11-06 17:30"
