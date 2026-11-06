@@ -1,0 +1,12 @@
+{
+  "data_date": "2026-11-06",
+  "update_time": "2026-11-06 21:44:03",
+  "ratio_max": 1.225,
+  "ratio_etf": "易方达创业板ETF",
+  "amount_max_yi": 138.43,
+  "down_day": true,
+  "index_chg_pct": -1.1,
+  "ok_count": 6,
+  "source": "东方财富 push2his K线（6只头部宽基ETF 当日成交额/前20日均额）",
+  "note": "下跌日放量计护盘分；非下跌日中性50。D 路为护盘公开指纹，详见 gen_national_team.py 文档头。"
+}
