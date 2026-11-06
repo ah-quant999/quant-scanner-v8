@@ -39,8 +39,8 @@ concurrency:
 
 jobs:
   morning-plan:
-    runs-on: ubuntu-latest   # 2026-11-06 主人令「云端优先」：本链只读 main 已推送 data/*.js + 东财取数（v8_cn_fetch_cloud 已证东财云端可达），无中国 IP 硬依赖 → 迁云端省本机算力/token。
-    # safe-delete 批量删除守卫阈值仍显式设 2000（Windows/cn 场景保险；云端 ubuntu 为 no-op）。
+    runs-on: [self-hosted, cn]   # 🔴 中国 IP 硬依赖（非可选）：东财 push2delay 域唯独对境内可达（境外托管 runner 结构性不可达，见头部血证），本生成器直连该域。2026-11-06 误迁 ubuntu 实测 sync 步即 failure（且即便过 sync，push2delay 云端仍不可达会复发取数失败），已回退。
+    # 🔴 safe-delete 批量删除守卫阈值必须显式设 2000（cn runner 为 Windows，不设则吃默认 50）。
     env:
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
       # cn runner（Windows）默认 GBK —— 脚本打印中文会 UnicodeEncodeError('gbk') 崩链。

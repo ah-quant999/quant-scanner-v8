@@ -45,8 +45,8 @@ concurrency:
 
 jobs:
   us-hk-map-only:
-    runs-on: ubuntu-latest   # 2026-11-06 主人令「云端优先」：东财全球端点云端可达；腾讯/新浪美股若云端不可达由 fetcher 兜底(东财)覆盖。迁前已 dispatch 实测确认。
-    # 🔴 safe-delete 批量删除守卫阈值仍显式设 2000（Windows/cn 场景保险；云端 ubuntu 为 no-op）。
+    runs-on: [self-hosted, cn]   # 🔴 中国 IP 硬依赖（非可选）：2026-10-20 主人令「一劳永逸修复」实证——东财美股+新浪美股日K 从云端境外 IP **双不可达**⇒ strong_count=0；仅 cn(中国IP) 下可达。本链永不可迁云端，违者复发该 bug（2026-11-06 误迁 ubuntu 实测即 failure，已回退）。
+    # 🔴 safe-delete 批量删除守卫阈值必须显式设 2000（cn runner 为 Windows，不设则吃默认 50）。
     env:
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
       # 🔴 cn runner（Windows）默认 GBK —— 本脚本打印中文会 UnicodeEncodeError('gbk') 崩链。
