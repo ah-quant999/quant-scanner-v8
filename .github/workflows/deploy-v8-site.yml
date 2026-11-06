@@ -10,6 +10,26 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+# 🔴 2026-11-06 一劳永逸（主人令「主站还是 13 点的数据」根因修复·续）：
+#   【2026-11-06 实证病灶】上条（11-05）只加了 schedule 保底 + 手动 dispatch 兜底，
+#     但 GitHub schedule 大面积哑火（本仓 09-18 已记录同款「schedule 大面积哑火」）——
+#     11-06 全天 deploy-v8-site 的 schedule 一次都没触发（recent runs 全是 push/dispatch，
+#     无一条 schedule）；同时 build_deploy 的「触发 Pages」步在交易时段被设计性跳过
+#     （避免抢 CI），而数据刷新是 bot 用 GITHUB_TOKEN 推 main（反递归不触发下游 workflow）。
+#     ⇒ 盘中每次刷新都把新数据推上 main，却**永远不发布到 Pages** → 主站冻结在 13:27 旧版。
+#   【修法】部署与「推送者 / 定时」彻底解耦：改用 workflow_run 触发器——任一条把数据推上
+#     main 的刷新链（STOCK_QUOTE / cn抓取云端 / cn抓取应急 / 盘中算法追踪）一跑完（completed），
+#     本工作流即被 GitHub 原生机制唤起，无需依赖已哑火的 schedule、也不受 GITHUB_TOKEN 反递归限制。
+#     workflow_run 上游无论由 schedule 还是手动 dispatch 触发都照样唤起，从根上保证
+#     「数据一进 main，Pages 必重发」。schedule / push / dispatch 触发保留作冗余兜底。
+  workflow_run:
+    workflows:
+      - "📈 v8 STOCK_QUOTE 轻量 refresh"
+      - "🇨🇳 v8 中国数据抓取(云端)"
+      - "🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)"
+      - "☁️ v8 盘中算法追踪(轻量)"
+    types: [completed]
+# 🔴 2026-11-05 一劳永逸（主人令「主站数据还是12点多的，自动刷新也没了」根因修复）：
 # 🔴 2026-11-05 一劳永逸（主人令「主站数据还是12点多的，自动刷新也没了」根因修复）：
 #   【病灶】Pages 部署此前只靠 push 事件触发。云端抓取链推 main 的 commit 是
 #     github-actions[bot]（GITHUB_TOKEN）—— GitHub 反递归设计规定 GITHUB_TOKEN 产生的
