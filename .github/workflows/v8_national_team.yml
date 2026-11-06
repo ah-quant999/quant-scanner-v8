@@ -94,6 +94,28 @@ jobs:
           rc=$?
           if [ "$rc" -ne 0 ]; then echo "::error title=v8-huijin(push-failed)::📤 data/HUIJIN_HOLDINGS.js 推送失败（非阻塞，下一轮补推）。"; exit 1; fi
 
+      - name: "📡 跑 fetch_broad_etf_volume.py（D路·宽基ETF放量异动真实源·best-effort）"
+        id: broad
+        if: always()
+        continue-on-error: true
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          dow=$(date +%u)
+          if [ "$dow" -ge 6 ]; then echo "[skip] weekend, exit ok"; exit 0; fi
+          # 2026-11-06 主人令·一劳永逸修复：D 路（宽基ETF放量异动）此前无生产者，
+          # broad_etf_volume.json 从未入库（远端 404）⇒ 卡常年 D 未就绪。现补真实生产者。
+          python v8/fetch_broad_etf_volume.py
+          rc=$?
+          if [ "$rc" -ne 0 ] || [ ! -f raw_data/broad_etf_volume.json ]; then
+            echo "::warning title=v8-broad-etf(failed)::📡 宽基ETF放量抓取失败（非阻塞）；gen 侧自动判 D 未就绪并权重重分，不影响 A/B/C。"
+            echo "produced=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "[ok] raw_data/broad_etf_volume.json ready (best-effort)"
+            echo "produced=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: "🏛️ 跑 gen_national_team.py（产出 data/NATIONAL_TEAM.js）"
         id: gen
         env:
@@ -145,6 +167,24 @@ jobs:
           rc=$?
           if [ "$rc" -ne 0 ]; then
             echo "::error title=v8-national-team(push-failed)::📤 data/NATIONAL_TEAM.js 推送失败（非阻塞，下一轮补推）。"
+            exit 1
+          fi
+
+      - name: "📤 推送 raw_data/broad_etf_volume.json（api_put_file.py，best-effort）"
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          if [ "${{ steps.broad.outputs.produced }}" != "true" ]; then
+            echo "[skip] 宽基ETF放量未成功抓取，不推送 raw_data"
+            exit 0
+          fi
+          python scripts/api_put_file.py raw_data/broad_etf_volume.json "raw_data: broad ETF volume refresh ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') CST)"
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=v8-broad-etf(push-failed)::📤 raw_data/broad_etf_volume.json 推送失败（非阻塞，下一轮补推）。"
             exit 1
           fi
 
