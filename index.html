@@ -12561,7 +12561,7 @@ function drawUpDownChart(){
 
           {name:'亚太市场概览', source:'OVERSEAS_MARKETS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'日经/恒生/KOSPI'},
 
-          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'IF/IC/IM'},
+          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'日更(收盘后)', slots:['15:30','02:00'], note:'IF/IC/IM·中金所每日收盘后一次性发布结算'},
 
           {name:'涨停热力矩阵', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'连板/炸板热度'},
 
@@ -13693,8 +13693,9 @@ function drawUpDownChart(){
       h+='</div>';
     }
     $b.innerHTML=h;
-    // 2026-09-13 主人令：期指主力合约 freq='盘中每30分'（intraday 刷新），时段固定「盘中」。
-    if($t) $t.innerHTML=_uBadge('盘中','短线',d.update_time);
+    // 2026-11-06 一劳永逸（主人令「期指卡显示 02:12 像断了」根因修复）：CFFEX_HOLDINGS 是中金所每日收盘后一次性发布的日频结算数据，
+    //   11-06 场次要次日凌晨才出，盘中不可能有当日数据；原「盘中 短线」标签误导。改为「日更 收盘」如实反映数据节奏。
+    if($t) $t.innerHTML=_uBadge('日更','收盘',d.update_time);
   }
   window.renderFuturesMain = renderFuturesMain;
 
