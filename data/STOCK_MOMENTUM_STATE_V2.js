@@ -1,6 +1,6 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-07 00:45:41",
+  "generated": "2026-11-07 01:04:43",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
@@ -254,86 +254,6 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 22.95
-    },
-    {
-     "code": "688696",
-     "symbol": "sh688696",
-     "name": "极米科技",
-     "date": "2026-09-30",
-     "count": 8,
-     "categories": [
-      "强势股",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 4.68,
-     "sel_change_pct": 4.68,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "震荡",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 8.98,
-     "max_drawdown_pct": 6.63,
-     "t1_gain_pct": -6.63,
-     "t3_gain_pct": 0.08,
-     "t5_gain_pct": 1.1,
-     "t10_gain_pct": 6.97,
-     "last_gain_pct": 6.97,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤6.63%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-10-08",
-       "gain": -6.63
-      },
-      {
-       "T": "T+2",
-       "date": "2026-10-09",
-       "gain": -2.31
-      },
-      {
-       "T": "T+3",
-       "date": "2026-10-12",
-       "gain": 0.08
-      },
-      {
-       "T": "T+4",
-       "date": "2026-10-13",
-       "gain": -1.16
-      },
-      {
-       "T": "T+5",
-       "date": "2026-10-14",
-       "gain": 1.1
-      },
-      {
-       "T": "T+6",
-       "date": "2026-10-15",
-       "gain": -0.99
-      },
-      {
-       "T": "T+7",
-       "date": "2026-10-16",
-       "gain": 2.52
-      },
-      {
-       "T": "T+8",
-       "date": "2026-10-19",
-       "gain": 3.02
-      },
-      {
-       "T": "T+9",
-       "date": "2026-10-20",
-       "gain": 8.98
-      },
-      {
-       "T": "T+10",
-       "date": "2026-10-21",
-       "gain": 6.97
-      }
-     ],
-     "entry_price": 84.79
     },
     {
      "code": "002909",
@@ -814,6 +734,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 78.95
+    },
+    {
+     "code": "300691",
+     "symbol": "sz300691",
+     "name": "联合光电",
+     "date": "2026-09-23",
+     "count": 8,
+     "categories": [
+      "加速",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 20.0,
+     "sel_change_pct": 20.0,
+     "data_available": true,
+     "consec_before": 3,
+     "stage": "震荡",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前3天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 17.76
     }
    ],
    "all": [
@@ -5628,74 +5628,74 @@ window.STOCK_MOMENTUM_ENHANCED = {
       "短线选股",
       "突破"
      ],
-     "change_pct": 4.68,
-     "sel_change_pct": 4.68,
+     "change_pct": 7.39,
+     "sel_change_pct": 7.39,
      "data_available": true,
      "consec_before": 0,
-     "stage": "震荡",
+     "stage": "启动",
      "consecutive_up_days": 0,
-     "max_gain_pct": 8.98,
-     "max_drawdown_pct": 6.63,
-     "t1_gain_pct": -6.63,
-     "t3_gain_pct": 0.08,
-     "t5_gain_pct": 1.1,
-     "t10_gain_pct": 6.97,
-     "last_gain_pct": 6.97,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
      "pattern": "普通",
-     "note": "连涨前0天 回撤6.63%",
+     "note": "连涨前0天 回撤0.0%",
      "daily_returns": [
       {
        "T": "T+1",
-       "date": "2026-10-08",
-       "gain": -6.63
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+2",
-       "date": "2026-10-09",
-       "gain": -2.31
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+3",
-       "date": "2026-10-12",
-       "gain": 0.08
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+4",
-       "date": "2026-10-13",
-       "gain": -1.16
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+5",
-       "date": "2026-10-14",
-       "gain": 1.1
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+6",
-       "date": "2026-10-15",
-       "gain": -0.99
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+7",
-       "date": "2026-10-16",
-       "gain": 2.52
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+8",
-       "date": "2026-10-19",
-       "gain": 3.02
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+9",
-       "date": "2026-10-20",
-       "gain": 8.98
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+10",
-       "date": "2026-10-21",
-       "gain": 6.97
+       "date": "",
+       "gain": null
       }
      ],
-     "entry_price": 84.79
+     "entry_price": 90.12
     },
     {
      "code": "300162",
@@ -13405,8 +13405,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "t1_gain_pct": 1.48,
      "t3_gain_pct": -5.8,
      "t5_gain_pct": -20.36,
-     "t10_gain_pct": -13.45,
-     "last_gain_pct": -13.45,
+     "t10_gain_pct": -9.95,
+     "last_gain_pct": -9.95,
      "pattern": "波动大",
      "note": "连涨前0天 回撤20.36%",
      "daily_returns": [
@@ -13457,8 +13457,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+10",
-       "date": "2026-11-06",
-       "gain": -13.45
+       "date": "",
+       "gain": null
       }
      ],
      "entry_price": 108.2
