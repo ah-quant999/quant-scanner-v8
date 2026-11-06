@@ -10597,3 +10597,56 @@ items:
     verified_at: "2026-11-06 17:30"
     updated_by: 小九机AI
     updated: "2026-11-06 17:30"
+
+  - id: fix-qz-card-label-1106
+    owner: 小九机（已上线 · 阿狸咪仅知会，勿再问「上线」）
+    priority: P1
+    status: done
+    created: 2026-11-06
+    title: 期指卡标签「盘中·短线」→「日更·收盘」一劳永逸根因修复（已上线 main）
+    note: >
+      主人令根因：期指卡显示「02:12 像断了」实为标签误导——CFFEX_HOLDINGS 是中金所每日收盘后一次性发布的日频结算数据，
+      11-06 场次要次日凌晨才出，盘中不可能有当日数据。改：CARD_DEFS freq「盘中每30分」→「日更(收盘后)」、slots→['15:30','02:00']；
+      渲染徽章 _uBadge('盘中','短线')→_uBadge('日更','收盘')。
+      【已上线】main 上 index.html 含 freq:'日更(收盘后)' 与 _uBadge('日更','收盘'（surgical push 仅 9 行真改、?v= 戳零改动）。
+      【阿狸咪】此卡已 live，勿再当作待上线项；任何卡片改动一律「修好审计完直接上线」，禁止发「要不要上线」类询问（铁律 2026-09-21）。
+    verify_how: >
+      主站硬刷后，期指主力合约卡徽章显示「日更 收盘」+ 时间如实（非盘中跳动）。
+    verified_at: "2026-11-06 19:15"
+    updated_by: 小九机AI
+    updated: "2026-11-06 19:15"
+
+  - id: premarket-reliability-1106
+    owner: 小九机（已上线 · 阿狸咪机须同步本地哨兵副本）
+    priority: P1
+    status: done
+    created: 2026-11-06
+    title: 盘前预案「大中午才出」+ 隔夜美股盘前不刷新 双根因根治（已上线 + 哨兵兜底）
+    note: >
+      根因双因：①GitHub schedule 系统性漂移（07:50 定时今天实际 11:42 才跑）；②v8_morning_plan.yml 末尾 INVEST_AVOID 推送步原 Write-Error;exit 1，
+      主卡已成功却整 job 标 failure（今天那批 run 全红）。修：INVEST_AVOID 步 continue-on-error:true + 非致命告警（删 exit 1），已净室推送 main。
+      另：小九机本地哨兵 v8_intraday_sentinel.py 新增 premarket_morning_plan()（工作日 07:45–08:30 盘前预案未生成则 dispatch v8_morning_plan.yml）
+      + premarket_us_hk_map()（同窗内隔夜美股 US_HK_MAP 未刷今日则 dispatch v8_us_hk_map.yml），均 fail-open、窗内 gated、main() 0.5 段已并联。
+      【阿狸咪必做】按双机协议，阿狸咪机(夜间)须在本地哨兵副本同步这两个函数 + 0.5 段调用（源文件 C:/Users/Administrator/.workbuddy/scripts/v8_intraday_sentinel.py，不在 v8 仓）。
+    verify_how: >
+      下个交易日(周一)盘前观察主站「盘前预案」是否在 07:45–08:30 出现（而非大中午）；阿狸咪机同步哨兵后 dry-run 确认两函数存在。
+    verified_at: "2026-11-06 19:15"
+    updated_by: 小九机AI
+    updated: "2026-11-06 19:15"
+
+  - id: ironrule-china-time-1106
+    owner: shared（双机共同遵守）
+    priority: P0
+    status: done
+    created: 2026-11-06
+    title: 铁律新增：一切时间计算与展示必须用中国时间（北京时间 UTC+8）
+    note: >
+      主人 2026-11-06 令「铁律加一条，必须用中国时间计算」。所有时间逻辑（定时档、新鲜度/陈旧判定、盘前窗、now 比较、并发组时窗、死锁冻结时长）
+      一律用北京时间(Asia/Shanghai UTC+8)计算与比较，禁止用 UTC、禁止用本地模糊时区。对外报时一律 +8 转 CST（GitHub API created_at/pushed_at 是 UTC，
+      漏转会把「08:32 盘前批」误读成「凌晨 00:32」）。代码层：哨兵等用 bj_now()；新写时间代码须显式 bj_now() 或本机 date +%H%M（本机已是 CST），
+      严禁 TZ=Asia/Shanghai date（Git Bash 无 tzdata 静默回退 UTC）。已写入用户级 MEMORY.md 铁律区。
+    verify_how: >
+      任何时间相关代码改动须 self-check：now 来源是否为 bj_now()/CST；对外时间是否 +8。
+    verified_at: "2026-11-06 19:15"
+    updated_by: 小九机AI
+    updated: "2026-11-06 19:15"
