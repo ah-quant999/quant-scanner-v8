@@ -262,6 +262,10 @@ WARN_SOURCES = {
     # 🛡 2026-08-27 主人令：SECTOR_FUND_FLOW_TREND 资金验证数据源（fetch_orphan 盘后产出），
     #   此前完全不在审计清单 → "资金验证60日夸张/陈旧"无人发现。纳入 WARN 48h。
     "SECTOR_FUND_FLOW_TREND": 48,
+    # 🆕 2026-11-06 主人令：国家队活跃度卡纳入自检（关闭「FRESHNESS_STATUS 盲检」盲区）。
+    #   盘后 daily（工作日20:50 v8_national_team.yml 产出 data/NATIONAL_TEAM.js），
+    #   阈值 48h 与 SECTOR_RS / LHB_DATA 等同档；周末/节假日由交易日口径豁免，不会误报。
+    "NATIONAL_TEAM": 48,
 }
 
 # 🛡 2026-08-20 主人令·一劳永逸：策略回测（统一）卡片依赖选股算法产出，
