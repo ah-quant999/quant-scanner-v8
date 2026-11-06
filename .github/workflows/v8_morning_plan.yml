@@ -195,6 +195,7 @@ jobs:
 
       - name: "📤 推送 data/INVEST_AVOID.js（api_put_file.py）"
         if: always()
+        continue-on-error: true
         shell: powershell
         env:
           GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
@@ -207,10 +208,10 @@ jobs:
           }
           python scripts/api_put_file.py data/INVEST_AVOID.js "data: invest-avoid consolidate refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
           if ($LASTEXITCODE -ne 0) {
-            Write-Error "[fail] INVEST_AVOID.js 推送失败（阻断 job，便于排查令牌/网络）"
-            exit 1
+            Write-Host "[warn] INVEST_AVOID.js 推送失败（非致命，不影响盘前预案主卡；下一轮重试）"
+          } else {
+            Write-Host "[ok] INVEST_AVOID.js 已推送"
           }
-          Write-Host "[ok] INVEST_AVOID.js 已推送"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 链路备忘（2026-10-22 阿狸咪的工程师）：
