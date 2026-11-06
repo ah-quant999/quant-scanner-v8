@@ -3524,7 +3524,7 @@ items:
       远端 raw_data/market_regime.json 与 sector_recommendation.json update_time 前进至 11-06+；
       build_deploy step[14] 跨层校验放行、连红止于 4 轮。三条件同批满足方可转 done。
     updated_by: 阿狸咪的工程师
-    updated: "2026-11-06 04:37"
+    updated: "2026-11-07 03:50"
 
     alimi_evidence_20261106_0650: >-
       2026-11-06 06:50 阿狸咪的工程师巡检补证（取证：#2920 job 日志逐行，非 run conclusion）。
@@ -3539,5 +3539,20 @@ items:
       20 条）。即：**闸门放行路径与问责判据结构性自相矛盾，走该路径的 run 必红**。待 #2921-#2924 队列消化后复核
       是否复发；复发则另行挂账 P1。
       ④ TOP10_DAILY 仍 11-05 05:33 档 20 条（22:02 档未恢复），待 B 批在队列 run 中重产。
+    alimi_evidence_20261107_0350: >-
+      2026-11-07 03:50 阿狸咪的工程师巡检补证（取证：#2937/#2938 job 日志 + build_deploy #13957 日志，非 run conclusion）。
+      ① 403 病灶未愈：#2938（11-07 02:49-03:41 CST，结论 success=假绿）链尾两波并发推送 398/425 个文件，
+      HTTP 403 共 159 次，失败 45+34 个（全部为 raw_data/kline_cache/688xxx.json + raw_data/sentiment_cycle.json），
+      「8 次均失败 HTTP 403」形态同 #2920。令牌修复 bccf28add（切 V8_GH_TOKEN）后仍 403 ⇒ ①②③（瘦身/退避/差量补推）均未落地。
+      失败量趋势 #2917=373 → #2918=485 → #2920=111 → #2938=79。
+      ② 🔴 自愈路径证伪（新定性）：#2937（success）链尾仅补 optimized_strategy raw（前进至 11-07）；#2938（success）链尾后
+      volatility=11-06 08:59 / sector_recommendation=11-06 08:59 / weekend_meta_report=11-06 09:16 / stock_list=11-06 02:14 全部未前进。
+      判据：四项 raw 不在当轮算法批产出清单（update_v8 日志「纯盘后产物，非 post_close 构建跳过」；链尾推 checkout 基线旧 raw=零增量不推）
+      ⇒「ALGO 链尾补 raw」自愈路径只覆盖当批产物，对跨批缺口结构性无解。
+      ③ 后果升级：build_deploy #13957（11-07 03:41 CST）跨层校验「真错位 4 项」：STOCK_LIST（raw 11-06 02:14 vs data 11-07 00:40，新进清单）/
+      VOLATILITY / WEEKEND_META_REPORT / SECTOR_RECOMMENDATION；OPTIMIZED_STRATEGY 已被 #2937 补推解除（反向证明「补 raw 即放行」）。
+      连红已达 14+ 轮（#13944-#13957）。⚠️ 时段门风险：CST 20:30 后「待重建」项转硬失败，11-07 白天若不补 raw，晚间 build 坏死面扩大。
+      ④ 修复方向建议追加：⑤ gate/调度面把「raw 落后于 data 的类别」纳入『缺什么跑什么』缺口检测，或 post_close 批夜间补排
+      （当前 gate 只看上游就绪，不看 raw 层缺口）。本轮阿狸咪零派发零改码（#13958/#13959 同 sha 双 run 在途，防踩踏）。
 
 
