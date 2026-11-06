@@ -70,7 +70,7 @@
     "national-team-4th-sub-1105",
     "algoraw-mass403-crosslayer-block-1106"
   ],
-  "updated": "2026-11-06 21:16",
+  "updated": "2026-11-07 03:50",
   "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径) (2026-10-22 小九：+intraday-first-batch-gate-1022 +ci-streak-fail-rootcause-1022 +ff3-composite-walkforward-1022；next_id_seq/max_next_id_seq 162→163；线上失配哈希按不盲改原则保留原值)",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
@@ -84,7 +84,7 @@
     "algo-step15-undefined-t": "e0f26d81ba7b796f",
     "algo-step16-sanity-hardfail": "fbbd75a0831eb090",
     "algo-t1-segment-d-gate-false-red-0926": "8eaa943827b7fb2e",
-    "algoraw-mass403-crosslayer-block-1106": "d643be281484e20d",
+    "algoraw-mass403-crosslayer-block-1106": "d4210eb7a1051d31",
     "align-gate-shiftleft": "13adb9af3b712cc1",
     "align-gate-unregistered-cron-workflow": "6c624f682dae1a12",
     "alimi-same-family-check": "e985164c73b845ff",
