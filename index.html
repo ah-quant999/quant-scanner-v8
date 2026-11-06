@@ -19152,7 +19152,8 @@ window.__renderV8CalToday();
     // 🔴 2026-10-26 主人令「最终推荐必须 = 终选输出 Top3，旧管线删掉」：
     //   主推与辅助全部直接来源于已上线的 TOP10_DAILY.top10（= 终选输出：金钻+缠论共振 38 只），
     //   按 total_score 降序取 Top3 = 设计上应推的最终推荐，与「终选输出卡 / 因子积分榜」同源同序；
-    //   彻底弃用陈旧独立的 FINAL_RECOMMEND_DATA.stocks（旧 20 只批次 2026-10-25，曾错批），仅当 TOP10_DAILY 缺失兜底。
+    //   彻底弃用陈旧独立的 FINAL_RECOMMEND_DATA.stocks（旧 20 只批次 2026-10-25，曾错批）；
+    //   🔴 2026-11-07 主人令「最终推荐·宁缺毋滥」：TOP10_DAILY 即当日唯一"收益率最高"真源，缺失即"今日未算出"，绝不以陈旧 FINAL_RECOMMEND_DATA 兜底滥竽充数。
     var TD = window.TOP10_DAILY || null;
     var _tdList = (TD && TD.top10) ? TD.top10 : [];
     function _normTop10(s){
@@ -19190,29 +19191,19 @@ window.__renderV8CalToday();
     //   即刻起盘前/盘中均展示 07:21 FINAL_RECOMMEND_DATA 实数据。如需恢复门禁，重写 if(_hr<15.5){...} 块即可。
     var sb=document.getElementById('finalStatusBadges'); if(sb) sb.innerHTML='';
     if(!mainStocks.length){
-      // TOP10_DAILY 无数据 → 退回 FINAL_RECOMMEND_DATA 兜底（可能陈旧）
-      if(!D || !D.stocks || !D.stocks.length){
-        el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">最终推荐数据暂不可用（等待盘后算法生成 TOP10_DAILY）</div>';
-        return;
-      }
-      mainStocks = D.stocks; allStocks = D.all_candidates||D.stocks; consStocks = D.consensus_stocks||[]; strongSec = D.strong_sectors||[]; _frUt = D.update_time||_frUt;
-    }
-    // 🔴 2026-10-16 主人令「方案B 因子融合整轮跳过·degrade_note 明示非全口径成功 ⇒ 没成功就不能展示」：
-    //   降级产物（DEGRADED_UPSTREAM / 因子实验室 data_date 非今日 / signal_edge 动态缺失）一律不推票，
-    //   只明示原因与数据时点，处置权交主人（此前前端对 data_degraded/degrade_note 零渲染，
-    //   降级产物被当正常推荐展示的漏洞由此堵死）。
-    if(D && D.data_degraded && mainStocks===D.stocks){
-      var _dn=String(D.degrade_note||'').replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
-      var _dut=D.update_time||'';
-      el.innerHTML='<div style="padding:20px;text-align:center">'
-        +'<div style="font-size:15px;font-weight:700;color:#fb923c;margin-bottom:8px">⚠️ 今日推荐未达全口径成功，按主人令不予展示</div>'
-        +'<div style="font-size:12.5px;color:var(--dim);line-height:1.7">'+(_dn||'上游数据降级，具体原因见 degrade_note')+'</div>'
-        +(_dut?'<div style="font-size:11.5px;color:var(--dim);margin-top:6px">数据时点：'+_dut+'</div>':'')
+      // 🔴 2026-11-07 主人令「最终推荐·宁缺毋滥」：终选输出(TOP10_DAILY)即当日唯一"收益率最高"真源；
+      //   无真源 → 绝不以陈旧 FINAL_RECOMMEND_DATA 滥竽充数，明示"今日未算出"并留空（可以空在那）。
+      var _why = (!_tdList.length)
+        ? '等待盘后算法生成终选输出（TOP10_DAILY · 金钻+缠论共振）'
+        : '当日终选输出中无符合"收益率最高 + 金钻+缠论共振"的有效标的';
+      el.innerHTML='<div style="padding:26px;text-align:center">'
+        +'<div style="font-size:16px;font-weight:700;color:var(--sub);margin-bottom:10px">📭 今日最终推荐未算出</div>'
+        +'<div style="font-size:12.5px;color:var(--dim);line-height:1.8">'+_why+'</div>'
+        +'<div style="font-size:11.5px;color:var(--dim);margin-top:10px">按主人令"宁缺毋滥"：无真收益率最高推荐时，不展示任何陈旧/替代数据。</div>'
         +'</div>';
-      var _sb2=document.getElementById('finalStatusBadges');
-      if(_sb2) _sb2.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">⚠️ 未达全口径 · 不予展示</span>';
-      var _tn2=document.getElementById('finalTopN'); if(_tn2) _tn2.textContent='0';
-      var _tg2=document.getElementById('finalHeaderTag'); if(_tg2) _tg2.textContent='降级未展示';
+      var _sbN=document.getElementById('finalStatusBadges'); if(_sbN) _sbN.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(148,163,184,.14);color:#94a3b8;border:1px solid rgba(148,163,184,.3);white-space:nowrap">📭 今日未算出</span>';
+      var _ntN=document.getElementById('finalTopN'); if(_ntN) _ntN.textContent='0';
+      var _tgN=document.getElementById('finalHeaderTag'); if(_tgN) _tgN.textContent='今日未算出';
       return;
     }
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(mainStocks.length||3);
@@ -19233,25 +19224,8 @@ window.__renderV8CalToday();
         if(it && it.code){ _algoIndex[String(it.code)] = { cons: it.consensus_count||0, algos: Array.isArray(it.algos_hit) ? it.algos_hit : [] }; }
       });
     }catch(e){ console.warn('[renderFinalRec] algoIndex', e); }
-    // 2026-09-03 主人令：Top5/共振轨字段缺失前端兜底（数据侧 final_recommend 点前缀修复次日生效）
-    //   '.601899' 类 ROE_TTM/高手跟踪源票 close/concepts/industry 全空 → 从 STOCK_PROFILE/STOCK_QUOTE 补齐
-    try{
-      var _profAll = (window.STOCK_PROFILE && window.STOCK_PROFILE.profiles) || {};
-      var _sqAll = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) || {};
-      function _frNk(c){ return String(c||'').replace(/\D/g,''); }
-      function _frFill(s){
-        var nk=_frNk(s.code);
-        var prof=_profAll[nk]||{};
-        if(!s.industry && prof.industry) s.industry=prof.industry;
-        if((!s.concepts||!s.concepts.length) && prof.concepts) s.concepts=prof.concepts.slice(0,8);
-        if(s.close==null){
-          var prefs=['','sz','sh','bj'];
-          for(var i=0;i<prefs.length;i++){ var q=_sqAll[prefs[i]+nk]; if(q&&q.price!=null){ s.close=q.price; if(s.pct_chg==null) s.pct_chg=q.pct; break; } }
-        }
-      }
-      (D.stocks||[]).forEach(_frFill);
-      (D.consensus_stocks||[]).forEach(_frFill);
-    }catch(e){ console.warn('[renderFinalRec] enrich', e); }
+    // 🔴 2026-11-07 主人令：删除仅服务于"陈旧 FINAL_RECOMMEND_DATA.stocks 兜底"的字段补齐死代码
+    //   （mainStocks 现恒来自 TOP10_DAILY，其 close/industry/concepts 已由 _normTop10 直接映射，无需再向 D.stocks 回填）。
     // 状态徽标行（统一 pill 风格）
     (function(){
       var sb=document.getElementById('finalStatusBadges'); if(!sb) return;
@@ -19344,12 +19318,18 @@ window.__renderV8CalToday();
     }
     var _candList = _tdList.map(_norm).filter(Boolean);
     if(!_candList.length){
-      // TOP10_DAILY 缺失 → 退回 FINAL_RECOMMEND_DATA 兜底
-      if(!D || !D.all_candidates || !D.all_candidates.length){
-        el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">候选池数据暂不可用（等待盘后算法生成 TOP10_DAILY）</div>';
-        return;
-      }
-      _candList = D.all_candidates;
+      // 🔴 2026-11-07 主人令「最终推荐·宁缺毋滥」：候选池亦属最终推荐体系，
+      //   无真源(TOP10_DAILY) → 绝不以陈旧 FINAL_RECOMMEND_DATA.all_candidates 兜底，明示"今日未算出"并留空。
+      var _cwhy = (!_tdList.length)
+        ? '等待盘后算法生成终选输出（TOP10_DAILY · 金钻+缠论共振）'
+        : '当日终选输出中无符合"收益率最高 + 金钻+缠论共振"的有效候选';
+      el.innerHTML='<div style="padding:26px;text-align:center">'
+        +'<div style="font-size:16px;font-weight:700;color:var(--sub);margin-bottom:10px">📭 今日推荐候选池未算出</div>'
+        +'<div style="font-size:12.5px;color:var(--dim);line-height:1.8">'+_cwhy+'</div>'
+        +'<div style="font-size:11.5px;color:var(--dim);margin-top:10px">按主人令"宁缺毋滥"：无真候选时，不展示任何陈旧/替代数据。</div>'
+        +'</div>';
+      var _csb=document.getElementById('finalCandBadges'); if(_csb) _csb.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(148,163,184,.14);color:#94a3b8;border:1px solid rgba(148,163,184,.3);white-space:nowrap">📭 今日未算出</span>';
+      return;
     }
     // 状态徽标（与 Top3 统一轻量 pill 风格）
     (function(){
