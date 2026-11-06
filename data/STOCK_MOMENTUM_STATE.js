@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-07 02:45",
- "generated": "2026-11-07 02:45",
+ "update_time": "2026-11-07 03:35",
+ "generated": "2026-11-07 03:35",
  "meta": {
-  "generated": "2026-11-07 02:45",
+  "generated": "2026-11-07 03:35",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 29,
+  "total_days": 30,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -12443,6 +12443,146 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "森特股份",
       "change_pct": 10.01,
       "price": 10.77,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-06",
+   "categories": {
+    "突破": [
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 10.096,
+      "price": 4.58,
+      "category": "突破"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 5.822,
+      "price": 26.9,
+      "category": "突破"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 20.0,
+      "price": 2.82,
+      "category": "突破"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 3.67,
+      "price": 5.65,
+      "category": "突破"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 3.55,
+      "price": 108.52,
+      "category": "突破"
+     },
+     {
+      "code": "002300",
+      "name": "太阳电缆",
+      "change_pct": 3.019,
+      "price": 8.53,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 10.096,
+      "price": 4.58,
+      "category": "加速"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 5.822,
+      "price": 26.9,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 10.096,
+      "price": 4.58,
+      "category": "短线选股"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 5.822,
+      "price": 26.9,
+      "category": "短线选股"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 20.0,
+      "price": 2.82,
+      "category": "短线选股"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 3.67,
+      "price": 5.65,
+      "category": "短线选股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 3.55,
+      "price": 108.52,
+      "category": "短线选股"
+     },
+     {
+      "code": "002300",
+      "name": "太阳电缆",
+      "change_pct": 3.019,
+      "price": 8.53,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 20.0,
+      "price": 2.82,
+      "category": "强势股"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 3.67,
+      "price": 5.65,
+      "category": "强势股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 3.55,
+      "price": 108.52,
+      "category": "强势股"
+     },
+     {
+      "code": "002300",
+      "name": "太阳电缆",
+      "change_pct": 3.019,
+      "price": 8.53,
       "category": "强势股"
      }
     ]
