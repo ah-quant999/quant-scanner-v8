@@ -200,12 +200,12 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=b3e127113e" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=e27da40fe4" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=4e32571ab4" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
-    <script src="data/SECTOR_LEADERS.js?v=f95e0fde3c" defer></script><!-- 🆕 板块龙头领涨（SECTOR_LEADERS）观测卡数据源（保留功能） -->
+    <script src="data/SECTOR_LEADERS.js?v=ff290a5cbe" defer></script><!-- 🆕 板块龙头领涨（SECTOR_LEADERS）观测卡数据源（保留功能） -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=1a4449d981" defer></script>
     <script>
@@ -1298,25 +1298,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=2033623b68" defer></script>
 <script src="data/CANDIDATE.js?v=0b9b9073cb" defer></script>
 
-    <script src="data/STOCK_STOP_DATA.js?v=314b633e73" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=90f71bfecc" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=32514115a6" defer></script>
 <script src="data/EXPERIMENT.js?v=1ee8692dac" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=40d48bba27" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=f17a88c608" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=d0c9a41131" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=d519b222d7" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=7a880229b1" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=e604a59c1e" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=629d83d073" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=02fda0ff61" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=873db152d8" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=4a81f7c0d9" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=86bb686412" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=c52be008ba" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
-<script src="data/BACKTEST_ALL_ALGOS.js?v=1a84fe059d" defer></script>
+<script src="data/BACKTEST_ALL_ALGOS.js?v=adab97ef0a" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=84824d5e96" defer></script>
+    <script src="data/FACTOR_LAB.js?v=49d4fa7b25" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=a16d535a05" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=bc2e039555" defer></script>
@@ -1335,12 +1335,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=c8ff3b0c31" defer></script>
 <script src="data/HB_XIAOJIU.js?v=81285f6b7f" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=6e3a57addc" defer></script>
-<script src="data/HEALTH_CHECK.js?v=41b82c4dbb" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=a04a8f96e5" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=eb26bc603a" defer></script>
+<script src="data/HEALTH_CHECK.js?v=98ceca7e7f" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=745e8e463d" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
-    <script src="data/CITIC_PE_THERMO.js?v=4071a667f5" defer></script>
-    <script src="data/CITIC_PE_BACKTEST.js?v=ac95112527" defer></script>
+    <script src="data/CITIC_PE_THERMO.js?v=2d26980120" defer></script>
+    <script src="data/CITIC_PE_BACKTEST.js?v=57cee3bd6b" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <script src="data/VALUATION_PERCENTILE.js?v=fe345bb3f0" defer></script>
     <!-- 🔴 2026-10-26 主人令·风险闸（回撤/估值/行业）落地：回撤闸 + 策略级 walk-forward 数据【内联本页】
@@ -2038,13 +2038,13 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=ca97197a87" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=f4ddc6df6a" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=7fbb3f92e2" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=7e3bc0d12f" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a2037cb4eb" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=8fa63bc4a0" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=5c03593b0d" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=c9a8fbe5ed" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=ec86d425a5" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=8a7ac0690a" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三因子（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三因子已并入因子实验室主评分 P5（amt60/turntrend/ivol60 纯加分项、walk-forward 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -15170,7 +15170,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
    注入行 ⇒ window.SECTOR_LEADERS 恒 undefined、整块恒不渲染（死块）。本版三项全治：
      ① 生成器 scripts/fetch_sector_leaders.py 扩 主升+启动（板块带 phase 字段）；
      ② 独立卡置于「概念/行业 → ETF·龙头 参考」卡上方（#sectorLeadersCard）；
-     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=f95e0fde3c"> 注入。
+     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=ff290a5cbe"> 注入。
    口径：主升=5日>3%且20日>5%；启动=5日>1.5%且20日>-8%（与「板块资金趋势」卡/生成器 _phase_of 三处同规则）。
    ⚠️ 护栏：无数据 ⇒ 卡保持 display:none（不产出空壳卡）；body.innerHTML 幂等重渲（重复调用不叠加）。 */
   /* ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射 · 填充函数 ═══
@@ -15919,7 +15919,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=7e3bc0d12f');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=8fa63bc4a0');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15928,7 +15928,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=a2037cb4eb');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=5c03593b0d');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -19659,7 +19659,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=aac0a7f3d3', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=a5c6a86abf', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=5b21013afc', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=31f953e1da', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
