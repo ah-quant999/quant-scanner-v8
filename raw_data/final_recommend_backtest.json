@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-07 02:40:59",
- "update_time": "2026-11-07 02:40:59",
+ "generated": "2026-11-07 03:30:44",
+ "update_time": "2026-11-07 03:30:44",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -45,8 +45,8 @@
    "best_return": 7.32,
    "worst_return": -10.97,
    "max_drawdown": -1.59,
-   "bench_avg_return": -0.383,
-   "bench_win_rate": 39.18,
+   "bench_avg_return": -0.3831,
+   "bench_win_rate": 39.19,
    "bench_days": 28
   },
   "2d": {
@@ -60,7 +60,7 @@
    "best_return": 10.89,
    "worst_return": -21.82,
    "max_drawdown": -3.63,
-   "bench_avg_return": -0.7393,
+   "bench_avg_return": -0.74,
    "bench_win_rate": 37.17,
    "bench_days": 28
   },
@@ -75,8 +75,8 @@
    "best_return": 10.79,
    "worst_return": -26.95,
    "max_drawdown": -5.71,
-   "bench_avg_return": -1.4383,
-   "bench_win_rate": 31.74,
+   "bench_avg_return": -1.4395,
+   "bench_win_rate": 31.72,
    "bench_days": 28
   },
   "5d": {
@@ -90,8 +90,8 @@
    "best_return": 13.31,
    "worst_return": -29.89,
    "max_drawdown": -9.78,
-   "bench_avg_return": -1.9842,
-   "bench_win_rate": 31.37,
+   "bench_avg_return": -1.9942,
+   "bench_win_rate": 31.32,
    "bench_days": 28
   },
   "10d": {
@@ -105,8 +105,8 @@
    "best_return": 21.13,
    "worst_return": -38.85,
    "max_drawdown": -16.61,
-   "bench_avg_return": -3.7312,
-   "bench_win_rate": 26.61,
+   "bench_avg_return": -3.7481,
+   "bench_win_rate": 26.51,
    "bench_days": 25
   },
   "20d": {
@@ -120,8 +120,8 @@
    "best_return": 13.56,
    "worst_return": -63.51,
    "max_drawdown": -28.2,
-   "bench_avg_return": -8.5065,
-   "bench_win_rate": 17.29,
+   "bench_avg_return": -8.5402,
+   "bench_win_rate": 17.14,
    "bench_days": 16
   },
   "30d": {
@@ -135,8 +135,8 @@
    "best_return": 8.63,
    "worst_return": -57.18,
    "max_drawdown": -29.48,
-   "bench_avg_return": -10.0982,
-   "bench_win_rate": 17.74,
+   "bench_avg_return": -10.1481,
+   "bench_win_rate": 17.63,
    "bench_days": 7
   },
   "45d": {
