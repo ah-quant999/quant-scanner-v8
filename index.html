@@ -536,7 +536,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       return '上一交易日(' + dsFull + ') ' + hm;
     }
     if(diff === 1) return '昨日 ' + hm;
-    return diff + '天前 ' + hm;
+    return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-') + ' ' + hm;
   };
   /* 🛡 2026-09-04 主人令「一劳永逸」：全站「更新于」胶囊内置陈旧度自判。
      ── 背景（主人 09-04 19:39 提问「盘后数据页每个卡时间都不对…是不是数据也是错的啊」）──
@@ -8000,7 +8000,24 @@ c.innerHTML = h;
       x.ok = x.revPos && x.roeOk;
     });
     hits = hits.filter(function(x){ return x.ok; });
-    hits.sort(function(a,b){ return (b.fund - a.fund) || b.tags.length - a.tags.length; });
+    // 🚀 2026-11-07 主人令：主题空间卡宗旨=「选出有未来大涨空间的股票」→ 按未来空间分(最科学推荐)降序
+    //   未来空间分 = 成长45%(营收增速+业绩预告增速) + 质量35%(ROE档位+评级) + 拐点20%(正向业绩预告)，0-100 整数
+    function _upside(x){
+      var fq = x.fq || {}, perf = x.perf || null;
+      var rg = (typeof fq.revenue_growth==='number') ? fq.revenue_growth : 0;    // 营收增速(%)
+      var fc = (perf && typeof perf.change_pct==='number') ? perf.change_pct : 0; // 业绩预告增速(%)
+      var grow = (Math.max(0, Math.min(1, rg/60)) * 0.6     // 营收增速封顶60% → 占成长60%
+                + Math.max(0, Math.min(1, fc/100)) * 0.4) * 100; // 预告增速封顶100% → 占成长40%
+      var roe = (typeof fq.roe==='number') ? fq.roe : 0;
+      var roeScore = Math.max(0, Math.min(1, roe/30));                  // ROE 封顶30% → 占质量70%
+      var gradeScore = ({A:1,B:0.7,C:0.4,D:0.2})[(fq.grade||'')] || 0;  // 评级占质量30%
+      var qual = (roeScore * 0.7 + gradeScore * 0.3) * 100;
+      var turn = (perf && fc > 0) ? 100 : 0;                            // 正向预告=拐点成立
+      var score = grow*0.45 + qual*0.35 + turn*0.20;
+      return Math.round(Math.max(0, Math.min(100, score)));
+    }
+    hits.forEach(function(x){ x.upside = _upside(x); });
+    hits.sort(function(a,b){ return (b.upside - a.upside) || (b.fund - a.fund) || b.tags.length - a.tags.length; });
     if(hits.length > 40) hits = hits.slice(0, 40);   // 每主题封顶 40 只，防爆屏
     var nFundPos = 0;
     hits.forEach(function(x){ if(x.nFundSec>0 && x.fund>0) nFundPos++; });
@@ -8008,12 +8025,14 @@ c.innerHTML = h;
     function _tvCard(x){
       var border = '#ff5252';   // 三项齐统一红（证据最全档）
       var tagStr = x.tags.slice(0,2).map(_ev).join(' / ') + (x.tags.length > 2 ? ' +' + (x.tags.length-2) : '');
+      var upBadge = (typeof x.upside==='number') ? '<span style="font-size:10px;color:#a78bfa;font-weight:700;">🚀 空间分 '+x.upside+'</span>' : '';
       var badge = perfBadge(x.perf) || revBadge(x.fq);
       var b2 = roeBadge(x.fq);
       if(badge && b2) badge += ' ' + b2; else if(b2) badge = b2;
       var badge3 = fundBadge(x);
       if(badge3) badge = badge ? badge + '<br>' + badge3 : badge3;
       if(!badge) badge = '<span style="font-size:10px;color:var(--dim);">仅概念命中</span>';
+      if(upBadge) badge = upBadge + (badge ? '<br>' + badge : '');
       return '<div style="border:1px solid ' + border + '44;border-left:3px solid ' + border + ';border-radius:8px;padding:6px 8px;font-size:12px;background:rgba(148,163,184,.05);">'
         + '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + quadMark(x) + '<b>' + _ev(x.code) + '</b> <span style="color:var(--sub);font-weight:400;">' + _ev(x.name) + '</span></div>'
         + '<div style="color:var(--dim);font-size:10.5px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + _ev(x.industry) + '</div>'
@@ -8066,7 +8085,7 @@ c.innerHTML = h;
       + '<div style="padding:12px 14px;">'
       + '<div style="background:rgba(192,132,252,0.21);border:1px solid rgba(192,132,252,0.63);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt);">'
       +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在 <b style="color:var(--txt);">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d;">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「概念想象空间 + 业绩正向 + ROE≥10%」三项齐的股票。</div>'
-      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列；按板块资金净额降序，资金为辅助验证。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列;按未来空间分（成长45%+质量35%+拐点20%）降序，资金为辅助验证。</div>'
       +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(255,208,36,0.23);border-left:3px solid #ffd024;"><b style="color:#ffd024;">🔥 主题会动：</b>7 个长期主题为固定种子，另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
       + '</div>'
       // 2026-10-02 晚 主人令：第一行固定 7 个长期主题种子，🔥金色热点独占第二行
@@ -8078,7 +8097,7 @@ c.innerHTML = h;
       + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'
       // 2026-10-02 晚 主人令「重复的整合到一行」：原三行里「三项齐 N 只」重复 2 遍 → 并入首行一行直出
       +   '本主题 <b style="color:var(--txt);">' + _ev(window.__TV_THEMES[window.__tvTheme].label) + '</b> · '
-      +   '<span style="color:#ff5252;font-weight:600;">✅三项齐 ' + hits.length + '</span> 只 · '
+      +   '<span style="color:#ff5252;font-weight:600;">✅三项齐 ' + hits.length + '</span> 只（按未来空间分排序） · '
       +   '<span style="color:#ff5252;font-weight:600;">💰资金净流入 ' + nFundPos + '</span> 只 · '
       +   '概念板块 <b>' + curSt.nSec + '</b> 个 · 板块资金合计 <b style="color:' + _numColor(curSt.net) + ';">' + _sign(curSt.net) + '亿</b>'
       +   (curSt.nSec ? ' · 均涨跌 <b style="color:' + _numColor(curSt.avg) + ';">' + _sign(curSt.avg, 2) + '%</b>' : '')
@@ -8089,7 +8108,7 @@ c.innerHTML = h;
                : '<div class="note" style="color:var(--dim);">本主题暂无「三项齐」股票（概念命中但缺业绩/ROE 证据），换个主题试试</div>')
       // 2026-09-13 主人令：A/B/C 分档后不再截断，删除「仅展示前 N 只」提示行。
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
-      + '卡内符号：🔥=资金流入+基本面证据 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
+      + '卡内符号：🚀=未来空间分（成长+质量+拐点合成，越高越具大涨空间）/ 🔥=资金流入+基本面证据 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
   };
 
@@ -13527,7 +13546,21 @@ function drawUpDownChart(){
       : z>=1 ? '空头持仓拥挤（z='+z+' ≥ +1）→ 逆向信号<b style="color:var(--up);">偏多</b> · 样本 '+(d.sample_size||'—')+' 个交易日'
       : z<=-1 ? '多头持仓拥挤（z='+z+' ≤ −1）→ 逆向信号<b style="color:var(--down);">偏空/减仓</b> · 样本 '+(d.sample_size||'—')+' 个交易日'
       : '多空持仓均衡（|z|='+Math.abs(z).toFixed(2)+' ＜ 1）→ 无逆向信号，中性观察 · 样本 '+(d.sample_size||'—')+' 个交易日';
-    h+='<div style="font-size:11.5px;color:var(--sub);line-height:1.7;margin-top:4px;"><b style="color:'+st.col+';">解读：</b>'+_rd+'</div>';
+    // 🌡 2026-11-07 主人令：温度条（净空占比 z 指针）持续右移=净空占比走高=机构加空/减多、避险升温；
+    //   按逆向框架（z≥+1 偏多）⇒ 偏多信号正在酝酿。复用 history_tail 近段净空占比序列判定漂移方向与累计幅度。
+    let _drift='';
+    const _tNlr=(d.history_tail||[]).map(function(x){return (typeof x.nlr==='number')?x.nlr:null;}).filter(function(v){return v!==null;});
+    if(_tNlr.length>=3){
+      const _f=_tNlr[0], _l=_tNlr[_tNlr.length-1], _dd=_l-_f;
+      const _dir=_dd>0.002?'右移（净空占比走高 → 机构加空/减多、避险升温）'
+                :_dd<-0.002?'左移（净空占比走低 → 机构减空/加多、风险偏好回暖）'
+                :'基本横盘（中性震荡）';
+      _drift='<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6;">🌡 温度条近 '+_tNlr.length+' 日<span style="color:var(--txt);">'+_dir+'</span>'
+        +(_dd>0.002?' → 逆向框架（z≥+1 偏多）下 <b style="color:var(--up);">偏多信号正在酝酿</b>'
+         :_dd<-0.002?' → 逆向框架下偏空/减仓压力缓和'
+         :'')+'（累计 Δ净空占比 '+(_dd>=0?'+':'')+(_dd*100).toFixed(2)+'pct）</div>';
+    }
+    h+='<div style="font-size:11.5px;color:var(--txt);background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-top:4px;margin-bottom:10px;line-height:1.7;"><b style="color:'+st.col+';">解读：</b>'+_rd+(_drift||'')+'</div>';
     // 近10日净空占比迷你走势（文字条形，宽度按 nlr 相对极值）
     const tail=(d.history_tail||[]).slice(-10);
     if(tail.length){
