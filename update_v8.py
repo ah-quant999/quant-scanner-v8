@@ -253,6 +253,7 @@ CATEGORY_MAP = {
     "CFFEX_HOLDINGS": "intraday,post_close",
     "CFFEX_POSITION": "post_close",  # 🆕 2026-10-15 与 cloud_fetch 同步：持仓排名16:30后公布
     "RESONANCE_TRACK": "post_close",  # 🆕 2026-10-21 最强共振回测跟踪：信号源自龙虎榜(17:30后)，归盘后档
+    "NATIONAL_TEAM": "post_close",            # 🆕 2026-11-06 主人令：国家队活跃度卡（v8_national_team.yml 工作日20:50 产出 data/NATIONAL_TEAM.js，4 子信号加权）
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
     # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷——与 cloud_fetch_v8.py 同步移出
