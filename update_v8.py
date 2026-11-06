@@ -1216,6 +1216,19 @@ def _is_raw_empty_or_stale(raw_path):
     return (False, "")
 
 
+def _parse_ts_any(s):
+    """兼容 '2026-11-06 20:32:48' / '2026-11-06T20:32:48' / 无秒 / 仅日期；解析失败返回 None。"""
+    if not s:
+        return None
+    t = str(s).strip().replace("T", " ")
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(t, fmt)
+        except ValueError:
+            continue
+    return None
+
+
 def _should_skip_data_staleness_guard(var_name, obj):
     """🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖。
 
@@ -1262,23 +1275,45 @@ def _should_skip_data_staleness_guard(var_name, obj):
             break
     if src_path is None:
         return (False, "raw 源不在 DATA_SOURCES 或文件不存在")
-    candidates = []
+    # 🔴 2026-11-06 22:20 阿狸咪的工程师（「build 回写旧档」复发根因修复）：
+    #   原 raw_ts = max(顶层ut, _meta.lu, mtime) 三源字符串混排，有两个结构性漏洞：
+    #   ① build 在 `git reset --hard FETCH_HEAD` 之后才跑本护栏，raw mtime 被 checkout
+    #      重置为「构建当下」⇒ 只要 data 是当天构建前几小时产出的，mtime 恒新于 data
+    #      语义时间 ⇒ 护栏恒失效，旧 raw 照旧洗新 data（实证：2026-11-06 22:06 build
+    #      2416b5cae9 把 ALGO #2934 刚推的新 TOP10_DAILY(20:32)/FINAL_RECOMMEND_DATA(21:50)
+    #      双双洗回旧档；同日 20:57/21:31 已两度同类回退）。
+    #   ② 'T' 分隔与空格分隔的时间戳直接字符串 max：'T'(0x54) > ' '(0x20) ⇒
+    #      "2026-11-06T08:59:04" 字符串上反而大于 "2026-11-06 22:04:30"，
+    #      同轮 MARKET_REGIME 被跳过纯属字符串比较事故，并非护栏按语义生效。
+    #   修法：① raw 有语义时间（顶层 ut / _meta.lu 任一）时**只用语义时间**取 max，
+    #   mtime 仅在 raw 完全无语义时间时兜底（checkout 重置的 mtime 不再参与判决）；
+    #   ② 比较改为解析 datetime（兼容 'T'/空格分隔，见 _parse_ts_any），不再字符串混排。
+    sem = []
     if isinstance(obj, dict):
         top = obj.get("update_time") or ""
         if top:
-            candidates.append(("顶层 ut", top))
+            sem.append(("顶层 ut", top))
         meta = (obj.get("_meta") or {}).get("last_update") or ""
         if meta:
-            candidates.append(("_meta.lu", meta))
-    try:
-        mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
-        candidates.append(("mtime", mtime_ts))
-    except Exception:
-        pass
+            sem.append(("_meta.lu", meta))
+    candidates = []
+    if sem:
+        candidates = sem
+    else:
+        try:
+            mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+            candidates.append(("mtime", mtime_ts))
+        except Exception:
+            pass
     raw_ts = max([t for _, t in candidates], default="")
     if not raw_ts:
         return (False, "raw 真实时间无法取得")
-    if data_ts > raw_ts:
+    d_dt, r_dt = _parse_ts_any(data_ts), _parse_ts_any(raw_ts)
+    if d_dt is not None and r_dt is not None:
+        newer = d_dt > r_dt
+    else:
+        newer = data_ts > raw_ts
+    if newer:
         return (True, f"data={data_ts} 已新于 raw={raw_ts}（{dict(candidates)}），跳过覆盖")
     return (False, f"data={data_ts} ≤ raw={raw_ts}（{dict(candidates)}）")
 
