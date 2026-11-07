@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-07 17:56",
+  "update_time": "2026-11-07 18:57",
   "data_date": "2026-11-06",
   "data_date_source": "kline",
   "fetch_date": "2026-11-07",
@@ -825,14 +825,14 @@
       "pct_60d": -2.94,
       "pct_90d": 2.46,
       "pct_180d": -26.62,
-      "pct_52w": -20.26,
+      "pct_52w": null,
       "relative_5d": 5.44,
       "relative_20d": -2.89,
       "relative_30d": -4.23,
       "relative_60d": -2.94,
       "relative_90d": 2.46,
       "relative_180d": -26.62,
-      "relative_52w": -20.26
+      "relative_52w": null
     },
     {
       "name": "美容护理",
@@ -4439,14 +4439,14 @@
       "pct_60d": -2.94,
       "pct_90d": 2.46,
       "pct_180d": -26.62,
-      "pct_52w": -20.26,
+      "pct_52w": null,
       "relative_5d": 5.44,
       "relative_20d": -2.89,
       "relative_30d": -4.23,
       "relative_60d": -2.94,
       "relative_90d": 2.46,
       "relative_180d": -26.62,
-      "relative_52w": -20.26
+      "relative_52w": null
     },
     {
       "name": "黑色家电",
