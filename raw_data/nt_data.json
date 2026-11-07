@@ -1,23 +1,23 @@
 {
-  "update_time": "2026-11-07 17:21",
+  "update_time": "2026-11-07 22:08",
   "alerts": [
     {
       "type": "summary",
       "severity": "medium",
       "message": "ETF监测中，0涨12跌",
-      "time": "17:21"
+      "time": "22:08"
     },
     {
       "type": "etf",
       "severity": "high",
       "message": "5G通信ETF 大跌 6.05%",
-      "time": "17:22"
+      "time": "22:09"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "芯片ETF 大跌 3.03%",
-      "time": "17:22"
+      "time": "22:09"
     }
   ],
   "etfFlow": {
