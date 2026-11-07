@@ -1,6 +1,6 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-07 21:11:43",
+  "generated": "2026-11-07 22:16:03",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
@@ -5868,74 +5868,74 @@ window.STOCK_MOMENTUM_ENHANCED = {
       "短线选股",
       "突破"
      ],
-     "change_pct": 3.25,
-     "sel_change_pct": 3.25,
+     "change_pct": 3.24,
+     "sel_change_pct": 3.24,
      "data_available": true,
-     "consec_before": 0,
-     "stage": "退潮",
+     "consec_before": 2,
+     "stage": "启动",
      "consecutive_up_days": 0,
-     "max_gain_pct": 2.32,
-     "max_drawdown_pct": 7.46,
-     "t1_gain_pct": -0.5,
-     "t3_gain_pct": -0.33,
-     "t5_gain_pct": -0.83,
-     "t10_gain_pct": -7.46,
-     "last_gain_pct": -7.46,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
      "pattern": "普通",
-     "note": "连涨前0天 回撤7.46%",
+     "note": "连涨前2天 回撤0.0%",
      "daily_returns": [
       {
        "T": "T+1",
-       "date": "2026-10-08",
-       "gain": -0.5
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+2",
-       "date": "2026-10-09",
-       "gain": 2.32
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+3",
-       "date": "2026-10-12",
-       "gain": -0.33
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+4",
-       "date": "2026-10-13",
-       "gain": 0.0
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+5",
-       "date": "2026-10-14",
-       "gain": -0.83
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+6",
-       "date": "2026-10-15",
-       "gain": -4.31
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+7",
-       "date": "2026-10-16",
-       "gain": -3.98
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+8",
-       "date": "2026-10-19",
-       "gain": -4.81
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+9",
-       "date": "2026-10-20",
-       "gain": -6.3
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+10",
-       "date": "2026-10-21",
-       "gain": -7.46
+       "date": "",
+       "gain": null
       }
      ],
-     "entry_price": 6.03
+     "entry_price": 6.7
     },
     {
      "code": "002962",
@@ -12440,13 +12440,13 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "consec_before": 3,
      "stage": "主升",
      "consecutive_up_days": 0,
-     "max_gain_pct": 1.68,
+     "max_gain_pct": 4.69,
      "max_drawdown_pct": 5.66,
      "t1_gain_pct": -4.02,
      "t3_gain_pct": -4.86,
      "t5_gain_pct": -1.06,
-     "t10_gain_pct": -2.12,
-     "last_gain_pct": -2.12,
+     "t10_gain_pct": 4.69,
+     "last_gain_pct": 4.69,
      "pattern": "普通",
      "note": "连涨前3天 回撤5.66%",
      "daily_returns": [
@@ -12487,18 +12487,18 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+8",
-       "date": "",
-       "gain": null
+       "date": "2026-11-02",
+       "gain": 3.14
       },
       {
        "T": "T+9",
-       "date": "",
-       "gain": null
+       "date": "2026-11-03",
+       "gain": 1.15
       },
       {
        "T": "T+10",
-       "date": "",
-       "gain": null
+       "date": "2026-11-04",
+       "gain": 4.69
       }
      ],
      "entry_price": 22.62
@@ -14684,9 +14684,9 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "max_drawdown_pct": 17.5,
      "t1_gain_pct": -5.54,
      "t3_gain_pct": -9.85,
-     "t5_gain_pct": -17.5,
-     "t10_gain_pct": -17.5,
-     "last_gain_pct": -17.5,
+     "t5_gain_pct": -13.19,
+     "t10_gain_pct": -11.35,
+     "last_gain_pct": -11.35,
      "pattern": "波动大",
      "note": "连涨前5天 回撤17.5%",
      "daily_returns": [
@@ -14712,23 +14712,23 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+5",
-       "date": "",
-       "gain": null
+       "date": "2026-11-02",
+       "gain": -13.19
       },
       {
        "T": "T+6",
-       "date": "",
-       "gain": null
+       "date": "2026-11-03",
+       "gain": -14.25
       },
       {
        "T": "T+7",
-       "date": "",
-       "gain": null
+       "date": "2026-11-04",
+       "gain": -12.84
       },
       {
        "T": "T+8",
-       "date": "",
-       "gain": null
+       "date": "2026-11-05",
+       "gain": -11.35
       },
       {
        "T": "T+9",
@@ -14761,14 +14761,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "stage": "震荡",
      "consecutive_up_days": 0,
      "max_gain_pct": -0.25,
-     "max_drawdown_pct": 3.68,
+     "max_drawdown_pct": 5.88,
      "t1_gain_pct": -3.68,
      "t3_gain_pct": -1.47,
-     "t5_gain_pct": -0.25,
-     "t10_gain_pct": -0.25,
-     "last_gain_pct": -0.25,
+     "t5_gain_pct": -3.92,
+     "t10_gain_pct": -2.7,
+     "last_gain_pct": -2.7,
      "pattern": "普通",
-     "note": "连涨前1天 回撤3.68%",
+     "note": "连涨前1天 回撤5.88%",
      "daily_returns": [
       {
        "T": "T+1",
@@ -14792,23 +14792,23 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+5",
-       "date": "",
-       "gain": null
+       "date": "2026-11-02",
+       "gain": -3.92
       },
       {
        "T": "T+6",
-       "date": "",
-       "gain": null
+       "date": "2026-11-03",
+       "gain": -2.33
       },
       {
        "T": "T+7",
-       "date": "",
-       "gain": null
+       "date": "2026-11-04",
+       "gain": -5.88
       },
       {
        "T": "T+8",
-       "date": "",
-       "gain": null
+       "date": "2026-11-05",
+       "gain": -2.7
       },
       {
        "T": "T+9",
