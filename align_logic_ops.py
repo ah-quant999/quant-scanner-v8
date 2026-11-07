@@ -78,6 +78,10 @@ MUST_HAVE_CRON = {
     #   产物 data/DAJIJIN_REDUCTION.js，供「🔒 暂未上架」页卡片读取（只减不增＝利空前瞻信号）。
     #   跑小九 cn（[self-hosted, cn]，东财域境外不可达）；已挂 logic.html 补充表。
     "v8_dajijin_fetch": "大基金增减持监控(工作日20:30)",
+    # 2026-11-08 补登记（门禁前移 [4/8] 拦截补漏）：股东增减持·结构化监控抓取链（全市场
+    #   法定披露增减持明细，产 data/SHAREHOLDER_CHANGE.js，供盘后数据页「📊 股东增减持·结构化监控」卡）。
+    #   工作日 20:30 CST 跑 cn runner；入库时漏双登记 ⇒ 门禁前移 [4/8] 恒红。本项即收口。
+    "v8_shareholder_change_fetch": "股东增减持结构化监控抓取(工作日20:30)",
     # 2026-10-05 阿狸咪的工程师补登记（门禁 [4/8] 拦截补漏）：未来预测子TAB数据链
     #   （v8/gen_market_thermo.py，交易日 16:10 CST 盘后，[self-hosted, cn]）——
     #   10-05 建链时漏双登记，Pre-deploy audit [4/8] 连续红灯阻断 deploy；
