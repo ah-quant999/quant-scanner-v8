@@ -1549,6 +1549,20 @@ def build(category=None, detect_changes=False):
             if obj is None:
                 skipped += 1
                 continue
+            # 🛡 2026-11-08 主人令一劳永逸根治「个股查询回归」（指令U②：20:23 盘后算法链重生成
+            #   STOCK_LIST.js 成段丢失 3863 只 → 601717/601688 等整段消失、前端查不了）：
+            #   转换层加股票数下限守卫。stock_names.json 正常约 9691 只；一旦因 transient bad build
+            #   掉到 < 9000（实测坏态 5829/7769，均远低于基线），直接跳过重建、保留线上旧版
+            #   data/STOCK_LIST.js（绝不用残缺数据覆盖好数据），并打红色告警交下游 HEALTH_CHECK 问责。
+            #   不构成整档构建失败（遵循 2026-10-31 单点故障不阻断其余 200+ 产物原则），仅隔离本文件。
+            if var_name == "STOCK_LIST":
+                _sl_cnt = len(obj) if isinstance(obj, list) else len(obj.get("data", []) or [])
+                if _sl_cnt < 9000:
+                    print(f"  🔴 {src_path.name} → data/{var_name}.js | 股票数_guard 触发："
+                          f"载入 {_sl_cnt} 只 < 下限 9000（基线约 9691），疑似 transient bad build 成段丢失；"
+                          f"跳过重建、保留线上旧版 data/STOCK_LIST.js（绝不用残缺数据覆盖好数据）")
+                    skipped += 1
+                    continue
             # 🆕 2026-09-05 cn 离线兜底：空/占位产物跳过重建，保留线上旧版 data/X.js（不写空污染前端）
             is_empty, empty_reason = _is_raw_empty_or_stale(src_path)
             if is_empty:
