@@ -6487,67 +6487,50 @@ c.innerHTML = h;
        已下架的大牛股猎手 / 全站精选 不在此列（其回测已随选股一并删除）。
        全部读取各策略回测源实时数据，样本累积后自动刷新，不写死。
        2026-09-03 主人令②：「📐 各策略回测如何算」整块迁往 logic.html 逻辑详解页 lg-st 子页（回测汇总卡内），本页不再渲染。 */
+    /* ══ 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名 · 收益率与胜率降序） ══
+       数据源 window.BACKTEST_ALL_ALGOS —— 由 E 批（回测批，在 D 批最终推荐之后）
+       algorithms/gen_backtest_all_algos.py 产出。两个子块：
+         卡级主表：每张卡只取既定主口径（同口径横比，绝不把 T+1 与 T+20 放一起比），
+            样本 ≥30 才排名，按「胜率降序 → 平均收益降序」。
+       下架提醒：低胜率/低收益、样本达标且源在链内的，逐条提请主人决定是否下架。
+       诚实铁律：未知一律 null → 显示「—」或「累积中」，绝不把「没样本」画成 0。 */
     (function(){
-      var _STRATS = [
-        /* 🔴 2026-10-11 主人令「完全下架」：triple（三重共识）/ crds（逆势龙头）条目随两策略下架移除。 */
-      ];
-      // P2-A：低样本判定阈
-      var SAMPLE_LOW_THRESHOLD = 30;
+      var A = window.BACKTEST_ALL_ALGOS;
+      if(!A || !A.rows) return;
+      var MINS = A.min_samples || 30;
       
-      // P2-A：低样本灰显样式（整行降饱和）
-      
-      
-      
-      // 🆕 2026-09-11 全算法回测汇总用（null → 「—」，绝不把「没样本」画成 0）
-      
-      
-      
-      /* ══ 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名 · 收益率与胜率降序） ══
-         数据源 window.BACKTEST_ALL_ALGOS —— 由 E 批（回测批，在 D 批最终推荐之后）
-         algorithms/gen_backtest_all_algos.py 产出。两个子块：
-           卡级主表：每张卡只取既定主口径（同口径横比，绝不把 T+1 与 T+20 放一起比），
-              样本 ≥30 才排名，按「胜率降序 → 平均收益降序」。
-           下架提醒：低胜率/低收益、样本达标且源在链内的，逐条提请主人决定是否下架。
-         诚实铁律：未知一律 null → 显示「—」或「累积中」，绝不把「没样本」画成 0。 */
-      (function(){
-        var A = window.BACKTEST_ALL_ALGOS;
-        if(!A || !A.rows) return;
-        var MINS = A.min_samples || 30;
-        
-        /* 累积中（不排名，明示原因）🔴 2026-10-12：并入 rows 里样本为 0 的口径内策略（如量质双擎），杜绝静默丢失 */
-        var _insAll = (A.insufficient || []).concat((A.rows || []).filter(function(r){
-          return r && r.win_rate == null && (window.__STRATEGY_BACKTESTS || []).some(function(m){ return m && m.name === r.card; });
-        }));
-        if(_insAll.length){
-          html += '<div style="margin:8px 0 4px;font-size:11px;color:var(--dim);line-height:1.7;">⏳ <b style="color:var(--sub);">累积中（样本 &lt; '+MINS+'，不进主表、不做下架评估）</b>：'
-               +  _insAll.map(function(r){
-                    return _esc(r.card)+'·'+_esc(r.label||'—')+' <b style="color:var(--sub);">n='+(r.sample||0)+'</b>'
-                         + (r.win_rate==null?'':'·胜率'+Number(r.win_rate).toFixed(1)+'%');
-                  }).join(' ｜ ')
-               +  '</div>';
-        }
+      /* 累积中（不排名，明示原因）🔴 2026-10-12：并入 rows 里样本为 0 的口径内策略（如量质双擎），杜绝静默丢失 */
+      var _insAll = (A.insufficient || []).concat((A.rows || []).filter(function(r){
+        return r && r.win_rate == null && (window.__STRATEGY_BACKTESTS || []).some(function(m){ return m && m.name === r.card; });
+      }));
+      if(_insAll.length){
+        html += '<div style="margin:8px 0 4px;font-size:11px;color:var(--dim);line-height:1.7;">⏳ <b style="color:var(--sub);">累积中（样本 &lt; '+MINS+'，不进主表、不做下架评估）</b>：'
+             +  _insAll.map(function(r){
+                  return _esc(r.card)+'·'+_esc(r.label||'—')+' <b style="color:var(--sub);">n='+(r.sample||0)+'</b>'
+                       + (r.win_rate==null?'':'·胜率'+Number(r.win_rate).toFixed(1)+'%');
+                }).join(' ｜ ')
+             +  '</div>';
+      }
 
-                /* 观察名单 */
+      /* 观察名单 */
 
-        /* 🗑️ 2026-09-13 主人令：原「是否下架并停止跟踪」提请块**整块删除**。
-           理由（主人原话）：选股池要关注的是**选股的对错**，不该用「胜率/平均收益」
-           这套信号回测口径去反向提议下架策略。 */
-        if((A.watch_list||[]).length){
-          html += '<div style="margin:10px 0;padding:10px 12px;border-left:4px solid rgba(148,163,184,.5);border-radius:8px;background:rgba(148,163,184,.05);">';
-          html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">👀 观察名单（不提议下架，仅记录）</div>';
-          (A.watch_list||[]).forEach(function(w){
-            html += '<div style="font-size:11px;color:var(--sub);line-height:1.8;">• <b style="color:var(--txt);">'+_esc(w.card)+'</b>·'+_esc(w.label||'—')
-                 +  '：'+_esc((w.reasons||[]).join('；'))
-                 +  (w.note?(' <span style="color:var(--dim);">['+_esc(w.note)+']</span>'):'')+'</div>';
-          });
-          html += '</div>';
-        }
-        html += '<div style="font-size:10.5px;color:var(--dim);margin:6px 0 14px;line-height:1.6;">'
-             +  '🧾 口径说明：只取各算法自身「最佳持有期」那一档（与上方「🏁 算法回测总表」同口径）· 样本 ≥'+MINS+' 才参与排名'
-             +  '｜ 排序：'+_esc(A.sort_rule||'')+' ｜ 数据日 '+_esc(A.data_day||'—')
-             +  '（'+_esc(A.chain_note||'')+'）。'+_esc(A.honesty_note||'')+'</div>';
-      })();
-
+      /* 🗑️ 2026-09-13 主人令：原「是否下架并停止跟踪」提请块**整块删除**。
+         理由（主人原话）：选股池要关注的是**选股的对错**，不该用「胜率/平均收益」
+         这套信号回测口径去反向提议下架策略。 */
+      if((A.watch_list||[]).length){
+        html += '<div style="margin:10px 0;padding:10px 12px;border-left:4px solid rgba(148,163,184,.5);border-radius:8px;background:rgba(148,163,184,.05);">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">👀 观察名单（不提议下架，仅记录）</div>';
+        (A.watch_list||[]).forEach(function(w){
+          html += '<div style="font-size:11px;color:var(--sub);line-height:1.8;">• <b style="color:var(--txt);">'+_esc(w.card)+'</b>·'+_esc(w.label||'—')
+               +  '：'+_esc((w.reasons||[]).join('；'))
+               +  (w.note?(' <span style="color:var(--dim);">['+_esc(w.note)+']</span>'):'')+'</div>';
+        });
+        html += '</div>';
+      }
+      html += '<div style="font-size:10.5px;color:var(--dim);margin:6px 0 14px;line-height:1.6;">'
+           +  '🧾 口径说明：只取各算法自身「最佳持有期」那一档（与上方「🏁 算法回测总表」同口径）· 样本 ≥'+MINS+' 才参与排名'
+           +  '｜ 排序：'+_esc(A.sort_rule||'')+' ｜ 数据日 '+_esc(A.data_day||'—')
+           +  '（'+_esc(A.chain_note||'')+'）。'+_esc(A.honesty_note||'')+'</div>';
     })();
 
     /* 🗑️ 2026-09-13 主人令：「这2个删除」（第二块）—— 原池内浮盈跟踪小表**整块删除**。
