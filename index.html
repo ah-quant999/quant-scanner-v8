@@ -1295,6 +1295,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_POOL_TRACKER.js?v=c991d65654" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=18f787b4f6" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=dd52f88ac8" defer></script>
+    <script src="data/HUIJIN_ETF_DRILL.js?v=202611072220" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=86bb686412" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=9ee968a3ed" defer></script>
@@ -15476,6 +15477,47 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
              + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:2px;">' + _e(s.detail) + '</div></div>';
         }
         h += '</div>';
+        /* 🆕 2026-11-07 主人令·ETF下钻子表（折叠·卡内明细·挂国家队活跃度卡下方） */
+        (function(){
+          var _dd = window.HUIJIN_ETF_DRILL;
+          if(!_dd || !_dd.etfs || !_dd.etfs.length) return;
+          var _rows = _dd.etfs.map(function(r){
+            var _ds = r.d_shares_yi, _da = r.d_amount_yi, _pct = r.pct, _sh = r.shares_yi, _m20 = r.ma20_mult;
+            var _col = (_ds===null)?'var(--dim)':(_ds>=0?'#ff5252':'#26d9c2');
+            var _dsTxt = (_ds===null)?'—':((_ds>=0?'+':'')+Number(_ds).toFixed(2));
+            var _daTxt = (_da===null)?'—':((_da>=0?'+':'')+Number(_da).toFixed(2));
+            var _pctTxt = (_pct===null)?'—':((_pct>=0?'+':'')+Number(_pct).toFixed(2)+'%');
+            var _shTxt = (_sh===null)?'—':Number(_sh).toFixed(1);
+            var _m20Txt = (_m20===null)?'—':(Number(_m20).toFixed(2)+'×');
+            return '<tr>'
+              + '<td style="padding:3px 6px;font-size:11px;color:var(--txt);white-space:nowrap;">'+r.code+'</td>'
+              + '<td style="padding:3px 6px;font-size:11px;color:var(--sub);white-space:nowrap;">'+r.name+'</td>'
+              + '<td style="padding:3px 6px;font-size:11px;color:'+_col+';text-align:right;white-space:nowrap;">'+_dsTxt+'</td>'
+              + '<td style="padding:3px 6px;font-size:11px;color:'+_col+';text-align:right;white-space:nowrap;">'+_daTxt+'</td>'
+              + '<td style="padding:3px 6px;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap;">'+_pctTxt+'</td>'
+              + '<td style="padding:3px 6px;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap;">'+_shTxt+'</td>'
+              + '<td style="padding:3px 6px;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap;">'+_m20Txt+'</td>'
+              + '<td style="padding:3px 6px;font-size:10px;color:#c084fc;white-space:nowrap;">'+_e(r.huijin||'')+'</td>'
+              + '</tr>';
+          }).join('');
+          h += '<div style="margin-top:10px;border-top:1px dashed var(--border);padding-top:8px;">'
+            + '<button onclick="var t=document.getElementById(\'huijinDrillTbl\');t.style.display=(t.style.display===\'none\'?\'block\':\'none\');" '
+            + 'style="background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--sub);font-size:11.5px;padding:4px 10px;cursor:pointer;">'
+            + '▸ 汇金宽基ETF下钻（'+_dd.etfs.length+'只·'+(_dd.matched_real||0)+'只含真实申赎）</button>'
+            + '<div id="huijinDrillTbl" style="display:none;margin-top:8px;overflow-x:auto;">'
+            + '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
+            + '<thead><tr style="color:var(--dim);text-align:left;">'
+            + '<th style="padding:3px 6px;">代码</th><th style="padding:3px 6px;">名称</th>'
+            + '<th style="padding:3px 6px;text-align:right;">申赎份额(亿份)</th>'
+            + '<th style="padding:3px 6px;text-align:right;">申赎金额(亿元)</th>'
+            + '<th style="padding:3px 6px;text-align:right;">占比%</th>'
+            + '<th style="padding:3px 6px;text-align:right;">当前份额(亿份)</th>'
+            + '<th style="padding:3px 6px;text-align:right;">较20日均</th>'
+            + '<th style="padding:3px 6px;">汇金标注</th></tr></thead>'
+            + '<tbody>'+_rows+'</tbody></table>'
+            + '<div style="font-size:10px;color:var(--dim);margin-top:4px;line-height:1.5;">'+_e(_dd.note||'')+'</div>'
+            + '</div></div>';
+        })();
         body.innerHTML = h;
         /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；派发信息降为胶囊后缀小字 */
         if(window.setBadge) setBadge('nationalTeamFresh','auto','',D.update_time,'');
