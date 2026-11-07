@@ -37,4 +37,29 @@
 ## 已完成（供小九对齐基线，勿重复）
 - 本轮已 live：`更新于 MM-DD HH:MM` 日期格式 + IF 卡黄框 + 温度条漂移解读 + 主题空间分科学重排（`35df6e03..bef85e24`）。
 - 本轮已 live：最终推荐·宁缺毋滥（删 `FINAL_RECOMMEND_DATA` 兜底 + 死代码，空态"今日未算出"留空）。
-- 主站当前 HEAD = `bef85e24`（与 origin/main 对齐）。
+- 主站当前 HEAD = `3b771e06`（2026-11-07 12:04 交接自动更新后，与 origin/main 对齐）。
+
+---
+
+## ⚠️ 待小九执行（2026-11-07 12:10 审计新增 · 真缺口）
+
+> 经 WorkBuddy AI 四方对齐实核查证：代码层（main 源码 + 前端实时页 + 逻辑详解页坚果云真源）**全部改好并实时核验通过**；以下两项是**小九端专属职责、AI 沙箱无法代执行**，需小九接手：
+
+### 待办 A：dd689 逻辑详解页发布机未发布（当前返回导航 stub）
+- **现状**：`https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/`（含 `/index.html`）实时返回 **8446 字节「九宝一站式导航」stub**，逻辑详解页补录内容（温度条漂移解读 / 宁缺毋滥铁律 / 主题空间分 / 淘汰算法总表 / 更新于铁律 等）**零命中**。
+- **真源已就绪**：坚果云私享副本 `C:/Users/HH20210606/Nutstore/v8_logic_private/logic.full.html`（826455 字节，6 处补录全部落位）经坚果云同步至小九机。
+- **要求**：小九**恢复原发布机**，将坚果云真源 republish 到 dd689（唯一 canonical 地址，勿换地址）。republish 后硬抓 dd689 核验 6 处标记命中。
+- **依据**：主人铁律「dd689 是逻辑详解页唯一进入地址，即便暂时返回 stub 也只需恢复原发布机」。AI 不擅自 re-publish（避免动 canonical 地址）。
+
+### 待办 B：signal_edge 锚定尚未反映到实时数据产物
+- **现状**：锚定代码已入 main（`generate_top10.py` / `final_recommend.py` 四信号+组合层符号锚定，jinzuan/chan 锁正、trend/jigou 锁负），但实时 `data/TOP10_DAILY.js` 的 `update_time` 仍为 **2026-11-06 20:32:48**（早于锚定推送），锚定未生效。
+- **要求**：触发一次**完整盘后算法链重跑**（`generate_top10.py` 读已锚定的 edge 重新生成 TOP10_DAILY.js），重跑后硬抓 `data/TOP10_DAILY.js` 确认 `update_time` 刷新为今日且金钻+缠论共振组合预期收益翻正。
+- **验证**：重跑后比对 `raw_data/backtest_expectancy.json` 锚定前后组合 edge 符号（金钻+缠论应翻正）。
+
+## 执行铁律（小九接手须遵守，沿用上版）
+1. **防覆盖**：改前 `git fetch origin main` 校验 fast-forward 友好。
+2. **精确提交**：只 `git add` 相关文件。
+3. **改后三件套**：审计 + 四方对齐（云端 main+data / 双机 / 运维页 / 逻辑详解页 dd689）+ 推仓防覆盖交接。
+4. **写 main ≠ 已上线**：硬抓实时页/dd689 核验标记生效。
+5. **最终推荐·宁缺毋滥铁律不变**：无真源即留空，勿回退 FINAL_RECOMMEND_DATA 兜底。
+6. **输出形态铁律**：一律对话框文本，不产截图/图像/可视化。
