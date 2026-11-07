@@ -52,7 +52,19 @@ def week_range_str(today=None):
     return "%d/%d–%d/%d" % (monday.month, monday.day, sunday.month, sunday.day)
 
 
+def _ensure_utf8_output():
+    """Windows 下 stdout/stderr 默认 GBK，emoji(🛡/✅/⚠️/❌)会 UnicodeEncodeError 导致脚本崩溃、
+    退出码失真（假阳性）。统一切 UTF-8，确保脚本在任意编码环境都能正常打印与返回真实退出码。"""
+    for s in (sys.stdout, sys.stderr):
+        if hasattr(s, "reconfigure"):
+            try:
+                s.reconfigure(encoding="utf-8")
+            except Exception:
+                pass
+
+
 def main():
+    _ensure_utf8_output()
     path = sys.argv[sys.argv.index("--file") + 1] if "--file" in sys.argv else DEFAULT_FILE
     if not os.path.isfile(path):
         print("❌ 文件不存在: %s" % path)
