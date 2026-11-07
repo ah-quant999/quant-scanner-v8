@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-08 02:48",
- "generated": "2026-11-08 02:48",
+ "update_time": "2026-11-08 02:49",
+ "generated": "2026-11-08 02:49",
  "meta": {
-  "generated": "2026-11-08 02:48",
+  "generated": "2026-11-08 02:49",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
