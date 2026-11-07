@@ -1,19 +1,19 @@
 {
-  "update_time": "2026-11-06 02:55:25",
-  "crisis_score": 32.4,
+  "update_time": "2026-11-07 11:34:55",
+  "crisis_score": 34.9,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
   "total_candidates": 8,
   "top_n": 3,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-06 01:03:45",
+    "source": "backtest_expectancy@2026-11-07 10:44:18",
     "degraded": false,
     "effective": {
-      "jinzuan": -1.103,
-      "chan": 0.037,
-      "trend": 0.56,
-      "jigou": 0.655
+      "jinzuan": -0.934,
+      "chan": -0.014,
+      "trend": 0.594,
+      "jigou": 0.704
     },
     "hardcoded_default": {
       "jinzuan": 0.532,
@@ -22,24 +22,24 @@
       "jigou": -0.66
     },
     "n_on10": {
-      "jinzuan": 393,
-      "chan": 606,
-      "trend": 275,
-      "jigou": 501
+      "jinzuan": 508,
+      "chan": 721,
+      "trend": 276,
+      "jigou": 504
     },
     "consistent": {
-      "jinzuan": false,
+      "jinzuan": true,
       "chan": true,
       "trend": false,
       "jigou": false
     },
     "loaded": {
-      "generated": "2026-11-06 01:03:45",
+      "generated": "2026-11-07 10:44:18",
       "hit": 4,
-      "n_snapshots": 102,
+      "n_snapshots": 104,
       "date_range": [
         "2026-06-06",
-        "2026-11-04"
+        "2026-11-06"
       ]
     },
     "alpha_select": {
@@ -49,7 +49,7 @@
   },
   "degrade_note": null,
   "market_regime": {
-    "date": "2026-11-05",
+    "date": "2026-11-06",
     "regime": "panic",
     "open": true,
     "ok": true,
@@ -57,15 +57,15 @@
     "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）"
   },
   "ima_intake": {
-    "data_date": "2026-11-05",
+    "data_date": "2026-11-06",
     "pool_total": 8,
     "new_selected": 8,
     "rule": "first_selected==data_date（当日新入选）⇒ 入池独立源（展示+候选池）；2026-10-20 起不参与 Top3 竞位——最终推荐严格=当日因子榜前 N 名（同序同分），进最终推荐须先入因子榜",
     "note": "09-18 walk-forward 曾测「高手跟踪」作四量加分项边际 −1.76pp（n=13、回放口径、四量池上下文）——与本处「IMA 自身信号真实流」非同口径同场景，如实并列不隐瞒；回退开关 V8_IMA_INTAKE=0"
   },
   "price_source": {
-    "date": null,
-    "source": null,
+    "date": "2026-11-07",
+    "source": "CANDIDATE_QUOTES",
     "covered": 0,
     "total": 8,
     "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"
@@ -76,78 +76,19 @@
     "影视院线",
     "教育",
     "文化传媒",
-    "机场航运",
     "游戏",
     "电池",
-    "白酒",
+    "种植业与林业",
     "能源金属",
-    "贵金属"
+    "贵金属",
+    "软件开发"
   ],
   "stocks": [],
   "consensus_stocks": [
     {
       "rank": 1,
-      "code": "300071",
-      "name": "福石控股",
-      "market": "深市",
-      "board": "创业板",
-      "horizon": "短线",
-      "close": null,
-      "close_date": null,
-      "close_source": null,
-      "close_verified": false,
-      "pct_chg": null,
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null,
-      "atr": null,
-      "sources": [
-        "强势跟踪"
-      ],
-      "source_scores": {
-        "强势跟踪": 90.0
-      },
-      "resonance": 1,
-      "strength": 90.0,
-      "final_score": 0.0,
-      "sector_score": 0.0,
-      "sector_hits": [],
-      "enter_date": "2026-11-05",
-      "signals": [
-        "强势跟踪·当日新入选",
-        "高手共振"
-      ],
-      "_60m_resonance": false,
-      "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 90；高手强势股跟踪池共振（IMA 状态有效）",
-      "industry": "商务服务业",
-      "concepts": [
-        "数据要素",
-        "DeepSeek概念",
-        "华为概念",
-        "深股通",
-        "Web3.0",
-        "元宇宙概念",
-        "AI语料",
-        "AIGC概念"
-      ],
-      "tracking": {
-        "entry_date": "2026-11-05",
-        "entry_price": null,
-        "latest_price": null,
-        "return_pct": null,
-        "hold_days": 1,
-        "exit_type": "hold",
-        "note": "等待行情数据开始跟踪"
-      },
-      "action": "买入",
-      "market_regime": "panic"
-    },
-    {
-      "rank": 2,
-      "code": "600261",
-      "name": "阳光照明",
+      "code": "600327",
+      "name": "大东方",
       "market": "沪市",
       "board": "主板",
       "horizon": "短线",
@@ -173,26 +114,83 @@
       "final_score": 0.0,
       "sector_score": 0.0,
       "sector_hits": [],
-      "enter_date": "2026-11-05",
+      "enter_date": "2026-11-06",
       "signals": [
         "强势跟踪·当日新入选",
         "高手共振"
       ],
       "_60m_resonance": false,
       "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 88；高手强势股跟踪池共振（IMA 状态有效）",
-      "industry": "电气机械和器材制造业",
+      "industry": "卫生",
       "concepts": [
-        "氢能源",
-        "长江三角",
-        "证金持股",
-        "节能环保",
+        "机构重仓",
+        "新零售",
+        "参股银行",
         "破增发价股",
-        "LED概念",
-        "参股券商",
-        "贬值受益"
+        "内贸流通",
+        "长江三角",
+        "2026中报预减",
+        "社区团购"
       ],
       "tracking": {
-        "entry_date": "2026-11-05",
+        "entry_date": "2026-11-06",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 2,
+      "code": "601599",
+      "name": "浙文影业",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "强势跟踪"
+      ],
+      "source_scores": {
+        "强势跟踪": 85.0
+      },
+      "resonance": 1,
+      "strength": 85.0,
+      "final_score": 0.0,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "enter_date": "2026-11-06",
+      "signals": [
+        "强势跟踪·当日新入选",
+        "高手共振"
+      ],
+      "_60m_resonance": false,
+      "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 85；高手强势股跟踪池共振（IMA 状态有效）",
+      "industry": "纺织业",
+      "concepts": [
+        "低价股",
+        "央国企改革",
+        "破发股",
+        "影视概念",
+        "文娱消费",
+        "一带一路"
+      ],
+      "tracking": {
+        "entry_date": "2026-11-06",
         "entry_price": null,
         "latest_price": null,
         "return_pct": null,
@@ -205,9 +203,9 @@
     },
     {
       "rank": 3,
-      "code": "002565",
-      "name": "顺灏股份",
-      "market": "深市",
+      "code": "600371",
+      "name": "万向德农",
+      "market": "沪市",
       "board": "主板",
       "horizon": "短线",
       "close": null,
@@ -232,26 +230,25 @@
       "final_score": 0.0,
       "sector_score": 0.0,
       "sector_hits": [],
-      "enter_date": "2026-11-05",
+      "enter_date": "2026-11-06",
       "signals": [
         "强势跟踪·当日新入选",
         "高手共振"
       ],
       "_60m_resonance": false,
       "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 73；高手强势股跟踪池共振（IMA 状态有效）",
-      "industry": "造纸和纸制品业",
+      "industry": "农、林、牧、渔专业及辅助性活动",
       "concepts": [
-        "算力概念",
-        "融资融券",
-        "土壤修复",
-        "新消费",
-        "小盘成长",
-        "深股通",
-        "电子烟",
-        "商业航天"
+        "机构重仓",
+        "粮食概念",
+        "微盘股",
+        "农业种植",
+        "乡村振兴",
+        "QFII重仓",
+        "转基因"
       ],
       "tracking": {
-        "entry_date": "2026-11-05",
+        "entry_date": "2026-11-06",
         "entry_price": null,
         "latest_price": null,
         "return_pct": null,
@@ -265,10 +262,10 @@
   ],
   "all_candidates": [
     {
-      "code": "300071",
-      "name": "福石控股",
-      "market": "深市",
-      "board": "创业板",
+      "code": "600327",
+      "name": "大东方",
+      "market": "沪市",
+      "board": "主板",
       "horizon": "短线",
       "close": null,
       "close_date": null,
@@ -284,57 +281,18 @@
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "商务服务业",
+      "industry": "卫生",
       "concepts": [
-        "数据要素",
-        "DeepSeek概念",
-        "华为概念",
-        "深股通",
-        "Web3.0",
-        "元宇宙概念",
-        "AI语料",
-        "AIGC概念"
-      ],
-      "enter_date": "2026-11-05",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null,
-      "factor_actions": []
-    },
-    {
-      "code": "600261",
-      "name": "阳光照明",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "短线",
-      "close": null,
-      "close_date": null,
-      "close_verified": false,
-      "pct_chg": null,
-      "final_score": 0.0,
-      "mix_pct": 92.6,
-      "resonance": 1,
-      "sources": [
-        "强势跟踪"
-      ],
-      "signals": [
-        "强势跟踪·当日新入选",
-        "高手共振"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "氢能源",
-        "长江三角",
-        "证金持股",
-        "节能环保",
+        "机构重仓",
+        "新零售",
+        "参股银行",
         "破增发价股",
-        "LED概念",
-        "参股券商",
-        "贬值受益"
+        "内贸流通",
+        "长江三角",
+        "2026中报预减",
+        "社区团购"
       ],
-      "enter_date": "2026-11-05",
+      "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -343,56 +301,17 @@
       "factor_actions": []
     },
     {
-      "code": "002565",
-      "name": "顺灏股份",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "短线",
-      "close": null,
-      "close_date": null,
-      "close_verified": false,
-      "pct_chg": null,
-      "final_score": 0.0,
-      "mix_pct": 37.0,
-      "resonance": 1,
-      "sources": [
-        "强势跟踪"
-      ],
-      "signals": [
-        "强势跟踪·当日新入选",
-        "高手共振"
-      ],
-      "industry": "造纸和纸制品业",
-      "concepts": [
-        "算力概念",
-        "融资融券",
-        "土壤修复",
-        "新消费",
-        "小盘成长",
-        "深股通",
-        "电子烟",
-        "商业航天"
-      ],
-      "enter_date": "2026-11-05",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null,
-      "factor_actions": []
-    },
-    {
-      "code": "688316",
-      "name": "青云科技",
+      "code": "601599",
+      "name": "浙文影业",
       "market": "沪市",
-      "board": "科创板",
+      "board": "主板",
       "horizon": "短线",
       "close": null,
       "close_date": null,
       "close_verified": false,
       "pct_chg": null,
       "final_score": 0.0,
-      "mix_pct": 29.6,
+      "mix_pct": 87.0,
       "resonance": 1,
       "sources": [
         "强势跟踪"
@@ -401,9 +320,16 @@
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "互联网和相关服务",
-      "concepts": [],
-      "enter_date": "2026-11-05",
+      "industry": "纺织业",
+      "concepts": [
+        "低价股",
+        "央国企改革",
+        "破发股",
+        "影视概念",
+        "文娱消费",
+        "一带一路"
+      ],
+      "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -412,9 +338,9 @@
       "factor_actions": []
     },
     {
-      "code": "000995",
-      "name": "皇台酒业",
-      "market": "深市",
+      "code": "600371",
+      "name": "万向德农",
+      "market": "沪市",
       "board": "主板",
       "horizon": "短线",
       "close": null,
@@ -422,7 +348,7 @@
       "close_verified": false,
       "pct_chg": null,
       "final_score": 0.0,
-      "mix_pct": 14.8,
+      "mix_pct": 34.8,
       "resonance": 1,
       "sources": [
         "强势跟踪"
@@ -431,16 +357,17 @@
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "酒、饮料和精制茶制造业",
+      "industry": "农、林、牧、渔专业及辅助性活动",
       "concepts": [
-        "西部大开发",
-        "白酒",
-        "味蕾经济",
+        "机构重仓",
+        "粮食概念",
         "微盘股",
+        "农业种植",
+        "乡村振兴",
         "QFII重仓",
-        "酿酒概念"
+        "转基因"
       ],
-      "enter_date": "2026-11-05",
+      "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -449,8 +376,8 @@
       "factor_actions": []
     },
     {
-      "code": "001393",
-      "name": "维通利",
+      "code": "002310",
+      "name": "东方新能",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -459,7 +386,7 @@
       "close_verified": false,
       "pct_chg": null,
       "final_score": 0.0,
-      "mix_pct": 7.4,
+      "mix_pct": 8.7,
       "resonance": 1,
       "sources": [
         "强势跟踪"
@@ -468,18 +395,95 @@
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "电气机械和器材制造业",
+      "industry": "电力、热力生产和供应业",
       "concepts": [
+        "低价股",
+        "央国企改革",
+        "光伏概念",
+        "绿色电力",
+        "2026中报扭亏",
+        "富时罗素",
+        "小盘成长",
+        "小盘股"
+      ],
+      "enter_date": "2026-11-06",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "002929",
+      "name": "润建股份",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 0.0,
+      "mix_pct": 8.7,
+      "resonance": 1,
+      "sources": [
+        "强势跟踪"
+      ],
+      "signals": [
+        "强势跟踪·当日新入选",
+        "高手共振"
+      ],
+      "industry": "软件和信息技术服务业",
+      "concepts": [
+        "机构重仓",
         "电网概念",
-        "风能",
-        "次新股",
-        "深股通",
-        "专精特新",
+        "数据中心",
         "储能概念",
-        "融资融券",
+        "虚拟现实",
+        "东数西算",
+        "大数据",
+        "智能电网"
+      ],
+      "enter_date": "2026-11-06",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "002578",
+      "name": "闽发铝业",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 0.0,
+      "mix_pct": 8.7,
+      "resonance": 1,
+      "sources": [
+        "强势跟踪"
+      ],
+      "signals": [
+        "强势跟踪·当日新入选",
+        "高手共振"
+      ],
+      "industry": "有色金属冶炼和压延加工业",
+      "concepts": [
+        "低价股",
+        "央国企改革",
+        "破增发价股",
+        "光伏概念",
+        "破发股",
+        "2026中报首亏",
         "新能源车"
       ],
-      "enter_date": "2026-11-05",
+      "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -488,10 +492,49 @@
       "factor_actions": []
     },
     {
-      "code": "300493",
-      "name": "润欣科技",
+      "code": "000525",
+      "name": "红太阳",
       "market": "深市",
-      "board": "创业板",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 0.0,
+      "mix_pct": 4.3,
+      "resonance": 1,
+      "sources": [
+        "强势跟踪"
+      ],
+      "signals": [
+        "强势跟踪·当日新入选",
+        "高手共振"
+      ],
+      "industry": "化学原料和化学制品制造业",
+      "concepts": [
+        "机构重仓",
+        "农药兽药",
+        "央国企改革",
+        "长江三角",
+        "2026中报扭亏",
+        "深股通",
+        "标准普尔",
+        "草甘膦"
+      ],
+      "enter_date": "2026-11-06",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "600278",
+      "name": "东方创业",
+      "market": "沪市",
+      "board": "主板",
       "horizon": "短线",
       "close": null,
       "close_date": null,
@@ -509,65 +552,26 @@
       ],
       "industry": "批发业",
       "concepts": [
-        "先进封装",
-        "创业板综",
-        "半导体概念",
-        "物联网",
-        "移动支付",
-        "国产芯片",
-        "5G概念",
-        "深股通"
+        "沪企改革",
+        "创投",
+        "央国企改革",
+        "上海自贸",
+        "破净股",
+        "参股券商",
+        "贬值受益",
+        "长江三角"
       ],
-      "enter_date": "2026-11-05",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null,
-      "factor_actions": []
-    },
-    {
-      "code": "300709",
-      "name": "精研科技",
-      "market": "深市",
-      "board": "创业板",
-      "horizon": "短线",
-      "close": null,
-      "close_date": null,
-      "close_verified": false,
-      "pct_chg": null,
-      "final_score": 0.0,
-      "mix_pct": 0.0,
-      "resonance": 1,
-      "sources": [
-        "强势跟踪"
-      ],
-      "signals": [
-        "强势跟踪·当日新入选",
-        "高手共振"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "智能穿戴",
-        "融资融券",
-        "机器人概念",
-        "富时罗素",
-        "深股通",
-        "液冷概念",
-        "无线耳机",
-        "尾气治理"
-      ],
-      "enter_date": "2026-11-05",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null,
+      "enter_date": "2026-11-06",
+      "stop_loss": 6.41,
+      "target_price": 8.54,
+      "risk_reward": 2.0,
+      "support": 5.96,
+      "resistance": 7.12,
       "factor_actions": []
     }
   ],
   "factor_chain": {
-    "update_time": "2026-11-06 02:55:25",
+    "update_time": "2026-11-07 11:34:55",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
