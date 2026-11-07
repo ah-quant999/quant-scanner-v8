@@ -1287,11 +1287,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=cfef0ab8b1" defer></script>
 <script src="data/CANDIDATE.js?v=d829b0c53d" defer></script>
 
-    <script src="data/STOCK_STOP_DATA.js?v=ab09955b1f" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=2756879562" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=155778031e" defer></script>
 <script src="data/EXPERIMENT.js?v=d18d7dc914" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=7b192b4ba3" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=0150cea867" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=d4c10f3a1f" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=4c57380f3d" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=471b5dcb0f" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=73b8b2dfeb" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=c991d65654" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=18f787b4f6" defer></script>
@@ -1300,12 +1300,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/MORNING_PLAN.js?v=86bb686412" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=b3e890c292" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
-<script src="data/BACKTEST_ALL_ALGOS.js?v=e5b648d0e7" defer></script>
+<script src="data/BACKTEST_ALL_ALGOS.js?v=6c5b7fdd5a" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=421f81d599" defer></script>
+    <script src="data/FACTOR_LAB.js?v=5e15a56a1f" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=08a0222cd6" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=5b71b3b5d1" defer></script>
@@ -1328,8 +1328,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/HEALTH_CHECK.js?v=98775ccd40" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=be220212c0" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
-    <script src="data/CITIC_PE_THERMO.js?v=0f08f775a0" defer></script>
-    <script src="data/CITIC_PE_BACKTEST.js?v=5e269c34dd" defer></script>
+    <script src="data/CITIC_PE_THERMO.js?v=736437bcce" defer></script>
+    <script src="data/CITIC_PE_BACKTEST.js?v=6fb21efdce" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <script src="data/VALUATION_PERCENTILE.js?v=67f80e170e" defer></script>
     <!-- 🔴 2026-10-26 主人令·风险闸（回撤/估值/行业）落地：回撤闸 + 策略级 walk-forward 数据【内联本页】
@@ -19641,7 +19641,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=2a7d6d45b3', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=19fa8d064c', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=10ccbf962f', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=88f0891a58', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
