@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-11-08 03:30:29",
+  "update_time": "2026-11-08 05:58:23",
   "crisis_score": 34.9,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,13 +7,13 @@ window.FINAL_RECOMMEND_DATA = {
   "top_n": 3,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-08 02:12:43",
+    "source": "backtest_expectancy@2026-11-08 05:08:20",
     "degraded": false,
     "effective": {
-      "jinzuan": 1.085,
-      "chan": 0.083,
-      "trend": -0.691,
-      "jigou": -0.801
+      "jinzuan": 1.022,
+      "chan": 0.053,
+      "trend": -0.647,
+      "jigou": -0.757
     },
     "hardcoded_default": {
       "jinzuan": 0.532,
@@ -22,8 +22,8 @@ window.FINAL_RECOMMEND_DATA = {
       "jigou": -0.66
     },
     "n_on10": {
-      "jinzuan": 493,
-      "chan": 705,
+      "jinzuan": 502,
+      "chan": 715,
       "trend": 276,
       "jigou": 504
     },
@@ -34,7 +34,7 @@ window.FINAL_RECOMMEND_DATA = {
       "jigou": false
     },
     "loaded": {
-      "generated": "2026-11-08 02:12:43",
+      "generated": "2026-11-08 05:08:20",
       "hit": 4,
       "n_snapshots": 104,
       "date_range": [
@@ -123,14 +123,14 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 88；高手强势股跟踪池共振（IMA 状态有效）",
       "industry": "卫生",
       "concepts": [
-        "婴童概念",
-        "新能源车",
+        "参股银行",
         "IPO受益",
-        "社区团购",
-        "新材料",
         "内贸流通",
-        "2026中报预减",
-        "新零售"
+        "新零售",
+        "长江三角",
+        "机构重仓",
+        "破增发价股",
+        "2026中报预减"
       ],
       "tracking": {
         "entry_date": "2026-11-06",
@@ -182,12 +182,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 85；高手强势股跟踪池共振（IMA 状态有效）",
       "industry": "纺织业",
       "concepts": [
-        "央国企改革",
-        "破发股",
+        "文娱消费",
         "影视概念",
-        "一带一路",
         "低价股",
-        "文娱消费"
+        "央国企改革",
+        "一带一路",
+        "破发股"
       ],
       "tracking": {
         "entry_date": "2026-11-06",
@@ -239,13 +239,13 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "强势跟踪（短线情绪选股）当日新入选·强度分 73；高手强势股跟踪池共振（IMA 状态有效）",
       "industry": "农、林、牧、渔专业及辅助性活动",
       "concepts": [
-        "转基因",
-        "微盘股",
         "乡村振兴",
-        "农业种植",
-        "QFII重仓",
+        "转基因",
+        "机构重仓",
+        "微盘股",
         "粮食概念",
-        "机构重仓"
+        "农业种植",
+        "QFII重仓"
       ],
       "tracking": {
         "entry_date": "2026-11-06",
@@ -283,14 +283,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "卫生",
       "concepts": [
-        "婴童概念",
-        "新能源车",
+        "参股银行",
         "IPO受益",
-        "社区团购",
-        "新材料",
         "内贸流通",
-        "2026中报预减",
-        "新零售"
+        "新零售",
+        "长江三角",
+        "机构重仓",
+        "破增发价股",
+        "2026中报预减"
       ],
       "enter_date": "2026-11-06",
       "stop_loss": null,
@@ -322,12 +322,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "纺织业",
       "concepts": [
-        "央国企改革",
-        "破发股",
+        "文娱消费",
         "影视概念",
-        "一带一路",
         "低价股",
-        "文娱消费"
+        "央国企改革",
+        "一带一路",
+        "破发股"
       ],
       "enter_date": "2026-11-06",
       "stop_loss": null,
@@ -359,13 +359,13 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "农、林、牧、渔专业及辅助性活动",
       "concepts": [
-        "转基因",
-        "微盘股",
         "乡村振兴",
-        "农业种植",
-        "QFII重仓",
+        "转基因",
+        "机构重仓",
+        "微盘股",
         "粮食概念",
-        "机构重仓"
+        "农业种植",
+        "QFII重仓"
       ],
       "enter_date": "2026-11-06",
       "stop_loss": null,
@@ -395,17 +395,8 @@ window.FINAL_RECOMMEND_DATA = {
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "电力、热力生产和供应业",
-      "concepts": [
-        "央国企改革",
-        "富时罗素",
-        "小盘成长",
-        "绿色电力",
-        "深股通",
-        "标准普尔",
-        "2026中报扭亏",
-        "光伏概念"
-      ],
+      "industry": "",
+      "concepts": [],
       "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
@@ -434,17 +425,8 @@ window.FINAL_RECOMMEND_DATA = {
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "软件和信息技术服务业",
-      "concepts": [
-        "边缘计算",
-        "算力概念",
-        "东数西算",
-        "虚拟现实",
-        "标准普尔",
-        "信创",
-        "区块链",
-        "小盘股"
-      ],
+      "industry": "",
+      "concepts": [],
       "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
@@ -473,16 +455,8 @@ window.FINAL_RECOMMEND_DATA = {
         "强势跟踪·当日新入选",
         "高手共振"
       ],
-      "industry": "有色金属冶炼和压延加工业",
-      "concepts": [
-        "央国企改革",
-        "破发股",
-        "新能源车",
-        "光伏概念",
-        "低价股",
-        "2026中报首亏",
-        "破增发价股"
-      ],
+      "industry": "",
+      "concepts": [],
       "enter_date": "2026-11-06",
       "stop_loss": null,
       "target_price": null,
@@ -513,14 +487,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "化学原料和化学制品制造业",
       "concepts": [
-        "央国企改革",
-        "农药兽药",
-        "一带一路",
         "草甘膦",
-        "深股通",
         "标准普尔",
+        "长江三角",
+        "机构重仓",
+        "央国企改革",
+        "一带一路",
         "2026中报扭亏",
-        "长江三角"
+        "农药兽药"
       ],
       "enter_date": "2026-11-06",
       "stop_loss": null,
@@ -552,14 +526,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "批发业",
       "concepts": [
+        "沪股通",
+        "在线教育",
+        "内贸流通",
         "沪企改革",
+        "长江三角",
+        "破增发价股",
         "央国企改革",
-        "融资融券",
-        "贬值受益",
-        "一带一路",
-        "IPO受益",
-        "破净股",
-        "内贸流通"
+        "一带一路"
       ],
       "enter_date": "2026-11-06",
       "stop_loss": 6.41,
@@ -571,7 +545,7 @@ window.FINAL_RECOMMEND_DATA = {
     }
   ],
   "factor_chain": {
-    "update_time": "2026-11-08 03:30:29",
+    "update_time": "2026-11-08 05:58:23",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
