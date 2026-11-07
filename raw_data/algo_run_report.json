@@ -1,16 +1,12 @@
 {
-  "update_time": "2026-11-07 15:44:44",
-  "run_start": "2026-11-07 13:22:07",
-  "ok": 41,
-  "fail": 3,
+  "update_time": "2026-11-07 17:51:00",
+  "run_start": "2026-11-07 15:58:43",
+  "ok": 42,
+  "fail": 2,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
-    },
-    {
-      "script": "fetch_orphan_sector_fund_flow.py",
-      "reason": "超时 >30min"
     },
     {
       "script": "v8/fetch_citic_pe.py",
