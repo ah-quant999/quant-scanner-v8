@@ -4104,5 +4104,39 @@
    }
   ],
   "fail_items": []
+ },
+ {
+  "date": "2026-11-08",
+  "time": "02:59:13",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 116,
+   "warn": 2,
+   "fail": 1,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 120
+  },
+  "warn_items": [
+   {
+    "id": "final_enter_stale",
+    "name": "最终推荐入选日期",
+    "message": "未找到 enter_date 字段，无法判断入选新鲜度"
+   },
+   {
+    "id": "all_DO_T_SPACE",
+    "name": "DO_T_SPACE",
+    "message": "DO_T_SPACE.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "CFFEX_HOLDINGS",
+    "name": "股指期货持仓",
+    "message": "更新于 2天前 02:12；超过阈值 2880 分钟"
+   }
+  ]
  }
 ]
