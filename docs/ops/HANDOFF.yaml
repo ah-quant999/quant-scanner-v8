@@ -3554,5 +3554,26 @@ items:
       连红已达 14+ 轮（#13944-#13957）。⚠️ 时段门风险：CST 20:30 后「待重建」项转硬失败，11-07 白天若不补 raw，晚间 build 坏死面扩大。
       ④ 修复方向建议追加：⑤ gate/调度面把「raw 落后于 data 的类别」纳入『缺什么跑什么』缺口检测，或 post_close 批夜间补排
       （当前 gate 只看上游就绪，不看 raw 层缺口）。本轮阿狸咪零派发零改码（#13958/#13959 同 sha 双 run 在途，防踩踏）。
-
-
+  - id: dual-machine-rules-sync-1107
+    owner: 阿狸咪机（shared）
+    priority: P1
+    status: todo
+    created: 2026-11-07
+    title: 双机各自增补「中国时间铁律」+「云端优先铁律」（跨机需知，二卡锁定 cn 勿迁云）
+    note: >
+      小九 2026-11-06 立两条铁律，需双机各自在本地 MEMORY.md 增补（不跨机传播）：
+      ① 中国时间铁律：一切时间计算/展示/报时一律北京时间 UTC+8，禁 UTC/本地模糊时区；
+         GitHub API 的 created_at/pushed_at 是 UTC，报主人前必 +8；代码层统一 bj_now()，
+         严禁 TZ=Asia/Shanghai date（Git Bash 无 tzdata 静默回退 UTC）。
+      ② 云端优先铁律：凡不强制中国 IP 的抓取/计算/构建/部署一律放 GitHub 云端 ubuntu-latest
+         （公开仓免费 2000min/月）；自托管 cn runner 只承担需中国 IP 的数据链 + 哨兵触发监控，
+         本机禁重算/AI 手工长循环兜底，省 token。
+      🔴 已确认中国 IP 硬依赖（永不可迁云，违者复发取数失败）：v8_us_hk_map.yml（东财美股+新浪美股日K）、
+      v8_morning_plan.yml（直连东财 push2delay 域）。2026-11-06 误迁 ubuntu 实测 sync 步即 failure，
+      已回退 cn（commit 11062e03）。阿狸咪机交接时须明确这两张卡锁定 cn，勿再试迁云。
+      两条铁律完整文本见本机 MEMORY.md 对应条目（仓不存密）。
+    verify_how: >
+      阿狸咪机本地 MEMORY.md 含中国时间铁律、云端优先铁律两条；v8_us_hk_map.yml 与
+      v8_morning_plan.yml 仍 runs-on: [self-hosted, cn]（未被迁云）。
+    updated_by: 小九机AI
+    updated: "2026-11-07 20:43"
