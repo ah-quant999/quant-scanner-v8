@@ -1,6 +1,6 @@
 {
- "update_time": "2026-11-07 11:35:30",
- "source_update_time": "2026-11-07 08:02:10",
+ "update_time": "2026-11-07 15:43:19",
+ "source_update_time": "2026-11-07 11:35:25",
  "policy": "主人 2026-09-09 22:31 决策：分批 walk-forward，禁止直接硬编码高分；OOS IR > 0.3 且 4/5 年胜率 > 55% 方可上线。主人 2026-09-15 07:33 令：本表即「待回测候选因子台账」——准备回测/准备追加的因子一律先登记在此（备忘），回测达标则接入、不达标则从台账删除该条（不留遗体）。",
  "summary": {
   "total": 0,
@@ -9,7 +9,7 @@
   "from_audit": 0,
   "from_candidate": 0,
   "batches": {},
-  "walkforward_run_at": "2026-11-07 03:30:34",
+  "walkforward_run_at": "2026-11-07 11:36:50",
   "walkforward_done": 0,
   "walkforward_retired": 8,
   "walkforward_integrated": [],
@@ -19,88 +19,88 @@
    {
     "name": "60日成交额中位数",
     "pool": "audit",
-    "ir_oos": -0.36,
+    "ir_oos": -0.562,
     "beat_base_rate": 46.4,
-    "top_win_avg": 46.2,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": -0.756,
+    "top_win_avg": 45.7,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": -1.2631,
     "was_p5_integrated": true,
     "p5_gate_note": "⚠️ 本因子此前已接入 generate_top10.py :: P5 段，但本次复跑未过 P5 门槛（verdict=FAIL）⇒ 已自动停止加权，并从已接入清单移除。"
    },
    {
     "name": "60日波动率",
     "pool": "audit",
-    "ir_oos": 0.208,
+    "ir_oos": 0.111,
     "beat_base_rate": 46.4,
-    "top_win_avg": 47.1,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": 0.6,
+    "top_win_avg": 47.0,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": 0.3289,
     "was_p5_integrated": false,
     "p5_gate_note": null
    },
    {
     "name": "12-1 跨周期动量",
     "pool": "candidate",
-    "ir_oos": -0.347,
+    "ir_oos": -0.297,
     "beat_base_rate": 64.3,
-    "top_win_avg": 46.4,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": -0.9375,
+    "top_win_avg": 47.2,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": -0.8267,
     "was_p5_integrated": false,
     "p5_gate_note": null
    },
    {
     "name": "残差动量",
     "pool": "candidate",
-    "ir_oos": -0.313,
+    "ir_oos": -0.261,
     "beat_base_rate": 64.3,
-    "top_win_avg": 46.6,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": -0.849,
+    "top_win_avg": 47.3,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": -0.7436,
     "was_p5_integrated": false,
     "p5_gate_note": null
    },
    {
     "name": "最大日收益 MAX",
     "pool": "candidate",
-    "ir_oos": -0.145,
+    "ir_oos": -0.074,
     "beat_base_rate": 50.0,
-    "top_win_avg": 46.0,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": -0.2889,
+    "top_win_avg": 46.1,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": -0.1584,
     "was_p5_integrated": false,
     "p5_gate_note": null
    },
    {
     "name": "特质波动率 IVOL",
     "pool": "candidate",
-    "ir_oos": 0.195,
+    "ir_oos": 0.102,
     "beat_base_rate": 46.4,
-    "top_win_avg": 46.3,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": 0.4997,
+    "top_win_avg": 46.5,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": 0.2774,
     "was_p5_integrated": false,
     "p5_gate_note": null
    },
    {
     "name": "换手率趋势",
     "pool": "candidate",
-    "ir_oos": -0.829,
-    "beat_base_rate": 46.4,
+    "ir_oos": -0.859,
+    "beat_base_rate": 35.7,
     "top_win_avg": 45.6,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": -1.4208,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": -1.542,
     "was_p5_integrated": true,
     "p5_gate_note": "⚠️ 本因子此前已接入 generate_top10.py :: P5 段，但本次复跑未过 P5 门槛（verdict=FAIL）⇒ 已自动停止加权，并从已接入清单移除。"
    },
    {
     "name": "隔夜跳空累积",
     "pool": "candidate",
-    "ir_oos": -1.031,
+    "ir_oos": -0.748,
     "beat_base_rate": 53.6,
-    "top_win_avg": 45.3,
-    "base_win_avg": 46.2,
-    "spread_oos_pct": -0.9951,
+    "top_win_avg": 45.5,
+    "base_win_avg": 46.4,
+    "spread_oos_pct": -0.7299,
     "was_p5_integrated": false,
     "p5_gate_note": null
    }
@@ -113,7 +113,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺总股本/总市值",
     "why_unsolvable": "kline_cache 无股本字段；STOCK_QUOTE.stocks 无市值字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -123,7 +123,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺 PE/EPS",
     "why_unsolvable": "pe_ttm 被 fetch_stock_quote_v8.py 白名单丢弃；fundamental.eps 恒为 null",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -133,7 +133,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺毛利/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -143,7 +143,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺经营现金流/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -153,7 +153,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺总负债/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -163,7 +163,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺毛利/总资产/经营现金流/负债/营收",
     "why_unsolvable": "同上，且 9 项中 7 项依赖缺失字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -173,7 +173,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺净利润/经营现金流/总资产",
     "why_unsolvable": "fundamental_quality 无此三字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -183,7 +183,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺营业收入/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-11-07 03:30:34",
+    "retired_at": "2026-11-07 11:36:50",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    }
   ],

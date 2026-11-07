@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-07 10:46:09",
+ "update_time": "2026-11-07 14:37:29",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -6567,12 +6567,12 @@
   {
    "code": "300140",
    "name": "节能环境",
-   "n_signals": 2,
+   "n_signals": 1,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-11-04",
-   "last_seen": "2026-11-06",
+   "last_seen": "2026-11-04",
    "is_final": false,
    "horizons": {
     "1": {
@@ -6592,12 +6592,12 @@
   {
    "code": "300247",
    "name": "融捷健康",
-   "n_signals": 1,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-11-04",
-   "last_seen": "2026-11-04",
+   "last_seen": "2026-11-06",
    "is_final": false,
    "horizons": {
     "1": {
