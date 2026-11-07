@@ -5,6 +5,11 @@
 > - **任务1（过期补丁重做）**：`national_team` ETF 接入、`etf_subscription_eastmoney` 已在 main（数据注册 + 渲染卡就位，2026-11-05）；`final_recommend` 排序已在 main 按 `total_score` 降序且已嵌入收益率+胜率（非旧 main 缺失项）。所谓"过期补丁"实为基于更早会话摘要的误列。
 > - **任务2（signal_edge 反号根治）**：**反号确实存在**（今天 00:05 重算的 `raw_data/backtest_expectancy.json` 测出 jinzuan/chan 负、trend/jigou 正，与铁律反号）。根因 = `next_open` 入场口径对买点型信号系统性偏差（买点次日高开低走→回测全负）。已在算法层根因修复：于 `generate_top10.py` + `final_recommend.py` 对四信号 edge 及 `BT_BY_SIGNAL` 组合层施加**铁律符号锚定**（金钻/缠论锁正、trend/jigou 锁负，幅度保留回测相对大小），消除反号对最终推荐的污染。已提交推送，下次盘后算法链重跑即生效。
 
+> 🔴 **状态纠错（2026-11-07 21:48 由 WorkBuddy AI 实时抓主站核实 + 据 critique 补正）**：
+> 经硬抓活站 `data/TOP10_DAILY.js`（2026-11-07 21:48）确证，本交接单原「检验项」两处写偏，已据实补正（见下方 🔴 待办 B⑨ 检验项）：
+> - **① 当前未达成**：`update_time` 仍 = `2026-11-06 20:32:48`，未刷到 11-07。原单把"待核验"写得像已达成，已纠正为"🔴 未达成、须先真刷再写结论"。
+> - **② 漏掉缠论源 stale 硬伤**：活站 `chan_source = {stale:true, last_update:"2026-09-19 20:22:11", stale_days:48}` —— **缠论数据源已陈旧 48 天**，`effective.chan` 仅 0.054（贴 0）。建立在陈旧数据上的"缠论共振翻正"可信度存疑，已补为"② 之前必须先重新拉取刷新缠论源（stale→false）再核验翻正"，并新增 ④(b) 数据源陈旧降级类（原清单只查 `SIGNAL_EDGE_DEGRADED` 漏了 staleness）。
+
 ## 交接背景
 用户要求将以下 v8 待办**紧急交接给小九（白天机）**接手执行。
 本 AI 已具备独立执行能力（本轮已直接推过 `fix-if-theme` 分支多次，fast-forward 干净），但用户选择交由小九处理。
@@ -99,9 +104,13 @@
 - **执行（立即，勿等 cron）**：
   1. 触发 `v8_algo_cloud.yml` **workflow_dispatch**，入参 **`force_run=true`**（忽略周末时间门控）+ **`stage=all`**（全链：A采集/B选股/D汇总/E回测），或本机直接 `python algorithms/run_algorithms.py --stage all --force`。
   2. 跑通**整条选股(B批 generate_top10) + 推荐(D批 final_recommend)**，而非只 generate_top10。
-- **检验项（跑完逐项硬抓核验，回写本文件）**：
-  ① `data/TOP10_DAILY.js` 的 `update_time` 刷新为 **2026-11-07**（今日，非 11-06 20:32）；
-  ② `signal_edge` 锚定生效：`raw_data/backtest_expectancy.json` + TOP10 里金钻+缠论共振组合预期收益**翻正**（jinzuan/chan 锁正、trend/jigou 锁负）；
-  ③ `data/FINAL_RECOMMEND_DATA.js` 重算，`update_time` 今日，**最终推荐票刷新为基于今日终选**（非昨晚冻住的票）；
-  ④ 整条链无任何异常/降级告警（若 `SIGNAL_EDGE_DEGRADED` 为真，须排查动态加载失败原因）。
-- **现状回溯**：截至 19:08 线上 TOP10_DAILY `update_time` 仍 = **2026-11-06 20:32:48** → 此前小九未触发重跑，本次须立即补跑。
+- **检验项（🔴 当前全部未达成，须小九跑完逐项硬抓核验后回写本文件，禁止把"待核验"当"已完成"）**：
+ ① `data/TOP10_DAILY.js` 的 `update_time` 刷新为 **2026-11-07**（今日）。
+    🔴 **硬核现状（2026-11-07 21:48 实时抓）**：仍 = `2026-11-06 20:32:48` → **① 当前未达成**。小九第一项就须先把 TOP10 真刷到 11-07 再写结论。
+ ② `signal_edge` 锚定生效：`raw_data/backtest_expectancy.json` + TOP10 里金钻+缠论共振组合预期收益**翻正**（jinzuan/chan 锁正、trend/jigou 锁负）。
+    🔴 **缠论源陈旧硬伤（2026-11-07 21:48 实时抓确证，原清单漏项）**：活站 `chan_source = {stale:true, last_update:"2026-09-19 20:22:11", stale_days:48}` —— **缠论数据源已 stale 48 天**，`effective.chan` 仅 0.054（基本贴 0）。故"缠论共振翻正"若建立在陈旧数据上**可信度存疑**。小九须在 ② 之前**先重新拉取并刷新缠论源**（令 `chan_source.stale=false`、`last_update` 为近期），再核验 ② 翻正；否则 ② 翻正不成立，须在 HANDOFF 标注"缠论源陈旧未解决，翻正存疑、不计入达成"。
+ ③ `data/FINAL_RECOMMEND_DATA.js` 重算，`update_time` 今日，**最终推荐票刷新为基于今日终选**（非昨晚冻住的票）。
+ ④ 整条链降级/告警核验，**须覆盖两类**（原清单只查 (a) 漏了 (b)）：
+    - (a) **逻辑降级**：`SIGNAL_EDGE_DEGRADED` 为真 → 排查动态加载失败原因；
+    - (b) **🔴 数据陈旧降级（本次新增）**：任数据源 `stale:true` 即属"陈旧降级"。**重点核查 `chan_source`（已知 stale 48d，见 ②）**，并遍历 `backtest` / `gold_pool` 等源 staleness 字段；有 stale 须先于 ④ 解决，否则不得判"链无异常"。
+- **现状回溯**：截至 21:48 线上 TOP10_DAILY `update_time` 仍 = **2026-11-06 20:32:48**、`chan_source.stale=true`（48d）→ ①未达成、缠论源陈旧，本次重跑须一并解决两处。
