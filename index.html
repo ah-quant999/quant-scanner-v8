@@ -7428,7 +7428,7 @@ c.innerHTML = h;
               + '。仅为版面清晰而收起，<u>分数并未删掉</u>：每行「🧮 算式」照样逐项列出该股全部加数；任一维度日后出现非 0 会自动回到表内。'
             : '')
        + '数据源 data/TOP10_DAILY.js'
-       + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
+       + (D.update_time ? (' · 更新于 <b>'+(window._fmtAshareRel?window._fmtAshareRel(D.update_time):_e(D.update_time))+'</b>') : '')
        + '。仅研究参考，非买卖建议。</div>';
     host.innerHTML = h;
     // 🦊 2026-09-21 主人令：卡头「更新于」胶囊（全站规范：卡名置顶 + 更新于紧随，读产物真值不写死）
@@ -10487,7 +10487,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     const a=new Date(+ap[0],+ap[1]-1,+ap[2]);
     const b=new Date(+bp[0],+bp[1]-1,+bp[2]);
     const diff=Math.round((a-b)/86400000);
-    const day = diff===1?'昨日':diff>1?`${diff}天前`:diff<0?'未来':'今日';
+    const day = diff===1?'昨日':diff>1?(d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-')):diff<0?'未来':'今日';
     const hm = window._fmtHmCST ? window._fmtHmCST(d) : pad(d.getHours())+':'+pad(d.getMinutes());
     return `${day} ${hm}`;
   }
@@ -10498,7 +10498,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     if(!d || isNaN(d.getTime())) return '';
     const diffMs=Date.now()-d.getTime();
     const days=Math.floor(diffMs/86400000);
-    if(days>=2) return `<span style="color:#ffd024;margin-left:6px;">⚠ 数据 ${days} 天前</span>`;
+    if(days>=2) return '<span style="color:#ffd024;margin-left:6px;">⚠ 数据 '+d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-')+'</span>';
     return '';
   }
 
@@ -15059,10 +15059,15 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     const dayDiff=Math.round((today0-data0)/864e5);
     const hm = window._fmtHmCST ? window._fmtHmCST(d) : ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
     let txt;
-    if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
-    else if(dayDiff<=0) txt='今日 '+hm;
+    // 🛡 全局铁律（2026-11-07 主人令「昨日今日超过才写日期」）：相对时间一律今日/昨日/MM-DD HH:MM，
+    //   与 _fmtAshareRel 严格一致；老于昨日绝不显示「N天前」。
+    if(dayDiff<=0) txt='今日 '+hm;
+    else if(dayDiff===1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)){
+      var dsFull0 = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+      txt='上一交易日('+dsFull0+') '+hm;
+    }
     else if(dayDiff===1) txt='昨日 '+hm;
-    else txt=dayDiff+'天前 '+hm;
+    else txt = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-') + ' ' + hm;
     return {text:txt};
   }
 
