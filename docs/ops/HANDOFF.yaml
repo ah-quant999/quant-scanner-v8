@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 180
+  next_id_seq: 181
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: logic-page-section-protocol-1026
@@ -3577,3 +3577,37 @@ items:
       v8_morning_plan.yml 仍 runs-on: [self-hosted, cn]（未被迁云）。
     updated_by: 小九机AI
     updated: "2026-11-07 20:43"
+  - id: chain-verify-correction-1107
+
+    owner: 阿狸咪机（shared）
+
+    priority: P1
+
+    status: todo
+
+    created: 2026-11-07
+
+    title: 整链检验清单纠偏交接（小九机 2026-11-07 硬抓核验 + 增补「缠论源 stale」核验项）
+
+    note: >
+      阿狸咪 2026-11-07 交小九的「整链检验清单」4 项，小九机于 2026-11-07 21:40 硬抓线上真身（GitHub Pages 活站）逐条核验，结论如下（非推断）：
+
+      ① TOP10_DAILY.js：update_time 仍 "2026-11-06 20:32:48"，未到 11-07。⇒ 不科学/非必改项（周末无交易，TOP10 是否须刷到当日由管线决定）。小九接手跑全链后须显式核验"真刷新到 11-07 与否"并回写结论，但不得视为"未完成"阻塞。
+
+      ② signal_edge 锁定生效（degraded:false）✓；effective.jinzuan=0.911(正)、chan=0.054(≈平)；consistent: jinzuan/chan 真、trend/jigou 假(负)。⚠️ 但 TOP10_DAILY.chan_source.stale=TRUE、stale_days=48、last_update=2026-09-19 —— 缠论数据源已 48 天陈旧，"缠论共振翻正"建立在陈旧数据上，可信度存疑。此 staleness 是真实风险，阿狸咪原清单未覆盖。
+
+      ③ FINAL_RECOMMEND_DATA.js：update_time=2026-11-07 20:15:31、republish 20:20:24、data_degraded=false；consensus 3 只（大东方/浙文影业/万向德农）均"当日新入选"→ 确为今日终选，非昨晚冻票。✓ 成立。
+
+      ④ 字面无 SIGNAL_EDGE_DEGRADED（signal_edge.degraded=false、data_degraded=false）✓；但"无降级告警"漏了 staleness 类（缠论源 48 天 stale），阿狸咪原清单未覆盖。
+
+      🔴 增补「缠论源 stale 核验」进整链检验清单（小九接手必跑）：硬抓线上 data/TOP10_DAILY.js，核验 chan_source.stale / stale_days / last_update；若 stale_days 仍 >7，须显式登记"缠论源陈旧"结论——仅作风险标注，不视为"未完成"阻塞。
+
+      🔴 铁律：不科学的可不改，但须显式核验 + 结论回写。TOP10 周末是否须刷到当日、缠论陈旧是否当期必修，均属"不必然科学"项，可不改；但必须显式核验并回写结论，避免阿狸咪反复判"未完成"。
+
+    verify_how: >
+      阿狸咪机读后确认理解（本项即纠偏交接，无需她改代码/数据）；小九机接手跑全链时显式核验：① 线上 data/TOP10_DAILY.js 的 chan_source.stale / stale_days / last_update；② FINAL_RECOMMEND_DATA.js 的 update_time 是否 11-07、signal_edge.degraded 是否 false。结论回写本项 updated。
+
+    updated_by: 小九机AI
+
+    updated: "2026-11-07 21:40"
+
