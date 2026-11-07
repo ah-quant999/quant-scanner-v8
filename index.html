@@ -797,7 +797,7 @@ function __judgmentCandidatesHTML(){
 
   // ---- 统一候选池（去重，保留最高评分） ----
   var raw = [];
-  function _push(s){ if(s && s.code) raw.push(s); }
+  
 
 
 
@@ -832,9 +832,7 @@ function __judgmentCandidatesHTML(){
     }
     return sq[nk] || null;
   }
-  function _boardStopPct(board){
-    return (board==='创业板' || board==='科创板' || board==='港股') ? 0.90 : 0.93;
-  }
+  
   var ssStocks = (window.STOCK_STOP_DATA && window.STOCK_STOP_DATA.stocks) || {};
   list.forEach(function(s){
     var q = _lookupQuote(s);
@@ -1050,7 +1048,7 @@ function _buildJudgmentEnvHTML(d){
     + '<div style="font-size:10.5px;margin-top:6px;color:var(--sub)">生成后会自动刷新，无需手动操作</div>'
     + '</div>';
   var h = '';
-  // 0) 红黄绿灯总览（交通灯语义：🟢积极 / 🟡观望 / 🔴防守）
+  // 0) 红黄绿灯总览（红涨绿跌语义：🔴积极 / 🟡观望 / 🟢防守）
   var LIGHT = {green:'#26d9c2', yellow:'#ffd024', red:'#ff5252'};
   function lightDot(c,size){
     size = size || 10;
@@ -1185,8 +1183,9 @@ function _buildJudgmentEnvHTML(d){
         apContent += mkPill(x.name, sign+Math.abs(_v).toFixed(2)+'%', c);
       });
       if(om.bias){
-        var biasLight = (om.bias||'').indexOf('强')>=0 ? '🟢' : ((om.bias||'').indexOf('弱')>=0 ? '🔴' : '🟡');
-        apContent += mkBadge(om.bias, '#4ade80', biasLight);
+        var biasLight = (om.bias||'').indexOf('强')>=0 ? '🔴' : ((om.bias||'').indexOf('弱')>=0 ? '🟢' : '🟡');
+        var biasColor = (om.bias||'').indexOf('强')>=0 ? '#ff5252' : ((om.bias||'').indexOf('弱')>=0 ? '#26d9c2' : '#ffd024');
+        apContent += mkBadge(om.bias, biasColor, biasLight);
       }
       cards.push(mkCard('#4ade80', apContent));
     }
@@ -2219,7 +2218,7 @@ window.STRATEGY_WALKFORWARD = {
       <div style="padding:14px 16px;background:var(--card2);border-radius:10px;border:1px solid var(--border);">
         <div style="font-size:13px;color:var(--txt);font-weight:700;margin-bottom:10px;">查询后会展示该标的在本站中的扩展信息：</div>
         <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
-          <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
+          <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🔴偏多机会 / 🟢建议减仓 / ⏸中性观望</li>
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
           <li>🧬 <b>综合财务画像（并入实时行情卡）</b>：综合评级、ROE、营收增速、EPS、股息率、分红方案、消息面加减分</li>
           <li>🧮 <b>算法现场评分</b>：0-100 综合分（技术面/基本面/资金面）+ 策略命中(三重共识/金股池/候选池)，结论置顶</li>
@@ -3578,7 +3577,7 @@ function fmtSigned(v){
   /* ===== 工具函数 ===== */
   function _rc$(id){ return document.getElementById(id); }
   function _rcEsc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
-  function _rcFmt(v){ return v==null?'--':Number(v).toFixed(2) }
+  
   function _rcRel(ts){ return window._fmtAshareRel?window._fmtAshareRel(ts):String(ts) }
   function _rcFmtYi(wan){ var yi=wan/10000; return (yi>=0?'+':'')+yi.toFixed(2)+'亿'; }
 
@@ -3635,28 +3634,7 @@ function fmtSigned(v){
   }
   // 以 anchorDate 所在周(周一)为中心,向上下扩展生成 6 周卡(参考页布局)
   // 索引 0..5, 中心 index=2 (前 3 周 / 后 2 周)
-  function _rc6WeekCards(anchorDateStr){
-    if(!anchorDateStr || anchorDateStr.length < 8) return [];
-    var y = parseInt(anchorDateStr.slice(0,4));
-    var m = parseInt(anchorDateStr.slice(4,6)) - 1;
-    var d = parseInt(anchorDateStr.slice(6,8));
-    var wr = _rcWeekRangeOf(y, m, d);
-    var anchorMon = new Date(wr.mon.getTime());
-    var DAY = 86400000;
-    var out = [];
-    for(var i = 0; i < 6; i++){
-      var off = (i - 3) * 7; // -21,-14,-7,0,+7,+14
-      var wm = new Date(anchorMon.getTime() + off * DAY);
-      var ws = new Date(wm.getTime() + 6 * DAY);
-      out.push({
-        no: i + 1,
-        mon: wm, sun: ws,
-        monLabel: (wm.getMonth()+1) + '/' + wm.getDate(),
-        sunLabel: (ws.getMonth()+1) + '/' + ws.getDate()
-      });
-    }
-    return out;
-  }
+  
 
   /* ===== TAB1: 机游共振日历（参照参考页布局） ===== */
   window.__jyCalRendered = false;
@@ -6163,15 +6141,7 @@ c.innerHTML = h;
       var byAr = _bestList.slice().sort(function(a,b){ return (b.avg_return==null?-999:b.avg_return) - (a.avg_return==null?-999:a.avg_return); });
       var bestWr = byWr[0] || null, bestAr = byAr[0] || null;
       function _holdDays(r){ return String((r && r.hold) || '').replace(/[^0-9]/g,'') || '—'; }
-      function _holdTxt(r){
-        if(!r) return '<span style="color:var(--dim);">—</span>';
-        var hd = String(r.hold||'').replace(/[^0-9]/g,'');
-        if(!hd) return '<span style="color:var(--dim);">—</span>';
-        return '<span style="font-weight:700;color:var(--txt);white-space:nowrap;">'+hd+' 日</span>'
-             + '<span style="color:'+_colorNum(r.win_rate)+';font-weight:700;margin-left:6px;">'+_n(r.win_rate)+'%</span>'
-             + '<span style="color:var(--sub);"> / </span>'
-             + '<span style="color:'+_colorPL(r.avg_return)+';font-weight:700;">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</span>';
-      }
+      
       var h = '';
       /* ═══════════════════════════════════════════════════════════════════════
          🔴 2026-09-16 主人令（图「两张卡重复了感觉，合并吧，我要知道每种算法的
@@ -6523,64 +6493,15 @@ c.innerHTML = h;
       ];
       // P2-A：低样本判定阈
       var SAMPLE_LOW_THRESHOLD = 30;
-      function _metric(s){
-        /* 🔴 2026-10-11 主人令「完全下架」：triple 旧代理分支（BACKTEST_COMPREHENSIVE）已删。 */
-        var vname = null;
-        var sm=((window[vname]||{}).summary||{});
-        var total=sm.total_signals||0, bp=sm.by_period||{}, upd=sm.update_time||sm.calc_time||'';
-
-        var bpk=null,bw=-1;
-        /* 2026-09-13：samples>0 不等于有胜率 —— 全部信号平盘时 win_rate 为 null
-           （decided=0）。必须显式判非空，否则下方 m.wr.toFixed() 抛异常崩整卡。 */
-        /* 2026-09-14 CN runner1号机：档位由硬编码 5 档改为派生（by_period 实测 12 档）——
-           否则「最佳持有期」永远只能在 T+1/3/5/10/20 里挑，长档胜率更好也选不出来。 */
-        (window._holdLadder ? window._holdLadder(bp) : [1,3,5,10,20]).forEach(function(p){ var r=bp[String(p)]||{}; if((r.samples||0)>0&&r.win_rate!=null&&(r.win_rate||0)>bw){bw=r.win_rate;bpk=p;} });
-        if(bpk!=null){
-          var r=bp[String(bpk)];
-          return {
-            sample:total, hold:bpk, wr:r.win_rate, ar:r.avg_return,
-            max_dd: r.max_drawdown || 0,   // P2-C
-            sharpe: r.sharpe_ratio || 0,   // P2-C
-            upd:upd, ready:true,
-          };
-        }
-        return {sample:total,hold:null,wr:null,ar:null,upd:upd,ready:false};
-      }
+      
       // P2-A：低样本灰显样式（整行降饱和）
-      function _rowStyle(m){
-        // m.sample<30 → 灰显；m.sample=0 也灰显；其它正常
-        if(!m.ready && (m.sample||0)===0) return 'background:rgba(148,163,184,.04);color:var(--dim);';
-        if(m.ready && (m.sample||0)<SAMPLE_LOW_THRESHOLD) return 'background:rgba(148,163,184,.08);color:var(--sub);';
-        return '';
-      }
-      function _wrCell(m){
-        if(!m.ready || m.wr==null) return '<span style="color:var(--dim);">—</span>';
-        var _dim = (m.sample||0)<SAMPLE_LOW_THRESHOLD ? ';opacity:.6;' : '';
-        return '<span style="font-weight:700;color:'+_colorWR(m.wr)+';'+_dim+'">'+m.wr.toFixed(1)+'%</span>';
-      }
-      function _arCell(m){
-        if(!m.ready || m.ar==null) return '<span style="color:var(--dim);">—</span>';
-        var _dim = (m.sample||0)<SAMPLE_LOW_THRESHOLD ? ';opacity:.6;' : '';
-        return '<span style="color:'+_colorPL(m.ar)+';'+_dim+'">'+(m.ar>0?'+':'')+m.ar.toFixed(2)+'%</span>';
-      }
+      
+      
+      
       // 🆕 2026-09-11 全算法回测汇总用（null → 「—」，绝不把「没样本」画成 0）
-      function _wrNum(v,n){
-        if(v==null) return '<span style="color:var(--dim);">—</span>';
-        var _d = (n||0) < SAMPLE_LOW_THRESHOLD ? ';opacity:.55;' : '';
-        return '<span style="font-weight:700;color:'+_colorWR(v)+_d+'">'+Number(v).toFixed(1)+'%</span>';
-      }
-      function _arNum(v,n){
-        if(v==null) return '<span style="color:var(--dim);">—</span>';
-        var _d = (n||0) < SAMPLE_LOW_THRESHOLD ? ';opacity:.55;' : '';
-        return '<span style="color:'+_colorPL(v)+_d+'">'+(v>0?'+':'')+Number(v).toFixed(2)+'%</span>';
-      }
-      function _riskCell(m){  // P2-C：最大回撤+夏普紧凑展示
-        if(!m.ready) return '<span style="color:var(--dim);font-size:10px;">—</span>';
-        var _dim = (m.sample||0)<SAMPLE_LOW_THRESHOLD ? ';opacity:.6;' : '';
-        var dd = (m.max_dd||0).toFixed(2);
-        var sr = (m.sharpe||0).toFixed(2);
-        return '<span style="font-size:10px;color:var(--sub);white-space:nowrap;'+_dim+'">DD '+dd+'%<br><span style="color:'+(m.sharpe>=1?'#22c55e':'var(--sub)')+';">SR '+sr+'</span></span>';
-      }
+      
+      
+      
       /* ══ 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名 · 收益率与胜率降序） ══
          数据源 window.BACKTEST_ALL_ALGOS —— 由 E 批（回测批，在 D 批最终推荐之后）
          algorithms/gen_backtest_all_algos.py 产出。两个子块：
@@ -6592,7 +6513,7 @@ c.innerHTML = h;
         var A = window.BACKTEST_ALL_ALGOS;
         if(!A || !A.rows) return;
         var MINS = A.min_samples || 30;
-        function _asof(t){ return t ? ('<span style="font-size:10px;color:var(--sub);">'+_esc(String(t).substring(0,16))+'</span>') : '<span style="color:var(--dim);">—</span>'; }
+        
         /* 累积中（不排名，明示原因）🔴 2026-10-12：并入 rows 里样本为 0 的口径内策略（如量质双擎），杜绝静默丢失 */
         var _insAll = (A.insufficient || []).concat((A.rows || []).filter(function(r){
           return r && r.win_rate == null && (window.__STRATEGY_BACKTESTS || []).some(function(m){ return m && m.name === r.card; });
@@ -8936,7 +8857,7 @@ function switchSec(sec,el){
       return i > TH && y > TH;
     });
   };
-  function fullKey(s){ return (s.market||'') + '_' + (s.code||''); }
+  
   // STOCK_LIST 兼容两种 schema：直接数组（旧）或 {data:[...]} 包装（2026-08-02 收紧 update_time 后）
   function stockListArray(){
     const sl = window.STOCK_LIST;
@@ -9368,7 +9289,7 @@ function switchSec(sec,el){
 
     // 综合判定
     let verdict, vColor;
-    if(score>=2){ verdict='🟢 偏多机会'; vColor='var(--up)'; }
+    if(score>=2){ verdict='🔴 偏多机会'; vColor='var(--up)'; }
     else if(score<=-2){ verdict='🔴 建议减仓/观望'; vColor='var(--down)'; }
     else { verdict='⏸ 中性观望'; vColor='var(--gold)'; }
 
@@ -14109,47 +14030,7 @@ window.showRestrictedItems = showRestrictedItems;
     return m[b]||'background:var(--bg2);color:var(--sub)';
   }
   function makeTag(text,cls){ return '<span class="tp-tag '+cls+'">'+text+'</span>'; }
-  function renderStock(p,isNear,trackMap){
-    const code=(p.code||'').replace(/^(sh|sz|hk|bj)_/,'');
-    let h='<div class="tp-stock">';
-    h+='<div class="tp-head">';
-    h+='<span class="tp-code">'+code+'</span>';
-    h+='<span class="tp-name">'+(p.name||'')+'</span>';
-    if(p.board)h+='<span class="tp-board" style="'+boardColor(p.board)+'">'+p.board+'</span>';
-    if(isNear){
-      const miss=[]; if(!p.in_top10)miss.push('TOP10'); if(!p.in_good_fund)miss.push('基本面A档');
-      const step=((p.miss_steps||1)===2?'差两步':'差一步');
-      h+='<span class="tp-badge near">'+step+' · 缺 '+miss.join(' · ')+'</span>';
-    } else {
-      h+='<span class="tp-badge cons">三重共识</span>';
-    }
-    h+='</div>';
-    h+='<div class="tp-meta"><span class="tp-score">'+(p.total_score||0)+'</span>';
-    // 2026-09-06 审计修复：去掉「A档0分」死字段展示
-    h+=' <span>TOP10#'+(p.top10_rank||'-')+' · 基本面'+(p.quality_grade||'-')+'</span></div>';
-    let tags='';
-    if(p.industry)tags+=makeTag('🏭 '+p.industry,'ind');
-    (p.sectors||[]).slice(0,6).forEach(s=>tags+=makeTag(s,'sec'));
-    (p.concepts||[]).slice(0,6).forEach(c=>tags+=makeTag(c,'con'));
-    if(tags)h+='<div class="tp-tags">'+tags+'</div>';
-    h+='<div class="tp-detail">'+fmtPct(p.pct_chg)+' &nbsp; 20日 '+fmtPct(p.pct_chg_20d)+'</div>';
-    const tk=trackMap[code];
-    if(tk){
-      h+='<div class="tp-track">';
-      h+='<span>📅 入选 <b>'+(tk.enter_date||'-')+'</b></span>';
-      h+='<span>⏳ 持有 <b>'+(tk.hold_days||0)+'</b> 日</span>';
-      h+='<span>🔁 连续 <b>'+(tk.consecutive_days||0)+'</b> 日</span>';
-      h+='<span>📈 入选以来 <b '+pnlClass(tk.pnl_pct)+'>'+(tk.pnl_pct==null?'—':(tk.pnl_pct>0?'+':'')+Number(tk.pnl_pct).toFixed(2)+'%')+'</b></span>';
-      h+='</div>';
-      if(tk.catalysts&&tk.catalysts.length){
-        h+='<div class="tp-tags">';
-        tk.catalysts.forEach(c=>{const c2=c.reaction==='已兑现(价涨)'?'ok':c.reaction==='走弱'?'weak':''; h+='<span class="tp-catalyst '+c2+'">'+c.tag+' · '+c.reaction+'</span>';});
-        h+='</div>';
-      }
-    }
-    h+='</div>';
-    return h;
-  }
+  
   function fvNum(v, d){ return (v===null||v===undefined||isNaN(v)) ? '—' : Number(v).toFixed(d==null?2:d); }
   function fvPct(v){ return (v===null||v===undefined||isNaN(v)) ? '—' : (v>0?'+':'')+Number(v).toFixed(2)+'%'; }
   function fvSrcLabel(s){
@@ -14168,133 +14049,9 @@ window.showRestrictedItems = showRestrictedItems;
     }).join('');
   }
 
-  function fvRenderTrack(track){
-    if(!track || typeof track!=='object') return;
-    var _tt=$('fvTrackTime');
-    if(_tt) _tt.textContent = track.update_time ? rel(track.update_time) : '';
-    var tb=$('fvTrackBody');
-    if(!tb) return;
-    var arr = track.tracked || [];
-    if(!arr.length){
-      tb.innerHTML='<div style="color:var(--sub);text-align:center;padding:14px">暂无跟踪样本（首次运行后逐日累积）</div>';
-      return;
-    }
-    /* 2026-10-04 主人令：样本太多不必全铺 —— 按入选自然月分组，本月展开、历史月 <details> 折叠（与入选历史卡同口径） */
-    var _thead='<table style="width:100%"><thead><tr><th style="width:18%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>四灯</th><th>价格源</th></tr></thead><tbody>';
-    var rowHtml=function(t){
-      var st = t.status==='active'
-        ? '<span class="tp-badge cons">在池</span>'
-        : '<span class="tp-badge near" style="background:rgba(255,82,82,0.3);color:var(--up)">已掉出</span>';
-      var hold = (t.hold_days==null?'—':t.hold_days+'日');
-      var cons = (t.consecutive_days==null?'—':t.consecutive_days+'日');
-      return '<tr>'
-        + '<td style="text-align:left"><b>'+(t.name||'')+'</b> <span class="tp-code">'+(t.code||'')+'</span>'
-        +   (t.is_new?' <span style="font-size:10px;color:#ffd024">新</span>':'')+'</td>'
-        + '<td>'+st+'</td>'
-        + '<td>'+(t.enter_date||'—')+'</td>'
-        + '<td>'+hold+'</td>'
-        + '<td>'+cons+'</td>'
-        + '<td '+pnlClass(t.pnl_pct)+'>'+fvPct(t.pnl_pct)+'</td>'
-        + '<td style="text-align:left">'+fvLamps(t)+'</td>'
-        + '<td>'+fvSrcLabel(t.price_source)+'</td>'
-        + '</tr>';
-    };
-    var _nowM=(function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
-    var groups={}; var order=[];
-    arr.forEach(function(t){
-      var m=(t.enter_date&&/^\d{4}-\d{2}/.test(t.enter_date)) ? t.enter_date.slice(0,7) : '未知';
-      if(!groups[m]){ groups[m]=[]; order.push(m); }
-      groups[m].push(t);
-    });
-    order.sort(function(a,b){ if(a==='未知')return 1; if(b==='未知')return -1; return a<b?1:-1; });
-    var h='';
-    order.forEach(function(m){
-      var rows=groups[m];
-      var tableHtml=_thead+rows.map(rowHtml).join('')+'</tbody></table>';
-      if(m===_nowM){
-        h+='<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+rows.length+' 只</div>'+tableHtml;
-      }else{
-        h+='<details style="margin:8px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden;">'
-          +'<summary style="cursor:pointer;padding:8px 12px;background:rgba(148,163,184,.07);font-size:12px;font-weight:600;color:var(--sub);list-style:none;user-select:none;">📅 '+(m==='未知'?'未标注入选日':m)+' · '+rows.length+' 只 <span style="color:var(--dim);font-weight:400;font-size:11px;">（点击展开查阅）</span></summary>'
-          +'<div style="padding:4px 12px 10px;">'+tableHtml+'</div></details>';
-      }
-    });
-    tb.innerHTML=h;
+  
 
-    // ---- 告警 ----
-    var alerts = track.alerts || [];
-    var ac=$('fvAlertCount'); if(ac) ac.textContent = alerts.length;
-    var box=$('fvAlerts');
-    if(box){
-      if(alerts.length){
-        var _cols = Math.min(3, alerts.length);
-        box.innerHTML = '<div style="display:grid;grid-template-columns:repeat('+_cols+',1fr);gap:6px;">'
-          + alerts.slice(0,15).map(function(a){ return '<div class="tp-alert '+a.level+'" style="margin:0;">'+a.text+'</div>'; }).join('')
-          + '</div>'
-          + (alerts.length>15 ? '<div class="tp-detail" style="margin-top:6px">仅显示前 15 条，共 '+alerts.length+' 条。</div>' : '');
-      } else {
-        box.innerHTML='<div class="tp-empty">暂无状态迁移告警</div>';
-      }
-    }
-
-    // ---- 板块聚类 ----
-    var sc = track.sector_cluster || {};
-    var cl=$('fvCluster');
-    if(cl){
-      var bi = sc.by_industry || [];
-      if(bi.length){
-        var maxc = bi[0].count || 1;
-        var conc = sc.concentration;
-        var warn = (conc!=null && conc>=50) ? ' <span style="color:var(--up);font-weight:700">⚠ 单一行业占比 '+conc+'%，相关性风险偏高</span>' : '';
-        cl.innerHTML = bi.map(function(x){
-          var w = Math.max(8, Math.round(x.count/maxc*180));
-          return '<div class="tp-cluster-row"><span class="tp-cluster-label">'+x.industry+'</span>'
-            + '<span class="tp-cluster-bar" style="width:'+w+'px"></span>'
-            + '<span class="tp-cluster-num">'+x.count+' 只</span></div>';
-        }).join('')
-        + '<div class="tp-detail" style="margin-top:6px">口径：'+(sc.scope||'当前在池')+'（'+fvNum(sc.pool_size,0)+' 只）；行业集中度(最高占比)：<b>'+fvNum(conc,1)+'%</b>'+warn+'</div>';
-      } else {
-        cl.innerHTML='<div class="tp-empty">暂无行业分布数据</div>';
-      }
-    }
-
-    /* 🔴 2026-09-16 主人令（第三轮纠偏）：「选股池重叠度」渲染段整体删除（与三重共识页同源）。
-       原代码读 track.overlap.top10_ge70（「全站精选层」口径），ALGO_TRACK 数据层无此字段，
-       gen_algo_track.py 也不产出 ⇒ 恒走 else 分支显示「无重叠数据」。
-       卡与 DOM 锚点 #fvOverlap 已一并移除。 */
-  }
-
-  function fvRenderBacktest(bt){
-    var note=$('fvBackNote'), body=$('fvBackBody');
-    if(!body) return;
-    if(!bt || typeof bt!=='object'){ if(note) note.textContent='回测数据未加载'; body.innerHTML='<tr><td colspan="8" style="color:var(--sub);text-align:center">回测数据未加载</td></tr>'; return; }
-    var s = bt.summary || bt;
-    var bp = s.by_period || s.periods || {};
-    var keys = Object.keys(bp).map(function(k){ return [parseInt(String(k).replace('d',''),10), k]; })
-                  .filter(function(p){ return !isNaN(p[0]); })
-                  .sort(function(a,b){ return a[0]-b[0]; });
-    if(note){
-      note.textContent = '口径：'+(s.method||'')+'；信号 '+(s.total_signals!=null?s.total_signals:'—')+' 笔；区间 '+(s.signal_date_range||'—')
-        + '；数据截至 '+rel(s.calc_time||s.update_time||'')+'。'+(s.cost_adjusted===false?'（未扣成本）':'');
-    }
-    if(!keys.length){
-      body.innerHTML='<tr><td colspan="8" style="color:var(--sub);text-align:center">回测分层尚未产出（待回测批运行）</td></tr>';
-      return;
-    }
-    body.innerHTML = keys.map(function(p){
-      var k = p[0], v = bp[p[1]] || {};
-      return '<tr>'
-        + '<td>T+'+(k>=45 ? k+'日' : k+'日')+'</td>'
-        + '<td>'+(v.samples==null?'—':v.samples)+'</td>'
-        + '<td '+pnlClass(v.win_rate!=null?v.win_rate-50:null)+'>'+fvNum(v.win_rate,1)+'%</td>'
-        + '<td '+pnlClass(v.avg_return)+'>'+fvPct(v.avg_return)+'</td>'
-        + '<td class="up">'+fvPct(v.best_return)+'</td>'
-        + '<td class="down">'+fvPct(v.worst_return)+'</td>'
-        + '<td class="down">'+fvNum(v.max_drawdown,2)+'%</td>'
-        + '<td>'+(v.sharpe_ratio==null?'—':fvNum(v.sharpe_ratio,2))+'</td>'
-        + '</tr>';
-    }).join('');
-  }
+  
 
 function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var body = document.getElementById(bodyId);
@@ -14354,64 +14111,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 
   /* 🔴 2026-10-04 主人令：fvRenderSelf（前向累积跟踪渲染）整函数删除——卡已删重 */
 
-  function fvRenderHistory(hist, track){
-    var box=$('fvHistory');
-    if(!box) return;
-    if(!hist || typeof hist!=='object'){ box.innerHTML='<div class="tp-empty">历史账本未加载</div>'; return; }
-    var dates = Object.keys(hist).filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).sort().reverse();
-    var meta = hist._meta || {};
-    var latest = hist._tracking_latest || {};
-    var h='';
-    if(meta.track_start) h += '<div class="tp-detail">追踪起始：'+meta.track_start
-      + (meta.last_signal_date ? ' · 最新信号日 '+meta.last_signal_date : '')
-      + (meta.last_price_date ? ' · 最新价日 '+meta.last_price_date : '')
-      + (meta.last_update ? ' · 最后更新 '+rel(meta.last_update) : '') + '</div>';
-    if(!dates.length){ h += '<div class="tp-empty">暂无每日入选记录。</div>'; box.innerHTML=h; return; }
-    /* 2026-09-16 主人令：历史查询按**自然月**折叠 —— 当月全部展开，
-       前一自然月及更早按月折叠（<details>，点击展开查询）；同时解除原「仅显示 30 个信号日」截断。 */
-    var months = {};
-    dates.forEach(function(d){ var m=d.slice(0,7); (months[m]=months[m]||[]).push(d); });
-    var mkeys = Object.keys(months).sort().reverse();
-    var renderDay = function(d){
-      var arr = (hist[d]||[]).slice();
-      var order = { active:0, dropped:1 };
-      arr.sort(function(a,b){
-        var sa=(latest[(a.code||'')]||{}).status||'active';
-        var sb=(latest[(b.code||'')]||{}).status||'active';
-        return (order[sa]===undefined?0:order[sa]) - (order[sb]===undefined?0:order[sb]);
-      });
-      var s = '<div class="tp-hist-date">📅 '+d+' · '+arr.length+' 只</div><div class="tp-hist-grid">';
-      arr.forEach(function(s2){
-        var t = latest[s2.code] || {};
-        var st = t.status==='active'
-          ? '<span class="tp-badge cons">在池</span>'
-          : (t.status==='dropped' ? '<span class="tp-badge near" style="background:rgba(255,82,82,0.3);color:var(--up)">已掉出</span>' : '');
-        var pnl = (t.pnl_pct==null) ? '' : ('<span '+pnlClass(t.pnl_pct)+' style="font-weight:700">'+fvPct(t.pnl_pct)+'</span>');
-        s += '<div class="tp-hist-cell">'
-          + '<div class="tp-hd"><span class="tp-code">'+(s2.code||'')+'</span><span class="tp-name" title="'+(s2.name||'')+'">'+(s2.name||'')+'</span></div>'
-          + '<div class="tp-foot">'+st+'<span style="color:var(--sub);font-size:11px">'+((s2.qd)?'QD':'')+'</span>'+pnl+'</div>'
-          + '</div>';
-      });
-      return s + '</div>';
-    };
-    /* 「本月」=当前真实日期所在月（2026-10-04 主人令：数据滞后时不得把上月当本月全展开） */
-    var _nowM=(function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
-    mkeys.forEach(function(m,mi){
-      var ds = months[m];
-      var total = ds.reduce(function(a,d){ return a + (((hist[d]||[]).length)||0); }, 0);
-      if(m===_nowM){
-        h += '<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+ds.length+' 个信号日 · '+total+' 只</div>';
-        ds.forEach(function(d){ h += renderDay(d); });
-      }else{
-        h += '<details style="margin:8px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden;">'
-           + '<summary style="cursor:pointer;padding:8px 12px;background:rgba(148,163,184,.07);font-size:12px;font-weight:600;color:var(--sub);list-style:none;user-select:none;">📅 '+m+' · '+ds.length+' 个信号日 · '+total+' 只 <span style="color:var(--dim);font-weight:400;font-size:11px;">（点击展开查询）</span></summary>'
-           + '<div style="padding:4px 12px 10px;">';
-        ds.forEach(function(d){ h += renderDay(d); });
-        h += '</div></details>';
-      }
-    });
-    box.innerHTML=h;
-  }
+  
 
 
   // ════════════════════════════════════════════════════════════════════
@@ -15051,7 +14751,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var map={'主板成交前100':'主板活跃成交池','创业板成交前100':'创业板活跃成交池','科创板成交前100':'科创板活跃成交池','港股成交前50':'港股活跃成交池','外资研投':'公开资讯源'};
     return map[k]||k;
   }
-  function genericSourceList(arr){ return (arr||[]).map(genericSource).join('、')||'—'; }
+  
 
   /* ── 辅助：暗色主题卡片头（全站统一样式） ── */
   /* 本脚本块包在 IIFE 内，函数不会自动成为 window 属性；跨块调用方
@@ -18452,41 +18152,7 @@ h+=`</div>`;
 })();
 
 
-function switchLg(id,el){
-  if(!el) el=document.querySelector('[data-lg="'+id+'"]');
-  document.querySelectorAll('.lg-pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.lg-subtabs .lg-tab').forEach(t=>t.classList.remove('active'));
-  var pane=document.getElementById('lg-'+id);
-  if(pane) pane.classList.add('active');
-  if(el) el.classList.add('active');
-    if(id==='v6'){
-    var d=document.getElementById('v6MemoFrame');
-    var err=document.getElementById('v6MemoError');
-    var st=document.getElementById('v6MemoStatus');
-    if(d&&err){
-      err.style.display='none';
-      // 2026-08-23 修复：只在检测到 iframe 内容为空/异常时才重载，避免 iOS Safari 重复加载。
-      try{
-        var isEmpty = !d.contentDocument || !d.contentDocument.body || d.contentDocument.body.innerHTML.length<500;
-        if(isEmpty && d.src && d.src.indexOf('v6_memo')>=0){
-          d.src = d.src.split('?')[0] + '?' + Date.now();
-        }
-      }catch(e){}
-    }
-    if(st){
-      st.style.display='inline-flex';
-      st.innerHTML='📦 v6 备忘录加载中…';
-    }
-    // 3 秒后兜底检测：若未收到子页 ready/未触发 onload，则显示直接打开按钮
-    clearTimeout(window.__v6MemoCheckT);
-    window.__v6MemoCheckT = setTimeout(function(){
-      if(!window.__v6MemoReady){
-        if(err) err.style.display='flex';
-        if(st) st.style.display='none';
-      }
-    }, 3500);
-  }
-}
+
 
 // v6 备忘录加载完成回调（iframe onload + 子页 postMessage ready 双保险）
 window.__v6MemoLoaded = function(){
