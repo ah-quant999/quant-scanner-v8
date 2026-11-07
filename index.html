@@ -1328,8 +1328,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=95fb45c48c" defer></script>
 <script src="data/HB_XIAOJIU.js?v=3dddf0032c" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=331b5107ab" defer></script>
-<script src="data/HEALTH_CHECK.js?v=824c98db7a" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=2f1f6c58da" defer></script>
+<script src="data/HEALTH_CHECK.js?v=010920e118" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=2e90b1ea11" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=07fa653bae" defer></script>
@@ -2034,7 +2034,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/SENTIMENT_CYCLE.js?v=c5710b65d3" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=2fd0225442" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=557c0b2d08" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=491ba6991f" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=a41c92892c" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=3996148c25" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
@@ -15701,7 +15701,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=557c0b2d08');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=491ba6991f');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
