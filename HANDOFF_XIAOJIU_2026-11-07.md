@@ -92,7 +92,15 @@
 - **数据来源**：公开源（gtimg.cn ETF 实时 + 新浪5minK + 东财五分类申赎），**已有草稿 `algorithms/fetch_national_team_etf.py`**（6378B，但未基于当前 main 推上，且国家队卡结构已变）。
 - **AI 行动**：按当前 main 重做该 fetcher + 在 国家队活跃度卡内注入可展开子表（较20日均倍数/份额申赎变化/汇金持仓绝版标注），推 main 并硬抓核验。完成后回写本文件状态。
 
-### 🔴 待办 B（⑨）状态重申：仍**未执行**
-- 截至 19:08，线上 `data/TOP10_DAILY.js` 的 `update_time` 仍为 **2026-11-06 20:32:48** → 小九此前未触发完整盘后算法链重跑。
-- **今日（周六）重跑 ≠ 解卡**（无新行情），但**仍必须跑**：把已入 main 的 signal_edge 锚定（金钻+缠论转正）应用到 TOP10_DAILY，使终选带上正确 edge 并显示今日时间戳，消解主人「终选还是昨晚的」观感。
-- 请小九今日补跑一次并硬抓核验回写。
+### 🔴 待办 B（⑨）升级 · 2026-11-07 19:56 主人令「周六也要跑·检验整条链」
+- **主人原话**：「今天周六有 T+1 数据，所以周六也要跑，正好检验一下整条选股和推荐的算法链。」
+- **核心纠正（AI 此前误判，已修正）**：此前 AI 误以为「周六非交易日不该跑」，这是**错的**——周五的完整 T+1 行情数据周六才到齐，金股池 `GOLD_POOL.js` 已于今日 18:01 刷新（已含周五完整数据）。故周六**必须**重跑完整算法链。
+- **执行（立即，勿等 cron）**：
+  1. 触发 `v8_algo_cloud.yml` **workflow_dispatch**，入参 **`force_run=true`**（忽略周末时间门控）+ **`stage=all`**（全链：A采集/B选股/D汇总/E回测），或本机直接 `python algorithms/run_algorithms.py --stage all --force`。
+  2. 跑通**整条选股(B批 generate_top10) + 推荐(D批 final_recommend)**，而非只 generate_top10。
+- **检验项（跑完逐项硬抓核验，回写本文件）**：
+  ① `data/TOP10_DAILY.js` 的 `update_time` 刷新为 **2026-11-07**（今日，非 11-06 20:32）；
+  ② `signal_edge` 锚定生效：`raw_data/backtest_expectancy.json` + TOP10 里金钻+缠论共振组合预期收益**翻正**（jinzuan/chan 锁正、trend/jigou 锁负）；
+  ③ `data/FINAL_RECOMMEND_DATA.js` 重算，`update_time` 今日，**最终推荐票刷新为基于今日终选**（非昨晚冻住的票）；
+  ④ 整条链无任何异常/降级告警（若 `SIGNAL_EDGE_DEGRADED` 为真，须排查动态加载失败原因）。
+- **现状回溯**：截至 19:08 线上 TOP10_DAILY `update_time` 仍 = **2026-11-06 20:32:48** → 此前小九未触发重跑，本次须立即补跑。
