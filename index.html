@@ -1324,9 +1324,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=ffe2dec904" defer></script>
 <script src="data/HB_XIAOJIU.js?v=d6dfe30416" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=2022c65eae" defer></script>
-<script src="data/HEALTH_CHECK.js?v=58b7530c8d" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=b8ec43f5a6" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=9339507ee5" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e64eb50bca" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=cbe9671cea" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=c6e8c90a88" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=9891baa987" defer></script>
@@ -2027,10 +2027,10 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=a78fe86034" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=24bcfeddbe" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=a20cb18dae" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=125df5de45" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b5d120f655" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=d38d9bc340" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=706dd3bef3" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=0619a8bd21" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
@@ -15930,7 +15930,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=b5d120f655');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=d38d9bc340');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
