@@ -168,6 +168,7 @@ window.__domReadyFns=[];
      数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=89da7b9d29" defer></script>
+<script src="data/SHAREHOLDER_CHANGE.js?v=981c73fa5d" defer></script>
 <script src="data/INVEST_AVOID.js?v=95a02af6aa" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页，严重异动雷达仍在暂未上架›观测类。 -->
     <script src="data/SEVERE_SWING.js?v=ad0b4ee61d" defer></script>
@@ -3235,6 +3236,15 @@ function fmtSigned(v){
         <span style="font-size:15px;font-weight:700;color:#c084fc;">&#x1F3DB;&#xFE0F; 国家队活跃度</span>
         <span id="nationalTeamFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>
       <div id="nationalTeamBody"><div class="note">加载中&#x2026;</div></div>
+    </div>
+
+    <!-- 🆕 2026-11-08 主人令：股东增减持·结构化监控（全市场法定披露，东财 RPT_SHARE_HOLDER_INCREASE；与重要公告速览互补，非公告标题级） -->
+    <div class="card" id="shareholderChangeCard" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <span style="font-size:15px;font-weight:700;color:#22c55e;">&#x1F4C8; 股东增减持·结构化监控</span>
+        <span id="shcFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>
+      <div id="shareholderChangeBody"><div class="note">加载中&#x2026;</div></div>
+      <div class="note">口径：东方财富数据中心·股东增减持（法定披露明细），按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。行业取自 STOCK_LIST 行业映射，增持绿 / 减持红。</div>
     </div>
 
 
@@ -8717,6 +8727,75 @@ setInterval(_v8ForceUnlockAdminTabs, 1500);
 
 
 /* ===== 板块切换 ===== */
+// 🆕 2026-11-08 主人令：股东增减持·结构化监控（全市场法定披露，东财 RPT_SHARE_HOLDER_INCREASE）
+//   数据 window.SHAREHOLDER_CHANGE（data/SHAREHOLDER_CHANGE.js ← algorithms/fetch_shareholder_change.py 盘后定时抓取）。
+//   与「重要公告速览」互补：那边是公告标题标签，这边是结构化金额/股东/行业聚合。
+//   三视图：板块聚焦（默认）/ 增持榜 / 减持榜；增持绿 #22c55e / 减持红 #ff5252。
+window.__renderShareholderChange = function(){
+  try{
+    var card = document.getElementById('shareholderChangeCard');
+    var body = document.getElementById('shareholderChangeBody');
+    if(!card || !body) return;
+    var D = window.SHAREHOLDER_CHANGE;
+    if(!D || !(D.increase_top || D.reduce_top || D.industry_agg)){
+      if(!window.__shcRetryTimer){
+        window.__shcRetryN = 0;
+        window.__shcRetryTimer = setInterval(function(){
+          window.__shcRetryN++;
+          var d = window.SHAREHOLDER_CHANGE;
+          if((d && (d.increase_top || d.reduce_top || d.industry_agg)) || window.__shcRetryN > 30){
+            clearInterval(window.__shcRetryTimer); window.__shcRetryTimer = null; window.__shcRetryN = 0;
+            try{ window.__renderShareholderChange(); }catch(e){}
+          }
+        }, 600);
+      }
+      return;
+    }
+    if(window.__shcRetryTimer){ clearInterval(window.__shcRetryTimer); window.__shcRetryTimer = null; window.__shcRetryN = 0; }
+    function _e(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+    var S = D.summary || {};
+    if(!window.__shcView) window.__shcView = 'ind';
+    var caps = [['ind','板块聚焦'],['inc','增持榜'],['red','减持榜']];
+    var h = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">';
+    caps.forEach(function(c){
+      var act = (window.__shcView === c[0]);
+      var col = c[0]==='red' ? '#ff5252' : (c[0]==='inc' ? '#22c55e' : '#c084fc');
+      h += '<span onclick="window.__shcShow(\''+c[0]+'\')" style="cursor:pointer;font-size:12px;background:'+(act?col:'transparent')+';color:'+(act?'#e6edf7':col)+';border:1px solid '+(act?col:col+'66')+';border-radius:6px;padding:2px 8px;'+(act?'font-weight:700;':'opacity:.55;')+'">'+c[1]+'</span>';
+    });
+    h += '</div>';
+    if(window.__shcView === 'ind'){
+      h += '<div style="font-size:12px;color:var(--dim);margin-bottom:6px;">按行业聚合增持金额（近'+(D.window_days||120)+'日）· 绿=净增持</div>';
+      h += '<div style="display:flex;flex-direction:column;gap:5px;">';
+      (D.industry_agg||[]).forEach(function(x){
+        var net = x.net_amt||0; var nc = net>=0 ? '#22c55e' : '#ff5252';
+        h += '<div style="border-left:3px solid #c084fc;background:rgba(148,163,184,.05);border-radius:0 8px 8px 0;padding:5px 9px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;">'
+            + '<span style="font-size:12.5px;font-weight:700;color:var(--txt);">'+_e(x.industry)+'</span>'
+            + '<span style="font-size:12px;color:#22c55e;">增 '+x.inc_amt+'亿/'+x.inc_cnt+'笔</span>'
+            + '<span style="font-size:12px;color:#ff5252;">减 '+x.red_amt+'亿/'+x.red_cnt+'笔</span>'
+            + '<span style="font-size:12px;font-weight:700;color:'+nc+';">净 '+net+'亿</span></div>';
+      });
+      h += '</div>';
+    } else {
+      var arr = window.__shcView==='inc' ? (D.increase_top||[]) : (D.reduce_top||[]);
+      var col = window.__shcView==='inc' ? '#22c55e' : '#ff5252';
+      h += '<div style="display:flex;flex-direction:column;gap:5px;">';
+      arr.forEach(function(r){
+        h += '<div style="border-left:3px solid '+col+';background:rgba(148,163,184,.05);border-radius:0 8px 8px 0;padding:5px 9px;">'
+            + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12.5px;font-weight:700;color:var(--txt);">'+_e(r.name)+' <span style="color:var(--dim);font-weight:400;">'+_e(r.code)+'</span></span>'
+            + '<span style="font-size:12px;color:'+col+';font-weight:700;">'+(r.amount!=null?r.amount+'亿':'—')+'</span></div>'
+            + '<div style="font-size:11.5px;color:var(--dim);margin-top:2px;">'+_e(r.holder)+' · '+_e(r.holder_type)+' · '+_e(r.industry)+' · '+_e(r.start)+'~'+_e(r.end)+'</div>'
+            + '</div>';
+      });
+      if(!arr.length) h += '<div class="note">该方向近期无记录</div>';
+      h += '</div>';
+    }
+    body.innerHTML = h;
+    var fr = document.getElementById('shcFresh'); if(fr) fr.textContent = '更新 '+_e((D.update_time||'').slice(5,16));
+    card.style.display = 'block';
+  }catch(e){ console.warn('[renderShareholderChange]', e); }
+};
+window.__shcShow = function(v){ window.__shcView = v; try{ window.__renderShareholderChange(); }catch(e){} };
+
 function switchSec(sec,el){
   /* 2026-09-22 主人令：真锁页「内容层」强制守卫（一劳永逸）。
      原实现只在 nav 点击时经 guardLock 拦一次，switchSec 本身零校验 ⇒
@@ -8770,6 +8849,7 @@ function switchSec(sec,el){
       try{ window.renderRestrictedCalendar(window.RESTRICTED_RELEASE || {}); }catch(e){}
       try{ window.renderForecastCalendar(window.PERFORMANCE_FORECAST || {}); }catch(e){}
       try{ window.__renderNationalTeam(); }catch(e){}
+      try{ window.__renderShareholderChange(); }catch(e){}
     }, 80);
   }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
