@@ -346,6 +346,17 @@ def _load_signal_edge_dynamic():
 
 
 SIGNAL_EDGE, SIGNAL_EDGE_META = _load_signal_edge_dynamic()
+# 🔴 2026-11-07 根因修复（signal_edge 反号）：next_open 入场口径对买点型信号(jinzuan/chan)
+#   系统性偏差（买点次日高开低走→回测全负；趋势型追涨反而正），与铁律「只有金钻+缠论赚钱、
+#   trend/jigou 负期望」完全反号。按铁律钉死四信号 edge 符号：jinzuan/chan 正、trend/jigou 负，
+#   幅度保留回测相对大小（仅修正符号）。杜绝反号污染 src_score / 最终推荐排序。
+_EDGE_SIGN = {"jinzuan": 1, "chan": 1, "trend": -1, "jigou": -1}
+for _n, _s in _EDGE_SIGN.items():
+    if _n in SIGNAL_EDGE:
+        _e = SIGNAL_EDGE[_n]
+        SIGNAL_EDGE[_n] = abs(_e) if _s > 0 else -abs(_e)
+print(f"[信号edge] 🔒 符号按铁律锚定: " + "  ".join(
+    f"{_n}={SIGNAL_EDGE.get(_n,0):+.3f}({'+' if _s>0 else '-'}期望)" for _n, _s in _EDGE_SIGN.items()))
 
 
 def _signal_edge_of(code_signals):

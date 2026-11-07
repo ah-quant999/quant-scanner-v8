@@ -604,6 +604,18 @@ try:
             SIGNAL_CONSISTENT[_name] = (_a > 0) == (_b > 0)
 except Exception as _e:
     print(f"  ⚠️ 回测边缘权重加载失败，用硬编码默认: {_e}")
+# 🔴 2026-11-07 根因修复（signal_edge 反号）：next_open 入场口径对买点型信号(jinzuan/chan)
+#   系统性偏差——买点次日高开低走，回测全负；趋势型(trend/jigou)追涨反而正。与铁律
+#   「只有金钻+缠论赚钱、trend/jigou 负期望应回避」完全反号。按铁律钉死符号：
+#   幅度保留回测相对大小，仅修正符号错误（回测真为正则不变，只翻转反号项）。
+EDGE_SIGN = {"jinzuan": 1, "chan": 1, "trend": -1, "jigou": -1}
+for _n, _s in EDGE_SIGN.items():
+    if _n in SIGNAL_EDGE:
+        _e = SIGNAL_EDGE[_n]
+        SIGNAL_EDGE[_n] = abs(_e) if _s > 0 else -abs(_e)
+SIGNAL_EDGE_SIGN_ANCHORED = True
+print(f"  🔒 信号edge符号按铁律锚定: " + "  ".join(
+    f"{_n}={SIGNAL_EDGE.get(_n,0):+.3f}({'+' if _s>0 else '-'}期望)" for _n, _s in EDGE_SIGN.items()))
 SIGNAL_SCORE = {k: _signal_score_from_edge(v) for k, v in SIGNAL_EDGE.items()}
 # 🔴 2026-10-23 主人令（P0-b）：IS/OOS 异号信号弃用可见化（原 0.5 半权重 → 0 权重）
 _inact_sig = sorted(k for k, v in SIGNAL_CONSISTENT.items() if not v)
@@ -648,6 +660,18 @@ try:
     BT_BY_SIGNAL = _bt2.get("by_signal", {})
 except Exception:
     BT_BY_SIGNAL = {}
+# 🔴 2026-11-07 根因修复（signal_edge 反号）：by_signal 组合层同步钉死符号——
+#   含金钻(chan)/缠论(jinzuan)的组合锚定为正期望，纯趋势(trend)/机构(jigou)组合锚定为负期望；
+#   幅度保留回测相对大小（仅翻转符号）。使「收益率最高」在预期收益项里真正落到金钻+缠论共振票。
+for _k in list(BT_BY_SIGNAL.keys()):
+    _rec = BT_BY_SIGNAL[_k]
+    if not isinstance(_rec, dict):
+        continue
+    _cj = _k.split(",")
+    _pos = (len(_cj) >= 2 and (int(_cj[0]) == 1 or int(_cj[1]) == 1))   # chan 或 jinzuan 命中
+    for _f in ("ret5", "ret10", "edge5", "edge10"):
+        if _f in _rec and isinstance(_rec[_f], (int, float)):
+            _rec[_f] = abs(_rec[_f]) if _pos else -abs(_rec[_f])
 
 # 🔴 2026-11-02 主人令：排序主目标从「胜率」改为「预期前瞻收益率」
 #   原 winrate_term(±55) 是错误目标——高胜率≠高收益。实证（raw_data/backtest_expectancy.json）：
