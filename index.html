@@ -310,7 +310,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       name: NAME[r] || r,
       open: open,
       icon: open ? '✅' : '⛔',
-      color: open ? '#26d9c2' : '#ff5252',
+      color: open ? '#ff5252' : '#26d9c2',
       verdict: open ? '可开新仓' : '不开新仓',
       // 证据链：回测口径与数字写死在前端，避免各处复述走样
       evidence: '数据驱动：仅「阴跌磨底 / 恐慌下行」状态开仓（T+10 胜率 54.6%，无门控基准 48.1%，+6.5pp；样本 464 信号 / 296 只）',
@@ -339,9 +339,9 @@ window.V8_CAL = {weeks:[],legend:[]};
     var _lo = Math.min(_rank[hs]!=null?_rank[hs]:1, _rank[ss]!=null?_rank[ss]:1);
     var obs, obsName, obsColor;
     if(_lo === 2){
-      obsName='偏多'; obs='今日偏强，节奏积极'; obsColor='#26d9c2';
+      obsName='偏多'; obs='今日偏强，节奏积极'; obsColor='#ff5252';
     } else if(_lo === 0){
-      obsName='偏弱'; obs='今日偏弱，注意节奏'; obsColor='#ff5252';
+      obsName='偏弱'; obs='今日偏弱，注意节奏'; obsColor='#26d9c2';
     } else {
       obsName='震荡'; obs='今日情绪分化，控制仓位'; obsColor='#ffd024';
     }
@@ -355,7 +355,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     topFrac = topFrac || 0.2;
     var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false, name:'未知'};
     if(!mkt.open){
-      return {pass:false, reason:'择时封闭·'+mkt.name, color:'#ff5252'};
+      return {pass:false, reason:'择时封闭·'+mkt.name, color:'#26d9c2'};
     }
     if(!allVals || !allVals.length || factorVal==null) {
       return {pass:false, reason:'因子缺失', color:'#94a3b8'};
@@ -363,7 +363,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var sorted = allVals.slice().sort(function(a,b){return b-a;});
     var thr = sorted[Math.floor(sorted.length*topFrac)];
     if(factorVal >= thr){
-      return {pass:true, reason:'择时开放·因子前'+Math.round(topFrac*100)+'%', color:'#26d9c2'};
+      return {pass:true, reason:'择时开放·因子前'+Math.round(topFrac*100)+'%', color:'#ff5252'};
     }
     return {pass:false, reason:'择时开放·因子未达分位', color:'#ffd024'};
   };
@@ -5483,7 +5483,7 @@ c.innerHTML = h;
     var shortExcess = (p1 && p1.excess != null) ? p1.excess
                     : ((p5 && p5.excess != null) ? p5.excess : null);
     /* ── 样本量封顶 4⭐（🔴 2026-09-17 主人令落地第②处原文规则）────────────────
-       规则表原文写着「n<30不评级；n<100最高4⭐」，但**代码从未实现后者**。
+       规则表原文写着「n<30不评级；n<100最高4⭐」——**代码已在下方 L5491 落地实现后者**（maxN<100 ⇒ 封顶 4⭐），本注释原为过期记录，现更正。
        实证：强势跟踪 maxN=40，按分数自然算得 4.69 ⇒ 5⭐
        —— 全站唯一挡住它的是「未登记 ⇒ 显示 0⭐」这个**流程漏洞**，而不是规则。
        现落地：最大样本 <100 ⇒ 证据强度不足以支撑满分，封顶 4⭐。 */
