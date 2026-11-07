@@ -1,40 +1,40 @@
 {
-  "update_time": "2026-11-07 22:08:10",
+  "update_time": "2026-11-08 00:43:26",
   "suspended": [
     {
       "code": "688496",
       "name": "*ST清越",
-      "days": 57,
+      "days": 58,
       "reason": "刊登重要公告"
     },
     {
       "code": "002717",
       "name": "*ST岭南",
-      "days": 25,
+      "days": 26,
       "reason": "刊登重要公告"
     },
     {
       "code": "688121",
       "name": "*ST卓然",
-      "days": 9,
+      "days": 10,
       "reason": "刊登重要公告"
     },
     {
       "code": "000831",
       "name": "中国稀土",
-      "days": 5,
+      "days": 6,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "002129",
       "name": "TCL中环",
-      "days": 5,
+      "days": 6,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "002623",
       "name": "亚玛顿",
-      "days": 4,
+      "days": 5,
       "reason": "刊登重要公告"
     }
   ],
