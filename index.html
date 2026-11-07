@@ -16210,20 +16210,20 @@ window.__renderTailSelect = function(){
     var top = (D.top10||[]);
     if(!top.length){ card.style.display='none'; return; }
     card.style.display = 'block';
-    var h = '<div style="font-size:11.5px;color:var(--dim);margin-bottom:8px;">数据源：'+_e(D.source||'')+' · 更新 '+_e((D.update_time||'').slice(5,16))+' · 候选 '+_e(D.total_candidates||0)+' → Top10</div>';
-    h += '<div style="display:grid;gap:6px;">';
+    var h = '<div style="font-size:11.5px;color:var(--dim);margin-bottom:8px;">数据源：'+_e(D.source||'')+' · 更新 '+_e((D.update_time||'').slice(5,16))+' · 候选 '+_e(D.total_candidates||0)+' → Top10 <b style="color:#ffb020;">（按「信号融合分」排序，非收益率/胜率排序）</b></div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">';
     top.forEach(function(t){
       var _pick = t.pick ? ' <span style="color:#ffd024;font-weight:700;">精选</span>' : '';
       var _mom = t.momentum_today ? ' <span style="color:#ff5252;">&#x1F525;今日突破</span>' : '';
       var _sig = (t.signals||[]).join('·');
       var _bd = 'border-left:3px solid '+(t.pick?'#ffd024':'var(--border)')+';';
-      h += '<div style="background:var(--card2);border-radius:7px;'+_bd+'padding:7px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;">'
-         + '<div style="font-size:13px;"><b style="color:var(--txt);">'+_e(t.code)+'</b> '+_e(t.name)+' <span style="font-size:11px;color:var(--dim);">'+_e(t.board)+'</span>'+_pick+_mom+'</div>'
-         + '<div style="font-size:11.5px;color:var(--sub);text-align:right;white-space:nowrap;">'+_e(_sig)+' <b style="color:'+(t.pick?'#ffd024':'var(--sub)')+';">分'+_e(t.score)+'</b></div>'
+      h += '<div style="background:var(--card2);border-radius:7px;'+_bd+'padding:7px 9px;">'
+         + '<div style="font-size:12.5px;margin-bottom:3px;"><b style="color:var(--txt);">'+_e(t.code)+'</b> '+_e(t.name)+' <span style="font-size:10.5px;color:var(--dim);">'+_e(t.board)+'</span>'+_pick+_mom+'</div>'
+         + '<div style="font-size:10.5px;color:var(--sub);line-height:1.45;">'+_e(_sig)+' <b style="color:'+(t.pick?'#ffd024':'var(--sub)')+';">分'+_e(t.score)+'</b></div>'
          + '</div>';
     });
     h += '</div>';
-    h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;">&#x26A0;&#xFE0F; 量化预选（v8 自有信号），仅供参考、不构成投资建议。</div>';
+    h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;">&#x26A0;&#xFE0F; 排序依据 = v8 信号融合分（金钻/缠论买点/上涨趋势等信号出现度加权），<b style="color:#ffb020;">不是你的最高优先级「收益率最高+胜率最高」口径</b>；仅供参考、不构成投资建议。</div>';
     body.innerHTML = h;
     if(window.setBadge) setBadge('tailSelectFresh','auto','',D.update_time,'');
     else { var _f=document.getElementById('tailSelectFresh'); if(_f) _f.textContent='已更新 '+_e((D.update_time||'').slice(5,16)); }
