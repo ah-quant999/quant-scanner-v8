@@ -13565,12 +13565,7 @@ function drawUpDownChart(){
       : z>=1 ? '空头持仓拥挤（z='+z+' ≥ +1）→ 逆向信号<b style="color:var(--up);">偏多</b> · 样本 '+(d.sample_size||'—')+' 个交易日'
       : z<=-1 ? '多头持仓拥挤（z='+z+' ≤ −1）→ 逆向信号<b style="color:var(--down);">偏空/减仓</b> · 样本 '+(d.sample_size||'—')+' 个交易日'
       : '多空持仓均衡（|z|='+Math.abs(z).toFixed(2)+' ＜ 1）→ 无逆向信号，中性观察 · 样本 '+(d.sample_size||'—')+' 个交易日';
-    // 📌 2026-11-08 主人令：明确写出买卖操作建议（逆向框架），不再只写模糊「中性观察」
-    const _rec = z===null
-      ? '📌 <b>操作建议：</b>样本累积中 → 暂不开新仓，等 ≥20 日数据出逆向信号'
-      : z>=1 ? '📌 <b>操作建议：</b><b style="color:var(--up);">逆向看多 → 可逢低布局多单 / 持有多头</b>（空头拥挤，警惕逼空）'
-      : z<=-1 ? '📌 <b>操作建议：</b><b style="color:var(--down);">逆向看空 → 减仓避险 / 逢高兑现</b>（多头拥挤，谨防回撤）'
-      : '📌 <b>操作建议：</b><b style="color:var(--gold);">中性观望 → 不追多、不杀空</b>，持仓结构均衡，等待 z 突破 ±1 再择向（z≥+1 偏多 / z≤−1 偏空）';
+    // 2026-11-08 主人令撤回：IF 卡只展示真实数据+中性解读，不写买卖操作建议（避免误导/混乱，数据本身已足够）
     // 🌡 2026-11-07 主人令：温度条（净空占比 z 指针）持续右移=净空占比走高=机构加空/减多、避险升温；
     //   按逆向框架（z≥+1 偏多）⇒ 偏多信号正在酝酿。复用 history_tail 近段净空占比序列判定漂移方向与累计幅度。
     let _drift='';
@@ -13585,7 +13580,7 @@ function drawUpDownChart(){
          :_dd<-0.002?' → 逆向框架下偏空/减仓压力缓和'
          :'')+'（累计 Δ净空占比 '+(_dd>=0?'+':'')+(_dd*100).toFixed(2)+'pct）</div>';
     }
-    h+='<div style="font-size:11.5px;color:var(--txt);background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-top:4px;margin-bottom:10px;line-height:1.85;"><b style="color:'+st.col+';">解读：</b>'+_rd+'<br>'+_rec+(_drift||'')+'</div>';
+    h+='<div style="font-size:11.5px;color:var(--txt);background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-top:4px;margin-bottom:10px;line-height:1.7;"><b style="color:'+st.col+';">解读：</b>'+_rd+(_drift||'')+'</div>';
     // 近10日净空占比迷你走势（文字条形，宽度按 nlr 相对极值）
     const tail=(d.history_tail||[]).slice(-10);
     if(tail.length){
