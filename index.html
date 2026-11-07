@@ -498,7 +498,13 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(diff <= 30) return { show:true, label:'✅ '+_stamp+' 已跑' };
     return { show:false, label:'' };
   };
-  /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
+  /* 🛡 2026-11-07 主人令「全部重新做·更新于唯一真源」：全站相对时间收敛为唯一规则，杜绝第三种格式被误判「不对」：
+       今日 HH:MM            —— 数据日期 == 今日
+       昨日 HH:MM            —— 数据日期 == 昨日
+       MM-DD HH:MM           —— 老于昨日（超出昨日/今日才写日期，绝不写「N天前」）
+       ⚠️ 未来 YYYY-MM-DD HH:MM —— 时间戳晚于当前（防误导）
+     删除历史「上一交易日」特殊分支：周末昨日的 data 也统一显示「昨日 HH:MM」，与铁律严格一致。
+     全站「更新于」只此一处算法，胶囊/脚注/裸拼处全部委托本函数。 */
   window._fmtAshareRel = function(ts){
     if(!ts) return '--';
     var d = window._parseAsCST(ts);
@@ -506,8 +512,6 @@ window.V8_CAL = {weeks:[],legend:[]};
     var now = new Date();
     var hm = window._fmtHmCST(d);
     // 🛡 2026-08-30 一劳永逸：时间戳在未来时，绝不可显示为「今日 HH:MM」误导用户。
-    //   原因是：STOCK_QUOTE snapshot_time 只有 HMS，后端曾用 date.today() 拼接出未来时间。
-    //   未来时间一律显示「⚠️ 未来 YYYY-MM-DD HH:MM」；仅允许 1 分钟时钟容差。
     if(d.getTime() > now.getTime() + 60*1000){
       var ds = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
       return '⚠️ 未来 ' + ds + ' ' + hm;
@@ -519,22 +523,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var today0 = new Date(+tp[0], +tp[1]-1, +tp[2]);
     var data0  = new Date(+dp[0], +dp[1]-1, +dp[2]);
     var diff = Math.round((today0 - data0) / 864e5);
-    // 🔴 2026-09-19 主人令（CN runner2号机的工程师）—— 「上一交易日收盘」前缀会把当日时刻吞掉。
-    //   原实现：非交易日（周末）时 diff>=1 一律 return '上一交易日收盘 ' + hm，
-    //   而 hm 是**该时间戳自身的时分** ⇒ 金股池 update_time=2026-09-19 13:24（周六）
-    //   被渲染成「上一交易日收盘 13:24」，自相矛盾（收盘不可能在 13:24）。
-    //   更毒的是：周末本来就有链路在跑（云端抓数 / 算法链），今天新产生的时间戳
-    //   被贴上「上一交易日」标签 ⇒ 主人无法判断这份数据今天到底有没有更新。
-    //   正解：仅当「数据日期确实是上一交易日」（diff>=1）且今日非交易日的**盘前**
-    //   语义下才打该前缀；数据日期 == 今日（diff<=0）时一律按「今日 HH:MM」处理，
-    //   与是否交易日无关 —— 数据是今天的就直说今天。
     if(diff <= 0) return '今日 ' + hm;
-    if(diff >= 1 && !window._isAshareTradingDay(today0) && diff === 1){
-      // 今天是非交易日、数据落在昨天：展示为「上一交易日 HH:MM + (日期)」，
-      // 保留原语义但补日期，避免与今天新产生的时间戳混淆。
-      var dsFull = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-      return '上一交易日(' + dsFull + ') ' + hm;
-    }
     if(diff === 1) return '昨日 ' + hm;
     return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-') + ' ' + hm;
   };
@@ -3556,7 +3545,7 @@ function fmtSigned(v){
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
       + '<h3 style="margin:0;font-size:14px;">🎯 最强共振 · 回测跟踪</h3>'
       + '<span style="font-size:10.5px;color:var(--dim);">T+1开盘入场·成本0.15%·vs 880003平均股价</span>'
-      + '<span style="font-size:10.5px;color:var(--dim);margin-left:auto;">'+(T.generated?('更新于 '+T.generated):'')+' · 样本 '+T.n_tracked+'/'+T.n_signals+'</span>'
+      + '<span style="font-size:10.5px;color:var(--dim);margin-left:auto;">'+(T.generated?('更新于 '+(window._fmtAshareRel?window._fmtAshareRel(T.generated):T.generated)):'')+' · 样本 '+T.n_tracked+'/'+T.n_signals+'</span>'
       + '</div>'
       + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 6px;font-size:11px;">'
       + '<span style="padding:2px 8px;border-radius:10px;background:var(--down);color:#fff;">次日买入：抛硬币·无edge</span>'
@@ -7629,7 +7618,7 @@ c.innerHTML = h;
     // 数据未到位：短重试（WAVE_ELLIOTT.js 为 defer 注入，切页时通常已就绪）
     if(!marks.length || closes.length < 2){
       if(window.__ewRetry < 20){ window.__ewRetry++; setTimeout(window.__renderElliottWave, 400); return; }
-      dst.innerHTML = '<div class="note" style="padding:16px;text-align:center;color:var(--dim);">&#x1F4CA; 波浪客观数据未到位（data/WAVE_ELLIOTT.js）· 更新于 ' + _e(stamp || '--') + '</div>';
+      dst.innerHTML = '<div class="note" style="padding:16px;text-align:center;color:var(--dim);">&#x1F4CA; 波浪客观数据未到位（data/WAVE_ELLIOTT.js）· 更新于 ' + (window._fmtAshareRel?window._fmtAshareRel(stamp):_e(stamp||'--')) + '</div>';
       return;
     }
     window.__ewRetry = 0;
@@ -7780,7 +7769,7 @@ c.innerHTML = h;
     h += '<div style="margin-top:8px;font-size:11px;line-height:1.75;color:var(--sub);">'
        + '<b style="color:#ff5252;">情景A（主 · 约 ' + pA + '%）：</b>五浪已完成 → ABC 回调。确认信号=跌破 ' + _n(lifeVal) + '（④浪生命线）；斐波那契回撤目标 ' + _n(t382) + '（0.382）/ ' + _n(t500) + '（0.5）/ ' + _n(t618) + '（0.618）。<br>'
        + '<b style="color:#22c55e;">情景B（次 · 约 ' + pB + '%）：</b>⑤浪尚未走完 → 需站上 ' + _n(newVal) + '（' + _e(newName) + '）并有效突破 ' + _n(hiVal) + '（本轮高点）方成立。<br>'
-       + '<b style="color:#c8a2e8;">口径：</b>数据 <b>window.WAVE_ELLIOTT</b>（真实收盘 + 人工浪型拐点 · CN runner1号机交易日 16:00 自动刷新 · 更新于 ' + _e(stamp || '--') + '）· 概率由 SH_FIB.mode「' + _e(mode || '--') + '」倾向 + 距生命线 ' + gapPct.toFixed(1) + '% + 距高点 ' + ddPct.toFixed(1) + '% 加权归一（每日随数据刷新，不硬编码）· 浪型拐点为人工研判资产（脚本不重判）· 斐波那契回撤以 ①起 ' + _n(startVal) + ' → 本轮高点 整段计 · 仅供研究参考，不构成投资建议。'
+       + '<b style="color:#c8a2e8;">口径：</b>数据 <b>window.WAVE_ELLIOTT</b>（真实收盘 + 人工浪型拐点 · CN runner1号机交易日 16:00 自动刷新 · 更新于 ' + (window._fmtAshareRel?window._fmtAshareRel(stamp):_e(stamp||'--')) + '）· 概率由 SH_FIB.mode「' + _e(mode || '--') + '」倾向 + 距生命线 ' + gapPct.toFixed(1) + '% + 距高点 ' + ddPct.toFixed(1) + '% 加权归一（每日随数据刷新，不硬编码）· 浪型拐点为人工研判资产（脚本不重判）· 斐波那契回撤以 ①起 ' + _n(startVal) + ' → 本轮高点 整段计 · 仅供研究参考，不构成投资建议。'
        + '</div>';
     dst.innerHTML = h;
   };
@@ -10475,30 +10464,22 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     if(diff>1)return `${diff}天后`; return `${Math.abs(diff)}天前`;
   }
   function scoreColor(s){ if(s>=70)return '#ffd024'; if(s>=55)return '#ff7ac2'; if(s>=40)return '#93a4c4'; return '#94a3b8'; }
+  /* 🛡 2026-11-07 主人令「全部重新做·更新于唯一真源」：fmtUpdateTime 统一委托 window._fmtAshareRel，
+     不再自实现 diff 计算，避免与胶囊/_fmtAshareRel 分流导致格式不一致。返回字符串契约不变。 */
   function fmtUpdateTime(ts){
-    if(!ts) return '今日';
-    const d = window._parseAsCST ? window._parseAsCST(ts) : null;
-    if(!d || isNaN(d.getTime())) return ts;
-    const t0=new Date();
-    const aStr = t0.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
-    const bStr = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
-    const ap = aStr.split('/');
-    const bp = bStr.split('/');
-    const a=new Date(+ap[0],+ap[1]-1,+ap[2]);
-    const b=new Date(+bp[0],+bp[1]-1,+bp[2]);
-    const diff=Math.round((a-b)/86400000);
-    const day = diff===1?'昨日':diff>1?(d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-')):diff<0?'未来':'今日';
-    const hm = window._fmtHmCST ? window._fmtHmCST(d) : pad(d.getHours())+':'+pad(d.getMinutes());
-    return `${day} ${hm}`;
+    if(!ts) return (window._fmtAshareRel ? window._fmtAshareRel('') : '今日');
+    return (window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts));
   }
   // 数据陈旧度（>1 天时金色提示，和资金流时间轴同款）
+  /* 🛡 2026-11-07 主人令「全部重新做·更新于唯一真源」：陈旧提示内的时间也走 _fmtAshareRel，
+     与全站胶囊格式统一（⚠ 数据 昨日 20:32 / ⚠ 数据 11-06 20:32），不再裸拼 MM-DD。 */
   function fmtStaleness(ts){
     if(!ts) return '';
-    const d = window._parseAsCST ? window._parseAsCST(ts) : null;
-    if(!d || isNaN(d.getTime())) return '';
-    const diffMs=Date.now()-d.getTime();
-    const days=Math.floor(diffMs/86400000);
-    if(days>=2) return '<span style="color:#ffd024;margin-left:6px;">⚠ 数据 '+d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-')+'</span>';
+    var _diffMs = null;
+    try{ var _d = window._parseAsCST ? window._parseAsCST(ts) : null; _diffMs = (_d && !isNaN(_d.getTime())) ? (Date.now()-_d.getTime()) : null; }catch(e){ _diffMs = null; }
+    if(_diffMs == null) return '';
+    var _days = Math.floor(_diffMs/86400000);
+    if(_days >= 2) return '<span style="color:#ffd024;margin-left:6px;">⚠ 数据 ' + (window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts)) + '</span>';
     return '';
   }
 
@@ -15045,30 +15026,13 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   const DATA={};
 
   /* ---- 相对时间（v8 风格：今日/昨日/N天前 HH:MM，统一中国时间） ---- */
+  /* 🛡 2026-11-07 主人令「全部重新做·更新于唯一真源」：fmtDataTime 不再自实现相对时间，
+     统一委托 window._fmtAshareRel（今日/昨日/MM-DD HH:MM + ⚠️未来），
+     全站「更新于」只此一处算法，杜绝分流导致格式不一致。返回 {text} 契约不变。 */
   function fmtDataTime(timeStr){
     if(!timeStr) return {text:''};
-    const d = window._parseAsCST ? window._parseAsCST(timeStr) : null;
-    if(!d || isNaN(d.getTime())) return {text:String(timeStr)};
-    const now=new Date();
-    const todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
-    const dataStr  = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
-    const tp = todayStr.split('/');
-    const dp = dataStr.split('/');
-    const today0=new Date(+tp[0], +tp[1]-1, +tp[2]);
-    const data0=new Date(+dp[0], +dp[1]-1, +dp[2]);
-    const dayDiff=Math.round((today0-data0)/864e5);
-    const hm = window._fmtHmCST ? window._fmtHmCST(d) : ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    let txt;
-    // 🛡 全局铁律（2026-11-07 主人令「昨日今日超过才写日期」）：相对时间一律今日/昨日/MM-DD HH:MM，
-    //   与 _fmtAshareRel 严格一致；老于昨日绝不显示「N天前」。
-    if(dayDiff<=0) txt='今日 '+hm;
-    else if(dayDiff===1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)){
-      var dsFull0 = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-      txt='上一交易日('+dsFull0+') '+hm;
-    }
-    else if(dayDiff===1) txt='昨日 '+hm;
-    else txt = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-') + ' ' + hm;
-    return {text:txt};
+    var rel = (window._fmtAshareRel ? window._fmtAshareRel(timeStr) : String(timeStr));
+    return {text: rel};
   }
 
   /* 2026-09-03 主人令：renderAlgoCard + buildAllsiteSelectionHTML 整体删除（cockpit/allsite 全方位下线后死代码）。
@@ -18199,7 +18163,7 @@ h+=`</div>`;
     var _redN=(_redV?1:0)+(_redT?1:0);
     var _posTxt=(_redN>=2?'立即降仓防守':(_redN===1?'降低仓位、严控回撤':'中性仓位、重结构、控回撤'));
     var _tsfClause=(_tsfY==null?'社融脉冲待接入':(_tsfY<0?('社融脉冲已转负（'+_tsfY+'%）、杠杆'+_mgTxt+'——历史上每轮转熊的宏观先兆，需盯'):('社融脉冲仍为正（'+_tsfY+'%）、杠杆'+_mgTxt+'——信用尚未收缩，维持观察')));
-    html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「'+_bstTxt+'、估值'+_valTxt+'、信用'+_tsfTxt+'」的状态——估值与情绪'+(EXT.erp>=4?'不贵':(EXT.erp>=2?'中性':'偏贵'))+'（val10='+(_v10==null?'—':_v10)+'·'+_v10Tag+'·成交热度 '+(EXT.turnover&&EXT.turnover.pct!=null?EXT.turnover.pct+'%':'—')+' 分位·股债性价比 '+_erpTxt+'），距牛市峰值回撤 '+edhecDD.toFixed(1)+'%；'+_tsfClause+'；宜'+_posTxt+'。红灯触发条件：val10 冲上 80 或 社融脉冲 ≤ −10%——当前已触发 <b style="color:'+(_redN?'#ff5252':'#26d9c2')+';">'+_redN+'/2</b>'+(_redN?'（⚠️ 按红灯纪律执行）':'（均未触发）')+'。<span style="color:var(--dim);font-size:11px;">（结论由上方指标实时拼装 · 数据更新于 '+T.generated+' · 月度序列截至 '+D.dates[D.dates.length-1]+' 末）</span></div>';
+    html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「'+_bstTxt+'、估值'+_valTxt+'、信用'+_tsfTxt+'」的状态——估值与情绪'+(EXT.erp>=4?'不贵':(EXT.erp>=2?'中性':'偏贵'))+'（val10='+(_v10==null?'—':_v10)+'·'+_v10Tag+'·成交热度 '+(EXT.turnover&&EXT.turnover.pct!=null?EXT.turnover.pct+'%':'—')+' 分位·股债性价比 '+_erpTxt+'），距牛市峰值回撤 '+edhecDD.toFixed(1)+'%；'+_tsfClause+'；宜'+_posTxt+'。红灯触发条件：val10 冲上 80 或 社融脉冲 ≤ −10%——当前已触发 <b style="color:'+(_redN?'#ff5252':'#26d9c2')+';">'+_redN+'/2</b>'+(_redN?'（⚠️ 按红灯纪律执行）':'（均未触发）')+'。<span style="color:var(--dim);font-size:11px;">（结论由上方指标实时拼装 · 数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(T.generated):T.generated)+' · 月度序列截至 '+D.dates[D.dates.length-1]+' 末）</span></div>';
     // ── 上证/沪深300 实时点位（2026-10-05 主人令：从KPI行胶囊移至一句话结论下方；更新时间已由统一卡头承载，此处删除）──
     html+='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--dim);">'
       +'<span>&#x1F4CD; 上证 / 沪深300：</span>'
@@ -18236,7 +18200,7 @@ h+=`</div>`;
     // ── 图② ──
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px;">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
     html+='<div id="futureC2" style="height:260px;"></div>';
-    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+T.generated+'（每日刷新）<br>📅 两图为月度序列，右端末档 = <b style="color:'+C_TXT+';">'+D.dates[D.dates.length-1]+'</b>（当月至今·进行中，交易日滚动更新；估值分位为月频，当月值月末补齐）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
+    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(T.generated):T.generated)+'（每日刷新）<br>📅 两图为月度序列，右端末档 = <b style="color:'+C_TXT+';">'+D.dates[D.dates.length-1]+'</b>（当月至今·进行中，交易日滚动更新；估值分位为月频，当月值月末补齐）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
     // ── 2027 情景 ──
     function tgt(v,r){ return Math.round(v*(1+r/100)); }
     var scn=[{name:'牛市',p:25,r:[15,22],col:C_GRN,drv:'强财政货币延续 + 居民资金入市 + 估值扩张 + 盈利兑现'},
