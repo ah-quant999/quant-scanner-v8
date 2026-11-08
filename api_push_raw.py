@@ -114,7 +114,11 @@ def api(method, path, data=None, timeout=300):
     #   ETF_DAILY_MONITOR 等盘中数据整批丢失，cn fetch 判 failure）。
     # 修法：1) 异常元组补 http.client.HTTPException；
     #      2) 幂等请求(GET)内建 3 次退避重读，抵御 cn runner 网络抖动，不再靠调用方兜底。
-    attempts = 3 if method.upper() == "GET" else 1
+    # 🛡 2026-11-08（小九 · 主人出差兜底令 · algoraw-mass403 一劳永逸）：
+    #   非 GET 旧为 1（不重试）。共享 PAT 被多链并发榨干配额返回 403 时，blob 上传循环
+    #   把 403 当不可重试直接放弃 ⇒ 整批文件 403。故非 GET 也允许 4 次重试，由下方
+    #   「限流判定」在 403/429 上退避到配额重置再重试（限流=请求未被处理，重试安全）。
+    attempts = 3 if method.upper() == "GET" else 4
     last_msg = ""
     for i in range(attempts):
         try:
@@ -122,22 +126,48 @@ def api(method, path, data=None, timeout=300):
                 txt = r.read().decode("utf-8")
                 return json.loads(txt) if txt else {}
         except urllib.error.HTTPError as e:
+            _h = e.headers or {}
             body = e.read().decode("utf-8", "replace")
             print(f"  ⚠️ API {method} {path} -> HTTP {e.code}")
+            msg = ""
             try:
                 err = json.loads(body)
-                print(f"     message: {err.get('message')}")
+                msg = err.get("message") or ""
+                print(f"     message: {msg}")
                 print(f"     doc: {err.get('documentation_url')}")
             except Exception:
                 print(f"     body: {body[:500]}")
-            # 🔴 2026-09-11 修复（今夜 P0 事故·一劳永逸）：
-            #   原实现只对「网络类异常」重试，HTTPError 一律立即 return →
-            #   api() 的 3 次重试对 HTTP 5xx 形同虚设。实测今夜 run#1689：
-            #   `GET /git/trees/{sha}?recursive=1 -> HTTP 500`（GitHub 瞬时故障）
-            #   → 防倒退守卫拿不到基线 → sys.exit(1) → **整条链算完却零推送**，
-            #   主站最终推荐整天停在昨天。
-            #   修法：幂等请求(GET)遇 5xx / 429（可重试瞬时错）走退避重试。
-            if method.upper() == "GET" and (e.code >= 500 or e.code == 429) and i < attempts - 1:
+            # 🔴 2026-11-08 修复（小九 · 主人出差兜底令 · algoraw-mass403 一劳永逸）：
+            #   根因：共享 PAT 被多链并发榨干配额 → 返回 403，而旧实现对非 GET 不重试、
+            #   blob 循环把 403 当不可重试直接放弃 ⇒ 每个文件重试 8 次全 403 后放弃
+            #   （实测 11-05/11-07 算法链 373~485 文件整批 403）。
+            #   修法：403/429 判定为「限流」→ 读 x-ratelimit-reset / Retry-After 退避到
+            #   配额重置再重试（非 GET 也安全：限流=请求未被处理，不会重复写入）；
+            #   权限类等真 403（remaining 非空且非 0、message 不涉限流）仍快速失败，不误重试。
+            _rem = _h.get("x-ratelimit-remaining")
+            _reset = _h.get("x-ratelimit-reset")
+            _ra = _h.get("retry-after")
+            _is_rl = (e.code in (403, 429)) and (
+                _rem is None or str(_rem) == "0"
+                or "rate limit" in msg.lower()
+                or "secondary rate" in msg.lower()
+                or "abuse" in msg.lower()
+                or _ra is not None)
+            if _is_rl and i < attempts - 1:
+                _wait = 2 ** i
+                try:
+                    if _reset:
+                        _wait = max(_wait, int(float(_reset)) - int(_time.time()) + 2)
+                    elif _ra:
+                        _wait = max(_wait, int(float(_ra)))
+                except Exception:
+                    pass
+                _wait = min(_wait, 90)
+                print(f"     ↻ HTTP {e.code} 属限流，休眠 {_wait}s 至配额重置后重试 {i + 1}/{attempts - 1}")
+                _time.sleep(_wait)
+                last_msg = f"HTTP {e.code} ratelimit"
+                continue
+            if method.upper() == "GET" and e.code >= 500 and i < attempts - 1:
                 wait = 2 ** i
                 print(f"     ↻ HTTP {e.code} 属可重试瞬时故障，{wait}s 后重试 {i + 1}/{attempts - 1}")
                 _time.sleep(wait)
@@ -1208,8 +1238,10 @@ def main():
             if "__error__" not in b:
                 break
             code = b.get("__error__")
+            # 🛡 2026-11-08：403 加入可重试（限流型）—— api() 已在错误内按配额重置退避，
+            #   此处兜底继续退避，确保持久限流窗口内整批文件最终落地而非整批丢。
             retryable = (code == "network"
-                         or (isinstance(code, int) and (code >= 500 or code == 429)))
+                         or (isinstance(code, int) and (code >= 500 or code in (429, 403))))
             if not retryable:
                 return ("failed", path, code)
             if attempt < _BLOB_MAX_TRY - 1:
@@ -1222,6 +1254,24 @@ def main():
         return ("uploaded", path, b["sha"])
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
+    # 🛡 2026-11-08 全局配额守卫（小九 · mass403 一劳永逸·根因治理）：
+    #   批上传前探一次 /rate_limit，若核心配额剩余低于阈值，休眠到 reset 再开工，
+    #   从源头不再「连环跑榨干配额」（即 11-05/11-07 算法链整批 403 的真因）。
+    try:
+        _rl = api("GET", "/rate_limit")
+        if isinstance(_rl, dict) and _rl.get("resources"):
+            _core = _rl["resources"].get("core", {})
+            _rem = _core.get("remaining")
+            _reset = _core.get("reset")
+            if isinstance(_rem, int) and _rem < 200 and _reset:
+                _wg = max(0, int(_reset) - int(_time.time()) + 2)
+                if _wg > 0:
+                    _wg = min(_wg, 600)
+                    print(f"⏳ 核心配额剩余 {_rem} < 200，休眠 {_wg}s 至重置后再批量上传（防 mass403）")
+                    _time.sleep(_wg)
+    except Exception as _ge:
+        print(f"  ⚠️ 配额探测异常（忽略，继续）：{_ge}")
+
     print(f"🚀 并发推送启动：{len(files)} 个文件 / 并发 {_PUSH_CONC} / 软闸 {_SOFT_DEADLINE:.0f}s")
     _ex = ThreadPoolExecutor(max_workers=_PUSH_CONC)
     _futs = {_ex.submit(_push_one, _p, _c): _p for _p, _c in files.items()}
