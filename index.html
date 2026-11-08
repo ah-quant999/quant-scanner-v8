@@ -1296,7 +1296,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_POOL_TRACKER.js?v=c991d65654" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=18f787b4f6" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=dd52f88ac8" defer></script>
-    <script src="data/HUIJIN_ETF_DRILL.js?v=b6b08f8463" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=86bb686412" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=d04d356773" defer></script>
@@ -1313,8 +1312,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TOP10_DAILY.js?v=988dbf32ac" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
 <script src="data/DO_T_SPACE.js?v=b4ce6b2829" defer></script>
-<!-- 🆕 2026-11-07 主人令②：尾盘预选（数据源 GOLD_POOL 信号旗标 + STOCK_MOMENTUM_STATE 今日突破） -->
-<script src="data/TAIL_SELECT.js?v=0dde54811d" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=e8a9ef5846" defer></script>
 <script src="data/WEEKEND_RUN.js?v=54cbc05ee1" defer></script>
@@ -15608,47 +15605,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
              + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:2px">' + _e(s.detail) + '</div></div>';
         }
         h += '</div>';
-        /* 🆕 2026-11-07 主人令·ETF下钻子表（折叠·卡内明细·挂国家队活跃度卡下方） */
-        (function(){
-          var _dd = window.HUIJIN_ETF_DRILL;
-          if(!_dd || !_dd.etfs || !_dd.etfs.length) return;
-          var _rows = _dd.etfs.map(function(r){
-            var _ds = r.d_shares_yi, _da = r.d_amount_yi, _pct = r.pct, _sh = r.shares_yi, _m20 = r.ma20_mult;
-            var _col = (_ds===null)?'var(--dim)':(_ds>=0?'#ff5252':'#26d9c2');
-            var _dsTxt = (_ds===null)?'—':((_ds>=0?'+':'')+Number(_ds).toFixed(2));
-            var _daTxt = (_da===null)?'—':((_da>=0?'+':'')+Number(_da).toFixed(2));
-            var _pctTxt = (_pct===null)?'—':((_pct>=0?'+':'')+Number(_pct).toFixed(2)+'%');
-            var _shTxt = (_sh===null)?'—':Number(_sh).toFixed(1);
-            var _m20Txt = (_m20===null)?'—':(Number(_m20).toFixed(2)+'×');
-            return '<tr>'
-              + '<td style="padding:3px 6px;font-size:11px;color:var(--txt);white-space:nowrap">'+r.code+'</td>'
-              + '<td style="padding:3px 6px;font-size:11px;color:var(--sub);white-space:nowrap">'+r.name+'</td>'
-              + '<td style="padding:3px 6px;font-size:11px;color:'+_col+';text-align:right;white-space:nowrap">'+_dsTxt+'</td>'
-              + '<td style="padding:3px 6px;font-size:11px;color:'+_col+';text-align:right;white-space:nowrap">'+_daTxt+'</td>'
-              + '<td style="padding:3px 6px;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap">'+_pctTxt+'</td>'
-              + '<td style="padding:3px 6px;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap">'+_shTxt+'</td>'
-              + '<td style="padding:3px 6px;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap">'+_m20Txt+'</td>'
-              + '<td style="padding:3px 6px;font-size:10px;color:#c084fc;white-space:nowrap">'+_e(r.huijin||'')+'</td>'
-              + '</tr>';
-          }).join('');
-          h += '<div style="margin-top:10px;border-top:1px dashed var(--border);padding-top:8px">'
-            + '<button onclick="var t=document.getElementById(\'huijinDrillTbl\');t.style.display=(t.style.display===\'none\'?\'block\':\'none\');" '
-            + 'style="background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--sub);font-size:11.5px;padding:4px 10px;cursor:pointer">'
-            + '▸ 汇金宽基ETF下钻（'+_dd.etfs.length+'只·'+(_dd.matched_real||0)+'只含真实申赎）</button>'
-            + '<div id="huijinDrillTbl" style="display:none;margin-top:8px;overflow-x:auto">'
-            + '<table style="width:100%;border-collapse:collapse;font-size:11px">'
-            + '<thead><tr style="color:var(--dim);text-align:left">'
-            + '<th style="padding:3px 6px">代码</th><th style="padding:3px 6px">名称</th>'
-            + '<th style="padding:3px 6px;text-align:right">申赎份额(亿份)</th>'
-            + '<th style="padding:3px 6px;text-align:right">申赎金额(亿元)</th>'
-            + '<th style="padding:3px 6px;text-align:right">占比%</th>'
-            + '<th style="padding:3px 6px;text-align:right">当前份额(亿份)</th>'
-            + '<th style="padding:3px 6px;text-align:right">较20日均</th>'
-            + '<th style="padding:3px 6px">汇金标注</th></tr></thead>'
-            + '<tbody>'+_rows+'</tbody></table>'
-            + '<div style="font-size:10px;color:var(--dim);margin-top:4px;line-height:1.5">'+_e(_dd.note||'')+'</div>'
-            + '</div></div>';
-        })();
         body.innerHTML = h;
         /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；派发信息降为胶囊后缀小字 */
         if(window.setBadge) setBadge('nationalTeamFresh','auto','',D.update_time,'');
@@ -15709,7 +15665,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis', '__renderSevereSwing', '__renderTailSelect'];
+      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis', '__renderSevereSwing'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
@@ -15889,13 +15845,6 @@ h += '<div class="card" id="severeSwingCard" style="display:none;margin-bottom:1
    + '<span style="font-size:12px;color:var(--dim)">观测类 · 连板≥2 已触发 / 池内涨幅≥15% 逼近</span></div>'
    + '<div id="severeSwingBody"><div class="note">加载中&#x2026;</div></div></div>';
 
-// 🆕 2026-11-07 主人令②：尾盘预选（暂未上架·观测类；数据源 GOLD_POOL 信号旗标 + STOCK_MOMENTUM_STATE 今日突破）
-h += '<div class="card" id="tailSelectCard" style="display:none;margin-bottom:16px;border-left:4px solid #41c9ff">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-   + '<span style="font-size:15px;font-weight:700;color:#41c9ff">&#x1F4CB; 尾盘预选</span>'
-   + '<span id="tailSelectFresh" style="display:inline-flex;align-items:center">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim)">有活跃买信号 · 可关注次日低吸（量化预选，非次日必涨）</span></div>'
-   + '<div id="tailSelectBody"><div class="note">加载中&#x2026;</div></div></div>';
 
 // 🗑 2026-11-05 主人令：重要公告速览卡迁往「今日事件」页（今日事件详情卡下方）——
 //   卡壳改静态 HTML 随 sec-td 输出（见上方今日事件 section），本处旧 h+= 卡壳删除；
@@ -16272,48 +16221,6 @@ window.__renderSevereSwing = function(){
   }catch(e){ console.warn('[renderSevereSwing]', e); }
 };
 
-// 🆕 2026-11-07 主人令②：尾盘预选（数据源 GOLD_POOL 信号旗标 + STOCK_MOMENTUM_STATE 今日突破）
-window.__renderTailSelect = function(){
-  try{
-    var card = document.getElementById('tailSelectCard');
-    var body = document.getElementById('tailSelectBody');
-    if(!card || !body) return;
-    var D = window.TAIL_SELECT;
-    if(!D){
-      if(!window.__tsRetryTimer){
-        window.__tsRetryN = 0;
-        window.__tsRetryTimer = setInterval(function(){
-          window.__tsRetryN++;
-          if(window.TAIL_SELECT){ clearInterval(window.__tsRetryTimer); window.__tsRetryTimer=null; window.__tsRetryN=0; try{ window.__renderTailSelect(); }catch(e){} }
-          else if(window.__tsRetryN > 30){ clearInterval(window.__tsRetryTimer); window.__tsRetryTimer=null; window.__tsRetryN=0; }
-        }, 600);
-      }
-      return;
-    }
-    if(window.__tsRetryTimer){ clearInterval(window.__tsRetryTimer); window.__tsRetryTimer=null; window.__tsRetryN=0; }
-    function _e(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
-    var top = (D.top10||[]);
-    if(!top.length){ card.style.display='none'; return; }
-    card.style.display = 'block';
-    var h = '<div style="font-size:11.5px;color:var(--dim);margin-bottom:8px">数据源：'+_e(D.source||'')+' · 更新 '+(window._fmtAshareRel?window._fmtAshareRel(D.update_time):_e((D.update_time||'').slice(5,16)))+' · 候选 '+_e(D.total_candidates||0)+' → Top10 <b style="color:#ffb020">（按「信号融合分」排序，非收益率/胜率排序）</b></div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
-    top.forEach(function(t){
-      var _pick = t.pick ? ' <span style="color:#ffd024;font-weight:700">精选</span>' : '';
-      var _mom = t.momentum_today ? ' <span style="color:#ff5252">&#x1F525;今日突破</span>' : '';
-      var _sig = (t.signals||[]).join('·');
-      var _bd = 'border-left:3px solid '+(t.pick?'#ffd024':'var(--border)')+';';
-      h += '<div style="background:var(--card2);border-radius:7px;'+_bd+'padding:7px 9px">'
-         + '<div style="font-size:12.5px;margin-bottom:3px"><b style="color:var(--txt)">'+_e(t.code)+'</b> '+_e(t.name)+' <span style="font-size:10.5px;color:var(--dim)">'+_e(t.board)+'</span>'+_pick+_mom+'</div>'
-         + '<div style="font-size:10.5px;color:var(--sub);line-height:1.45">'+_e(_sig)+' <b style="color:'+(t.pick?'#ffd024':'var(--sub)')+'">分'+_e(t.score)+'</b></div>'
-         + '</div>';
-    });
-    h += '</div>';
-    h += '<div style="font-size:11px;color:var(--dim);margin-top:8px">&#x26A0;&#xFE0F; 排序依据 = v8 信号融合分（金钻/缠论买点/上涨趋势等信号出现度加权），<b style="color:#ffb020">不是你的最高优先级「收益率最高+胜率最高」口径</b>；仅供参考、不构成投资建议。</div>';
-    body.innerHTML = h;
-    if(window.setBadge) setBadge('tailSelectFresh','auto','',D.update_time,'');
-    else { var _f=document.getElementById('tailSelectFresh'); if(_f) _f.textContent='已更新 '+(window._fmtAshareRel?window._fmtAshareRel(D.update_time):_e((D.update_time||'').slice(5,16))); }
-  }catch(e){ console.warn('[renderTailSelect]', e); }
-};
 
 // ═══ 🆕 2026-10-30 主人令：重要公告速览（孤儿模块，全站零重复）═══
 //   🆕 2026-11-05 主人令：整卡自「暂未上架·观测类」迁入「今日事件」页（今日事件详情卡下方）。
