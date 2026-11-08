@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-08 19:58",
+  "update_time": "2026-11-08 21:04",
   "data_date": "2026-11-06",
   "data_date_source": "kline",
   "fetch_date": "2026-11-08",
@@ -43,24 +43,6 @@
       "relative_52w": -29.36
     },
     {
-      "name": "白色家电",
-      "pct_day": -1.56,
-      "pct_5d": 1.74,
-      "pct_20d": -10.3,
-      "pct_30d": -10.74,
-      "pct_60d": -8.23,
-      "pct_90d": -8.89,
-      "pct_180d": -17.96,
-      "pct_52w": -13.99,
-      "relative_5d": 1.74,
-      "relative_20d": -10.3,
-      "relative_30d": -10.74,
-      "relative_60d": -8.23,
-      "relative_90d": -8.89,
-      "relative_180d": -17.96,
-      "relative_52w": -13.99
-    },
-    {
       "name": "保险",
       "pct_day": -0.48,
       "pct_5d": 2.66,
@@ -77,24 +59,6 @@
       "relative_90d": 2.28,
       "relative_180d": -23.06,
       "relative_52w": -12.2
-    },
-    {
-      "name": "包装印刷",
-      "pct_day": -1.81,
-      "pct_5d": 4.57,
-      "pct_20d": -10.32,
-      "pct_30d": -9.93,
-      "pct_60d": -8.42,
-      "pct_90d": -12.64,
-      "pct_180d": -21.35,
-      "pct_52w": -9.49,
-      "relative_5d": 4.57,
-      "relative_20d": -10.32,
-      "relative_30d": -9.93,
-      "relative_60d": -8.42,
-      "relative_90d": -12.64,
-      "relative_180d": -21.35,
-      "relative_52w": -9.49
     },
     {
       "name": "厨卫电器",
