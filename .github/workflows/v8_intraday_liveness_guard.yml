@@ -1,0 +1,103 @@
+# 九宝量化 v8.0 — 盘中链路存活监控（防静默断更·一劳永逸）
+#
+# 2026-11-08 一劳永逸修复（小九）：复盘 2026-10-25~11-03 盘中链路静默断更 9 天
+#   （cn_fetch_cloud 云端主力 0 runs + intraday_slot 调度器稀发 8/70 + CN 兜底 64/65 失败），
+#   主人全程不知情。旧 v8_cn_fetch_watchdog 只查"数据新鲜度"且误判，未兜住。
+#   本监控不依赖数据内容，直接数 workflow run：盘中窗口内若 intraday_slot 与 cn_fetch_cloud
+#   连续 90 分钟均无 success run → 视为链路停滞，开 GitHub Issue 告警（intraday-stall 标签）
+#   + 让 job 失败（若主人订阅 Actions 失败邮件则双重通知）。恢复后自动关闭 issue。
+#   跑 GitHub 云端 ubuntu-latest，不依赖小九单位机在线。
+#
+# 🔴 写法铁律（继承自 runner_health_alert.yml）：彻底不用多行内嵌 python，全部 jq + 单行命令，
+#   杜绝 YAML 缩进与 python 缩进互相打架导致 workflow 解析失败。
+
+name: "🩺 盘中链路存活监控"
+
+on:
+  # UTC 01:00-07:30 = CST 09:00-15:30，工作日盘中每 30 分；收盘后不再需要（数据定稿）
+  schedule:
+    - cron: '*/30 1-7 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  liveness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      REPO: ah-quant999/quant-scanner-v8
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: "🔍 检查盘中链路存活（intraday_slot + cn_fetch_cloud 近90分 success）"
+        id: check
+        run: |
+          set -eo pipefail
+          # 当前 CST 判断盘中窗口（周一~周五 09:00-15:30）
+          DOW=$(TZ='Asia/Shanghai' date '+%u')
+          HM=$(TZ='Asia/Shanghai' date '+%H%M' | sed 's/^0*//'); HM=${HM:-0}
+          IN_WINDOW=false
+          if [ "$DOW" -le 5 ] && [ "$HM" -ge 900 ] && [ "$HM" -le 1530 ]; then IN_WINDOW=true; fi
+          if [ "$IN_WINDOW" = "false" ]; then
+            echo "state=skip" >> "$GITHUB_OUTPUT"
+            echo "非盘中窗口(dow=$DOW hm=$HM)，不判故障"
+            exit 0
+          fi
+          # 数近90分 success run（jq，避免 python 缩进打架）
+          CNT_SLOT=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/workflows/354533319/runs?per_page=30&status=success" \
+            | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("Z";"+00:00") | fromdateiso8601))/60 <= 90)] | length')
+          CNT_CLOUD=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/workflows/327687211/runs?per_page=30&status=success" \
+            | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("Z";"+00:00") | fromdateiso8601))/60 <= 90)] | length')
+          echo "intraday_slot 近90分 success=$CNT_SLOT ; cn_fetch_cloud 近90分 success=$CNT_CLOUD"
+          if [ "$CNT_SLOT" = "0" ] && [ "$CNT_CLOUD" = "0" ]; then
+            echo "state=stall" >> "$GITHUB_OUTPUT"
+          else
+            echo "state=ok" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "🚨 链路停滞：开 GitHub Issue 告警"
+        if: steps.check.outputs.state == 'stall'
+        run: |
+          set -eo pipefail
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%m-%d %H:%M')
+          EXISTING=$(curl -sS -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/issues?state=open&labels=intraday-stall&per_page=1" \
+            | jq -r 'if length>0 then .[0].number else "" end')
+          if [ -n "$EXISTING" ]; then echo "  issue #$EXISTING 已开，跳过"; exit 0; fi
+          BODY=$(printf '%s\n' \
+            "@ah-quant999 ⚠️ **盘中高频更新链路停滞**" \
+            "" \
+            "- 检测时间: $BJ_NOW 北京" \
+            "- 现象: 盘中窗口内 intraday_slot 与 cn_fetch_cloud 近90分钟均无成功运行" \
+            "- 后果: 盘中数据卡可能显示旧值（类似 2026-10-25~11-03 静默断更9天）" \
+            "- 排查: 查 GitHub Actions 中 v8_cn_fetch_intraday_lemoncat / v8_cn_fetch_cloud / v8_cn_fetch_cloud_selfhosted 的运行与 ::error 标注" \
+            "" \
+            "*本 issue 由 v8_intraday_liveness_guard.yml 自动创建*")
+          jq -n --arg t "🩺 盘中链路停滞 ($BJ_NOW)" --arg b "$BODY" \
+            '{title:$t, body:$b, labels:["intraday-stall"], assignees:["ah-quant999"]}' > payload.json
+          curl -sS -X POST -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/issues" -d @payload.json > /dev/null
+          echo "::error title=v8-intraday-stall::盘中链路停滞，已开 issue 告警"
+          exit 1
+
+      - name: "✅ 恢复：关闭告警 Issue"
+        if: steps.check.outputs.state == 'ok'
+        run: |
+          set -eo pipefail
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          ISSUES=$(curl -sS -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/issues?state=open&labels=intraday-stall&per_page=10" \
+            | jq -r '.[].number')
+          if [ -z "$ISSUES" ]; then echo "  无 open 告警 issue，链路健康"; exit 0; fi
+          for n in $ISSUES; do
+            echo "  closing issue #$n"
+            jq -n --arg b "✅ 盘中链路已恢复（$BJ_NOW 北京）" '{body:$b}' > cmt.json
+            curl -sS -X POST -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$REPO/issues/$n/comments" -d @cmt.json > /dev/null
+            curl -sS -X PATCH -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$REPO/issues/$n" -d '{"state":"closed"}' > /dev/null
+          done
