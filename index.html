@@ -4502,6 +4502,7 @@ function fmtSigned(v){
     }
     try{
     var CR = window.CRISIS_DATA || {};
+    var score = CR.score || 50;  // 🛡 2026-11-08 回归：风险判断(L4658 if(score>=70)) 依赖此变量；评分环卡虽删，score 仍需保留供风险项判定
     var CAND = window.CANDIDATE || {};
     var SR = window.SECTOR_RS || {};
     var VOL = window.VOLATILITY || {};
