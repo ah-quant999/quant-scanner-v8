@@ -1,0 +1,49 @@
+name: "💎 金钻跟踪 monitor (cloud)"
+# 🔴 2026-11-09 主人令：演示卡「大资金买点三样·金钻跟踪」升级为 v8 真实日更监控管线（非盈利信号）。
+#   本工作流在 GitHub 托管 ubuntu-latest 跑 gen_jinzuan_track.py：纯读本地 raw_data/kline_cache/*.json
+#   （已提交，6139 文件，离线可用）+ 固定 352 池 raw_data/jinzuan_pool.json，仅算最新一日金钻起涨/紧迫度/支撑/四档，
+#   产出 data/JINZUAN_TRACK.js → window.JINZUAN_TRACK，由 index.html 选股策略页「💎 金钻跟踪」子TAB 读取。
+#   与 v8_invest_avoid（2026-11-04 根治 cn 单点）同款：把关键数据链从 cn 自托管机解耦，云端每日可靠刷新。
+#   铁律：akshare 仅在 --rebuild-pool 惰性导入；每日运行不联网（对齐 V8_NO_NET）。
+#   本卡为监控跟踪用途，非买点算法；回测已证无稳定盈利边缘，前端如实标注「监控用途·非盈利信号」。
+on:
+  schedule:
+    - cron: '0 10 * * *'          # 北京 18:00 每日（UTC 10:00），确保盘后 kline_cache 已更新
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-jinzuan-track
+  cancel-in-progress: false
+
+jobs:
+  jinzuan-track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: "📦 安装依赖（仅 pandas/numpy；akshare 惰性，不需联网）"
+        run: pip install pandas numpy
+      - name: "🧭 跑 gen_jinzuan_track.py（产出 data/JINZUAN_TRACK.js）"
+        run: python v8/gen_jinzuan_track.py
+      - name: "📤 推送 data/JINZUAN_TRACK.js（变化才推）"
+        run: |
+          git config user.name "v8-bot"
+          git config user.email "bot@quant-scanner-v8.local"
+          if git diff --quiet data/JINZUAN_TRACK.js; then
+            echo "JINZUAN_TRACK 内容无变化，跳过推送"
+          else
+            git add data/JINZUAN_TRACK.js
+            git commit -m "v8 jinzuan_track: daily monitor snapshot $(date +'%Y-%m-%d %H:%M')"
+            git fetch origin main
+            git rebase origin/main || true
+            git push || echo "push 被其他链抢先（数据已更新），跳过"
+          fi
