@@ -2261,7 +2261,7 @@ window.STRATEGY_WALKFORWARD = {
     <!-- 今日事件详情（日历事件） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📅</span>今日事件详情 - <span class="fresh" id="v8DayDate">--</span></h3>
-      <div id="v8TodayAll" style="font-size:13px;color:var(--txt)"></div>
+      <div id="v8TodayAll" style="font-size:13px;color:#e6edf7"></div>
     </div>
 
     <!-- 重要公告速览（2026-11-05 主人令：自「暂未上架·观测类」迁入今日事件页，置于今日事件详情卡下方；
@@ -3185,6 +3185,7 @@ function fmtSigned(v){
               （概念行前 5 + 新建「行业资金」行，见 algorithms/gen_market_brief.py），此处不再重复展示。
               注意：renderSector() 已同步删除 Block1 渲染与 sfBlock1 依赖，勿再引入。 -->
     <div class="card" style="margin-bottom:16px">
+    <div class="card" id="sectorFundTrendCard" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>板块资金趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
 
       <!-- Block 2: 收盘复盘 -->
@@ -8761,7 +8762,7 @@ window.__renderShareholderChange = function(){
     caps.forEach(function(c){
       var act = (window.__shcView === c[0]);
       var col = c[0]==='red' ? '#ff5252' : (c[0]==='inc' ? '#22c55e' : '#c084fc');
-      h += '<span onclick="window.__shcShow(\''+c[0]+'\')" style="cursor:pointer;font-size:12px;background:'+(act?col:'transparent')+';color:'+(act?'#e6edf7':col)+';border:1px solid '+(act?col:col+'66')+';border-radius:6px;padding:2px 8px;'+(act?'font-weight:700;':'opacity:.55;')+'">'+c[1]+'</span>';
+      h += '<span onclick="window.__shcShow(\''+c[0]+'\')" style="cursor:pointer;font-size:12px;background:'+(act?col:'transparent')+';color:'+(act?'#e6edf7':col)+';border:1px solid '+(act?col:col+'99')+';border-radius:6px;padding:2px 8px;'+(act?'font-weight:700;':'opacity:.9;')+'">'+c[1]+'</span>';
     });
     h += '</div>';
     if(window.__shcView === 'ind'){
@@ -10453,13 +10454,13 @@ window.__renderV8CalFull();
       html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">'
         + '<span class="no-shrink"  style="font-size:11px;color:'+clr+';border:1px solid rgba('+cr+','+cg+','+cb+',.75);padding:3px 9px;border-radius:4px;white-space:nowrap;font-weight:600">'+name+'</span>'
         + '<span class="no-shrink"  style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+clr+'"></span>'
-        + '<span style="flex:1">'+(e.text||'')+(e.released?' <span style="color:#4caf50;font-size:11px">✅已发</span>':'')+'</span></div>';
+        + '<span style="flex:1;color:#e8eef7">'+(e.text||'')+(e.released?' <span style="color:#4caf50;font-size:11px">✅已发</span>':'')+'</span></div>';
     });
     html += '</div>';
   } else {
-    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
+    html += '<div style="color:#9aa7b8;padding:8px 0">📅 今日日历无标注事件</div>';
   }
-  box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
+  box.innerHTML = html || '<div style="color:#9aa7b8;padding:12px">加载中…</div>';
 })();
 
 /* ===== 打新速览：动态加载 + 内嵌兜底 ===== */
@@ -18601,13 +18602,13 @@ window.__renderV8CalToday = function(){
       html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">'
         + '<span class="no-shrink"  style="font-size:11px;color:'+clr+';border:1px solid rgba('+cr+','+cg+','+cb+',.75);padding:3px 9px;border-radius:4px;white-space:nowrap;font-weight:600">'+name+'</span>'
         + '<span class="no-shrink"  style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+clr+'"></span>'
-        + '<span style="flex:1">'+(e.text||'')+(e.released?' <span style="color:#4caf50;font-size:11px">✅已发</span>':'')+'</span></div>';
+        + '<span style="flex:1;color:#e8eef7">'+(e.text||'')+(e.released?' <span style="color:#4caf50;font-size:11px">✅已发</span>':'')+'</span></div>';
     });
     html += '</div>';
   } else {
-    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
+    html += '<div style="color:#9aa7b8;padding:8px 0">📅 今日日历无标注事件</div>';
   }
-  box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
+  box.innerHTML = html || '<div style="color:#9aa7b8;padding:12px">加载中…</div>';
 };
 window.__renderV8CalToday();
 </script>

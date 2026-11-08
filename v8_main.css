@@ -208,6 +208,10 @@
   .sf-block-hot .sf-block-title{color:#7dd3fc}
   .sf-block-close .sf-block-title{color:#fdba74}
   .sf-block-trend .sf-block-title{color:#c4b5fd}
+/* 🆕 2026-11-08 主人令：板块资金趋势卡去底色（仅此卡，类级不改动，避免连坐其他 .sf-block 功能卡） */
+#sectorFundTrendCard .sf-block,
+#sectorFundTrendCard .sf-block-close,
+#sectorFundTrendCard .sf-block-trend{background:transparent}
   .sf-block-icon{font-size:18px;line-height:1}
   .sf-net-big{text-align:center;margin-bottom:10px;padding:10px;background:var(--card2);border-radius:8px}
   .sf-net-big .n{font-size:28px;font-weight:900}
@@ -380,7 +384,7 @@
   .logic-h{font-weight:700;margin:14px 0 6px;color:var(--cyan)}
   .logic-p{color:var(--sub);font-size:13px;line-height:1.7}
   .code{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold);margin:8px 0;overflow:auto}
-  .note{font-size:12px;color:var(--dim);margin-top:10px}
+  .note{font-size:12px;color:#1f2a3d;margin-top:10px;background:#eef2fb;border:1px solid #c5d2e8;border-radius:8px;padding:8px 10px;line-height:1.55}
 
   /* ===== 打新速览 v8 ===== */
   .ipo-sec{margin-bottom:16px}
