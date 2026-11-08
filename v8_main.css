@@ -322,24 +322,24 @@
   .v8cal-day.today{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan)}
   .v8cal-day-num{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
   .v8cal-day.dim{opacity:.4}
-  .v8cal-event{font-size:11px;line-height:1.4;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px}
-  .v8cal-event .ck{font-size:10px;color:#0d6e2a;background:#a5d6a7;padding:0 3px;border-radius:2px;font-weight:700}
-  .v8cal-event.imp{background:rgba(255,82,82,0.28);color:#ff8a80;border-left:3px solid #ff5252}
-  .v8cal-event.cb{background:rgba(21,101,192,.15);color:#64b5f6;border-left:3px solid #1565c0}
-  .v8cal-event.data{background:rgba(255,208,36,0.28);color:#ffd024;border-left:3px solid #ffd024}
-  .v8cal-event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid #43a047}
-  .v8cal-event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid #9c27b0}
-  .v8cal-event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid #42a5f5}
-  .v8cal-event.hk{background:rgba(255,82,82,0.28);color:#ef9a9a;border-left:3px solid #ff5252}
-  .v8cal-event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid #ff9800}
-  .v8cal-event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid #e91e63}
-  .v8cal-event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid #673ab7}
-  .v8cal-event.option{background:rgba(0,131,143,.15);color:#4dd0e1;border-left:3px solid #00838f}
-  .v8cal-event.future{background:rgba(29,111,66,.15);color:#81c784;border-left:3px solid #1d6f42}
-  .v8cal-event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid #37474f}
-  .v8cal-event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid #8e24aa}
-  .v8cal-event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid #00acc1}
-  .v8cal-event.us_earnings{background:rgba(102,187,106,.15);color:#a5d6a7;border-left:3px solid #66bb6a}
+  .v8cal-event{font-size:11.5px;line-height:1.45;padding:3px 6px;border-radius:4px;display:flex;align-items:center;gap:3px;font-weight:400}
+  .v8cal-event .ck{font-size:10px;color:#0d6e2a;background:#a5d6a7;padding:0 3px;border-radius:2px;font-weight:500}
+  .v8cal-event.imp{background:rgba(255,82,82,0.30);color:#ff9ea0;border-left:3px solid #ff5252}
+  .v8cal-event.cb{background:rgba(21,101,192,.20);color:#82c4ff;border-left:3px solid #1565c0}
+  .v8cal-event.data{background:rgba(255,208,36,0.32);color:#ffe04d;border-left:3px solid #ffd024}
+  .v8cal-event.data2{background:rgba(67,160,71,.20);color:#9bd49e;border-left:3px solid #43a047}
+  .v8cal-event.fomc{background:rgba(156,39,176,.20);color:#e3a8ec;border-left:3px solid #9c27b0}
+  .v8cal-event.us{background:rgba(66,165,245,.20);color:#a9d4ff;border-left:3px solid #42a5f5}
+  .v8cal-event.hk{background:rgba(255,82,82,0.30);color:#ff9e9e;border-left:3px solid #ff5252}
+  .v8cal-event.tw{background:rgba(255,152,0,.20);color:#ffd699;border-left:3px solid #ff9800}
+  .v8cal-event.a50{background:rgba(233,30,99,.20);color:#ff9ec4;border-left:3px solid #e91e63}
+  .v8cal-event.ipo{background:rgba(103,52,183,.20);color:#c6b2ec;border-left:3px solid #673ab7}
+  .v8cal-event.option{background:rgba(0,131,143,.20);color:#6fe0ee;border-left:3px solid #00838f}
+  .v8cal-event.future{background:rgba(29,111,66,.20);color:#9bd49e;border-left:3px solid #1d6f42}
+  .v8cal-event.appl{background:rgba(55,71,79,.20);color:#a9bdc7;border-left:3px solid #37474f}
+  .v8cal-event.sg{background:rgba(142,36,170,.20);color:#e3a8ec;border-left:3px solid #8e24aa}
+  .v8cal-event.kr{background:rgba(0,172,193,.20);color:#9fe6f0;border-left:3px solid #00acc1}
+  .v8cal-event.us_earnings{background:rgba(102,187,106,.20);color:#b8e0ba;border-left:3px solid #66bb6a}
   .v8cal-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
   .v8cal-legend-item{border-radius:8px;padding:12px 14px;font-size:13px;border-left:5px solid;backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:flex-start;gap:6px;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.12)}
   .v8cal-legend-item .lname{font-weight:800;color:var(--txt);font-size:14px;display:flex;align-items:center;gap:8px}
