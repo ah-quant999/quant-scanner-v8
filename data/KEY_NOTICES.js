@@ -1,1 +1,1 @@
-window.KEY_NOTICES = {"update_time":"2026-11-08 15:37:44","date":"2026-11-08","items":[],"republish_time":"2026-11-08 15:45:33"};
+window.KEY_NOTICES = {"update_time":"2026-11-08 21:59:20","date":"2026-11-08","items":[{"code":"A26239","name":"集益威","title":"8-1发行人及中介机构关于首轮审核问询函的回复(集益威半导体(上海)股份有限公司)","cat":"风险警示","date":"20261108"}],"republish_time":"2026-11-08 22:14:51"};
