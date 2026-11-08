@@ -170,7 +170,7 @@ window.__domReadyFns=[];
 <script src="data/DAJIJIN_REDUCTION.js?v=89da7b9d29" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=e69d889a08" defer></script>
 <script src="data/INVEST_AVOID.js?v=95a02af6aa" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
-<!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页，严重异动雷达仍在暂未上架›观测类。 -->
+<!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=bf47a23258" defer></script>
     <script src="data/KEY_NOTICES.js?v=4baa9d54b2" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：H_AUTO_BUY.js / H_AUTO_BUY_TRACK.js 经全文件审计为「全局零读取」死注入（H 反推短线买点策略已下线，无任何代码读 window.H_AUTO_BUY / window.H_AUTO_BUY_TRACK）⇒ 移除前端 script 注入。 -->
@@ -2403,7 +2403,7 @@ window.STRATEGY_WALKFORWARD = {
         </div>
         <div class="ipo-tab-body" id="ipoTabBody" style="display:none"><div class="ipo-grid" id="ipoTabsGrid"></div></div>
       </div>
-      <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
+      <div class="note note-insight">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
     <!-- 投资避雷针·新闻语料量化（2026-11-05 主人令：自「暂未上架·综合研判」区迁入今日事件页，置于打新速览卡下方；
@@ -2852,7 +2852,7 @@ window.STRATEGY_WALKFORWARD = {
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
       <div id="futuresMainBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-      <div class="note">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
+      <div class="note note-insight">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
     </div>
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
@@ -3242,6 +3242,15 @@ function fmtSigned(v){
       <div class="note">口径：东方财富数据中心·股东增减持（法定披露明细），按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。行业取自 STOCK_LIST 行业映射，增持绿 / 减持红。</div>
     </div>
 
+    <!-- 🆕 2026-11-08 主人令：严重异动雷达 自「暂未上架·观测类」迁入盘后数据，置于股东增减持·结构化监控卡下方（卡 DOM + __renderSevereSwing 派发见 sec-ph） -->
+    <div class="card" id="severeSwingCard" style="display:none;margin-bottom:16px;border-left:4px solid #ff5252">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:15px;font-weight:700;color:#ff5252">&#x1F4A5; 严重异动雷达</span>
+        <span id="severeSwingFresh" style="display:inline-flex;align-items:center">&#x2014;</span>
+        <span style="font-size:12px;color:var(--dim)">观测类 · 连板≥2 已触发 / 池内涨幅≥15% 逼近</span></div>
+      <div id="severeSwingBody"><div class="note">加载中&#x2026;</div></div>
+    </div>
+
 
     <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
     <div class="card" style="margin-bottom:16px">
@@ -3356,7 +3365,7 @@ function fmtSigned(v){
           <button id="stPoolOtherBtn" onclick="window.toggleStPoolOther()" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer">▾ 展开其他来源（主板/创业板/科创板/港股）</button>
         </div>
         <div id="stPoolOtherList" class="tp-stocklist" style="display:none"></div>
-        <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报) + 全市场流动性溢出(A股成交额前300保底) + 因子优选(amt60/turntrend/ivol60三因子全中)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280 且 全市场流动性溢出>0 且 因子优选>0 视为健康。</div>
+        <div class="note note-insight">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报) + 全市场流动性溢出(A股成交额前300保底) + 因子优选(amt60/turntrend/ivol60三因子全中)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280 且 全市场流动性溢出>0 且 因子优选>0 视为健康。</div>
       </div>
     </div><!--/st-pool-->
 
@@ -8852,6 +8861,7 @@ function switchSec(sec,el){
       try{ window.renderForecastCalendar(window.PERFORMANCE_FORECAST || {}); }catch(e){}
       try{ window.__renderNationalTeam(); }catch(e){}
       try{ window.__renderShareholderChange(); }catch(e){}
+      try{ window.__renderSevereSwing(); }catch(e){}
     }, 80);
   }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
@@ -15666,7 +15676,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis', '__renderSevereSwing'];
+      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
@@ -15838,13 +15848,7 @@ h += '<div id="sectorYearFlowCard" style="display:none;margin:14px 0 0;border-to
    + '<div id="sectorYearFlowBody"><div class="note">加载中&#x2026;</div></div></div>';
 h += '</div>'; // /comprehensiveCard;
 
-// ═══ 🆕 2026-10-30 主人令：严重异动雷达（暂未上架·观测类；孤儿模块，全站零重复）═══
-h += '<div class="card" id="severeSwingCard" style="display:none;margin-bottom:16px;border-left:4px solid #ff5252">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-   + '<span style="font-size:15px;font-weight:700;color:#ff5252">&#x1F4A5; 严重异动雷达</span>'
-   + '<span id="severeSwingFresh" style="display:inline-flex;align-items:center">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim)">观测类 · 连板≥2 已触发 / 池内涨幅≥15% 逼近</span></div>'
-   + '<div id="severeSwingBody"><div class="note">加载中&#x2026;</div></div></div>';
+// 🆕 2026-11-08 主人令：严重异动雷达 已迁至「盘后数据」页（股东增减持·结构化监控卡下方）；卡 DOM 与 __renderSevereSwing 派发同步迁往 sec-ph（见下方盘后数据 section 与 switchSec('ph') 分支）。
 
 
 // 🗑 2026-11-05 主人令：重要公告速览卡迁往「今日事件」页（今日事件详情卡下方）——
@@ -16158,7 +16162,7 @@ window.__renderInvestAvoid = function(){
   var f=document.getElementById('investAvoidFresh'); if(f) f.innerHTML = _uBadge('盘后','',(IA&&IA.update_time)||(DJ&&DJ.update_time)||(SA&&SA.update_time));
 };
 
-// ═══ 🆕 2026-10-30 主人令：严重异动雷达（暂未上架·观测类；孤儿模块，全站零重复）═══
+// ═══ 🆕 2026-10-30 主人令：严重异动雷达（孤儿模块，全站零重复；🆕 2026-11-08 迁至「盘后数据」sec-ph 派发，卡 DOM 见盘后数据 section）═══
 //   数据 window.SEVERE_SWING（data/SEVERE_SWING.js ← cloud_fetch_v8.py::f_severe_swing() 盘中每轮派发）。
 //   口径：连板≥2=已触发档（严重异动高发）；池内涨幅≥15%=逼近档（3日偏离20%触发线）。
 //   无数据 ⇒ 整卡 display:none（不产空壳卡）；600ms×30 自愈轮询（同 renderUnlisted 派发范式）。
@@ -17047,7 +17051,7 @@ h+='      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿
 h+='      <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible">';
 h+='        <svg id="amountChart" width="100%" height="260" style="overflow:visible" overflow="visible"></svg>';
 h+='      </div>';
-h+='      <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>';
+h+='      <div class="note note-insight" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>';
 h+='    </div>';
 h+='    <!-- 🏘️ 近一月 涨跌家数统计（实时页最下面 · 2026-08-14 主人令迁移） -->';
 h+='    <div class="card" style="margin-bottom:16px">';
@@ -17055,7 +17059,7 @@ h+='      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计<span c
 h+='      <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible">';
 h+='        <svg id="upDownChart" width="100%" height="260" style="overflow:visible" overflow="visible"></svg>';
 h+='      </div>';
-h+='      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>';
+h+='      <div class="note note-insight" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>';
 h+='    </div>';
 
       // 旧四类（ph-crisis-index / -cats / -row / -bar）已随 2026-09-17 胶囊化改造全量删除 ——

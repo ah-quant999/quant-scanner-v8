@@ -385,6 +385,7 @@
   .logic-p{color:var(--sub);font-size:13px;line-height:1.7}
   .code{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold);margin:8px 0;overflow:auto}
   .note{font-size:12px;color:var(--dim);margin-top:10px}
+  .note-insight{font-size:12px;color:var(--txt);margin-top:10px;background:rgba(65,201,255,0.07);border-left:3px solid #41c9ff;border-radius:0 8px 8px 0;padding:8px 10px;line-height:1.55}
 
   /* ===== 打新速览 v8 ===== */
   .ipo-sec{margin-bottom:16px}
