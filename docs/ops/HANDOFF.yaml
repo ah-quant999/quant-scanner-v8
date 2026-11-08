@@ -60,6 +60,27 @@ items:
       ③ 人为造同段冲突副本 → conflicts 检出、merge 并排保留并自动上线。
     updated: "2026-10-26 09:12"
     updated_by: 阿狸咪的工程师
+  - id: cn-fallback-runner-online-guard-1108
+    owner: 小九（落码）+ 阿狸咪（夜班复核）
+    priority: P0
+    status: pending-verify
+    created: 2026-11-08
+    title: 甲护栏：派发 CN 兜底前查在线 runner（灭周末 70 红 run 洪水）
+    note: >
+      根因（非代码 bug）：周末/双机下线时无 [self-hosted, cn] runner 在线，外部自动化/看门狗绕过守卫直派
+      v8_cn_fetch_cloud_selfhosted.yml -> 排队层瞬时失败（event=push / runner=None / created==started）->
+      10-31~11-01 共 70 次无 runner 红 run 洪水 + 告警洪水。11-03 成功 run 14 步全绿，证明代码本身健康。
+      甲方案（用户选·最低风险·纯新增）：在两块派发点（v8_cn_fetch_intraday_lemoncat.yml 的 fallback_cn、
+      v8_cn_fetch_watchdog.yml 的 dispatch_cat selfhosted 分支）派发前先查在线 [self-hosted,cn] runner；
+      明确无 -> 跳过 + 记 audit(dispatch_skip)，不产生红 run。探测失败默认视为在线（宁可派发也不漏兜底）。
+      已上线 commit 2312858（main），推送后当场回读 blob 逐字节自验一致
+      （intraday md5 660a6c49fc63 / watchdog md5 1b67673da54f）。
+    verify_how: >
+      ① 非交易时段/周末（无 CN runner 在线）跑一次 watchdog 或 intraday fallback -> 日志应出现
+      "无 CN 自托管 runner 在线" 且 GitHub Actions 不产生新 selfhosted 红 run；② 有 CN runner 在线时
+      正常派发不受影响（online=true）；③ 连续观察一个周末（11-14~11-15）确认红 run 计数归零。
+    updated: "2026-11-08 23:24"
+    updated_by: 小九机AI（落码）
   - id: nolost-protocol-v2-1026
     owner: shared（阿狸咪的工程师落码 · 小九复核）
     priority: P0
