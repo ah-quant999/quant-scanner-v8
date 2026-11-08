@@ -53,6 +53,12 @@ HORIZONS = [1, 2, 3, 5, 10, 20, 30, 45, 60, 75, 90, 180, 250]   # 与 IMA 卡同
 NIGHT_CUT = 9                         # 与闸门 _NIGHT_CUT 同源：小时 < 9 归前一自然日
 CST = dt.timezone(dt.timedelta(hours=8))
 
+# 🔴 2026-11-08 一劳永逸根因修复（主人令「不要前面垃圾选股了，直接从新算法跟进」）：
+#   11-01 金钻+缠论反号修复前的「垃圾选股」历史样本（09-03~10-31）一律剔除，
+#   只统计修复后新算法（金钻+缠论买点为正、trend/jigou 为负）的真实信号流，
+#   避免旧负期望污染回测成绩。如需回看旧算法全史，改此常量为 "2026-09-01" 即可。
+NEW_ALGO_START = "2026-11-01"
+
 METHOD = ("信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出"
           "（真实日K；已扣双边交易成本 0.30%）")
 
@@ -256,7 +262,15 @@ def main(argv=None):
     if not versions:
         print("  ⚠️ 无归档文件（raw_data/history/final_recommend_*.json），退出")
         return 1
-    print(f"  · 归档版本 {len(versions)} 个（{versions[0]['file_date']} ~ {versions[-1]['file_date']}）")
+    # 🔴 2026-11-08 一劳永逸：只统计新算法（11-01 修复后）信号，剔除修复前垃圾选股历史
+    _before = len(versions)
+    versions = [v for v in versions if v["file_date"] >= NEW_ALGO_START]
+    if not versions:
+        print(f"  ⚠️ 无 {NEW_ALGO_START} 之后的新算法归档"
+              f"（raw_data/history/final_recommend_*.json），退出")
+        return 1
+    print(f"  · 新算法归档 {len(versions)} 个（{versions[0]['file_date']} ~ {versions[-1]['file_date']}，"
+          f"已剔除 {_before - len(versions)} 个修复前垃圾样本）")
 
     # ── 市场日历 = 全部涉及股票日K日期并集（推荐股均为流动性标的，并集即市场交易日）──
     all_codes = sorted({c for v in versions for c, _, _ in v["stocks"]})

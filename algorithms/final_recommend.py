@@ -513,9 +513,9 @@ def _quote_snapshot():
                     continue
                 _c = norm_code(_it.get("code") or "").lstrip(".")
                 _p = num_or_none(_it.get("price"))
-            if _c and _p:
-                _m[_c] = {"price": _p, "pct": num_or_none(_it.get("chg")),
-                          "prev_close": num_or_none(_it.get("prev_close"))}
+                if _c and _p:
+                    _m[_c] = {"price": _p, "pct": num_or_none(_it.get("chg")),
+                              "prev_close": num_or_none(_it.get("prev_close"))}
             if _m:
                 snap = {"date": _d2, "source": "CANDIDATE_QUOTES", "map": _m}
 
