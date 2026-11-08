@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-11-08 21:59",
+ "update_time": "2026-11-09 00:58",
  "legend": [
   {
    "title": "重要政策",
@@ -282,7 +282,7 @@
     {
      "num": 8,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     }
    ]
@@ -294,7 +294,7 @@
     {
      "num": 9,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇨🇳 中国出口",
