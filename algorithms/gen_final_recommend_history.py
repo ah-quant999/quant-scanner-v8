@@ -76,8 +76,16 @@ def collect():
         prev = by_day.get(ad)
         if prev and prev["update_time"] >= ut:
             continue   # 旧版被刷新替代
+        # 🛡 2026-11-08 根治：11 月起快照的 stocks 字段改为空列表 []，Top3 实际落在
+        #   consensus_stocks（stocks=[] 静默跳过 ⇒ 历史卡停在 10-31）。回退链与回测生成器
+        #   同口径：stocks 优先，空则 consensus_stocks，再回退 all_candidates[:N_TOP]。
+        raw_list = d.get("stocks") or []
+        if not raw_list:
+            raw_list = d.get("consensus_stocks") or []
+        if not raw_list:
+            raw_list = (d.get("all_candidates") or [])[:N_TOP]
         stocks = []
-        for s in (d.get("stocks") or [])[:N_TOP]:
+        for s in raw_list[:N_TOP]:
             c = str(s.get("code") or "").strip().lstrip(".")
             if not c:
                 continue
