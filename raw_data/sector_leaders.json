@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-07 23:50",
-  "republish_time": "2026-11-08 06:10:04",
+  "republish_time": "2026-11-08 08:18:10",
   "data_date": "2026-11-06",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "上海电影",
           "price": 35.76,
           "chg": 10.0,
-          "main_net": 197704074.0
+          "main_net": null
         },
         {
           "code": "300528",
           "name": "幸福蓝海",
           "price": 14.67,
           "chg": 5.77,
-          "main_net": 15836396.0
+          "main_net": null
         },
         {
           "code": "600977",
           "name": "中国电影",
           "price": 16.01,
           "chg": 1.2,
-          "main_net": -6800230.0
+          "main_net": null
         },
         {
           "code": "001330",
           "name": "博纳影业",
           "price": 6.23,
           "chg": 1.14,
-          "main_net": 29172879.0
+          "main_net": null
         },
         {
           "code": "002739",
           "name": "儒意电影",
           "price": 9.24,
           "chg": -0.11,
-          "main_net": -21090798.0
+          "main_net": null
         }
       ],
       "match": "exact"
@@ -67,35 +67,35 @@
           "name": "神州泰岳",
           "price": 8.36,
           "chg": -0.24,
-          "main_net": -6988303.0
+          "main_net": null
         },
         {
           "code": "002517",
           "name": "恺英网络",
           "price": 17.18,
           "chg": -0.98,
-          "main_net": -36916869.0
+          "main_net": null
         },
         {
           "code": "002624",
           "name": "完美世界",
           "price": 11.29,
           "chg": -1.31,
-          "main_net": -57577434.0
+          "main_net": null
         },
         {
           "code": "603444",
           "name": "吉比特",
           "price": 349.31,
           "chg": -1.41,
-          "main_net": -21063543.0
+          "main_net": null
         },
         {
           "code": "300043",
           "name": "星辉娱乐",
           "price": 4.66,
           "chg": -1.48,
-          "main_net": -17835955.0
+          "main_net": null
         }
       ],
       "match": "norm"
@@ -2238,5 +2238,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "cache",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-08 06:01:00 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-08 06:10:04 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-08 08:18:10 跟随 FINAL 重算(一劳永逸)"
 }
