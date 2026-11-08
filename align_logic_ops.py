@@ -60,6 +60,10 @@ MUST_HAVE_CRON = {
     "v8_cleanup": "缓存清理(周日)",
     "cloud_weekly_cleanup": "周度清理",
     "runner_health_alert": "Runner 健康监控",
+    # 2026-11-08 阿狸咪的工程师补登记：小九 5ee4037 新增盘中链路存活监控（防静默断更，
+    #   工作日 09:00-15:30 每30分；intraday_slot+cn_fetch_cloud 近90分无 success 开 issue、
+    #   恢复自动关闭）。当晚推 HANDOFF 未同批刷新 ledger + 漏双登记 ⇒ [13/13]/[4/8] 连拦 build。
+    "v8_intraday_liveness_guard": "盘中链路存活监控(工作日09:00-15:30每30分·停滞开issue)",
     "v8_t1_guard": "周六 T+1 兜底",
     "v8_weekend_light": "周末轻量维护(周六/日)",
     # 2026-09-10 阿狸咪补登记：板块资金日内快照（独立高频·根治上午空白）
