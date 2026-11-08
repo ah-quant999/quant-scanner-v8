@@ -2659,9 +2659,9 @@ window.STRATEGY_WALKFORWARD = {
           //   MA 信号只在 ≥60 日时计算，< 60 日所有 MA 字段显示 "--"。
           if(!ap || !ap.avg_price){
             h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--dim);border-left:3px solid '+ac.c+'">';
-            h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+'">💰 平均股价·880003</span>';
+            h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+'">💰 平均股价</span>';
             h+=' <b style="font-size:15px;color:var(--txt)">--</b>';
-            h+=' <span style="color:var(--dim);font-size:12px">通达信880003 · 云端抓取中</span>';
+            h+=' <span style="color:var(--dim);font-size:12px">数据加载中…</span>';
             h+='</div>';
             return;
           }
@@ -2910,13 +2910,12 @@ window.STRATEGY_WALKFORWARD = {
              并把快照时间范围（旧的 ECharts title 文字）搬进 legend 文本，删除 ECharts 内冗余 title 以减少图表上方空白。 -->
         <div id="sfIntradayLegend" style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:8px 10px 10px;margin-bottom:6px;font-size:11px;color:#cbd5e1;border-bottom:1px solid rgba(71,85,105,.35)"></div>
         <div id="sfIntradayChart" style="width:100%;height:420px"><div class="ipo-empty">加载中…</div></div>
-        <!-- 2026-09-11 主人 P2：A 类（成交方向推断）卡统一口径披露 -->
-        <div class="note">⚠️ 口径披露：本曲线为<b>按主动成交方向推断的估算值</b>（东方财富「主力净额」分时口径），<b>非真实资金进出</b>。真实资金行为请看「资金热度·净申赎」（真实份额申赎）与「龙虎榜」（真实席位）。</div>
+        <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
       </div>
 
       <!-- 🚚 2026-09-11 主人令：原 Block 3「日监控·主力净流入」迁出至「盘后数据」页（市场宽度卡上方）——
             容器 id="etfDailyBlock" 与函数 renderEtfDaily() 不变，仅 DOM 位置移动。 -->
-      <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；主力净额分时=按主动成交方向推断的估算值（口径见上）。</div>
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
 
           </div>
 
@@ -2936,8 +2935,7 @@ window.STRATEGY_WALKFORWARD = {
         <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:var(--up);border-radius:2px"></span> 涨</span>
         <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:var(--down);border-radius:2px"></span> 跌</span>
       </div>
-      <!-- 2026-09-11 主人 P2：A 类（成交方向推断）卡统一口径披露 -->
-      <div class="note">⚠️ 口径披露：本图方块面积的「主力净流入」为<b>按主动成交方向推断的估算值</b>，<b>非真实资金进出</b>。真实资金行为请看「资金热度·净申赎」（真实份额申赎）与「龙虎榜」（真实席位）。</div>
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
     </div>
 
     <script>
@@ -3199,8 +3197,7 @@ function fmtSigned(v){
         <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
       </div>
 
-      <!-- 2026-09-11 主人 P2：A 类（成交方向推断）卡统一口径披露 -->
-      <div class="note">⚠️ 口径披露：本卡数值为<b>按主动成交方向推断的估算值</b>（东方财富「主力净额」口径），<b>非真实资金进出</b>。真实资金行为请看「资金热度·净申赎」（真实份额申赎）与「龙虎榜」（真实席位）。</div>
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
 
     </div>
 
@@ -3209,19 +3206,18 @@ function fmtSigned(v){
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+0·盘后定基（盘前显示昨收·盘中累积·15:10/15:30 定基）</span> <span style="font-size:10px;color:#c084fc;font-weight:600">↕ 与「实时数据」页 主力净额分时曲线 T+0 联动</span> · <span class="fresh" id="etfDailyTime">—</span></h3>
       <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
-      <!-- 2026-09-11 主人 P2：A 类（成交方向推断）卡统一口径披露 -->
-      <div class="note">⚠️ 口径披露：本卡「主力净流入」为<b>按主动成交方向推断的估算值</b>（东方财富口径），<b>非真实资金进出</b>。真实资金行为请看「资金热度·净申赎」（真实份额申赎）与「龙虎榜」（真实席位）。</div>
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
     </div>
 
     <!-- 🚚 资金热度·净申赎（2026-09-15 主人令：T-1 非实时，自「实时数据」页 ETF 盘中异动·主力净额分时卡 Block2 迁至本页「日监控·主力净流入」卡下方。
          容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat" 与 renderEtfHeatByCategory() 不变，仅 DOM 位置移动。） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔥</span>资金热度·净申赎（真实份额） <span style="font-size:10px;color:var(--dim);font-weight:600">上交所口径 · 东财五分类 · 金额亿元 · 数据日 T-1 · 非估算（交易所盘后披露）</span> · <span class="fresh" id="etfHeatTime">—</span></h3>
+      <h3><span class="ic">🔥</span>资金热度·净申赎（真实份额） <span style="font-size:10px;color:var(--dim);font-weight:600">金额亿元 · 数据日 T-1 · 非估算</span> · <span class="fresh" id="etfHeatTime">—</span></h3>
       <div id="etfHeatBlock">
         <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
       </div>
-      <div class="note">口径：上交所官方基金份额日环比（当日份额 − 上一交易日份额）＝真实申购/赎回引致的份额变动，<b>不是</b>按主动成交方向推断的主力净流入估算值；交易所盘后披露，数据日 T-1。</div>
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：资金热度·净申赎·份额类） -->
     </div>
 
     <!-- 🏛️ 2026-10-27 主人令：国家队活跃度（盘后数据）由「暂未上架」观测卡迁至盘后数据页 -->
@@ -3238,7 +3234,7 @@ function fmtSigned(v){
         <span style="font-size:15px;font-weight:700;color:#22c55e">&#x1F4C8; 股东增减持·结构化监控</span>
         <span id="shcFresh" style="display:inline-flex;align-items:center">&#x2014;</span></div>
       <div id="shareholderChangeBody"><div class="note">加载中&#x2026;</div></div>
-      <div class="note">口径：东方财富数据中心·股东增减持（法定披露明细），按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。行业取自 STOCK_LIST 行业映射，增持绿 / 减持红。</div>
+      <div class="note">口径：按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。增持绿 / 减持红。</div>
     </div>
 
     <!-- 🆕 2026-11-08 主人令：严重异动雷达 自「暂未上架·观测类」迁入盘后数据，置于股东增减持·结构化监控卡下方（卡 DOM + __renderSevereSwing 派发见 sec-ph） -->
@@ -3255,7 +3251,7 @@ function fmtSigned(v){
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
       <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：中金所前20会员 IF 全合约，净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。交易所每日 16:30 后披露。</div>
+      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
     </div>
 
     <!-- 市场宽度：52周新高广度 -->
@@ -3310,7 +3306,7 @@ function fmtSigned(v){
       <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 tab 随算法整支下架删除 -->
       <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
            ⇒ 收益转化算法 / 回测 N 日胜率 / 每日 Top3 历史 三卡整组迁入本子页（原在「最终推荐·rec」）。 -->
-      <button class="st-tab" data-st="track" onclick="switchSt('track')">📌 最终跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600">选股→执行→复盘</span></button>
+      <!-- 🗑 2026-11-08 主人令：📌 最终跟踪 子页整体下线（职责已由 📊 回测跟踪 st-bt 承接） -->
       <!-- 2026-11-08 主人令：新建「回测跟踪」子页，集中两张回测卡（每日洞察回测 + 最终推荐回测） -->
       <button class="st-tab" data-st="bt" onclick="switchSt('bt')">📊 回测跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600">每日洞察·最终推荐</span></button>
       <!-- 🗑 2026-10-23 主人令：三新算法（缩量回踩/板块共振/龙虎机构）选股策略子页随算法整支下架删除 -->
@@ -3404,32 +3400,8 @@ function fmtSigned(v){
   
     <!-- ===== 子页：📌 最终跟踪（选股 → 执行 → 复盘，一条链路收在一处） ===== -->
     <div id="st-track" class="st-pane">
-      <!-- 🧮 收益转化算法（选股 → 仓位 / 移动止损 / 时间止损）：逐票落数；常量同源 window.__EXEC，与「逻辑详解 → 收益转化算法」同一套公式。 -->
-      <div class="card" id="execAlgoCard" style="margin-bottom:16px;border-left:4px solid #41c9ff">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          <span style="font-size:15px;font-weight:700;color:var(--txt)">🧮 收益转化算法 · 选股 → 仓位 / 移动止损</span>
-          <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#41c9ff;border:1px solid #41c9ff4d">逐票落数 · 公式固定 · 可复算</span>
-          <span style="font-size:10px;color:var(--dim)">与「逻辑详解 → 收益转化算法」同口径</span>
-        </div>
-        <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
-          选出来只是起点：<b style="color:#41c9ff">买多少、止损放哪、什么时候挪、什么时候走</b>，全部按固定公式算，不靠感觉。
-        </div>
-        <div id="execAlgoHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">🧮 算法加载中…</div></div>
-      </div>
+      <!-- 🗑 2026-11-08 主人令：📌 最终跟踪 子页整体下线（职责已由 📊 回测跟踪 st-bt 承接；收益转化算法 / 每日 Top3 历史 两卡随之下线） -->
 
-      <!-- 2026-11-08 主人令：最终推荐·回测 N 日胜率卡已迁入「📊 回测跟踪」子页（st-bt） -->
-
-
-      <!-- 📜 每日推荐 Top3 历史：默认折叠，展开才渲染；数据源 FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py 每晚随 D 批自动重写）。 -->
-      <details class="card" id="finalHistCard" style="margin-top:16px;border-left:4px solid #c084fc"
-               ontoggle="if(this.open&&!window.__finalHistRendered){window.__finalHistRendered=true;try{window.renderFinalHist();}catch(e){console.error('[renderFinalHist]',e);}}">
-        <summary style="cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);user-select:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;list-style:none">
-          <span class="ic" style="font-style:normal">📜</span>每日推荐 Top3 历史
-          <span style="font-size:10.5px;font-weight:600;color:var(--dim)">（每日自动记录 · 默认折叠，点开查看）</span>
-          <span id="finalHistBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap"></span>
-        </summary>
-        <div id="finalHistBody" style="padding:12px 4px 2px"><div class="note">展开加载…</div></div>
-      </details>
 
     </div>
 
@@ -3592,7 +3564,7 @@ function fmtSigned(v){
       + '<th style="padding:5px 8px;text-align:left">超额</th><th style="padding:5px 8px;text-align:left">超额胜率</th>'
       + '</tr></thead><tbody>'+rows+'</tbody></table></div>'
       + repRow
-      + '<div style="margin-top:7px;font-size:10.5px;color:var(--dim);line-height:1.6">信号口径：龙虎榜机构+游资双正且合计≥8000万（转债剔除）。历史回测仅供研究参考，不构成个人投资建议。</div>'
+      + '<div style="margin-top:7px;font-size:10.5px;color:var(--dim);line-height:1.6">历史回测仅供研究参考，不构成个人投资建议。</div>'
       + '</div>';
   };
   /* 数据懒到位兜底：RESONANCE_TRACK 走 defer，DOMContentLoaded 前后均可能晚于本段执行 */
@@ -4040,7 +4012,7 @@ function fmtSigned(v){
     // Footer note
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
     h += '机游共振日历 · 机构/游资席位净买卖TOP5 + 机游共振信号 + 纯游资异动<br>';
-    h += '口径：龙虎榜机构+游资席位净买卖 | 仅供参考，不构成投资建议<br>';
+    h += '仅供参考，不构成投资建议<br>';
     h += '数据日期：' + (dataDateIso || '--');
     h += '</div>';
 
@@ -4186,8 +4158,7 @@ function fmtSigned(v){
     // Notice box（精简·去掉过期"已停更"信息）
     h += '<div style="border:1px solid rgba(255,208,36,0.34);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:11px;line-height:1.7;color:var(--sub)">';
     h += '<strong style="color:var(--gold)">说明：</strong><br>';
-    h += '1. 本页统计龙虎榜中「深股通/沪股通专用 + 瑞银/高盛/摩根等外资券商」席位净买卖动向（数据来自沪深交易所龙虎榜北向席位明细）。<br>';
-    h += '2. 口径：仅覆盖当日上龙虎榜的个股，精确但非全市场北向资金流。每日盘后更新。';
+    h += '本页仅覆盖当日上龙虎榜的个股，精确但非全市场北向资金流。每日盘后更新。';
     h += '</div>';
 
     // Calendar using LHB_HISTORY (多日) + 降级 LHB_DATA（补回7月等历史月）
@@ -4951,18 +4922,8 @@ function fmtSigned(v){
         };
         h += '<div id="rcRecContainer">' + _rcRecBuild() + '</div>';
       })();
-      /* 口径说明（通栏） */
-      h += '<div class="ms-note-card" style="margin-top:16px">';
-      h += '<div class="ms-note-head"><span style="color:#41c9ff">≡</span> 口径说明 <span class="ms-note-tag">共 '+_days.length+' 个交易日 · '+_mKeys.length+' 个月</span></div>';
-      h += '<div class="ms-note-body">';
-      h += '<span class="ms-note-item">数据源：龙虎榜历史+当日（从有数据开始），每交易日 17:30 自动延伸</span>';
-      h += '<span class="ms-note-item">净买/净卖=「机构+游资+北向」三通道整体净额；排序强度=正通道之和（与「明日关注/明日风险」同口径）</span>';
-      h += '<span class="ms-note-item">最强共振=机构+游资双正且合计≥8000万；机构独买/游资独买=单通道为正、另一通道非正</span>';
-      h += '<span class="ms-note-item">每周汇总：同股跨日三通道净额累加，流入/流出各取 TOP10</span>';
-      h += '<span class="ms-note-item">危机雷达风险度分无逐日历史快照，本记录不含该分值（不虚构历史）</span>';
-      h += '</div>';
-      h += '<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);opacity:.85">仅供参考，不构成投资建议</div>';
-      h += '</div>';
+      /* 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：共振记录·龙虎榜类） */
+      h += '<div style="margin-top:8px;font-size:10px;color:var(--dim);opacity:.85">仅供参考，不构成投资建议</div>';
     })();
 
 
@@ -7973,7 +7934,7 @@ c.innerHTML = h;
       + '<div style="border:1px solid rgba(192,132,252,0.63);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt)">'
       +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">📌 核心：</b>在 <b style="color:var(--txt)">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「概念想象空间 + 业绩正向 + ROE≥10%」三项齐的股票。</div>'
       +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列;按未来空间分（成长45%+质量35%+拐点20%）降序，资金为辅助验证。</div>'
-      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;border-left:3px solid #ffd024"><b style="color:#ffd024">🔥 主题会动：</b>7 个长期主题为固定种子，另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
+      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;border-left:3px solid #ffd024"><b style="color:#ffd024">🔥 主题会动：</b>7 个长期主题作为稳定分组锚点（人工知识，非行情可得），另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
       + '</div>'
       // 2026-10-02 晚 主人令：第一行固定 7 个长期主题种子，🔥金色热点独占第二行
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">' + chipsSeed + '</div>'
@@ -7994,7 +7955,7 @@ c.innerHTML = h;
       + (cards ? cards
                : '<div class="note" style="color:var(--dim)">本主题暂无「三项齐」股票（概念命中但缺业绩/ROE 证据），换个主题试试</div>')
       // 2026-09-13 主人令：A/B/C 分档后不再截断，删除「仅展示前 N 只」提示行。
-      + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6">口径：板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
+      + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6">口径：板块资金取概念类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
       + '卡内符号：🚀=未来空间分（成长+质量+拐点合成，越高越具大涨空间）/ 🔥=资金流入+基本面证据 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
   };
@@ -8126,7 +8087,7 @@ window.__renderCiticPeObserve = function(){
     + _uBadge('盘后', '中长线', uT, '数据 ' + _ev(dT))
     + '</div>'
     + '<div style="border:1px solid rgba(255,208,36,0.36);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.6;font-size:12px">'
-    + '<b style="color:#ffd024">&#x1F4CC; 核心：</b>用中信 PE-TTM 判断 A 股整体贵贱，并给出 PE&lt;10 历史买入后的持有胜率。<br>'
+    + '<b style="color:#ffd024">&#x1F4CC; 核心：</b>用 PE-TTM 判断 A 股整体贵贱，并给出 PE&lt;10 历史买入后的持有胜率。<br>'
     + '<b style="color:#ffd024">&#x1F4A1; 用法：</b>信号灯 + 近10年分位看中长期赔率；PE&lt;10 回测看极端低估事件的历史收益。<br>'
     + '<b style="color:#ffd024">&#x26A0; 限制：</b>非每日交易信号；PE&lt;10 罕见（16年仅' + (B && B.signals_pe10_total || '—') + '次），2018/2022 大底未触发。</div>'
     // 🔴 2026-09-13 主人令（结论先行 · 同卡内挪位）：一句话结论原被压在整卡最底部
@@ -8138,7 +8099,7 @@ window.__renderCiticPeObserve = function(){
     + compactMat
     + details
     + '<div style="font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.6">'
-    + '口径：中信 PE-TTM vs 近10年自身分位；PE&lt;10 回测为信号日<b>次一交易日开盘价买入</b>、持有 N 日末日收盘价卖出（未计成本/分红；与主站其余回测同口径）。</div>';
+    + '口径：PE-TTM vs 近10年自身分位；PE&lt;10 回测为信号日<b>次一交易日开盘价买入</b>、持有 N 日末日收盘价卖出（未计成本/分红；与主站其余回测同口径）。</div>';
 };
 
   
@@ -8747,10 +8708,10 @@ window.__renderShareholderChange = function(){
         var net = x.net_amt||0; var nc = net>=0 ? '#22c55e' : '#ff5252';
         var fmtAmt = function(v){ return (v!=null && !isNaN(+v)) ? (+v).toFixed(2) : '0.00'; };
         h += '<div style="border-left:3px solid #c084fc;background:rgba(148,163,184,.05);border-radius:0 8px 8px 0;padding:5px 9px;display:flex;align-items:baseline;gap:10px">'
-            + '<span style="font-size:12.5px;font-weight:700;color:var(--txt);flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_e(x.industry)+'</span>'
-            + '<span style="font-size:12px;color:#22c55e;flex:0 0 auto;min-width:96px;text-align:right;font-variant-numeric:tabular-nums">增 '+fmtAmt(x.inc_amt)+'亿/'+x.inc_cnt+'笔</span>'
-            + '<span style="font-size:12px;color:#ff5252;flex:0 0 auto;min-width:96px;text-align:right;font-variant-numeric:tabular-nums">减 '+fmtAmt(x.red_amt)+'亿/'+x.red_cnt+'笔</span>'
-            + '<span style="font-size:12px;font-weight:700;color:'+nc+';flex:0 0 auto;min-width:84px;text-align:right;font-variant-numeric:tabular-nums">净 '+fmtAmt(net)+'亿</span></div>';
+            + '<span style="font-size:12.5px;font-weight:700;color:var(--txt);flex:0 0 33%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_e(x.industry)+'</span>'
+            + '<span style="font-size:12px;color:#22c55e;flex:1 1 0;min-width:0;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums">增 '+fmtAmt(x.inc_amt)+'亿/'+x.inc_cnt+'笔</span>'
+            + '<span style="font-size:12px;color:#ff5252;flex:1 1 0;min-width:0;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums">减 '+fmtAmt(x.red_amt)+'亿/'+x.red_cnt+'笔</span>'
+            + '<span style="font-size:12px;font-weight:700;color:'+nc+';flex:1 1 0;min-width:0;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums">净 '+fmtAmt(net)+'亿</span></div>';
       });
       h += '</div>';
     } else {
@@ -9226,7 +9187,7 @@ function switchSec(sec,el){
     }
     var _qDate = (SQ.update_time||'').split(' ')[0] || '';
     var _snap = q.snapshot_time ? (_qDate ? (_qDate+' '+q.snapshot_time) : q.snapshot_time) : '—';
-    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim)">快照 '+_snap+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em · 财务画像源 算法链 baostock</div>';
+    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim)">快照 '+_snap+'</div>';
     // 🔴 2026-08-12 主人紧急修复：删除「平均股价/持仓/弱MA摘要行」
     //   主人：「平均股价放个股查询里干嘛？！」
     //   根因：这是 AVG_PRICE_DATA 全市场等权均价，与具体股票无关
@@ -11427,7 +11388,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     const tota=src.total_net_amount_yi||0, tots=src.total_net_share_yi||0;
     const tot=isEm?tota:tots;
     const totc=tot>=0?'var(--up)':'var(--down)';
-    let shtml='<span style="color:var(--dim)">ETF 净申赎 · '+(isEm?'东方财富五分类 · 金额口径':'真实份额口径（上交所）')+(src.data_date?(' · '+_dd):'')+'：</span>';
+    let shtml='<span style="color:var(--dim)">ETF 净申赎 · '+(isEm?'金额口径':'真实份额口径')+(src.data_date?(' · '+_dd):'')+'：</span>';
     shtml+='<span><span style="color:var(--txt);font-weight:700">合计</span> <span style="color:'+totc+';font-weight:700">'+fmtYi(tot)+metUnit+'</span> '+(isEm?'':'<span style="color:var(--sub);font-size:11px">（约 '+fmtYi(tota)+'元）</span>')+'· '+(src.total_etf||0)+'只</span>';
     if(el0) el0.innerHTML=shtml;
     let h='';
@@ -13387,7 +13348,7 @@ function drawUpDownChart(){
     h+='<table style="width:100%;border-collapse:collapse;font-size:12.5px">';
     h+='<thead><tr style="color:var(--dim)">'
       +'<th style="padding:5px 8px;text-align:left">板块</th>'
-      +'<th style="padding:5px 8px;text-align:right" title="东财板块资金流历史仅约121交易日(≈2026-05起)，非完整年初至今">'+data.year+' 约121交易日*</th>'
+      +'<th style="padding:5px 8px;text-align:right" title="板块资金流历史仅约121交易日(≈2026-05起)，非完整年初至今">'+data.year+' 约121交易日*</th>'
       +'<th style="padding:5px 8px;text-align:right" title="近5个交易日主力净流入合计（滚动增量）">近5日</th>'
       +'<th style="padding:5px 8px;text-align:right" title="近20个交易日主力净流入合计（滚动增量）">近20日</th>'
       +'<th style="padding:5px 8px;text-align:right">交易日</th></tr></thead><tbody>';
@@ -13405,7 +13366,7 @@ function drawUpDownChart(){
     });
     h+='</tbody></table></div>';
     var _foot='流入 Top10 + 流出 Top5（共 '+secs.length+' 板块）；单位亿元。近5日/近20日=滚动增量，看资金进退方向（总数是存量，增量才是边际信号）。';
-    if(data.partial){ _foot+=' <span style="color:var(--gold)">⚠️ 真实口径：东财板块资金流历史仅约121交易日(≈近半年)，「年初至今」实为近约半年，非完整年度。</span>'; }
+    if(data.partial){ _foot+=' <span style="color:var(--gold)">⚠️ 真实口径：板块资金流历史仅约121交易日(≈近半年)，「年初至今」实为近约半年，非完整年度。</span>'; }
     h+='<div style="margin-top:6px;font-size:11px;color:var(--sub)">'+_foot+'</div>';
     $b.innerHTML=h;
   }
@@ -14473,12 +14434,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
        ✅ 2026-10-06 CN runner2号机的工程师：经审计确认 __renderLifecycleSection 仅余 L7052 一处活触发（switchSt 调度已于 2026-09-19 删），目标 #lifeBody 全站无 DOM 定义 ⇒ 函数体（原 L6006–L6301）与 L7052 调用已**彻底删净**，死代码从根消除。__renderStrongBreakout 此前已删净。 */
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
-    // 2026-10-25 主人令：三卡迁入「📌 最终跟踪」子页 ⇒ 切入即按各自数据源重渲（懒加载不变）
-    if(n==='track'){
-      setTimeout(function(){ try{ window.__renderExecAlgo(); }catch(e){ console.warn('[track] exec', e); } }, 30);
-      setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[track] backtest', e); } }, 60);
-      if(window.__finalHistRendered){ try{ window.renderFinalHist(); }catch(e){} }
-    }
+    // 🗑 2026-11-08 主人令：📌 最终跟踪 子页已下线，对应调度分支移除（避免孤儿调用）
     // 2026-11-08 主人令：回测跟踪子页（st-bt）—— 两张回测卡（最强共振·回测跟踪 / 最终推荐·回测 N 日胜率）迁入集中展示
     if(n==='bt'){
       setTimeout(function(){ try{ window.renderResonanceTrack(); }catch(e){ console.warn('[bt] resonTrack', e); } }, 30);
@@ -16169,7 +16125,7 @@ window.__renderSevereSwing = function(){
     var h = '<div style="font-size:11.5px;color:var(--dim);margin-bottom:8px">口径：'+_e(D.caliber||'—')+'</div>';
     var trig = D.triggered||[];
     if(trig.length){
-      h += '<div style="font-size:13px;font-weight:700;color:#ff5252;margin:6px 0 6px">&#x1F525; 已触发档（'+trig.length+'）</div>';
+      h += '<div style="font-size:13px;font-weight:700;color:#ff5252;margin:6px 0 6px">&#x1F525; 已触发档 '+trig.length+'</div>';
       h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">';
       trig.forEach(function(x){
         h += '<div style="border-left:3px solid #ff5252;background:rgba(255,82,82,0.19);border-radius:0 8px 8px 0;padding:7px 10px">'
@@ -16181,7 +16137,7 @@ window.__renderSevereSwing = function(){
     }
     var near = D.near||[];
     if(near.length){
-      h += '<div style="font-size:13px;font-weight:700;color:#ffd024;margin:10px 0 6px">&#x1F3AF; 逼近档（'+near.length+'）</div>';
+      h += '<div style="font-size:13px;font-weight:700;color:#ffd024;margin:10px 0 6px">&#x1F3AF; 逼近档 '+near.length+'</div>';
       h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">';
       near.forEach(function(x){
         h += '<div style="border-left:3px solid #ffd024;border-radius:0 8px 8px 0;padding:7px 10px">'
@@ -16486,8 +16442,10 @@ window.__renderComprehensiveSynthesis = function(){
         if(s.indexOf('- ')===0){
           out += '<div style="display:flex;align-items:flex-start;gap:8px;padding:2px 0 2px 6px"><span style="color:#22c55e;flex-shrink:0">\u2022</span><span>'+s.slice(2)+'</span></div>';
         } else if(s.indexOf('\u3010')===0){
+          var _isOneLine = (raw.indexOf('\u4e00\u53e5\u8bdd\u7ed3\u8bba') >= 0);
           _bold = (raw.indexOf('\u4e00\u53e5\u8bdd\u7ed3\u8bba') >= 0);
-          out += '<div style="font-weight:700;color:#22c55e;margin:9px 0 3px;font-size:12.5px">'+s+'</div>';
+          var _hw = _isOneLine ? '400' : '700';
+          out += '<div style="font-weight:'+_hw+';color:#22c55e;margin:9px 0 3px;font-size:12.5px">'+s+'</div>';
         } else if(s.indexOf('\u2192')===0){
           out += '<div style="color:#ffd024;padding:2px 0 2px 6px">'+s+'</div>';
         } else {
@@ -17696,7 +17654,7 @@ hm += '</div>'; // /ulPaneBacktest
       h += '<div style="margin-top:8px;font-size:11.5px;line-height:1.7;color:'+C_SUB+'">'
         + '📊 市场广度(hc_count)：<b style="color:'+(brState==='未到位'?C_DIM:(brState==='充足'?C_GRN:(brState==='稀薄'?C_AMB:C_RED)))+'">'+brState+'</b>（选股管线候选数，反映赚钱效应宽度）</div>';
       h += '<div style="margin-top:6px;padding:8px 10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:7px;font-size:11px;line-height:1.7;color:'+C_SUB+'">'
-        + '📌 口径：指数层=EDHEC 20%规则牛熊状态机（上证月收盘·零未来函数，与「🔮 未来预测」同源）；个股层=平均股价(880003口径)距近 60 日峰值回撤——指数失真（二八分化）时以个股层为准。红涨绿跌。</div>';
+        + '📌 口径：指数层=20%规则牛熊状态机（上证月收盘·零未来函数，与「🔮 未来预测」同源）；个股层=平均股价距近 60 日峰值回撤——指数失真（二八分化）时以个股层为准。红涨绿跌。</div>';
       dst.innerHTML = h;
       var _cbTs = (TD && TD.update_time) ? TD.update_time : ((MT && (MT.update_time || MT.updated_at)) || '');
       var _cbF = document.getElementById('cycleBreadthFresh');
@@ -17988,7 +17946,7 @@ h+=`</div>`;
     });
     html+='</tbody></table>';
     // ── 图① ──
-    html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:16px 0 6px">&#x2460; 27年走势：上证综指（右轴）+ 全A等权（左轴对数）· 绿=熊市段 / 琥珀=牛市中回调 / 留白=牛市上行（EDHEC 20%规则·月收盘）</div>';
+    html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:16px 0 6px">&#x2460; 27年走势：上证综指（右轴）+ 全A等权（左轴对数）· 绿=熊市段 / 琥珀=牛市中回调 / 留白=牛市上行（20%规则·月收盘）</div>';
     html+='<div id="futureC1" style="height:380px"></div>';
     // ── 图② ──
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
