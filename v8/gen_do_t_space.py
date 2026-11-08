@@ -24,6 +24,7 @@
 from __future__ import annotations
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -62,7 +63,10 @@ def _load_stops() -> dict:
 def main():
     quotes = _load_quotes()
     stops = _load_stops()
-    update_time = ""
+    # 2026-11-09 一劳永逸（九宝令）：此前 update_time 起点为 "" → 兜底成 "from STOCK_QUOTE"
+    # 占位串，非时间戳 ⇒ 健康检查与卡片新鲜度徽标均「无法解析更新时间」假告警。
+    # 根因修复：直接写真实生成时间（STOCK_QUOTE 为盘中实时快照，时间戳即快照时刻）。
+    update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     out = {}
 
     # 以行情表为主（含 name + 今日 high/low）

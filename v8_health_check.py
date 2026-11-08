@@ -350,7 +350,7 @@ CARD_DEFS = [
     {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
     {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "每日盘前1次(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
     {"id": "FINAL_RECOMMEND_DATA", "name": "最终推荐·强势板块龙头股", "page": "最终推荐", "freq": "每日盘后(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_candidates", "market_regime"], "raw_file": "final_recommend.json", "producer": "algorithms/final_recommend.py"},  # 🆕 2026-11-02 一劳永逸（九宝令）：此前 CARD_DEFS 完全漏登记 ⇒ 不监控+自愈够不到 ⇒ 永久假死(实测卡 11-01)
-    {"id": "MAHORO_INSIGHTS", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
+    {"id": "MAHORO_INSIGHTS", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS", "_source_file": "maharo_insights"},
     {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "heal_cat": "experiments", "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
@@ -373,7 +373,7 @@ CARD_DEFS = [
     {"id": "ETF_SUBSCRIPTION_EASTMONEY", "name": "资金热度·东财五分类", "page": "盘后数据", "freq": "每日盘前(T+1)", "max_age": 1440, "key_fields": ["categories", "total_net_amount_yi", "update_time"], "heal_cat": "post_close", "producer": "cloud_fetch_v8.py::update_v8（单源双视图派生）"},
     {"id": "MARKET_THERMO", "name": "未来预测·牛转熊观测台", "page": "观测平台", "freq": "每日盘后(日更)", "max_age": 1440, "key_fields": ["D", "update_time"], "heal_cat": "algo_run", "raw_file": "market_thermo.json", "producer": "v8/gen_market_thermo.py"},
     {"id": "VALUATION_PERCENTILE", "name": "A股估值分位", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices", "update_time"], "heal_cat": "experiments", "producer": "fetch_valuation_percentile.py（v8_cn_fetch_experiments.yml）"},
-    {"id": "PORTFOLIO_DATA", "name": "实时持仓(westock)", "page": "运维", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["positions", "account", "update_time"], "heal_cat": "westock", "producer": "fetch_portfolio_westock.py", "note": "用户真实持仓·westock MCP 刷新；前端标 sourceMissing 表示 feed 不稳，需监控而非自愈"},
+    {"id": "PORTFOLIO_DATA", "name": "实时持仓(westock)", "page": "运维", "freq": "盘中每30分", "max_age": 1440, "_source_file": "PORTFOLIO", "key_fields": ["positions", "account", "update_time"], "heal_cat": "westock", "producer": "fetch_portfolio_westock.py", "note": "用户真实持仓·westock MCP 刷新；前端标 sourceMissing 表示 feed 不稳，需监控而非自愈"},
     {"id": "DO_T_SPACE", "name": "做T空间", "page": "个股查询", "freq": "盘中每30分", "max_age": 60, "key_fields": ["count", "stocks"], "heal_cat": "intraday", "producer": "v8/gen_do_t_space.py（派生 STOCK_QUOTE+STOCK_STOP_DATA）"},
   ]
 
