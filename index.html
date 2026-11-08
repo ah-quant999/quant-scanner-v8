@@ -14152,6 +14152,17 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(note && meta){
       note.textContent = (meta.method||'') + (meta.total_signals!=null?'；信号 '+meta.total_signals+' 笔':'') + (meta.signal_date_range?'；区间 '+meta.signal_date_range:'') + (meta.generated?'；数据截至 '+rel(meta.generated):'');
     }
+    // 🆕 2026-11-08 主人令（截图「信号 0 筹」）：total_signals=0 时不再只丢一排「未成熟/—」，
+    // 而是写明诚实原因（与「选不出来就写原因」铁律同源）：新算法只认金钻+缠论买点共振且剔除负期望信号，
+    // 观察窗口无符合标的即如实空仓，绝不以 0 冒充收益。
+    if(meta && (meta.total_signals === 0 || meta.total_signals === '0')){
+      var _honest = '🟡 本期无真实信号：新算法仅认「金钻+缠论买点共振」且剔除 trend/jigou 负期望信号；'
+        + '若观察窗口内无符合条件的标的，则如实空仓、不凑数（绝不以 0 冒充收益）。'
+        + (meta.signal_date_range ? '<br>信号区间：'+meta.signal_date_range : '')
+        + (meta.generated ? ' · 数据截至 '+rel(meta.generated) : '');
+      body.innerHTML = '<tr><td colspan="8" style="color:var(--dim);text-align:center;line-height:1.8;padding:14px 10px">'+_honest+'</td></tr>';
+      return;
+    }
     if(!keys.length){
       body.innerHTML='<tr><td colspan="8" style="color:var(--sub);text-align:center">回测分层尚未产出（待回测批运行）</td></tr>';
       return;

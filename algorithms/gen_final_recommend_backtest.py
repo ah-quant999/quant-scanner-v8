@@ -241,6 +241,16 @@ def load_versions():
             if not c:
                 continue
             stocks.append((c, str(s.get("name") or ""), s.get("rank")))
+        # 🔴 2026-11-08 一劳永逸兜底：_quote_snapshot bug 致 11-01~11-08 快照 stocks 为空、
+        #   且 consensus 内价亦 None；当 stocks 为空但 consensus_stocks 含真实选股代码时，
+        #   退回 consensus_stocks（真实算法 Top3 选股）作信号源，避免回测恒显「0 筹」失真。
+        #   仅 stocks 为空时触发，正常含 stocks 的快照（09-03~10-31 等）完全不受影响。
+        if not stocks:
+            for s in (d.get("consensus_stocks") or []):
+                c = str(s.get("code") or "").strip().lstrip(".")
+                if not c:
+                    continue
+                stocks.append((c, str(s.get("name") or ""), s.get("rank")))
         out.append({
             "file": p.name,
             "file_date": fd,
