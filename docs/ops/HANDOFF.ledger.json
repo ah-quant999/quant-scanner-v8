@@ -2,6 +2,7 @@
  "max_next_id_seq": 183,
  "ids": [
   "logic-page-section-protocol-1026",
+  "cn-fallback-runner-online-guard-1108",
   "nolost-protocol-v2-1026",
   "logic-page-live-url-1022",
   "logic-page-master-sync-1027",
@@ -74,7 +75,7 @@
   "travel-fallback-dual-machine-1108",
   "audit-intraday-stall-1108"
  ],
- "updated": "2026-11-08 22:17",
+ "updated": "2026-11-09 01:07",
  "generated_by": "小九机AI",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -91,6 +92,7 @@
   "cache-buster-token-defeats-browser-cache": "fc7b36df3ccef3bd",
   "cachebot-build-race": "97dbca13d21f63c2",
   "chain-verify-correction-1107": "4ef3a756e9f5a5f0",
+  "cn-fallback-runner-online-guard-1108": "badd2199e76c80e1",
   "cn-fetch-queue-growth": "5a235b8cad8add42",
   "cn-run-start-env-dead-guards-0926": "5a42b32866ee63ae",
   "cn-runner-ps1-utf8-noBOM-gbk-parse-fail": "84a1a5dc67b21d87",
