@@ -8,6 +8,10 @@
       - 🔴 红线：绝不得删除主人的工作文档（桌面/文档/下载/高考志愿/个人文件）
     本脚本采用「白名单式」清理：只删明确可确认的垃圾位置/类型，
     绝不去遍历或删除任何用户文档目录。默认 dry-run（只报告），-Apply 才真删。
+    📌 2026-11-08 主人令细化（「超过 7 天的垃圾可清，前提是确认过无用无关联」）：
+      确认无关且修改时间 >7 天的本地项目散落副本/缓存/临时产物可清除；
+      工作文档、仓内主目录、runner 活动 checkout、坚果云云同步副本、受保护目录
+      一律不在此列，绝不自动遍历删除——「确认无关」是硬前提。
 .PARAMETER Apply
     加 -Apply 才真正删除；缺省仅打印将要清理的项（安全默认）。
 .PARAMETER Drives
@@ -15,12 +19,14 @@
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File safe_cleanup.ps1            # 仅报告
     powershell -NoProfile -ExecutionPolicy Bypass -File safe_cleanup.ps1 -Apply     # 真删
+    powershell -NoProfile -ExecutionPolicy Bypass -File safe_cleanup.ps1 -Apply -MaxAgeDays 7   # 真删，仅清 >7天项
 #>
 
 [CmdletBinding()]
 param(
     [switch]$Apply,
-    [string[]]$Drives = @('C','D','E')
+    [string[]]$Drives = @('C','D','E'),
+    [int]$MaxAgeDays = 7
 )
 
 $ErrorActionPreference = 'SilentlyContinue'
@@ -63,13 +69,18 @@ $candidates += 'D:\actions\_backup_pre_svc0'
 
 $total = 0
 $plan = @()
+# 📌 2026-11-08 主人令：年龄阈值（默认 7 天）。仅清理 LastWriteTime 早于该 cutoff 的项，
+#    近 ${MaxAgeDays} 天内的临时/缓存一律放过，避免「暴风式」误删，符合「确认无关才删」。
+$cutoff = (Get-Date).AddDays(-$MaxAgeDays)
 
 foreach ($base in ($candidates | Where-Object { $_ } | Select-Object -Unique)) {
     if (-not (Test-Path $base)) { continue }
     if (Test-Protected $base) { Write-Host "🛡 跳过受保护区: $base"; continue }
 
     # 回收站 / Temp：递归收集可删项
-    Get-ChildItem -Path $base -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+    Get-ChildItem -Path $base -Recurse -Force -ErrorAction SilentlyContinue | Where-Object {
+        $_.LastWriteTime -lt $cutoff
+    } | ForEach-Object {
         if (Test-Protected $_.FullName) { return }
         $plan += $_.FullName
         $total++
@@ -80,7 +91,9 @@ foreach ($d in $Drives) {
     $root = "${d}:\"
     if (-not (Test-Path $root)) { continue }
     foreach ($name in $projCacheNames) {
-        Get-ChildItem -Path $root -Recurse -Force -Filter $name -ErrorAction SilentlyContinue | ForEach-Object {
+        Get-ChildItem -Path $root -Recurse -Force -Filter $name -ErrorAction SilentlyContinue | Where-Object {
+            $_.LastWriteTime -lt $cutoff
+        } | ForEach-Object {
             $p = $_.FullName
             if (Test-Protected $p) { return }
             if ($p -like '*\_work\*') { return }   # 绝不碰活动 checkout
@@ -92,7 +105,7 @@ foreach ($d in $Drives) {
 
 Write-Host "===== v8 安全清理（$(if($Apply){'APPLY 真删'}else{'DRY-RUN 仅报告'})) ====="
 Write-Host "受保护区(绝不删): $($protectedRoots -join ' | ')"
-Write-Host "拟清理项数: $total"
+Write-Host "拟清理项数: $total  （仅含修改时间早于 $cutoff 的 >${MaxAgeDays}天项；受保护区/近 ${MaxAgeDays}天项已自动放过）"
 
 if ($total -eq 0) { Write-Host '无垃圾可清。'; exit 0 }
 
