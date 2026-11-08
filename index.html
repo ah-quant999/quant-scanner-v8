@@ -3311,6 +3311,8 @@ function fmtSigned(v){
       <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
            ⇒ 收益转化算法 / 回测 N 日胜率 / 每日 Top3 历史 三卡整组迁入本子页（原在「最终推荐·rec」）。 -->
       <button class="st-tab" data-st="track" onclick="switchSt('track')">📌 最终跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600">选股→执行→复盘</span></button>
+      <!-- 2026-11-08 主人令：新建「回测跟踪」子页，集中两张回测卡（每日洞察回测 + 最终推荐回测） -->
+      <button class="st-tab" data-st="bt" onclick="switchSt('bt')">📊 回测跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600">每日洞察·最终推荐</span></button>
       <!-- 🗑 2026-10-23 主人令：三新算法（缩量回踩/板块共振/龙虎机构）选股策略子页随算法整支下架删除 -->
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
@@ -3415,21 +3417,7 @@ function fmtSigned(v){
         <div id="execAlgoHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">🧮 算法加载中…</div></div>
       </div>
 
-      <!-- 📊 最终推荐 · 回测 N 日胜率：渲染引擎复用 lifeRenderBacktest（全站唯一份），数据源 FINAL_RECOMMEND_BACKTEST.js（真实每日选股信号流回测；gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」已删除回放归档引用）。 -->
-      <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #ffd024">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          <span style="font-size:14px;font-weight:700;color:var(--txt)">📊 最终推荐 · 回测 N 日胜率（真实信号流）</span>
-          <span id="finalRecBackBadge"></span>
-          <span style="font-size:10px;font-weight:700;color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap">✅ 真实信号流回测</span>
-        </div>
-        <div class="note" id="finalRecBackNote">加载中…</div>
-        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
-        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75">
-          信号源 = 算法链每日<b style="color:var(--txt)">真实选股</b>的 dated 快照归档（raw_data/history/final_recommend_YYYYMMDD.json，真实信号流口径，<b style="color:#22c55e">非历史规则回放</b>）；
-          次一交易日开盘买入 / 持有 N 日收盘卖出 / 双边成本 0.30%；与「强势跟踪」回测卡<b style="color:var(--txt)">同引擎、同口径、全站唯一真源</b>。
-          样本每日盘后累积，走满一档进一档（未成熟档如实标「0（未成熟）」，绝不以 0 冒充）；真实流自 2026-09-03 起累积。
-        </div>
-      </div>
+      <!-- 2026-11-08 主人令：最终推荐·回测 N 日胜率卡已迁入「📊 回测跟踪」子页（st-bt） -->
 
 
       <!-- 📜 每日推荐 Top3 历史：默认折叠，展开才渲染；数据源 FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py 每晚随 D 批自动重写）。 -->
@@ -3444,6 +3432,29 @@ function fmtSigned(v){
       </details>
 
     </div>
+
+    <!-- ===== TAB 页面：📊 回测跟踪（2026-11-08 主人令：每日洞察·回测跟踪 + 最终推荐·回测 N 日胜率 两张回测卡迁入集中） ===== -->
+    <div id="st-bt" class="st-pane">
+      <!-- 🎯 最强共振 · 回测跟踪（原共振日历→每日洞察 tab3；T+1→T+250 持久跟踪，成熟到哪档显示哪档；renderResonanceTrack 自绘完整卡片，故此处仅留裸容器） -->
+      <div id="resonTrackContainer"></div>
+
+      <!-- 📊 最终推荐 · 回测 N 日胜率（真实信号流；复用 lifeRenderBacktest，与强势跟踪卡同引擎同口径） -->
+      <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #ffd024">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:700;color:var(--txt)">📊 最终推荐 · 回测 N 日胜率（真实信号流）</span>
+          <span id="finalRecBackBadge"></span>
+          <span style="font-size:10px;font-weight:700;color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap">✅ 真实信号流回测</span>
+        </div>
+        <div class="note" id="finalRecBackNote">加载中…</div>
+        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
+        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75">
+          信号源 = 算法链每日<b style="color:var(--txt)">真实选股</b>的 dated 快照归档（raw_data/history/final_recommend_YYYYMMDD.json，真实信号流口径，<b style="color:#22c55e">非历史规则回放</b>）；
+          次一交易日开盘买入 / 持有 N 日收盘卖出 / 双边成本 0.30%；与「强势跟踪」回测卡<b style="color:var(--txt)">同引擎、同口径、全站唯一真源</b>。
+          样本每日盘后累积，走满一档进一档（未成熟档如实标「0（未成熟）」，绝不以 0 冒充）；真实流自 2026-09-03 起累积。
+        </div>
+      </div>
+    </div><!--/st-bt-->
+
   </section>
 
 
@@ -3474,8 +3485,7 @@ function fmtSigned(v){
     <!-- ===== TAB3: 每日洞察 ===== -->
     <div id="rcTab3" class="rc-pane">
       <div id="insightContainer"></div>
-      <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（T+1→T+250 持久跟踪，成熟到哪档显示哪档） -->
-      <div id="resonTrackContainer"></div>
+      <!-- 2026-11-08 主人令：最强共振·回测跟踪卡（resonTrackContainer）已迁入「选股策略→回测跟踪」子页（st-bt） -->
     </div>
 
     <!-- 2026-09-03 主人令：TAB4 HTML 容器（含已下线大牛股猎手）已删除（renderHunter 函数 + chips 都已全方位下线，仅保留共振日历三大功能 tab：机游共振/北向席位/每日洞察） -->
@@ -3516,7 +3526,7 @@ function fmtSigned(v){
     if(tabId === 'tab1' && _rcNeedRender('jyCalContainer')){ setTimeout(renderJyCalendar, 30); }
     if(tabId === 'tab2' && _rcNeedRender('northCalContainer')){ setTimeout(renderNorthCalendar, 30); }
     if(tabId === 'tab3' && _rcNeedRender('insightContainer')){ setTimeout(renderInsight, 30); }
-    if(tabId === 'tab3' && _rcNeedRender('resonTrackContainer')){ setTimeout(window.renderResonanceTrack, 30); }
+    /* 2026-11-08 主人令：resonTrackContainer 已迁入「选股策略→回测跟踪」子页（st-bt），不再于 tab3 调度渲染（避免误渲到隐藏容器） */
     /* tab4 大牛股猎手已于 2026-09-03 主人令全方位下线（renderHunter 函数删除、不再挂载 window）
        —— 2026-09-03 二清：注释精简为通用已下线 trace，保留审计 */
   }
@@ -3592,7 +3602,7 @@ function fmtSigned(v){
       if(window.RESONANCE_TRACK){
         clearInterval(iv);
         var el=document.getElementById('resonTrackContainer');
-        if(el && !el.innerHTML.trim() && window.__rcActiveTab==='tab3'){ window.renderResonanceTrack(); }
+        if(el && !el.innerHTML.trim()){ window.renderResonanceTrack(); }  // 2026-11-08 主人令：resonTrackContainer 已迁入 st-bt，数据就绪即渲染（不再限定 __rcActiveTab==='tab3'）
       } else if(n>400){ clearInterval(iv); }
     },300);
   })();
@@ -14469,6 +14479,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[track] backtest', e); } }, 60);
       if(window.__finalHistRendered){ try{ window.renderFinalHist(); }catch(e){} }
     }
+    // 2026-11-08 主人令：回测跟踪子页（st-bt）—— 两张回测卡（最强共振·回测跟踪 / 最终推荐·回测 N 日胜率）迁入集中展示
+    if(n==='bt'){
+      setTimeout(function(){ try{ window.renderResonanceTrack(); }catch(e){ console.warn('[bt] resonTrack', e); } }, 30);
+      setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[bt] backtest', e); } }, 60);
+    }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
@@ -14485,6 +14500,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist))&&!!window.GOLD_POOL;},  // 2026-09-11：金股池卡片并入 pool 子页，需 GOLD_POOL 就绪
       /* 🔴 2026-10-11 主人令「完全下架」：tc/crds 就绪判定随两策略下架移除 */
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
+      // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
+      bt:function(){return !!(window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST);},
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};
