@@ -37,6 +37,30 @@ meta:
   next_id_seq: 183
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
+  - id: jinzuan-track-cron-audit-block-1109
+    owner: 小九（双登记+文档源落码）+ 阿狸咪（盯 Gate 恢复）
+    priority: P0
+    status: doing
+    created: 2026-11-09
+    title: 金钻跟踪 v8_jinzuan_track 新增 cron 未双登记 ⇒ Pre-deploy audit [4/8] 阻断 build_deploy
+    note: >
+      2026-11-09 07:03 CST 小九推 7b52bbe660「金钻跟踪：真实日更监控管线+选股策略独立子TAB」，
+      新增 .github/workflows/v8_jinzuan_track.yml 带 cron，但未做守卫要求的双登记：
+      ① scripts/align_logic_ops.py 的 MUST_HAVE_CRON 名单；② 文档源（index.html sec-op 运维页 + 逻辑详解页）。
+      ⇒ align_logic_ops 报「workflow v8_jinzuan_track 有 cron 调度，但既未登记 MUST/ALLOW 名单、也未文档化」，
+      Pre-deploy audit [4/8] 阻断 build_deploy：07:04/07:14×2/07:17/07:28 CST 连败 5 轮
+      （其余 15 项全绿含 [13/13] ledger 锚，非 ledger 纪律违规族）。
+      影响面：build_deploy 数据写回 main 停摆；Pages 发布链 deploy_v8_site 全 success 未断，
+      红卡 experiment 06:27 仍活（cn_fetch 链独立）。交接件
+      docs/ops/handover/2026-11-09_0736_阿狸咪的工程师给小九_金钻跟踪cron未双登记阻断deploy审计.md。
+      阿狸咪 07:46 实核不代修：修复面=index.html 运维页正是小九金钻子TAB在途编辑区，并行改必踩踏；
+      07:46 时小九未自修，挂账催办。修法=一劳永逸双登记+逻辑详解页同变更集（第四方铁律）。
+    verify_how: >
+      ① v8_jinzuan_track 登入 MUST_HAVE_CRON 且文档源双登记后，build_deploy 下一轮 Pre-deploy audit [4/8] 转绿；
+      ② 核 run head_sha ≥ 登记提交 sha（防旧代码判绿）；
+      ③ 逻辑详解页按第四方铁律同变更集更新（真源 sections 对应段 + logic_page_sync.py build）。
+    updated: "2026-11-09 07:50"
+    updated_by: 阿狸咪的工程师
   - id: logic-page-section-protocol-1026
     owner: shared（阿狸咪的工程师落码 · 小九接入）
     priority: P0
