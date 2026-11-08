@@ -1,13 +1,13 @@
 {
-  "generated": "2026-11-08 09:59:05",
-  "update_time": "2026-11-08 09:59:05",
+  "generated": "2026-11-08 10:50:35",
+  "update_time": "2026-11-08 10:50:35",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
   "n_top": 3,
-  "days": 40,
+  "days": 37,
   "date_from": "2026-09-03",
-  "date_to": "2026-11-07",
+  "date_to": "2026-10-31",
   "by_date": {
     "2026-09-03": {
       "date": "2026-09-03",
@@ -1629,139 +1629,6 @@
           "resonance": 1,
           "sources": [
             "四量终极"
-          ]
-        }
-      ]
-    },
-    "2026-11-01": {
-      "date": "2026-11-01",
-      "update_time": "2026-11-01 16:07:42",
-      "file": "final_recommend_20261101.json",
-      "degraded": false,
-      "top3": [
-        {
-          "rank": 1,
-          "code": "603131",
-          "name": "上海沪工",
-          "close": null,
-          "close_date": null,
-          "final_score": 0.0,
-          "resonance": 2,
-          "sources": [
-            "动量共识",
-            "强势跟踪"
-          ]
-        },
-        {
-          "rank": 2,
-          "code": "002708",
-          "name": "光洋股份",
-          "close": null,
-          "close_date": null,
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        },
-        {
-          "rank": 3,
-          "code": "002149",
-          "name": "西部材料",
-          "close": null,
-          "close_date": null,
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        }
-      ]
-    },
-    "2026-11-04": {
-      "date": "2026-11-04",
-      "update_time": "2026-11-04 18:08:29",
-      "file": "final_recommend_20261104.json",
-      "degraded": true,
-      "top3": [
-        {
-          "rank": 1,
-          "code": "600261",
-          "name": "阳光照明",
-          "close": 4.46,
-          "close_date": "2026-11-04",
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        },
-        {
-          "rank": 2,
-          "code": "002652",
-          "name": "扬子新材",
-          "close": 4.59,
-          "close_date": "2026-11-04",
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        },
-        {
-          "rank": 3,
-          "code": "002522",
-          "name": "浙江众成",
-          "close": 4.92,
-          "close_date": "2026-11-04",
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        }
-      ]
-    },
-    "2026-11-07": {
-      "date": "2026-11-07",
-      "update_time": "2026-11-08 08:15:42",
-      "file": "final_recommend_20261108.json",
-      "degraded": false,
-      "top3": [
-        {
-          "rank": 1,
-          "code": "600327",
-          "name": "大东方",
-          "close": null,
-          "close_date": null,
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        },
-        {
-          "rank": 2,
-          "code": "601599",
-          "name": "浙文影业",
-          "close": null,
-          "close_date": null,
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
-          ]
-        },
-        {
-          "rank": 3,
-          "code": "600371",
-          "name": "万向德农",
-          "close": null,
-          "close_date": null,
-          "final_score": 0.0,
-          "resonance": 1,
-          "sources": [
-            "强势跟踪"
           ]
         }
       ]
