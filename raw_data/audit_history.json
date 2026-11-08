@@ -4138,5 +4138,44 @@
     "message": "更新于 2天前 02:12；超过阈值 2880 分钟"
    }
   ]
+ },
+ {
+  "date": "2026-11-09",
+  "time": "02:58:05",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 119,
+   "warn": 2,
+   "fail": 2,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 124
+  },
+  "warn_items": [
+   {
+    "id": "DO_T_SPACE",
+    "name": "做T空间",
+    "message": "无法解析更新时间"
+   },
+   {
+    "id": "final_enter_stale",
+    "name": "最终推荐入选日期",
+    "message": "未找到 enter_date 字段，无法判断入选新鲜度"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "MAHORO_INSIGHTS",
+    "name": "机构研究·AI解析",
+    "message": "找不到数据文件 MAHORO_INSIGHTS.js 或解析失败"
+   },
+   {
+    "id": "PORTFOLIO_DATA",
+    "name": "实时持仓(westock)",
+    "message": "找不到数据文件 PORTFOLIO_DATA.js 或解析失败"
+   }
+  ]
  }
 ]
