@@ -191,6 +191,7 @@ jobs:
           else
             echo "⚠️ 云端 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cloud.json)"
             echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error title=v8-intraday-dispatch-fail::盘中档云端主力 dispatch 失败(HTTP=$HTTP_CODE)，本档数据可能缺失，已转 CN 兜底；若兜底也失败请查 v8_cn_fetch_cloud_selfhosted"
           fi
 
       - name: "⏳ 实时轮询云端 run 状态（最多 12 分钟，每 30s 探测）"
@@ -333,6 +334,7 @@ jobs:
           else
             echo "⚠️ cn 兜底 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cn.json)"
             echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error title=v8-intraday-cnfallback-fail::盘中档 CN 兜底 dispatch 也失败(HTTP=$HTTP_CODE)，本档数据完全缺失！盘中卡将显示旧值，请立即排查"
           fi
 
       - name: "📝 档期状态汇总"
