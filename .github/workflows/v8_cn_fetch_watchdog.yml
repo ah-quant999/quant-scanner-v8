@@ -242,10 +242,38 @@ jobs:
               except Exception as e:
                   print(f"[watchdog] 破锁查询失败: {e}")
 
+          def cn_runner_online():
+              """查是否有在线的 [self-hosted, cn] runner；探测失败默认 True（宁可派发也不漏兜底）。"""
+              try:
+                  import os, urllib.request as _ur
+                  req = _ur.Request(
+                      "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/runners?per_page=100",
+                      headers={"Authorization": "Bearer " + os.environ.get("GH_TOKEN", ""),
+                                "Accept": "application/vnd.github+json"})
+                  d = json.loads(_ur.urlopen(req, timeout=15).read().decode("utf-8", "replace"))
+                  for r in d.get("runners", []):
+                      if r.get("status") != "online":
+                          continue
+                      labels = [l.get("name", "") for l in r.get("labels", [])]
+                      if "cn" in labels and "self-hosted" in labels:
+                          return True
+                  return False
+              except Exception as e:
+                  print("[watchdog] cn runner 在线查询失败({})，默认视为在线".format(e))
+                  return True
+
           def dispatch_cat(category, use_selfhosted=False):
               """按拥堵状态派发：云端正常 -> 派云端；拥堵/刚失败 -> 派 selfhosted 兜底。"""
               import subprocess
               if use_selfhosted:
+                  # [甲护栏 2026-11-08] CN 兜底跑在 [self-hosted, cn]，周末/双机下线时无 runner 接单
+                  #   -> 派发即产生"无 runner"红 run（实测 10-31~11-01 70 次）。派发前先查在线 CN runner，
+                  #   明确无 -> 跳过 + 记 audit，不产生红 run、不洪水告警。
+                  if not cn_runner_online():
+                      print("[watchdog] info: 无 CN 自托管 runner 在线（周末/双机下线属预期）-> 跳过 selfhosted 兜底，不派发不产生红 run")
+                      audit("dispatch_skip", path="selfhosted", cat=category, ok=True,
+                            why="no_cn_runner_online")
+                      return
                   r = subprocess.run(
                       ["gh", "workflow", "run", "v8_cn_fetch_cloud_selfhosted.yml",
                        "-f", f"category={category}"],
