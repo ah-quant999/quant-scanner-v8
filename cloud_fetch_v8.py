@@ -3250,7 +3250,11 @@ def f_cffex_position():
     have = {h.get("date") for h in hist}
     today = now_cst().date()
     fetched = 0
-    for back in range(1, 60):          # 回补窗口：约 40 个交易日
+    for back in range(0, 60):          # 回补窗口：约 40 个交易日
+        # 🔴 2026-11-09 主人令「IF会员持仓择时卡断了」根因修复：原 range(1,60) 从昨天起步，
+        #   生成器**永远抓不到当天**的排名 ⇒ 卡 data_date 恒滞后一个交易日（周一晚显示周五档）。
+        #   改 range(0,60) 含当日：16:30 中金所公布后 post_close 轮即取当日；
+        #   当日尚未公布时接口空/异常 → 下方静默跳过，行为安全。
         if fetched >= 45:              # 单轮抓取上限（防预算失控）
             break
         d = today - timedelta(days=back)

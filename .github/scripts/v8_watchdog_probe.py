@@ -87,7 +87,11 @@ PROBE = {
     "premarket": ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js", "US_HK_MAP.js", "V8_CALENDAR.js", "MARGIN_DATA.js",
                   "INDEX_VALUE_FRAMEWORK.js", "VALUATION_PERCENTILE.js"],
     "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js",
-               "MARKET_ALERTS.js"],
+               "MARKET_ALERTS.js",
+               # 🔴 2026-11-09 主人令「IF会员持仓择时卡断了」：CFFEX_POSITION（中金所前20会员
+               #   持仓排名，16:30 后公布、日更一档）不在名单 = 第4例「整体健康、局部坏死」盲区
+               #   —— 11-09 post_close 调度跳班，卡 data_date 停周五 11-06 无人察觉。
+               "CFFEX_POSITION.js"],
 }
 files = PROBE.get(cat) or ["LIMIT_UP_HEATMAP.js"]
 # 🔴 2026-09-10 修正（主人令·13:00开盘数据停更事故）：
@@ -518,3 +522,46 @@ if cst.weekday() < 5 and hhmm >= 1260:
                       trigger="cron_missed_fallback", err=str(_e3)[:120])
     except Exception as _e:
         print(f"[watchdog] 股东增减持新鲜度检查失败（跳过兜底）: {_e}")
+
+# 🔴 2026-11-09 期指实时专用兜底（主人令「期指卡断了」）：
+#   【病灶】v8_futures_realtime.yml（11-09 中午建链，cron 09:00-16:30 每 30 分）上线首日
+#     **全天零触发**（runs total=0，GitHub schedule 跳班第 3 例：金钻 18:00 / shc 20:30 同款），
+#     线上 FUTURES_REALTIME 停 14:13（手工档），期指卡退回 CFFEX 日频回退档。
+#   【修法】强交易时段（工作日 09:20-11:25 / 13:05-15:20 CST，避开午休 tick 冻结与
+#     15:15 收盘后冻结防误判）且线上 FUTURES_REALTIME.update_time 距今 >45min
+#     （容忍错过一个 30 分周期）⇒ gh dispatch 补跑。该 workflow 自带 workflow_dispatch。
+def _shc_frt_stale_min():
+    """返回线上 FUTURES_REALTIME.update_time 距今分钟数；解析失败返回 None。"""
+    try:
+        r4 = urllib.request.Request(BASE_URL + "FUTURES_REALTIME.js",
+                                    headers={"User-Agent": "Mozilla/5.0"})
+        _ft = urllib.request.urlopen(r4, timeout=20).read().decode("utf-8", "replace")
+        _m5 = re.search(r'"update_time"\s*:\s*"(\d{4}-\d{2}-\d{2} \d{2}:\d{2})', _ft)
+        if not _m5:
+            return None
+        _t = datetime.strptime(_m5.group(1), "%Y-%m-%d %H:%M").replace(
+            tzinfo=datetime.timezone(datetime.timedelta(hours=8)))
+        return (cst - _t).total_seconds() / 60.0
+    except Exception:
+        return None
+
+_hh = cst.hour * 60 + cst.minute
+_in_strong = (9*60+20 <= _hh <= 11*60+25) or (13*60+5 <= _hh <= 15*60+20)
+if cst.weekday() < 5 and _in_strong:
+    _fr_min = _shc_frt_stale_min()
+    if _fr_min is None:
+        print("[watchdog] 📈 期指实时新鲜度解析失败（跳过兜底）")
+    elif _fr_min <= 45:
+        print(f"[watchdog] 📈 期指实时档已鲜（距今 {_fr_min:.0f}min），无需兜底")
+    else:
+        print(f"[watchdog] 📈 期指实时档停滞（距今 {_fr_min:.0f}min > 45min）→ dispatch v8_futures_realtime.yml 补跑")
+        try:
+            _r4 = subprocess.run(["gh", "workflow", "run", "v8_futures_realtime.yml"],
+                                 capture_output=True, text=True, check=False)
+            print(_r4.stdout.strip(), _r4.stderr.strip())
+            audit("dispatch", path="futures_realtime", ok=(_r4.returncode == 0),
+                  trigger="cron_missed_fallback", stale_min=int(_fr_min))
+        except Exception as _e4:
+            print(f"[watchdog] ⚠️ 期指实时兜底派发异常（gh 缺失?）: {_e4}")
+            audit("dispatch", path="futures_realtime", ok=False,
+                  trigger="cron_missed_fallback", err=str(_e4)[:120])
