@@ -489,3 +489,32 @@ if hhmm >= 1140:
                       trigger="cron_missed_fallback", err=str(_e)[:120])
     except Exception as _e:
         print(f"[watchdog] 金钻新鲜度检查失败（跳过兜底）: {_e}")
+
+# 🔴 2026-11-09 股东增减持兜底（主人令「统一版式」排查实证：v8_shareholder_change_fetch.yml
+#   上线首日（11-09）20:30 首跑零触发 —— GitHub schedule 跳班同款，卡停在 11-08 05:46 构建档）。
+#   【修法】仅工作日 CST ≥21:00（给 20:30 官方 cron 30 分钟余量）且线上 SHAREHOLDER_CHANGE
+#     的 update_time 日期 ≠ 今日 ⇒ gh dispatch 补跑。周末不兜底（cron 本就周一~五，
+#     公告/增减持披露非交易口径，周末档属正常）。
+if cst.weekday() < 5 and hhmm >= 1260:
+    try:
+        r3 = urllib.request.Request(BASE_URL + "SHAREHOLDER_CHANGE.js",
+                                    headers={"User-Agent": "Mozilla/5.0"})
+        _sc = urllib.request.urlopen(r3, timeout=20).read().decode("utf-8", "replace")
+        _m4 = re.search(r'"update_time"\s*:\s*"(\d{4}-\d{2}-\d{2})', _sc)
+        _sd = _m4.group(1) if _m4 else ""
+        if _sd == cst.strftime("%Y-%m-%d"):
+            print(f"[watchdog] 📈 股东增减持今日档已鲜（update_time={_sd}），无需兜底")
+        else:
+            print(f"[watchdog] 📈 股东增减持今日档缺失（update_time={_sd or '无'}，今日 {cst:%Y-%m-%d}）→ dispatch 补跑")
+            try:
+                _r3 = subprocess.run(["gh", "workflow", "run", "v8_shareholder_change_fetch.yml"],
+                                     capture_output=True, text=True, check=False)
+                print(_r3.stdout.strip(), _r3.stderr.strip())
+                audit("dispatch", path="shareholder_change_fetch", ok=(_r3.returncode == 0),
+                      trigger="cron_missed_fallback", stale_update_date=_sd)
+            except Exception as _e3:
+                print(f"[watchdog] ⚠️ 股东增减持兜底派发异常（gh 缺失?）: {_e3}")
+                audit("dispatch", path="shareholder_change_fetch", ok=False,
+                      trigger="cron_missed_fallback", err=str(_e3)[:120])
+    except Exception as _e:
+        print(f"[watchdog] 股东增减持新鲜度检查失败（跳过兜底）: {_e}")
