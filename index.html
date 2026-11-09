@@ -156,6 +156,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=5bb651fc87" defer></script>
 <script src="data/MARGIN_DATA.js?v=2f67a64970" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=125d5433a7" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=f9e68a2626" defer></script>
 <script src="data/IPO_DATA.js?v=397f0e2d2b" defer></script>
     <script src="data/CRISIS_DATA.js?v=84897bbd29" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=459b0b4f5a" defer></script>
@@ -8825,7 +8826,7 @@ function switchSec(sec,el){
   // 2026-08-30：盘后数据补位卡（宏观/期指/解禁/业绩）切 tab 时重绘
   if(sec==='ph'){
     setTimeout(function(){
-      try{ window.renderFuturesMain(window.CFFEX_HOLDINGS || {}); }catch(e){}
+      try{ window.renderFuturesMain(window.FUTURES_REALTIME || window.CFFEX_HOLDINGS || {}); }catch(e){}
       try{ window.renderMacroSummary(window.MACRO_DATA || {}); }catch(e){}
       try{ window.renderRestrictedCalendar(window.RESTRICTED_RELEASE || {}); }catch(e){}
       try{ window.renderForecastCalendar(window.PERFORMANCE_FORECAST || {}); }catch(e){}
@@ -13751,9 +13752,14 @@ function drawUpDownChart(){
       h+='</div>';
     }
     $b.innerHTML=h;
-    // 2026-11-06 一劳永逸（主人令「期指卡显示 02:12 像断了」根因修复）：CFFEX_HOLDINGS 是中金所每日收盘后一次性发布的日频结算数据，
-    //   11-06 场次要次日凌晨才出，盘中不可能有当日数据；原「盘中 短线」标签误导。改为「日更 收盘」如实反映数据节奏。
-    if($t) $t.innerHTML=_uBadge('日更','收盘',d.update_time);
+    // 2026-11-09 一劳永逸根因修复（主人令「这个实时数据的卡怎么没实时」）：本卡位于【实时数据】页，但历史上只读
+    //   CFFEX_HOLDINGS（中金所每日收盘后一次性日频结算，盘中无当日值），故无论怎么标「盘中每30分刷新」都不可能真·实时，
+    //   2026-11-06 那次只是把标签改成「日更 收盘」并未解决矛盾。现优先读 FUTURES_REALTIME（新浪vip实时期指 + 东财push2实时现货，
+    //   盘中刷新）；缺失时回退 CFFEX_HOLDINGS（日频），绝不空卡。徽标：实时源→「实时盘中」（不显示"不刷新"误导）；回退日频→「日更 收盘」。
+    if($t){
+      if(d && d.realtime) $t.innerHTML=_uBadge('auto','盘中',d.update_time,'实时盘中');
+      else $t.innerHTML=_uBadge('日更','收盘',d.update_time);
+    }
   }
   window.renderFuturesMain = renderFuturesMain;
 
@@ -14121,7 +14127,7 @@ window.showRestrictedItems = showRestrictedItems;
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
     // 🏔 2026-10-20 主人令：板块年度主力净流入卡已迁「暂未上架」（renderUnlisted._fillSectorYearFlow 派发），此处旧 safe() 调用删除
     safe(window.renderCffexPosition, window.CFFEX_POSITION || {});  // 🆕 2026-10-15 IF会员持仓择时
-    safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
+    safe(window.renderFuturesMain, window.FUTURES_REALTIME || window.CFFEX_HOLDINGS || {});
     safe(window.renderMacroSummary, window.MACRO_DATA || {});
     safe(window.renderRestrictedCalendar, window.RESTRICTED_RELEASE || {});
     safe(window.renderForecastCalendar, window.PERFORMANCE_FORECAST || {});

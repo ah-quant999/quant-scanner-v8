@@ -1,0 +1,348 @@
+# 九宝量化 v8.0 — FUTURES_REALTIME 期指实时 refresh
+#
+# 🆕 2026-11-09 阿狸咪新建（主人令：「这个实时数据的卡怎么没实时？一劳永逸修复」）。
+#   根因：📈 期指主力合约·情绪方向 卡位于【实时数据】页，但历史上只读 CFFEX_HOLDINGS
+#   （中金所每日收盘后一次性日频结算，盘中无当日值），故无论怎么标「盘中每30分刷新」都不可能真·实时，
+#   2026-11-06 那次只是把标签改成「日更 收盘」并未解决矛盾。
+#   根治：新增 v8/gen_futures_realtime.py，盘中走「新浪vip实时期指 + 东财push2实时现货」
+#   （均依赖中国 IP，故本 workflow 跑 [self-hosted, cn]），产出 data/FUTURES_REALTIME.js →
+#   window.FUTURES_REALTIME（realtime:true）。前端 renderFuturesMain 优先读 FUTURES_REALTIME，
+#   缺失时回退 CFFEX_HOLDINGS（日频），绝不空卡；徽标实时源→「实时盘中」（不显示"不刷新"误导）。
+#   每 30 分钟刷新一次，且必须同步 index.html 里 data/FUTURES_REALTIME.js?v= 缓存戳，
+#   否则浏览器恒读旧缓存（等于没刷新）。
+#
+# 输出：
+#   - data/FUTURES_REALTIME.js  (window.FUTURES_REALTIME，realtime:true)
+#   - index.html 内 data/FUTURES_REALTIME.js?v=<中性化sha1前10位> 缓存戳对齐
+
+name: "📈 v8 期指实时 refresh (cn)"
+
+on:
+  schedule:
+    # 09:00-16:30 北京时间（UTC 01:00-08:30），每 30 分钟一次（结构拆分强制重新注册 cron）
+    - cron: '0 1-8 * * 1-5'
+    - cron: '30 1-8 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      skip_trading_day_gate:
+        description: '跳过交易日历 gate（应急手动触发时用）'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-futures-realtime
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    # 🔴 IP 敏感：新浪vip期指 + 东财push2现货 均只对中国 IP 畅通，美云 Ubuntu 实测超时 → 必须 cn 机
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 🔴 GBK 崩溃一劳永逸（runner 为 Windows 中文终端）：job 级强制 UTF-8
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # 🛡 self-hosted 直连源码同步（绕开 actions/checkout CDN 墙 + git 协议墙）：
+      #   本生成器纯标准库（无需 akshare / algorithms/），仅需 3 个文件：
+      #   v8/gen_futures_realtime.py（本体）、v8_date.py（根，交易日历）、algorithms/check_trading_day.py（门控）。
+      - name: "📥 经 GitHub API 同步源码（self-hosted 直连·仅拉 3 文件）"
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          set -e
+          mkdir -p v8 data algorithms
+          cat > "$RUNNER_TEMP/sync_futures_src.py" <<'PYEOF'
+          import os, base64, json, hashlib, urllib.request, urllib.error, time, sys
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + token,
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def get_file(path, tries=6):
+              url = f"https://api.github.com/repos/{REPO}/contents/{path}"
+              last = None
+              for i in range(tries):
+                  try:
+                      req = urllib.request.Request(url, headers=H)
+                      with urllib.request.urlopen(req, timeout=120) as r:
+                          obj = json.load(r)
+                      content = base64.b64decode(obj["content"])
+                      return content, obj.get("sha")
+                  except Exception as e:
+                      last = e
+                      print("  retry %d for %s: %s" % (i + 1, path, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("API fetch failed: %s (%s)" % (path, last))
+
+          FILES = [
+              "v8/gen_futures_realtime.py",
+              "v8_date.py",
+              "algorithms/check_trading_day.py",
+          ]
+          for rel in FILES:
+              data, _sha = get_file(rel)
+              os.makedirs(os.path.dirname(rel) or ".", exist_ok=True)
+              with open(rel, "wb") as f:
+                  f.write(data)
+              print("  synced: %s (%d bytes)" % (rel, len(data)))
+          print("sync_futures_src OK")
+          PYEOF
+          python "$RUNNER_TEMP/sync_futures_src.py"
+
+      - name: "🕘 交易时间 gate（09:00-16:30 北京时间）"
+        id: trading_hours
+        run: |
+          if [ "${{ github.event.inputs.skip_trading_day_gate }}" = "true" ]; then
+            echo "is_trading_hours=true" >> "$GITHUB_OUTPUT"
+            echo "  ⚡ 应急模式：跳过交易时间 gate"
+          else
+            python - <<'PY'
+          from datetime import datetime, timedelta
+          now = datetime.utcnow() + timedelta(hours=8)
+          hm = now.hour * 60 + now.minute
+          ok = 540 <= hm <= 990  # 09:00..16:30
+          print(f"  Beijing time: {now:%H:%M} ({'inside' if ok else 'outside'} 09:00-16:30)")
+          import os
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"is_trading_hours={'true' if ok else 'false'}\n")
+          if not ok:
+              print("  ⏸️ 不在交易时间，跳过本次 refresh")
+          PY
+          fi
+
+      - name: "📅 交易日历 gate（非交易日自动跳过）"
+        id: trading
+        if: steps.trading_hours.outputs.is_trading_hours == 'true'
+        run: |
+          if [ "${{ github.event.inputs.skip_trading_day_gate }}" = "true" ]; then
+            echo "is_trading_day=true" >> "$GITHUB_OUTPUT"
+            echo "  ⚡ 应急模式：跳过交易日历 gate"
+          else
+            python algorithms/check_trading_day.py
+          fi
+
+      - name: "🧮 跑 gen_futures_realtime.py（新浪vip期指 + 东财push2现货）"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        run: |
+          set +e
+          python v8/gen_futures_realtime.py
+          rc=$?
+          echo "gen_futures_realtime exit: $rc"
+          # 🛡 抓取失败不得被 exit 0 吞掉：rc != 0 显式退出 1，让运维页/告警可见
+          if [ "$rc" != "0" ]; then
+            echo "::error::gen_futures_realtime 抓取失败 rc=$rc —— 期指/现货实时源不可用，已按设计保留旧文件"
+            exit 1
+          fi
+          if [ ! -s data/FUTURES_REALTIME.js ]; then
+            echo "::error::输出缺失：data/FUTURES_REALTIME.js 为空"
+            ls -la data/FUTURES_REALTIME.js 2>&1 || true
+            exit 1
+          fi
+          echo "✅ data/FUTURES_REALTIME.js: $(wc -c < data/FUTURES_REALTIME.js) bytes"
+          exit 0
+
+      # 🛡 推送前守卫（一劳永逸·严禁 0 字节/假实时覆盖）：
+      #   仅当产物非空且 realtime==true 才推送；否则保留远端旧文件，本次不产出新数据
+      - name: "🔍 校验实时产物（realtime:true 才推送）"
+        id: verify
+        if: steps.trading.outputs.is_trading_day == 'true'
+        run: |
+          python - <<'PY'
+          import os, json, re
+          p = "data/FUTURES_REALTIME.js"
+          if not os.path.exists(p) or os.path.getsize(p) == 0:
+              print("::error::FUTURES_REALTIME.js 缺失或空，拒绝推送")
+              raise SystemExit(1)
+          txt = open(p, "r", encoding="utf-8", errors="replace").read()
+          m = re.search(r"window\.FUTURES_REALTIME\s*=\s*(\{.*\})\s*;?\s*$", txt, re.S)
+          if not m:
+              print("::error::无法解析 FUTURES_REALTIME 负载")
+              raise SystemExit(1)
+          try:
+              obj = json.loads(m.group(1))
+          except Exception as e:
+              print("::error::FUTURES_REALTIME JSON 解析失败:", e)
+              raise SystemExit(1)
+          if not obj.get("realtime"):
+              print("::error::realtime!=true（源返回非实时/失败），拒绝推送，保留旧文件")
+              raise SystemExit(1)
+          items = obj.get("items") or []
+          if not items:
+              print("::error::items 为空，拒绝推送")
+              raise SystemExit(1)
+          print("✅ realtime 校验通过：%d 个品种，update_time=%s" % (len(items), obj.get("update_time")))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write("ok=true\n")
+          PY
+
+      - name: "📤 推送 data/FUTURES_REALTIME.js（Contents API，绕开 cn git 墙）"
+        if: steps.verify.outputs.ok == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, json, base64, urllib.request, urllib.error, hashlib, re, time
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + TOK,
+               "Content-Type": "application/json",
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              for i in range(5):
+                  try:
+                      with urllib.request.urlopen(req, timeout=120) as r:
+                          return json.load(r)
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409, 422) and method == "PUT" and i < 4:
+                          time.sleep(2 ** i); continue
+                      if i == 4: raise
+                      time.sleep(2 ** i)
+                  except Exception:
+                      if i == 4: raise
+                      time.sleep(2 ** i)
+
+          # 1) 计算中性化内容 sha1[:10]（与 update_v8.py::_neutral_content_sha1 同源：
+          #    剔除 republish_time 字段值后取 sha1；本文件无该字段，等同全文 sha1）
+          raw = open("data/FUTURES_REALTIME.js", "rb").read()
+          text = raw.decode("utf-8", "replace")
+          neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+          content_sha = hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+          print(f"  new FUTURES_REALTIME.js neutral sha10 = {content_sha}")
+
+          # 2) 推送数据文件（0 字节守卫：本步前已校验非空，双重保险）
+          if len(raw) == 0:
+              print("  ❌ 数据为空，拒绝推送")
+              raise SystemExit(1)
+          remote = "data/FUTURES_REALTIME.js"
+          get_url = f"https://api.github.com/repos/{REPO}/contents/{remote}"
+          try:
+              existing = api("GET", get_url)
+              sha = existing.get("sha")
+          except urllib.error.HTTPError as e:
+              sha = None if e.code == 404 else (_ for _ in ()).throw(e)
+          payload = {
+              "message": f"v8 futures_realtime: intraday snapshot {content_sha}",
+              "content": base64.b64encode(raw).decode(),
+              "branch": "main",
+          }
+          if sha:
+              payload["sha"] = sha
+          api("PUT", f"https://api.github.com/repos/{REPO}/contents/{remote}", payload)
+          print(f"    ✅ pushed {remote} ({len(raw)} bytes)")
+          print(f"FUTURES_SHA={content_sha}")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"futures_sha={content_sha}\n")
+          PY
+
+      # 🔴 与 STOCK_QUOTE 同款：刷新数据后必须更新 index.html 里 ?v= 缓存戳，否则 CDN 吐旧副本
+      - name: "🔄 同步 FUTURES_REALTIME.js 缓存戳 ?v 并推送 index.html"
+        if: steps.verify.outputs.ok == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, json, base64, urllib.request, urllib.error, hashlib, time
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + TOK,
+               "Content-Type": "application/json",
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              with urllib.request.urlopen(req, timeout=120) as r:
+                  return json.load(r)
+
+          # 计算新 ?v
+          with open("data/FUTURES_REALTIME.js", "rb") as f:
+              raw = f.read()
+          text = raw.decode("utf-8", "replace")
+          neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+          content_sha = hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+          print(f"  new FUTURES_REALTIME.js ?v = {content_sha}")
+
+          idx_url = f"https://api.github.com/repos/{REPO}/contents/index.html"
+          html = idx_sha = None
+          import http.client as _hc
+          _TRANSIENT = (urllib.error.URLError, _hc.IncompleteRead, ConnectionError, TimeoutError, OSError)
+          for attempt in range(5):
+              try:
+                  existing = api("GET", idx_url)
+                  idx_sha = existing.get("sha")
+                  html = base64.b64decode(existing["content"]).decode("utf-8")
+                  break
+              except urllib.error.HTTPError as e:
+                  if e.code in (409, 422) or e.code >= 500:
+                      time.sleep(3); continue
+                  if e.code == 404:
+                      print("  ⚠️ index.html 不存在，跳过 ?v 更新")
+                      raise SystemExit(0)
+                  raise
+              except _TRANSIENT:
+                  time.sleep(4); continue
+          if html is None:
+              print("  ⚠️ index.html 连续 5 次获取失败（网络截断），本轮跳过 ?v 更新（下轮自愈）")
+              raise SystemExit(0)
+
+          # 上下文无关匹配 data/FUTURES_REALTIME.js?v=xxx
+          pattern = r'(data/FUTURES_REALTIME\.js\?v=)([a-f0-9]+)'
+          new_html, n = re.subn(pattern, lambda m: m.group(1) + content_sha, html)
+          if n == 0:
+              print("  ⚠️ index.html 中未找到 FUTURES_REALTIME.js?v= 引用，跳过 ?v 更新")
+          elif new_html == html:
+              print(f"  FUTURES_REALTIME.js?v= 已是 {content_sha}，无需变更")
+          else:
+              print(f"  替换了 {n} 处 FUTURES_REALTIME.js?v= → {content_sha}")
+              payload = {
+                  "message": f"chore(cache): FUTURES_REALTIME.js?v={content_sha}",
+                  "content": base64.b64encode(new_html.encode("utf-8")).decode(),
+                  "branch": "main",
+              }
+              for attempt in range(4):
+                  if idx_sha:
+                      payload["sha"] = idx_sha
+                  try:
+                      api("PUT", idx_url, payload)
+                      break
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409, 422) and attempt < 3:
+                          time.sleep(3)
+                          try:
+                              existing = api("GET", idx_url)
+                              idx_sha = existing.get("sha")
+                              cur = base64.b64decode(existing["content"]).decode("utf-8")
+                          except Exception:
+                              break
+                          if re.search(pattern.replace(r'([a-f0-9]+)', content_sha), cur):
+                              print("  并发方已写入同款 ?v，跳过推送")
+                              break
+                          continue
+                      raise
+              print(f"  ✅ index.html 已推送（?v={content_sha}）")
+          PY
+
+      - name: "✅ 完成摘要"
+        if: steps.verify.outputs.ok == 'true'
+        run: |
+          echo "=== 期指实时 refresh 完成 ==="
+          ls -la data/FUTURES_REALTIME.js
+          echo "==="
+          echo "前端 renderFuturesMain 优先读 window.FUTURES_REALTIME（realtime:true），徽标显示「实时盘中」"
