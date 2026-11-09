@@ -208,7 +208,8 @@ window.__domReadyFns=[];
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=79049326df" defer></script>
-    <script src="data/JINZUAN_TRACK.js?v=b38e8e3adf" defer></script><!-- 🆕 板块龙头领涨（SECTOR_LEADERS）观测卡数据源（保留功能） -->
+    <script src="data/JINZUAN_TRACK.js?v=b38e8e3adf" defer></script><!-- 💎 金钻跟踪（机构六维 352 池）数据源 —— 唯一消费方：选股策略 > 💎 金钻跟踪 子页（st-jztrack）；暂未上架重复卡已于 2026-11-09 退役 -->
+    <!-- 🚀 板块龙头领涨（SECTOR_LEADERS）观测卡数据源见上方 209 行注入 -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=287d29f7ac" defer></script>
     <script>
@@ -15700,15 +15701,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       h += '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px">⚠️ 本卡为<b style="color:#ffb020">监控跟踪用途</b>，非选股买点算法，不构成投资建议。金钻起涨合 XMA 需 12 日定型，当日信号以收盘后复核为准。</div>';
       return h;
     };
-    window.__renderJinzuanTrack = function(){
-      try{
-        var card=document.getElementById('jinzuanTrackCard');
-        var body=document.getElementById('jinzuanTrackBody');
-        if(!card||!body) return;
-        body.innerHTML=window.__buildJinzuanTrackHtml(window.JINZUAN_TRACK,'card');
-        card.style.display='block';
-      }catch(e){ console.warn('[renderJinzuanTrack]', e); }
-    };
+    // 🗑 2026-11-09 主人令：暂未上架「大资金买点三档·金钻跟踪（暂未上架·演示版）」卡整卡退役（渲染函数 __renderJinzuanTrack / 卡壳 jinzuanTrackCard / 派发名单同批删）
+    //   与「选股策略 > 💎 金钻跟踪」子页（st-jztrack，__renderJinzuanTrackTab）完全重复：同一 __buildJinzuanTrackHtml 构建器 + 同一 window.JINZUAN_TRACK 数据源 ⇒ 内容 100% 一致。
+    //   数据注入 data/JINZUAN_TRACK.js 保留（选股策略子页消费）；window.__renderJinzuanTrackTab / __stRetryTab.jztrack 判定原样保留。
     window.__renderJinzuanTrackTab = function(){
       try{
         var body=document.getElementById('jzTrackBody');
@@ -15725,7 +15720,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderJinzuanTrack', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis'];
+      var names = ['__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
@@ -15867,13 +15862,9 @@ h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;border-radius:9px;
 h += '<div id="judgmentCardHeader"></div>';
 h += '<div style="padding:0 0 8px"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer">&#x25B4; 展开</button></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px"></div>';
-// ── 大资金买点三档 · 金钻跟踪（暂未上架·演示版）──
-h += '<div id="jinzuanTrackCard" style="display:none;margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'
-   + '<span style="font-size:15px;font-weight:700;color:#ffd024">&#x1F48E; 大资金买点三档 · 金钻跟踪</span>'
-   + '<span style="font-size:10.5px;color:#ffb020;background:rgba(255,176,32,.14);border:1px solid rgba(255,176,32,.4);border-radius:6px;padding:1px 7px">&#x26A0; 暂未上架·演示版</span>'
-   + '</div>'
-   + '<div id="jinzuanTrackBody"><div class="note">加载中&#x2026;</div></div></div>';
+// 🗑 2026-11-09 主人令：暂未上架「💎 大资金买点三档 · 金钻跟踪（暂未上架·演示版）」卡壳删除（jinzuanTrackCard/jinzuanTrackBody）——
+//   与「选股策略 > 💎 金钻跟踪」子页内容 100% 重复（同一 __buildJinzuanTrackHtml + 同一 window.JINZUAN_TRACK）；
+//   金钻跟踪唯一入口收敛为选股策略子页 st-jztrack。渲染函数 __renderJinzuanTrack 与派发名单引用同批删除（见上方 tombstone）。
 h += '<div id="marketStateCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
    + '<span style="font-size:15px;font-weight:700;color:#41c9ff">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
