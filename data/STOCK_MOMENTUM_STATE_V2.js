@@ -1,12 +1,12 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-09 16:43:33",
+  "generated": "2026-11-09 16:40:32",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
   "total_unique_stocks": 188,
-  "total_appearances": 553,
+  "total_appearances": 554,
   "kline_available": 188,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
@@ -4739,7 +4739,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-10": {
-   "count": 307,
+   "count": 308,
    "leaders": [
     {
      "code": "002343",
@@ -9948,7 +9948,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz003004",
      "name": "声迅股份",
      "date": "2026-10-16",
-     "count": 2,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
