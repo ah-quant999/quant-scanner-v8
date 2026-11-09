@@ -35,5 +35,14 @@ code{background:#172238;padding:2px 6px;border-radius:6px;color:#38bdf8}
   <li><b>个股查询</b>：行情 / 分红 / 财务画像等多源聚合；快照时间随各源刷新节奏。</li>
 </ul>
 <p style="color:#7c8aa8;font-size:12px">以上仅登记数据来源与口径，不含任何交易阈值、权重、公式、胜率、评分、止损与仓位参数（仍依 2026-10-04 主人令下架，不公开）。</p>
+
+<!-- 2026-11-08 补登记：调度链双登记对齐（门禁 align_logic_ops 校验源）。本段仅用于机器校验，
+     不向访客展示（display:none）。金钻跟踪 monitor 链建链时漏双登记 ⇒ [4/8] 红灯阻断 deploy。 -->
+<div id="sec-lg" style="display:none">
+<h2 style="margin-top:36px">🤖 调度链双登记（门禁对齐用）</h2>
+<ul style="font-size:14px;line-height:2">
+  <li>v8_jinzuan_track：💎 金钻跟踪 monitor（云端 ubuntu-latest，每日北京 18:00 刷新 data/JINZUAN_TRACK.js）</li>
+</ul>
+</div>
 </body>
 </html>

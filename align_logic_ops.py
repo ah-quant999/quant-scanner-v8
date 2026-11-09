@@ -142,6 +142,10 @@ MUST_HAVE_CRON = {
     #   推送者解耦·定时保底部署」给 deploy-v8-site 挂 cron（交易日 09:00-16:59 每15分 +
     #   盘外每小时保底）漏双登记 ⇒ build_deploy [4/8] 15:05 起连红阻断 deploy。
     "deploy-v8-site": "Pages 定时保底部署(交易日09:00-16:59每15分+盘外每小时)",
+    # 2026-11-08 补登记（门禁 [4/8] 拦截补漏）：💎 金钻跟踪 monitor 云端链（cron '0 10 * * *'
+    #   = 北京 18:00 每日，产 data/JINZUAN_TRACK.js）建链时漏双登记 ⇒ build_deploy [4/8]
+    #   红灯阻断 deploy。与上方同批对齐修复。
+    "v8_jinzuan_track": "💎 金钻跟踪monitor(云端ubuntu·每日北京18:00)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
