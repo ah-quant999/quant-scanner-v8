@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-11-08 09:39:34",
-  "data_date": "2026-11-06",
+  "update_time": "2026-11-09 18:13:23",
+  "data_date": "2026-11-09",
   "meta": {
-    "data_date": "2026-11-06",
+    "data_date": "2026-11-09",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 1307,
-    "n_at_valid": 1678,
+    "n_universe": 1312,
+    "n_at_valid": 1680,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -378,15 +378,39 @@
     ],
     "bottom": [
       {
+        "code": "sh.600261",
+        "name": "阳光照明",
+        "close": 5.32,
+        "close_date": "2026-11-09",
+        "liquid": true,
+        "abn": 3.549,
+        "factor_at": -3.5489,
+        "roe_ttm": null,
+        "size_proxy": 1818791987.9,
+        "asof_ym": "2026-11"
+      },
+      {
+        "code": "sz.001219",
+        "name": "青岛食品",
+        "close": 24.06,
+        "close_date": "2026-11-09",
+        "liquid": true,
+        "abn": 3.476,
+        "factor_at": -3.4763,
+        "roe_ttm": null,
+        "size_proxy": 1372343252.4,
+        "asof_ym": "2026-11"
+      },
+      {
         "code": "sh.600715",
         "name": "文投控股",
-        "close": 2.35,
-        "close_date": "2026-11-06",
+        "close": 2.59,
+        "close_date": "2026-11-09",
         "liquid": true,
-        "abn": 3.016,
-        "factor_at": -3.0164,
+        "abn": 3.418,
+        "factor_at": -3.4183,
         "roe_ttm": null,
-        "size_proxy": 2907575331.1,
+        "size_proxy": 2967985232.9,
         "asof_ym": "2026-11"
       },
       {
@@ -402,27 +426,27 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sz.001219",
-        "name": "青岛食品",
-        "close": 22.49,
-        "close_date": "2026-11-06",
+        "code": "sh.601188",
+        "name": "龙江交通",
+        "close": 4.19,
+        "close_date": "2026-11-09",
         "liquid": true,
-        "abn": 2.865,
-        "factor_at": -2.865,
+        "abn": 2.477,
+        "factor_at": -2.4771,
         "roe_ttm": null,
-        "size_proxy": 1312352952.7,
+        "size_proxy": 1781303081.1,
         "asof_ym": "2026-11"
       },
       {
-        "code": "sh.600261",
-        "name": "阳光照明",
-        "close": 5.4,
-        "close_date": "2026-11-06",
+        "code": "sz.002086",
+        "name": "东方海洋",
+        "close": 4.37,
+        "close_date": "2026-11-09",
         "liquid": true,
-        "abn": 2.633,
-        "factor_at": -2.6329,
+        "abn": 2.391,
+        "factor_at": -2.3912,
         "roe_ttm": null,
-        "size_proxy": 1701669750.2,
+        "size_proxy": 4153591790.5,
         "asof_ym": "2026-11"
       },
       {
@@ -448,15 +472,15 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sh.601188",
-        "name": "龙江交通",
-        "close": 3.81,
-        "close_date": "2026-11-06",
+        "code": "sh.600189",
+        "name": "泉阳泉",
+        "close": 8.56,
+        "close_date": "2026-11-09",
         "liquid": true,
-        "abn": 2.245,
-        "factor_at": -2.2448,
+        "abn": 1.938,
+        "factor_at": -1.9375,
         "roe_ttm": null,
-        "size_proxy": 1754678550.3,
+        "size_proxy": 2444638416.5,
         "asof_ym": "2026-11"
       },
       {
@@ -470,30 +494,6 @@
         "roe_ttm": null,
         "size_proxy": 2818417695.8,
         "asof_ym": "2026-10"
-      },
-      {
-        "code": "sz.002086",
-        "name": "东方海洋",
-        "close": 3.97,
-        "close_date": "2026-11-06",
-        "liquid": true,
-        "abn": 1.879,
-        "factor_at": -1.8788,
-        "roe_ttm": null,
-        "size_proxy": 3976945372.4,
-        "asof_ym": "2026-11"
-      },
-      {
-        "code": "sz.300112",
-        "name": "万讯自控",
-        "close": 9.11,
-        "close_date": "2026-09-11",
-        "liquid": true,
-        "abn": 1.821,
-        "factor_at": -1.8205,
-        "roe_ttm": null,
-        "size_proxy": 1622918765.7,
-        "asof_ym": "2026-09"
       }
     ]
   },
