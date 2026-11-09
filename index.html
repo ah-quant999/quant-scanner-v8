@@ -3394,7 +3394,7 @@ function fmtSigned(v){
     <!-- ===== TAB 页面：💎 金钻跟踪（2026-11-09 主人令：机构六维 352 池 · 监控跟踪；非盈利信号） ===== -->
     <div id="st-jztrack" class="st-pane">
       <div class="card" style="border-left:4px solid #ffd024">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">💎</span>金钻跟踪 <span style="font-size:11px;color:var(--sub);font-weight:400">机构六维 352 池 · 监控跟踪（非盈利信号）</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">💎</span>金钻跟踪 <span style="font-size:11px;color:var(--sub);font-weight:400">机构六维 352 池 · 监控跟踪（非盈利信号）</span> <span id="jzTrackTime">—</span></h3>
         <div id="jzTrackBody" class="note" style="padding:20px;text-align:center;color:var(--dim)">💎 金钻跟踪 加载中…</div>
       </div>
     </div><!--/st-jztrack-->
@@ -15615,7 +15615,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
          + '<span style="font-size:14px;font-weight:700;color:var(--txt)">💎 金钻跟踪 · 机构六维 352 池</span>'
          + '<span style="font-size:10px;font-weight:700;color:#ffb020;border:1px solid rgba(255,176,32,.4);padding:1px 8px;border-radius:10px;white-space:nowrap">⚠ 监控用途·非盈利信号</span>'
-         + '<span style="font-size:11px;color:var(--sub)">数据日 '+_e(D.data_date)+' ｜ 池 '+D.pool_size+' 只</span></div>';
+         + '<span style="font-size:11px;color:var(--sub)">数据日 '+_e(D.data_date)+' ｜ 池 '+D.pool_size+' 只 ｜ 盘后每日 18:00 监控</span></div>';
       var tc=D.tier_counts||{};
       h += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px">'
          + '<span style="color:#22c55e">①确认 '+ (tc.confirm||0) +'</span> · '
@@ -15708,6 +15708,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           return;
         }
         body.innerHTML=window.__buildJinzuanTrackHtml(window.JINZUAN_TRACK,'tab');
+        if(window.JINZUAN_TRACK && window.JINZUAN_TRACK.updated && window.setBadge){ window.setBadge('jzTrackTime','盘后','监控',window.JINZUAN_TRACK.updated); }
         body.style.textAlign='left'; body.style.padding='0';
       }catch(e){ console.warn('[renderJinzuanTrackTab]', e); }
     };
