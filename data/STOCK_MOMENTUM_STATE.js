@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-10 02:33",
- "generated": "2026-11-10 02:33",
+ "update_time": "2026-11-10 02:42",
+ "generated": "2026-11-10 02:42",
  "meta": {
-  "generated": "2026-11-10 02:33",
+  "generated": "2026-11-10 02:42",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11810,17 +11810,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "600278",
+      "name": "东方创业",
+      "change_pct": 9.972,
+      "price": 7.83,
+      "category": "突破"
+     },
+     {
       "code": "002913",
       "name": "奥士康",
       "change_pct": 9.998,
       "price": 58.42,
-      "category": "突破"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 5.076,
-      "price": 6.21,
       "category": "突破"
      }
     ],
@@ -12003,17 +12003,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "600278",
+      "name": "东方创业",
+      "change_pct": 9.972,
+      "price": 7.83,
+      "category": "短线选股"
+     },
+     {
       "code": "002913",
       "name": "奥士康",
       "change_pct": 9.998,
       "price": 58.42,
-      "category": "短线选股"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 5.076,
-      "price": 6.21,
       "category": "短线选股"
      }
     ],
@@ -12040,17 +12040,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "600278",
+      "name": "东方创业",
+      "change_pct": 9.972,
+      "price": 7.83,
+      "category": "强势股"
+     },
+     {
       "code": "002913",
       "name": "奥士康",
       "change_pct": 9.998,
       "price": 58.42,
-      "category": "强势股"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 5.076,
-      "price": 6.21,
       "category": "强势股"
      }
     ]
