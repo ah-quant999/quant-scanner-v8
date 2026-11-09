@@ -2211,6 +2211,31 @@ def check_data_cards():
         age_min = (now_cst() - dt).total_seconds() / 60
         status = "ok" if age_min <= max_age else "fail"
 
+        # 🛡 2026-11-09 主人令「全部一劳永逸修复」：intraday 类交易日收盘后「盘中档缺失」收紧判红——
+        #   根因（DO_T_SPACE 实证，主人 22:15 截图「做T空间还是今早7点的」）：盘中每30分链 13 档
+        #   全跳班（最后档 07:27 盘前快照），收盘后 adjust_max_age 放宽 + 「今日有档」⇒ 整晚判 ok、
+        #   自愈永不触发（探针盲区同款：「整体健康、局部坏死」无人察觉）。
+        #   收紧：heal_cat=intraday 且无 premarket_keep/picking 豁免的卡，交易日 15:30 后若最后档
+        #   早于 14:55（收盘前最后刷新窗）⇒ 直接 fail「盘中档缺失」，盘后即暴露而非整晚假绿。
+        #   不误伤：分时累计类最后快照 ~15:00（≥14:55）ok；收盘定稿档 16:3x ok；
+        #   premarket_keep（盘前保留 T+1 设计内）与 picking（按交易日判定）两类豁免。
+        if (d.get("heal_cat") == "intraday" and not d.get("premarket_keep")
+                and not d.get("picking") and dt is not None):
+            try:
+                _n9 = now_cst()
+                _after_close = _n9.hour > 15 or (_n9.hour == 15 and _n9.minute >= 30)
+                if _after_close and _is_trading_day(_n9.date()) and dt < _n9.replace(hour=14, minute=55, second=0, microsecond=0):
+                    # 今日档（盘中链跳班）与跨日旧档统一按「最后档早于收盘定稿窗」判缺失
+                    status = "fail"
+                    _emit(d, {
+                        "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                        "status": "fail", "last_update": str(ts), "age_min": round(age_min, 1),
+                        "message": f"盘中档缺失：最后档 {fmt_rel_time(ts)} 早于收盘定稿窗（14:55），盘中刷新链疑似跳班；超过阈值 {max_age} 分钟"
+                    })
+                    continue
+            except Exception:
+                pass
+
         # 🛡 2026-09-02 一劳永逸：选股类(picking)卡片按「交易日(data_date)」判定新鲜度，根治运维面板整日误标红 ✗
         #   根因：picking 卡由 overnight 算法链 ~04:xx 生成「当日」选股、再由盘后链 ~19:15 重写；
         #   04:xx→19:15 重写前年龄可达 15h+，原固定 360min 阈值（adjust_max_age 收盘后8h严格窗口）整日误判 stale。

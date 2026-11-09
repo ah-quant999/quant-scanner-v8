@@ -78,9 +78,14 @@ else:
 #          任一文件陈旧即派发 —— 杜绝"整体健康、局部坏死"。
 BASE_URL = "https://ah-quant999.github.io/quant-scanner-v8/data/"
 PROBE = {
+    # 🔴 2026-11-09 主人令「全部一劳永逸修复」（第5例盲区收口）：intraday 名单补两文件——
+    #   ① CFFEX_HOLDINGS.js（股指期货持仓）：11-09 云端 get_cffex_daily 自 10:13 起持续失败，
+    #     全天 13 档全跳班（本机中国 IP 实测接口正常 ⇒ 派 selfhosted 兜底即愈），原名单看不见；
+    #   ② DO_T_SPACE.js（做T空间）：派生卡（gen_do_t_space.py 挂 update_v8 _post_build_extras
+    #     派生重算），此前孤儿生成器全天停 07:27 盘前档无人察觉。挂链后随每档刷新，探针兜底防复发。
     "intraday": ["LIMIT_UP_HEATMAP.js", "CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js",
                  "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js",
-                 "MARKET_ALERTS.js"],
+                 "MARKET_ALERTS.js", "CFFEX_HOLDINGS.js", "DO_T_SPACE.js"],
     # 🔴 2026-11-09 一劳永逸（根因修复之二）：探针名单补入 07:10 档两文件——
     #   原名单 6 文件不含 INDEX_VALUE_FRAMEWORK / VALUATION_PERCENTILE，
     #   这两个文件烂了看门狗永远看不见（「整体健康、局部坏死」同类盲区）。
@@ -91,7 +96,10 @@ PROBE = {
                # 🔴 2026-11-09 主人令「IF会员持仓择时卡断了」：CFFEX_POSITION（中金所前20会员
                #   持仓排名，16:30 后公布、日更一档）不在名单 = 第4例「整体健康、局部坏死」盲区
                #   —— 11-09 post_close 调度跳班，卡 data_date 停周五 11-06 无人察觉。
-               "CFFEX_POSITION.js"],
+               "CFFEX_POSITION.js",
+               # 🔴 2026-11-09 主人令「全部一劳永逸修复」（第5例同款）：CFFEX_HOLDINGS 收盘定稿档
+               #   同样进 post_close 探针（16:30 中金所发布后定稿），盘中/盘后双窗口都看得见。
+               "CFFEX_HOLDINGS.js"],
 }
 files = PROBE.get(cat) or ["LIMIT_UP_HEATMAP.js"]
 # 🔴 2026-09-10 修正（主人令·13:00开盘数据停更事故）：

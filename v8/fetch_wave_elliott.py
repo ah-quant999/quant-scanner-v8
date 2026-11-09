@@ -134,15 +134,22 @@ def sync_local():
 
     🔴 必须用远端 blob 直写（而非 checkout/pull）：本仓工作树常被 monitor 持续写入 raw_data，
     常规 pull 会因脏树失败或误伤他人 WIP；只取单文件远端内容覆盖是零副作用的做法。
+
+    🛡 2026-11-09 主人令「全部一劳永逸修复」：返回值语义化——
+      True  = fetch 成功、本地已与远端对齐（幂等判断可信）
+      False = fetch 失败（网络抖动），本地副本新鲜度未知（可能领先远端）
+    返回值供 main() 幂等跳过条件使用：fetch 失败时**绝不**凭本地日期跳过推送
+    （11-09 实证死锁：17:50 档拉数成功但 push 因网络失败 → 本地已是最新日 →
+    后续每轮「无新交易日==已记录」误判跳过 → 线上永停 11-06，结构性永不上线）。
     """
     f = git(["fetch", "origin"])
     if f.returncode != 0:
-        print("· 警告：fetch 失败，沿用本地副本")
-        return
+        print("· 警告：fetch 失败，沿用本地副本（远端新鲜度未知，不跳过推送）")
+        return False
     blob = git(["show", "origin/main:data/WAVE_ELLIOTT.js"])
     if blob.returncode != 0 or not blob.stdout.strip():
         print("· 警告：远端无 data/WAVE_ELLIOTT.js，沿用本地副本")
-        return
+        return False
     cur = open(DATA, encoding="utf-8").read() if os.path.exists(DATA) else ""
     if cur != blob.stdout:
         with open(DATA, "w", encoding="utf-8", newline="") as fp:
@@ -150,6 +157,7 @@ def sync_local():
         print("· 已对齐远端最新 data/WAVE_ELLIOTT.js")
     else:
         print("· 本地已是远端最新 data/WAVE_ELLIOTT.js")
+    return True
 
 
 def raw_push(relpath, blob_path, commit_msg):
@@ -261,15 +269,17 @@ def main():
         idx_new.append({"name": name, "last": kc[-1], "date": kd[-1], "hi": hi, "hdate": hdate, "dd": dd})
 
     # 3) 先把本地与远端对齐，再读旧数据（否则可能基于落后副本误判"无新交易日"）
-    sync_local()
+    # 🛡 2026-11-09：sync_local 必须成功（本地已确认与远端一致）才允许凭日期跳过推送；
+    #   fetch 失败 → 本地可能领先远端 → 照常走 raw_push（其内置 diff-tree 无变化守卫，安全幂等）。
+    sync_ok = sync_local()
 
     old = parse_data()
     marks = old.get("marks", [])
 
-    # 4) 幂等判断（基于已对齐远端的最新副本）
+    # 4) 幂等判断（基于已对齐远端的最新副本；远端不可达时不跳过，交由推送端去重）
     old_last_date = old.get("series", {}).get("dates", [""])[-1]
-    if (not args.force) and new_last_date == old_last_date:
-        print("· 无新交易日（最新 %s == 已记录 %s），跳过推送，仅校验+渲染" % (new_last_date, old_last_date))
+    if (not args.force) and new_last_date == old_last_date and sync_ok:
+        print("· 无新交易日（最新 %s == 已记录 %s，且远端已确认一致），跳过推送，仅校验+渲染" % (new_last_date, old_last_date))
         render()
         sys.exit(0)
 
@@ -287,7 +297,14 @@ def main():
     meta["note"] = ("客观数据层：上证日线序列 + 浪型拐点 + 5指数对照（腾讯/新浪/东财三级降级取数）。"
                     "marks 为人工浪型拐点，脚本只保留不重判；主观研判固化在 v8/wave_report_template.html。"
                     "更新仅需CN runner1号机跑 v8/fetch_wave_elliott.py 自动刷新并推仓库，CN runner2号机无需 westock。")
-    new_obj = {"meta": meta, "series": {"dates": dates, "closes": closes}, "marks": marks, "idx": idx_new}
+    # 🛡 2026-11-09 主人令「全部一劳永逸修复」：补顶层 update_time——
+    #   此前 js 顶层只有嵌套 meta.date，无 update_time ⇒ v8_health_check「本地 vs 线上取较新」
+    #   解析不到本地时间戳 ⇒ 永远拿线上旧档判新鲜度（本地已 11-09 仍 fail「3天前」，自愈全盲）。
+    #   顶层 update_time = 数据日 + 当次构建时刻（真实产出时间，非伪造；与 _write_js 同语义）。
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+    _now_cst = _dt.now(_tz(_td(hours=8)))
+    new_obj = {"meta": meta, "series": {"dates": dates, "closes": closes}, "marks": marks, "idx": idx_new,
+               "update_time": _now_cst.strftime("%Y-%m-%d %H:%M:%S")}
 
     # 6) 校验
     if len(dates) != len(closes):

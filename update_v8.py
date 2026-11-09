@@ -1476,6 +1476,25 @@ def _post_build_extras():
     _expand_runner_status()
     _write_audit_trail_js(_generate_audit_trail())
     _emit_freshness_status_js()
+    # 🛡 2026-11-09 主人令「全部一劳永逸修复」：做T空间（DO_T_SPACE）派生挂链——
+    #   根因（主人 22:15 截图「做T空间还是今早7点的」实证）：v8/gen_do_t_space.py 自 11-07 建
+    #   卡起就是**孤儿生成器**（全仓零调度引用），仅 07:27 盘前档后永停 ⇒ 盘中 13 档全跳班、
+    #   卡面「今高/今低」还是盘前快照值。修法：本函数在每次 build 尾部跑（STOCK_QUOTE js 刚
+    #   重建完=最新），派生器纯本地幂等、不联网，任何档位（盘中/盘后/兜底）跑 update_v8 都
+    #   自动带上做T空间；heal_cat=intraday 自愈派发盘中链时同样经此挂链重算。失败只告警不阻断。
+    try:
+        import subprocess as _sp
+        _gen = ROOT / "v8" / "gen_do_t_space.py"
+        if _gen.exists():
+            _r = _sp.run([sys.executable, str(_gen)], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace", timeout=120)
+            print((_r.stdout or "").strip()[-300:] or "[gen_do_t_space] 无输出")
+            if _r.returncode != 0:
+                print(f"  ⚠️ gen_do_t_space 退出码 {_r.returncode}（已隔离，不影响部署）：{(_r.stderr or '')[-200:]}")
+        else:
+            print("  ⚠️ v8/gen_do_t_space.py 不存在，跳过做T空间派生")
+    except Exception as _e:
+        print(f"  ⚠️ 做T空间派生异常（已隔离，不影响部署）：{_e}")
 
 
 
