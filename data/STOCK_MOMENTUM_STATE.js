@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-09 16:27",
- "generated": "2026-11-09 16:27",
+ "update_time": "2026-11-09 16:39",
+ "generated": "2026-11-09 16:39",
  "meta": {
-  "generated": "2026-11-09 16:27",
+  "generated": "2026-11-09 16:39",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11773,6 +11773,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.076,
       "price": 6.21,
       "category": "突破"
+     },
+     {
+      "code": "003004",
+      "name": "声迅股份",
+      "change_pct": 10.009,
+      "price": 50.89,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -11952,6 +11959,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.076,
       "price": 6.21,
       "category": "短线选股"
+     },
+     {
+      "code": "003004",
+      "name": "声迅股份",
+      "change_pct": 10.009,
+      "price": 50.89,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -11988,6 +12002,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大连友谊",
       "change_pct": 5.076,
       "price": 6.21,
+      "category": "强势股"
+     },
+     {
+      "code": "003004",
+      "name": "声迅股份",
+      "change_pct": 10.009,
+      "price": 50.89,
       "category": "强势股"
      }
     ]
