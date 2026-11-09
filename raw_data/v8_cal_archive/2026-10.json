@@ -437,13 +437,7 @@
      "num": 22,
      "dim": false,
      "today": false,
-     "events": [
-      {
-       "text": "🇸🇬 SG公假（屠妖节）",
-       "cls": "sg",
-       "released": true
-      }
-     ]
+     "events": []
     },
     {
      "num": 23,
