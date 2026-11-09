@@ -54,6 +54,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # 🔴 2026-11-10 阿狸咪修复：11-09 6a065f8fac 探针抽出仓内脚本后漏加 checkout，runner 空工作区⇒ python3 找不到 .github/scripts/v8_watchdog_probe.py，自愈兜底层 7 连败。
+      - name: 检出仓库（探针脚本在仓内 .github/scripts/）
+        uses: actions/checkout@v4
       - name: 自检数据新鲜度并兜底派发
         env:
           GH_TOKEN: ${{ github.token }}
