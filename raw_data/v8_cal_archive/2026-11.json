@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-11-09 23:23",
+ "update_time": "2026-11-10 00:29",
  "legend": [
   {
    "title": "重要政策",
@@ -300,24 +300,24 @@
     {
      "num": 9,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇨🇳 中国出口",
        "cls": "data",
-       "released": false
+       "released": true
       },
       {
        "text": "🇸🇬 SG公假（屠妖节补假）",
        "cls": "sg",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 10,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇨🇳 CPI/PPI数据",
