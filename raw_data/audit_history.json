@@ -4177,5 +4177,44 @@
     "message": "找不到数据文件 PORTFOLIO_DATA.js 或解析失败"
    }
   ]
+ },
+ {
+  "date": "2026-11-10",
+  "time": "07:30:43",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 123,
+   "warn": 2,
+   "fail": 2,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 127
+  },
+  "warn_items": [
+   {
+    "id": "runner_local",
+    "name": "runner 本地检测",
+    "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·CN runner1"
+   },
+   {
+    "id": "runner",
+    "name": "self-hosted runner",
+    "message": "runner 本地检测:warn-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "all_HUIJIN_ETF_DRILL",
+    "name": "HUIJIN_ETF_DRILL",
+    "message": "HUIJIN_ETF_DRILL.js 更新于 3天前 22:20；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_TAIL_SELECT",
+    "name": "TAIL_SELECT",
+    "message": "TAIL_SELECT.js 更新于 3天前 21:11；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
