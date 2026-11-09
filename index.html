@@ -156,7 +156,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=29adc6ecdc" defer></script>
 <script src="data/MARGIN_DATA.js?v=2f67a64970" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=125d5433a7" defer></script>
-<script src="data/IPO_DATA.js?v=397f0e2d2b" defer></script>
+<script src="data/IPO_DATA.js?v=2a51eff677" defer></script>
     <script src="data/CRISIS_DATA.js?v=dd8b05a135" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=313f3ed423" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=54bec9a31d" defer></script>
@@ -1324,8 +1324,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=d8db2fa5ae" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=d48c0651f2" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=7e0453715b" defer></script>
-<script src="data/HB_XIAOJIU.js?v=2996c6e97e" defer></script>
+<script src="data/RUNNER_STATUS.js?v=4496235aa0" defer></script>
+<script src="data/HB_XIAOJIU.js?v=02de2f4240" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=557a452764" defer></script>
 <script src="data/HEALTH_CHECK.js?v=25c4049a79" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=8fe60806a9" defer></script>
@@ -10647,11 +10647,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=397f0e2d2b"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=2a51eff677"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=397f0e2d2b';
+        return 'data/IPO_DATA.js?v=2a51eff677';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -19446,7 +19446,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=ccc0c303c5', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=5090f711ce', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=7045c38e34', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=be2ce780d7', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
