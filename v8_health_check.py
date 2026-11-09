@@ -3340,13 +3340,43 @@ def check_signal_date_freshness():
             if ed:
                 dates.append(ed)
         if not dates:
-            results.append({
-                "id": "final_enter_stale",
-                "name": "最终推荐入选日期",
-                "page": "内容审计",
-                "status": "warn",
-                "message": "未找到 enter_date 字段，无法判断入选新鲜度"
-            })
+            # 🔴 2026-11-09 一劳永逸（主人令「诊断面板·最终推荐入选日期 无法判断」根因修复）：
+            #   stocks 为空/无 enter_date 时旧逻辑恒报「未找到 enter_date 字段，无法判断」——
+            #   实证 11-09 线上 stocks=0（当日无入选/策略降级），该消息让主人误以为审计坏了。
+            #   改为分层判据：stocks 空 ⇒ 入选新鲜度无对象可查，转用**顶层 update_time**
+            #   判「数据链本身」新鲜度（最终推荐 18:00 盘后产出，18:00 前最新一批来自昨夜
+            #   = 预期；落后 ≥2 交易日、或已过 18:00 仍停在上一交易日之前 → 真停更才 warn）。
+            _ut = str(d.get("update_time") or "")[:10]
+            _cst_e = now_cst()
+            _prev_e = _last_trade_date(_cst_e.date() - timedelta(days=1))
+            _prev_e_str = _prev_e.strftime("%Y-%m-%d") if _prev_e else ""
+            _today_e_str = _cst_e.date().strftime("%Y-%m-%d")
+            if not _ut:
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "warn",
+                    "message": "stocks 为空且顶层无 update_time，数据链疑似空壳，请核查最终推荐生成器"
+                })
+            elif _ut >= _today_e_str or (_prev_e_str and _ut >= _prev_e_str and _cst_e.hour < 18):
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "ok",
+                    "message": (f"stocks 为空（当日无入选或策略降级，data_degraded={d.get('data_degraded')}），"
+                                f"数据链 update_time {_ut} 新鲜（18:00 前未刷新属预期）")
+                })
+            else:
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "warn",
+                    "message": (f"stocks 为空且数据链 update_time {_ut} 已落后（最近交易日 {last_trade_str}），"
+                                "最终推荐整链停更，请核查盘后算法链")
+                })
         else:
             newest = max(dates)
             # 🛡 2026-09-29 小九（一劳永逸）：final_recommend 盘后 18:00 才产出
@@ -3663,6 +3693,40 @@ def check_guanlan_material_freshness():
                 win_end = datetime.strptime(_m.group(2), "%Y-%m-%d").date()
         except Exception:
             win_end = None
+
+        # 🔴 2026-11-09 一劳永逸（主人令「观澜台素材新鲜度 本环境无法间接评估」根因修复）：
+        #   data/maharo_insights.js 不在 git（出稿 automation 经部署链直推 Pages）
+        #   ⇒ CI 工作区恒无此文件 ⇒ 旧 fallback 恒「无法评估」。
+        #   且线上文件实测**已不再自述「素材窗口 A~B」**（2026-11-09 抓取验证 0 命中）
+        #   ⇒ 本地/在线正则判据均已过期。现补两级在线判据（CI 网络可达 github.io；
+        #     cn runner 可能超时 → 15s 短超时 + 异常静默降级，绝不拖垮巡检）：
+        #     ① 抓线上文件试素材窗口正则；
+        #     ② 仍无窗口 → 用文件 update_time（≥今日 或 ≥上一交易日 = 未落后 → ok）。
+        if win_end is None:
+            _live_ut = None
+            try:
+                _req_l = urllib.request.Request(
+                    "https://ah-quant999.github.io/quant-scanner-v8/data/maharo_insights.js",
+                    headers={"User-Agent": "Mozilla/5.0"})
+                _raw_l = urllib.request.urlopen(_req_l, timeout=15).read().decode("utf-8", "replace")
+                _m_l = re.search(r"素材窗口\s*(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})", _raw_l)
+                if _m_l:
+                    win_end = datetime.strptime(_m_l.group(2), "%Y-%m-%d").date()
+                else:
+                    _mu = re.search(r'"update_time"\s*:\s*"(\d{4}-\d{2}-\d{2})', _raw_l)
+                    if _mu:
+                        _live_ut = datetime.strptime(_mu.group(1), "%Y-%m-%d").date()
+            except Exception:
+                _live_ut = None
+            if win_end is None and _live_ut is not None:
+                _today_g = datetime.now().date()
+                if _live_ut >= _today_g or (_prev_td and _live_ut >= _prev_td):
+                    results.append({
+                        "id": rid, "name": rname, "page": "内容审计", "status": "ok",
+                        "message": (f"间接判据（在线）：出稿档 update_time {_live_ut}（今日 {_today_g}），"
+                                    "未落后；直判需在CN runner1号机（out/guanlan_reports.json）"),
+                    })
+                    return results
 
         if win_end is None:
             results.append({
