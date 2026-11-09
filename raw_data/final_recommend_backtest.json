@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-10 02:25:22",
- "update_time": "2026-11-10 02:25:22",
+ "generated": "2026-11-10 05:44:04",
+ "update_time": "2026-11-10 05:44:04",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -25,14 +25,14 @@
  ],
  "signal_source": "raw_data/history/final_recommend_YYYYMMDD.json（算法链每日真实选股的 dated 快照归档 —— 真实信号流口径，非历史规则回放）",
  "attribution_rule": "update_time 小时 < 9 归前一自然日（与闸门 _NIGHT_CUT 同源）；同一入场日的多个归档版本只认最新版（旧版视为被刷新替代），杜绝周末/国庆重跑双计",
- "versions_total": 5,
- "versions_superseded": 0,
- "versions_no_entry": 3,
+ "versions_total": 6,
+ "versions_superseded": 1,
+ "versions_no_entry": 2,
  "signals_missing_kline": 0,
- "total_signals": 6,
- "signal_days": 2,
- "signal_date_range": "2026-11-02 ~ 2026-11-05",
- "kline_calendar_range": "2023-06-29 ~ 2026-11-06",
+ "total_signals": 9,
+ "signal_days": 3,
+ "signal_date_range": "2026-11-02 ~ 2026-11-09",
+ "kline_calendar_range": "2023-06-29 ~ 2026-11-09",
  "periods": {
   "1d": {
    "samples": 2,
@@ -233,6 +233,27 @@
    "name": "浙江众成",
    "rank": 3,
    "src_file": "final_recommend_20261104.json"
+  },
+  {
+   "entry_date": "2026-11-09",
+   "code": "600327",
+   "name": "大东方",
+   "rank": 1,
+   "src_file": "final_recommend_20261108.json"
+  },
+  {
+   "entry_date": "2026-11-09",
+   "code": "601599",
+   "name": "浙文影业",
+   "rank": 2,
+   "src_file": "final_recommend_20261108.json"
+  },
+  {
+   "entry_date": "2026-11-09",
+   "code": "600371",
+   "name": "万向德农",
+   "rank": 3,
+   "src_file": "final_recommend_20261108.json"
   }
  ]
 }

@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-11-10 02:25:27",
-  "run_start": "2026-11-09 23:33:10",
-  "ok": 42,
-  "fail": 2,
+  "update_time": "2026-11-10 05:44:10",
+  "run_start": "2026-11-10 02:39:54",
+  "ok": 41,
+  "fail": 3,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
@@ -11,6 +11,10 @@
     {
       "script": "scripts/fetch_multiyear_kline.py",
       "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []
