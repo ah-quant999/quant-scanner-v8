@@ -1,26 +1,8 @@
 {
-  "update_time": "2026-11-08 10:52:31",
-  "run_start": "2026-11-08 08:35:14",
-  "ok": 31,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    }
-  ],
-  "skipped_by_time_gate": [
-    "fetch_fundamental_quality.py",
-    "fetch_stock_names.py",
-    "fetch_stock_quote_v8.py",
-    "fetch_sh_index_fib.py",
-    "fetch_inst_trade.py",
-    "fetch_sector_rs.py",
-    "fetch_lhb.py",
-    "fetch_orphan_suspension.py",
-    "fetch_orphan_market_alerts.py",
-    "fetch_orphan_nt_data.py",
-    "fetch_orphan_sector_fund_flow.py",
-    "fetch_weekend_run.py"
-  ]
+  "update_time": "2026-11-09 16:19:57",
+  "run_start": "2026-11-09 15:50:17",
+  "ok": 14,
+  "fail": 0,
+  "failed_scripts": [],
+  "skipped_by_time_gate": []
 }
