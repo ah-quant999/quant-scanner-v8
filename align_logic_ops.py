@@ -146,6 +146,10 @@ MUST_HAVE_CRON = {
     #   = 北京 18:00 每日，产 data/JINZUAN_TRACK.js）建链时漏双登记 ⇒ build_deploy [4/8]
     #   红灯阻断 deploy。与上方同批对齐修复。
     "v8_jinzuan_track": "💎 金钻跟踪monitor(云端ubuntu·每日北京18:00)",
+    # 2026-11-09 补登记（门禁 [4/8] 连红收口）：期指主力实时链（cron 交易时段每 30 分，
+    #   产 data/FUTURES_REALTIME.js）—— 11-09 早建链漏双登记 ⇒ 门禁自 6e3c452b 起连红
+    #   （含后续 watchdog 修复提交被连坐）。本轮与 watchdog 盲区修复同批收口。
+    "v8_futures_realtime": "期指主力实时(新浪vip+东财现货·cn runner盘中每30分)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────

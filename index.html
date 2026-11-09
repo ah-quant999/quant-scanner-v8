@@ -8545,14 +8545,20 @@ window.__renderIndexObserve = function(){
     </div>
 
     <!-- 2026-09-05 CN runner2号机加注 / 2026-09-10 重构：v8 workflow 同步清单（隐藏不渲染，但 align_logic_ops.py 校验需要这些 stem 出现在 index.html 的 sec-lg/sec-op 或 logic.html 的 sec-lg）——
-         35 项 MUST_HAVE_CRON（必须有 cron 且必须文档化）：
+         36 项 MUST_HAVE_CRON（必须有 cron 且必须文档化）：
            v8_cn_fetch_cloud | v8_cn_fetch_cloud_hosted | v8_cn_fetch_watchdog | v8_algo_cloud | v8_algo_intraday_lite |
            v8_lhb_fetch | v8_ima_strong_stock | v8_stock_quote_refresh | v8_risk_gauge | v8_health_patrol |
            v8_cache_buster_reconcile | v8_daily_audit | v8_backup | v8_cleanup | cloud_weekly_cleanup |
            runner_health_alert | v8_t1_guard | v8_weekend_light | v8_intraday_snapshot | v8_cn_fetch_intraday_lemoncat |
            v8_cn_fetch_cloud_selfhosted | v8_cn_fetch_experiments | v8_dajijin_fetch | v8_shareholder_change_fetch | v8_market_thermo |
            v8_us_hk_map | v8_morning_plan | v8_national_team | v8_nolost_guard | v8_final_recommend_history |
-           v8_alimi_heartbeat | v8_invest_avoid | v8_fr_leaders_followup | deploy-v8-site | v8_intraday_liveness_guard
+           v8_alimi_heartbeat | v8_invest_avoid | v8_fr_leaders_followup | deploy-v8-site | v8_intraday_liveness_guard | v8_futures_realtime
+         2026-11-09 补登记（门禁前移 [4/8] 连红收口）：
+           · v8_futures_realtime —— 期指主力实时链（cn runner，交易日 09:00-16:30 每 30 分，
+             新浪 vip 实时期指 + 东财 push2 实时现货 → data/FUTURES_REALTIME.js，realtime:true；
+             「期指主力合约·情绪方向」卡实时化数据源，缺源自动回退 CFFEX 日频）。
+             11-09 建链漏双登记 ⇒ 门禁自 6e3c452b 起连红（前轮期指卡实时化漏验门禁），
+             本轮与看门狗盘前盲区修复同批收口（MUST 名单 + 本清单 + logic.html sec-lg + 逻辑页 067 防漏表）。
          2026-11-08 补登记（阿狸咪·小九 5ee4037 新增）：
            · v8_intraday_liveness_guard —— 盘中链路存活监控（近90分 intraday_slot+cn_fetch_cloud 无 success 开 issue，恢复自动关闭；防 10-25~11-03 静默断更 9 天重演）
          2026-11-04 补登记（CN runner2号机收尾缺口 · 当日发现并收口）：
