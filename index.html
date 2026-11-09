@@ -14592,12 +14592,20 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       });
 
     // 时间胶囊（与选股池口径统一：盘后 · 中长线）
+    // 🔴 2026-11-09 主人令「金股池 15 点多就出数据了？」误会根治：GOLD_POOL.update_time 是
+    //   生成时刻（含给上一数据日的回填重算），数据归属日 date 可能与它不同 —— 徽标旁
+    //   追加「数据日 MM-DD」，两者不一致时才显示，杜绝「提前选股」误读。
     const tEl = $('stGoldPoolTime');
     const ts = gp.update_time || gp.last_update || '';
     if(tEl){
       try{
         tEl.innerHTML = window._uBadge ? window._uBadge('盘后','中长线', ts)
           : ((window._fmtAshareRel && window._fmtAshareRel(ts)) || String(ts).slice(0,16).replace('T',' '));
+        const _gpDateRaw = gp.data_date || gp.trade_date || (typeof gp.date === 'string' ? gp.date : '');
+        const _tsDay = String(ts).slice(0,10);
+        if(_gpDateRaw && /^\d{4}-\d{2}-\d{2}/.test(String(_gpDateRaw)) && String(_gpDateRaw).slice(0,10) !== _tsDay){
+          tEl.innerHTML += ' <span style="font-size:11px;color:var(--sub)">数据日 '+String(_gpDateRaw).slice(5,10)+'</span>';
+        }
       }catch(e){ tEl.textContent = String(ts).slice(0,16).replace('T',' '); }
     }
 

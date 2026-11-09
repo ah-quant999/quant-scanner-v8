@@ -274,6 +274,64 @@ def cancel_stuck_selfhosted_runs():
     except Exception as e:
         print(f"[watchdog] selfhosted 破锁查询失败: {e}")
 
+def cancel_stuck_algo_runs():
+    """盘后算法链（v8_algo_cloud.yml）僵尸破锁 —— 🔴 2026-11-09 一劳永逸（主人令·终选/最终推荐全被堵）。
+
+    【病灶】11-09 实证：16:50 起的算法链 run 卡死在「运行盘后算法链」步骤 3.5h+，
+      concurrency 组 v8-algo-cloud 被独占 ⇒ 20:00/21:00 唤醒与 2 笔 dispatch 全部 pending，
+      终选输出 / 最终推荐 / 金钻跟随 全断供到深夜；而看门狗 cron 原只覆盖 CST 08:00-15:59，
+      算法链全在 16:30-23:00 跑 ⇒ 卡死整段无人值守（第二个结构性盲区）。
+    【修法】与云端/应急链破锁同构：只杀 in_progress 且【真正开始执行】超过 240 分钟的
+      算法链 run（全链实测最长 84min，240 = 3 倍冗余，绝不误杀合法长跑）；
+      pending/queued 一律不动（排队是正常语义）。cancel 后 concurrency 组自然放行，
+      下一个唤醒档（cron 20:00/21:00/22:30 接力）按批次闸门自动补跑，无需主动补派。
+    """
+    import os as _os
+    try:
+        req = urllib.request.Request(
+            "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_algo_cloud.yml/runs?per_page=10",
+            headers={"Authorization": "Bearer " + _os.environ.get("GH_TOKEN", ""),
+                     "User-Agent": "v8-watchdog"})
+        runs = json.loads(urllib.request.urlopen(req, timeout=20).read()).get("workflow_runs", [])
+    except Exception as e:
+        print(f"[watchdog] algo 破锁查询失败: {e}")
+        return
+    import time as _time
+    now_ts = _time.time()
+    for x in runs:
+        if x.get("status") != "in_progress":
+            continue
+        st = x.get("run_started_at")
+        if not st:
+            continue
+        try:
+            started = datetime.datetime.strptime(st.replace("Z", ""),
+                                                 "%Y-%m-%dT%H:%M:%S").replace(
+                tzinfo=datetime.timezone.utc)
+            exec_min = (now_ts - started.timestamp()) / 60.0
+        except Exception:
+            continue
+        if exec_min > 240:
+            print(f"[watchdog] 🧟 算法链 run#{x['id']} 执行 {exec_min:.0f} 分（>240 阈值）→ 僵尸破锁 cancel")
+            try:
+                creq = urllib.request.Request(
+                    "https://api.github.com/repos/ah-quant999/quant-scanner-v8" + f"/actions/runs/{x['id']}/cancel",
+                    method="POST",
+                    headers={"Authorization": "Bearer " + _os.environ.get("GH_TOKEN", ""),
+                             "User-Agent": "v8-watchdog"})
+                urllib.request.urlopen(creq, timeout=20)
+                audit("cancel", target="algo_stuck_lock", run=x['id'],
+                      exec_min=round(exec_min, 1), limit=240,
+                      ok=True, why="zombie_in_progress")
+            except Exception as e:
+                audit("cancel", target="algo_stuck_lock", run=x['id'],
+                      exec_min=round(exec_min, 1), limit=240,
+                      ok=False, why="zombie_in_progress", err=str(e)[:120])
+                print(f"[watchdog] 取消算法链 run#{x['id']} 失败: {e}")
+        else:
+            print(f"[watchdog] 🏃 算法链 run#{x['id']} 执行中（{exec_min:.0f} 分，"
+                  f"阈值 240 分）→ 正常，不动")
+
 def dispatch_cat(category, use_selfhosted=False):
     """按拥堵状态派发：云端正常 -> 派云端；拥堵/刚失败 -> 派 selfhosted 兜底。
 
@@ -322,6 +380,9 @@ cancel_stuck_cloud_runs()
 # 🔴 2026-11-09 接线：应急链僵尸同样破锁（self-hosted 单机独占，
 #   应急僵尸不破锁 = 云端补派也排队，美股专链/盘前档全被堵，见 11-09 事故）。
 cancel_stuck_selfhosted_runs()
+# 🔴 2026-11-09 接线：盘后算法链僵尸破锁（concurrency 组 v8-algo-cloud 被独占时
+#   20:00/21:00 唤醒与 dispatch 全 pending，终选/最终推荐全断供，见 11-09 卡死 3.5h 事故）。
+cancel_stuck_algo_runs()
 
 stale, newest = [], None
 for fn in files:
@@ -394,3 +455,37 @@ elif stale:
               ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
 else:
     print(f"[watchdog] ✅ {len(files)} 个文件全部新鲜（最新 {newest}，监控阈值 {thr}min），无需派发")
+
+# 🔴 2026-11-09 金钻跟踪兜底（主人令「金钻跟踪新卡也是空的」）：
+#   【病灶】v8_jinzuan_track.yml cron '0 10 * * *'（北京 18:00）上线首日（11-09）零触发
+#     —— GitHub schedule 高负载跳过是本仓已知常态（盘前 08:25 档曾被静默丢弃 4h46m），
+#     金钻数据断更无人管。
+#   【修法】CST ≥19:00（给官方 cron 1 小时延迟余量）且线上 JINZUAN_TRACK.update_time
+#     日期 ≠ 今日 ⇒ 视为今日档缺失，gh dispatch 补跑（该 workflow 自带 workflow_dispatch）。
+#     执行机为云端 ubuntu（gen_jinzuan_track.py 纯 pandas/numpy + 本地缓存，无需中国 IP）。
+if hhmm >= 1140:
+    try:
+        r2 = urllib.request.Request(BASE_URL + "JINZUAN_TRACK.js",
+                                    headers={"User-Agent": "Mozilla/5.0"})
+        _jt = urllib.request.urlopen(r2, timeout=20).read().decode("utf-8", "replace")
+        # 🔴 判据用 data_date（数据归属日）而非 update_time：今晨 07:23 用周五 kline
+        #   跑出的回放档 update_time 也=今日，会误判「已鲜」；data_date 只在
+        #   18:00 盘后档（当日 kline 就绪）才会翻到今天。
+        _m3 = re.search(r'"data_date"\s*:\s*"([^"]+)"', _jt)
+        _dd = _m3.group(1) if _m3 else ""
+        if _dd == cst.strftime("%Y-%m-%d"):
+            print(f"[watchdog] 💎 金钻跟踪今日档已鲜（data_date={_dd}），无需兜底")
+        else:
+            print(f"[watchdog] 💎 金钻跟踪今日档缺失（data_date={_dd or '无'}，今日 {cst:%Y-%m-%d}）→ dispatch 补跑")
+            try:
+                _r = subprocess.run(["gh", "workflow", "run", "v8_jinzuan_track.yml"],
+                                    capture_output=True, text=True, check=False)
+                print(_r.stdout.strip(), _r.stderr.strip())
+                audit("dispatch", path="jinzuan_track", ok=(_r.returncode == 0),
+                      trigger="cron_missed_fallback", stale_data_date=_dd)
+            except Exception as _e:
+                print(f"[watchdog] ⚠️ 金钻兜底派发异常（gh 缺失?）: {_e}")
+                audit("dispatch", path="jinzuan_track", ok=False,
+                      trigger="cron_missed_fallback", err=str(_e)[:120])
+    except Exception as _e:
+        print(f"[watchdog] 金钻新鲜度检查失败（跳过兜底）: {_e}")

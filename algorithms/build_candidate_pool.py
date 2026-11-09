@@ -1221,6 +1221,11 @@ def derive_and_save_gold_pool(members):
     pool = {
         "update_time": now,
         "last_update": now,
+        # 🔴 2026-11-09 主人令「金股池 15 点多就出数据了？」误会根治：update_time 是生成
+        #   时刻（含给上一数据日的回填重算，如 11-09 15:50 的 11-06 回填），前端徽标只看
+        #   update_time 会误读成「提前跑今日选股」。顶层补 data_date=数据归属日
+        #   （v8_date.data_session_date 交易日历中枢），前端不一致时显示「数据日 MM-DD」。
+        "data_date": today,
         "total_count": len(stocks),
         "candidate_total": len(members),
         "stocks": stocks,
