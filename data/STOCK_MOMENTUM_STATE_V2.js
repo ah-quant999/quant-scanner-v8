@@ -1,13 +1,13 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-11 05:19:05",
+  "generated": "2026-11-11 05:16:18",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
-  "total_unique_stocks": 185,
-  "total_appearances": 603,
-  "kline_available": 185,
+  "total_unique_stocks": 186,
+  "total_appearances": 598,
+  "kline_available": 186,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
@@ -3859,7 +3859,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-10": {
-   "count": 380,
+   "count": 377,
    "leaders": [
     {
      "code": "002343",
@@ -8348,7 +8348,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605003",
      "name": "众望布艺",
      "date": "2026-10-15",
-     "count": 6,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -9948,7 +9948,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605008",
      "name": "长鸿高科",
      "date": "2026-10-19",
-     "count": 5,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -10988,7 +10988,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002201",
      "name": "九鼎新材",
      "date": "2026-10-21",
-     "count": 5,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -13640,13 +13640,13 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "consec_before": 3,
      "stage": "震荡",
      "consecutive_up_days": 0,
-     "max_gain_pct": 25.06,
+     "max_gain_pct": 23.44,
      "max_drawdown_pct": 10.91,
      "t1_gain_pct": -4.18,
      "t3_gain_pct": -2.45,
      "t5_gain_pct": -2.06,
-     "t10_gain_pct": 25.06,
-     "last_gain_pct": 25.06,
+     "t10_gain_pct": 23.44,
+     "last_gain_pct": 23.44,
      "pattern": "普通",
      "note": "连涨前3天 回撤10.91%",
      "daily_returns": [
@@ -13692,8 +13692,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+9",
-       "date": "2026-11-10",
-       "gain": 25.06
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+10",
@@ -14666,7 +14666,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-11": {
-   "count": 33,
+   "count": 31,
    "leaders": [
     {
      "code": "300741",
@@ -14913,7 +14913,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000679",
      "name": "大连友谊",
      "date": "2026-11-02",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -15715,7 +15715,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000679",
      "name": "大连友谊",
      "date": "2026-11-02",
-     "count": 4,
+     "count": 3,
      "categories": [
       "强势股",
       "短线选股",
@@ -17071,11 +17071,91 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "entry_price": 11.64
     },
     {
+     "code": "600278",
+     "symbol": "sh600278",
+     "name": "东方创业",
+     "date": "2026-11-10",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 4.6,
+     "sel_change_pct": 4.6,
+     "data_available": true,
+     "consec_before": 2,
+     "stage": "启动",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前2天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 8.19
+    },
+    {
      "code": "603381",
      "symbol": "sh603381",
      "name": "永臻股份",
-     "date": "2026-11-10",
-     "count": 2,
+     "date": "2026-11-11",
+     "count": 1,
      "categories": [
       "加速",
       "短线选股",
@@ -17154,8 +17234,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "code": "600510",
      "symbol": "sh600510",
      "name": "黑牡丹",
-     "date": "2026-11-10",
-     "count": 2,
+     "date": "2026-11-11",
+     "count": 1,
      "categories": [
       "加速",
       "短线选股",
