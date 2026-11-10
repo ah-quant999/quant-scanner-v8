@@ -371,12 +371,14 @@ def rank_neutralize(vals, scale):
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-09-20 口径改造（改动15）：默认值同步为「可实盘 T+5 超额 excess5」口径。
 #   旧默认是 T+10 edge（β 假象），若沿用会在「回测文件读不到」时静默退回错口径。
-#   取值 = 2026-09-20 新口径重跑（46 日，2026-06-08~09-18）by_factor.excess5。
+# 🔴 2026-11-10 整改（主人令·一劳永逸）：回退默认值改为 canonical backtest_expectancy.json
+#   真实 excess5 真值（金钻/缠论实测负、趋势/机构实测正），与 final_recommend.py 严格同值
+#   （全站同口径铁律）。读不到回测文件时亦不再静默用「信念反转」错值。
 SIGNAL_EDGE_DEFAULT = {
-    "jinzuan": 0.532,
-    "chan":    0.759,
-    "trend":  -1.532,
-    "jigou":  -0.660,
+    "jinzuan": -1.108,
+    "chan":    -0.089,
+    "trend":    0.697,
+    "jigou":    0.807,
 }
 SIGNAL_EDGE_TO_SCORE = 2.5   # 每 1% edge ≈ 2.5 分
 SIGNAL_SCORE_CAP, SIGNAL_SCORE_FLOOR = 30, -30
@@ -604,18 +606,13 @@ try:
             SIGNAL_CONSISTENT[_name] = (_a > 0) == (_b > 0)
 except Exception as _e:
     print(f"  ⚠️ 回测边缘权重加载失败，用硬编码默认: {_e}")
-# 🔴 2026-11-07 根因修复（signal_edge 反号）：next_open 入场口径对买点型信号(jinzuan/chan)
-#   系统性偏差——买点次日高开低走，回测全负；趋势型(trend/jigou)追涨反而正。与铁律
-#   「只有金钻+缠论赚钱、trend/jigou 负期望应回避」完全反号。按铁律钉死符号：
-#   幅度保留回测相对大小，仅修正符号错误（回测真为正则不变，只翻转反号项）。
-EDGE_SIGN = {"jinzuan": 1, "chan": 1, "trend": -1, "jigou": -1}
-for _n, _s in EDGE_SIGN.items():
-    if _n in SIGNAL_EDGE:
-        _e = SIGNAL_EDGE[_n]
-        SIGNAL_EDGE[_n] = abs(_e) if _s > 0 else -abs(_e)
-SIGNAL_EDGE_SIGN_ANCHORED = True
-print(f"  🔒 信号edge符号按铁律锚定: " + "  ".join(
-    f"{_n}={SIGNAL_EDGE.get(_n,0):+.3f}({'+' if _s>0 else '-'}期望)" for _n, _s in EDGE_SIGN.items()))
+# 🔴 2026-11-10 整改（主人令·一劳永逸修复）：删除 2026-11-07 的「符号按铁律锚定」块。
+#   原块把 jinzuan/chan 强制正、trend/jigou 强制负，覆盖 backtest_expectancy.json 真实 edge
+#   （金钻/缠论实测负、趋势/机构实测正），使 composite 把亏钱信号排高、赚钱信号排低，
+#   与「选最高收益率」宗旨彻底背道而驰，且违反修复铁律（用信念临时打补丁而非修根因）。
+#   根因 = next_open 入场对买点型信号(jinzuan/chan)有「次日高开低走」偏差；正确修法是回测
+#   改用无偏入场（见 algorithms/backtest_expectancy.py 长回测口径），而非硬编符号。
+#   ⇒ 此处不再做任何符号翻转，SIGNAL_EDGE 完全由上方动态加载器按真实 excess5 驱动。
 SIGNAL_SCORE = {k: _signal_score_from_edge(v) for k, v in SIGNAL_EDGE.items()}
 # 🔴 2026-10-23 主人令（P0-b）：IS/OOS 异号信号弃用可见化（原 0.5 半权重 → 0 权重）
 _inact_sig = sorted(k for k, v in SIGNAL_CONSISTENT.items() if not v)
@@ -660,18 +657,11 @@ try:
     BT_BY_SIGNAL = _bt2.get("by_signal", {})
 except Exception:
     BT_BY_SIGNAL = {}
-# 🔴 2026-11-07 根因修复（signal_edge 反号）：by_signal 组合层同步钉死符号——
-#   含金钻(chan)/缠论(jinzuan)的组合锚定为正期望，纯趋势(trend)/机构(jigou)组合锚定为负期望；
-#   幅度保留回测相对大小（仅翻转符号）。使「收益率最高」在预期收益项里真正落到金钻+缠论共振票。
-for _k in list(BT_BY_SIGNAL.keys()):
-    _rec = BT_BY_SIGNAL[_k]
-    if not isinstance(_rec, dict):
-        continue
-    _cj = _k.split(",")
-    _pos = (len(_cj) >= 2 and (int(_cj[0]) == 1 or int(_cj[1]) == 1))   # chan 或 jinzuan 命中
-    for _f in ("ret5", "ret10", "edge5", "edge10"):
-        if _f in _rec and isinstance(_rec[_f], (int, float)):
-            _rec[_f] = abs(_rec[_f]) if _pos else -abs(_rec[_f])
+# 🔴 2026-11-10 整改（主人令·一劳永逸修复）：删除 2026-11-07 的「by_signal 组合层符号钉死」块。
+#   原块把含金钻/缠论的组合收益/edge 强制 abs 变正、纯趋势/机构组合强制变负，直接污染
+#   「用 walk-forward T+5 收益修正排名」（L655）。这与真实数据(金钻/缠论组合负、趋势/机构
+#   组合正)完全反着，使 composite 把亏钱组合排高，与「选最高收益率」宗旨背道而驰。
+#   ⇒ 不再做任何符号翻转，BT_BY_SIGNAL 直接保留 backtest_expectancy.json 真实值驱动排名修正。
 
 # 🔴 2026-11-02 主人令：排序主目标从「胜率」改为「预期前瞻收益率」
 #   原 winrate_term(±55) 是错误目标——高胜率≠高收益。实证（raw_data/backtest_expectancy.json）：
