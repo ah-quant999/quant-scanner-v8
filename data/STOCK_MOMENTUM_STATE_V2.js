@@ -1,19 +1,19 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-10 23:44:31",
+  "generated": "2026-11-11 00:47:06",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
   "total_unique_stocks": 185,
-  "total_appearances": 567,
+  "total_appearances": 603,
   "kline_available": 185,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
  "periods": {
   "2026-09": {
-   "count": 185,
+   "count": 190,
    "leaders": [
     {
      "code": "301190",
@@ -340,7 +340,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000020",
      "name": "深华发Ａ",
      "date": "2026-09-28",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -740,7 +740,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603757",
      "name": "大元泵业",
      "date": "2026-09-29",
-     "count": 7,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -1142,7 +1142,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000020",
      "name": "深华发Ａ",
      "date": "2026-09-28",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -1862,7 +1862,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603757",
      "name": "大元泵业",
      "date": "2026-09-29",
-     "count": 7,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -2022,7 +2022,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh601999",
      "name": "出版传媒",
      "date": "2026-09-29",
-     "count": 8,
+     "count": 9,
      "categories": [
       "加速",
       "短线选股",
@@ -2182,7 +2182,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605258",
      "name": "协和电子",
      "date": "2026-09-29",
-     "count": 6,
+     "count": 7,
      "categories": [
       "加速",
       "短线选股",
@@ -2902,7 +2902,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605577",
      "name": "龙版传媒",
      "date": "2026-09-30",
-     "count": 16,
+     "count": 17,
      "categories": [
       "加速",
       "短线选股",
@@ -3859,7 +3859,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-10": {
-   "count": 354,
+   "count": 380,
    "leaders": [
     {
      "code": "002343",
@@ -4748,7 +4748,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002988",
      "name": "豪美新材",
      "date": "2026-10-08",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -4828,7 +4828,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002702",
      "name": "海欣食品",
      "date": "2026-10-08",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -5548,7 +5548,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300290",
      "name": "ST荣科",
      "date": "2026-10-09",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -5708,7 +5708,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600857",
      "name": "宁波中百",
      "date": "2026-10-09",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -6348,7 +6348,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603721",
      "name": "中广天择",
      "date": "2026-10-09",
-     "count": 10,
+     "count": 11,
      "categories": [
       "强势股",
       "短线选股",
@@ -6748,7 +6748,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300830",
      "name": "金现代",
      "date": "2026-10-09",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -7468,7 +7468,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300464",
      "name": "星徽股份",
      "date": "2026-10-14",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -7548,7 +7548,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300691",
      "name": "联合光电",
      "date": "2026-10-14",
-     "count": 6,
+     "count": 7,
      "categories": [
       "加速",
       "短线选股",
@@ -7868,7 +7868,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300992",
      "name": "泰福泵业",
      "date": "2026-10-14",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -8348,7 +8348,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605003",
      "name": "众望布艺",
      "date": "2026-10-15",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -8508,7 +8508,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301046",
      "name": "能辉科技",
      "date": "2026-10-16",
-     "count": 7,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -8668,7 +8668,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002357",
      "name": "富临运业",
      "date": "2026-10-16",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -8748,7 +8748,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002870",
      "name": "香山股份",
      "date": "2026-10-16",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -9068,7 +9068,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300553",
      "name": "集智股份",
      "date": "2026-10-16",
-     "count": 6,
+     "count": 7,
      "categories": [
       "加速",
       "短线选股",
@@ -9148,7 +9148,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301133",
      "name": "金钟股份",
      "date": "2026-10-16",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -9228,7 +9228,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603595",
      "name": "ST东尼",
      "date": "2026-10-16",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -9308,7 +9308,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603051",
      "name": "鹿山新材",
      "date": "2026-10-16",
-     "count": 8,
+     "count": 9,
      "categories": [
       "强势股",
       "短线选股",
@@ -9708,7 +9708,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301227",
      "name": "森鹰窗业",
      "date": "2026-10-19",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -9788,7 +9788,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz001326",
      "name": "联域股份",
      "date": "2026-10-19",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -9948,7 +9948,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh605008",
      "name": "长鸿高科",
      "date": "2026-10-19",
-     "count": 4,
+     "count": 5,
      "categories": [
       "强势股",
       "短线选股",
@@ -10348,7 +10348,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301086",
      "name": "鸿富瀚",
      "date": "2026-10-20",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -10588,7 +10588,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688620",
      "name": "安凯微",
      "date": "2026-10-20",
-     "count": 6,
+     "count": 7,
      "categories": [
       "强势股",
       "短线选股",
@@ -10988,7 +10988,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002201",
      "name": "九鼎新材",
      "date": "2026-10-21",
-     "count": 4,
+     "count": 5,
      "categories": [
       "加速",
       "短线选股",
@@ -11948,7 +11948,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603303",
      "name": "得邦照明",
      "date": "2026-10-23",
-     "count": 3,
+     "count": 4,
      "categories": [
       "加速",
       "短线选股",
@@ -12668,7 +12668,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301016",
      "name": "雷尔伟",
      "date": "2026-10-23",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -13868,7 +13868,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz301252",
      "name": "同星科技",
      "date": "2026-10-28",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -14666,14 +14666,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-11": {
-   "count": 28,
+   "count": 33,
    "leaders": [
     {
      "code": "300741",
      "symbol": "sz300741",
      "name": "华宝股份",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -14833,7 +14833,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300808",
      "name": "久量股份",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -14913,7 +14913,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000679",
      "name": "大连友谊",
      "date": "2026-11-02",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -15475,7 +15475,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300741",
      "name": "华宝股份",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -15635,7 +15635,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300808",
      "name": "久量股份",
      "date": "2026-11-02",
-     "count": 2,
+     "count": 3,
      "categories": [
       "加速",
       "短线选股",
@@ -15715,7 +15715,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000679",
      "name": "大连友谊",
      "date": "2026-11-02",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -17075,7 +17075,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh603381",
      "name": "永臻股份",
      "date": "2026-11-10",
-     "count": 1,
+     "count": 2,
      "categories": [
       "加速",
       "短线选股",
@@ -17155,7 +17155,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600510",
      "name": "黑牡丹",
      "date": "2026-11-10",
-     "count": 1,
+     "count": 2,
      "categories": [
       "加速",
       "短线选股",
