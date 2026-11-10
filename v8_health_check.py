@@ -2398,7 +2398,7 @@ _LOW_FREQ_FILES = {
     # 2026-10-29 一劳永逸：HUIJIN_HOLDINGS（汇金持仓季报，v8_national_team.yml D胶囊 best-effort 兜底）
     #   + RESONANCE_TRACK（龙虎榜共振回测研究集，track_resonance.py 手动/周期重算，index.html 有真实卡片渲染）
     #   二者均为**低频/研究型产物**，被 all_ 通用 24h 红线误杀。进白名单跳过 24h，并由 _LOW_FREQ_MAX_AGE 按节拍给红线。
-    "HUIJIN_HOLDINGS", "RESONANCE_TRACK",
+    "HUIJIN_HOLDINGS", "RESONANCE_TRACK", "HUIJIN_ETF_DRILL",
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
@@ -2537,6 +2537,7 @@ _LOW_FREQ_MAX_AGE = {
     "MARKET_THERMO": 3 * 24 * 60, # 大盘观测·未来预测（v8_market_thermo.yml 交易日16:10盘后批；3天红线容忍偶发漏跑）
     "US_HK_MAP": 3 * 24 * 60,     # 美股港股地图（v8_us_hk_map.yml 双种子盘前批；3天红线容忍偶发漏跑）
     "HUIJIN_HOLDINGS": 90 * 24 * 60,   # 汇金持仓季报披露（季度级更新，底层数据为季报；90天红线容忍季报空窗，超季未更仍报真故障）
+    "HUIJIN_ETF_DRILL": 90 * 24 * 60,  # 汇金ETF下钻（公开披露季报级，静态研究型，与HUIJIN_HOLDINGS同族；此前被通用1620min红线误杀为fail，现进低频白名单+90天红线，超季未更仍报真故障）
     "RESONANCE_TRACK": 30 * 24 * 60,   # 龙虎榜共振回测研究集（手动/周期重算，无自动调度；30天红线，超月未重算即告警）
 }
 
