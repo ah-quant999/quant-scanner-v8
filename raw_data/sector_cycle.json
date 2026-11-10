@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-10 06:51:46",
+  "update_time": "2026-11-10 09:27:29",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,20 +37,20 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1740,
+      "total": 1696,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "09/22",
-      "end": "11/10",
+      "end": "11/09",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 394,
+      "total": 388,
       "ongoing": true
     },
     {
@@ -69,14 +69,14 @@
     {
       "sector": "新能源车",
       "start": "09/22",
-      "end": "11/10",
+      "end": "11/09",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 26,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 25,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 289,
+      "total": 273,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 29,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 524,
+      "total": 512,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 29,
       "peak": 23,
       "peak_date": "09/22",
-      "total": 255,
+      "total": 244,
       "ongoing": true
     },
     {
@@ -128,7 +128,7 @@
       "hot_days": 29,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 201,
+      "total": 198,
       "ongoing": true
     },
     {
@@ -212,14 +212,14 @@
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "11/10",
+      "end": "11/09",
       "start_idx": 19,
-      "end_idx": 29,
-      "days": 11,
-      "hot_days": 10,
+      "end_idx": 28,
+      "days": 10,
+      "hot_days": 9,
       "peak": 6,
       "peak_date": "11/04",
-      "total": 44,
+      "total": 39,
       "ongoing": true
     },
     {
@@ -232,33 +232,33 @@
       "hot_days": 5,
       "peak": 12,
       "peak_date": "11/05",
-      "total": 31,
+      "total": 30,
       "ongoing": true
     },
     {
       "sector": "地产链",
       "start": "11/04",
-      "end": "11/10",
+      "end": "11/09",
       "start_idx": 25,
-      "end_idx": 29,
-      "days": 5,
-      "hot_days": 5,
+      "end_idx": 28,
+      "days": 4,
+      "hot_days": 4,
       "peak": 5,
       "peak_date": "11/05",
-      "total": 23,
+      "total": 18,
       "ongoing": true
     },
     {
       "sector": "半导体",
       "start": "11/05",
-      "end": "11/10",
+      "end": "11/09",
       "start_idx": 26,
-      "end_idx": 29,
-      "days": 4,
-      "hot_days": 4,
+      "end_idx": 28,
+      "days": 3,
+      "hot_days": 3,
       "peak": 10,
       "peak_date": "11/05",
-      "total": 25,
+      "total": 19,
       "ongoing": true
     },
     {
