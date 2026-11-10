@@ -1,6 +1,6 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-11 01:28:52",
+  "generated": "2026-11-11 01:57:06",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
@@ -4438,13 +4438,13 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "consec_before": 1,
      "stage": "震荡",
      "consecutive_up_days": 1,
-     "max_gain_pct": 11.66,
+     "max_gain_pct": 10.03,
      "max_drawdown_pct": 2.38,
      "t1_gain_pct": 10.03,
      "t3_gain_pct": -2.38,
      "t5_gain_pct": 3.51,
-     "t10_gain_pct": 11.66,
-     "last_gain_pct": 11.66,
+     "t10_gain_pct": 6.02,
+     "last_gain_pct": 6.02,
      "pattern": "普通",
      "note": "连涨前1天 回撤2.38%",
      "daily_returns": [
@@ -4485,8 +4485,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+8",
-       "date": "2026-11-10",
-       "gain": 11.66
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+9",
@@ -14360,13 +14360,13 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "consec_before": 1,
      "stage": "震荡",
      "consecutive_up_days": 1,
-     "max_gain_pct": 11.66,
+     "max_gain_pct": 10.03,
      "max_drawdown_pct": 2.38,
      "t1_gain_pct": 10.03,
      "t3_gain_pct": -2.38,
      "t5_gain_pct": 3.51,
-     "t10_gain_pct": 11.66,
-     "last_gain_pct": 11.66,
+     "t10_gain_pct": 6.02,
+     "last_gain_pct": 6.02,
      "pattern": "普通",
      "note": "连涨前1天 回撤2.38%",
      "daily_returns": [
@@ -14407,8 +14407,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+8",
-       "date": "2026-11-10",
-       "gain": 11.66
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+9",
