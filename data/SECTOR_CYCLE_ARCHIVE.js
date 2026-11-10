@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-10 13:11:18
+// 最后更新：2026-11-10 14:04:04
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-10 13:11:18",
+  "update_time": "2026-11-10 14:04:04",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1726,
+      "total": 1732,
       "ongoing": true
     },
     {
@@ -91,7 +91,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 26,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 292,
+      "total": 293,
       "ongoing": true
     },
     {
@@ -104,7 +104,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 529,
+      "total": 531,
       "ongoing": true
     },
     {
@@ -117,7 +117,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 23,
       "peak_date": "09/22",
-      "total": 253,
+      "total": 258,
       "ongoing": true
     },
     {
@@ -273,21 +273,21 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 4,
       "peak": 10,
       "peak_date": "11/05",
-      "total": 25,
+      "total": 27,
       "ongoing": true
     },
     {
       "sector": "固态电池",
       "start": "11/05",
-      "end": "11/05",
+      "end": "11/10",
       "start_idx": 26,
-      "end_idx": 26,
-      "days": 1,
-      "hot_days": 1,
+      "end_idx": 29,
+      "days": 4,
+      "hot_days": 2,
       "peak": 6,
       "peak_date": "11/05",
-      "total": 6,
-      "ongoing": false
+      "total": 12,
+      "ongoing": true
     }
   ]
 };
