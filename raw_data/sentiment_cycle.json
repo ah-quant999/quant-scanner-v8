@@ -1,41 +1,42 @@
 {
-  "update_time": "2026-11-10 16:54:07",
+  "update_time": "2026-11-10 19:14:27",
   "data_date": "2026-11-10",
   "source": "LIMIT_UP_HEATMAP",
-  "phase": "高潮",
-  "color": "#f59e0b",
-  "score": 79.0,
-  "delta_pct": 0.0,
-  "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
+  "phase": "狂热",
+  "color": "#ef4444",
+  "score": 85.0,
+  "delta_pct": 72.22,
+  "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
   "metrics": {
-    "total_up": 54,
-    "max_ladder": 6,
-    "high_ladder_count": 1,
+    "total_up": 93,
+    "max_ladder": 7,
+    "high_ladder_count": 5,
     "sectors_count": 13
   },
   "ladder_dist": {
-    "1": 45,
-    "2": 8,
-    "6": 1
+    "1": 73,
+    "2": 15,
+    "3": 4,
+    "7": 1
   },
   "leaders": [
     {
       "code": "002578",
       "name": "闽发铝业",
-      "lbc": 6,
+      "lbc": 7,
       "chg": 9.98
     },
     {
       "code": "002310",
       "name": "东方新能",
-      "lbc": 2,
-      "chg": 9.91
+      "lbc": 3,
+      "chg": 10.2
     },
     {
-      "code": "603366",
-      "name": "日出东方",
-      "lbc": 2,
-      "chg": 10.01
+      "code": "601188",
+      "name": "龙江交通",
+      "lbc": 3,
+      "chg": 10.02
     }
   ],
   "prev_total": 54,

@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-11-10 05:44:10",
-  "run_start": "2026-11-10 02:39:54",
+  "update_time": "2026-11-10 19:34:58",
+  "run_start": "2026-11-10 16:55:11",
   "ok": 41,
-  "fail": 3,
+  "fail": 4,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout failed!"
     },
     {
       "script": "scripts/fetch_multiyear_kline.py",
