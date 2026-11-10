@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-10 19:44",
- "generated": "2026-11-10 19:44",
+ "update_time": "2026-11-10 19:48",
+ "generated": "2026-11-10 19:48",
  "meta": {
-  "generated": "2026-11-10 19:44",
+  "generated": "2026-11-10 19:48",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11544,6 +11544,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "603381",
+      "name": "永臻股份",
+      "change_pct": 10.0,
+      "price": 21.89,
+      "category": "突破"
+     },
+     {
       "code": "300741",
       "name": "华宝股份",
       "change_pct": 3.17,
@@ -11656,6 +11663,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "600510",
+      "name": "黑牡丹",
+      "change_pct": 9.973,
+      "price": 8.16,
+      "category": "突破"
+     },
+     {
       "code": "603303",
       "name": "得邦照明",
       "change_pct": 6.818,
@@ -11730,13 +11744,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "雷尔伟",
       "change_pct": 3.433,
       "price": 12.05,
-      "category": "突破"
-     },
-     {
-      "code": "600278",
-      "name": "东方创业",
-      "change_pct": 4.598,
-      "price": 8.19,
       "category": "突破"
      },
      {
@@ -11791,6 +11798,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "603381",
+      "name": "永臻股份",
+      "change_pct": 10.0,
+      "price": 21.89,
+      "category": "加速"
+     },
+     {
       "code": "300741",
       "name": "华宝股份",
       "change_pct": 3.17,
@@ -11900,6 +11914,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "联域股份",
       "change_pct": 6.278,
       "price": 80.92,
+      "category": "加速"
+     },
+     {
+      "code": "600510",
+      "name": "黑牡丹",
+      "change_pct": 9.973,
+      "price": 8.16,
       "category": "加速"
      },
      {
@@ -11947,6 +11968,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "603381",
+      "name": "永臻股份",
+      "change_pct": 10.0,
+      "price": 21.89,
+      "category": "短线选股"
+     },
+     {
       "code": "300741",
       "name": "华宝股份",
       "change_pct": 3.17,
@@ -12056,6 +12084,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "联域股份",
       "change_pct": 6.278,
       "price": 80.92,
+      "category": "短线选股"
+     },
+     {
+      "code": "600510",
+      "name": "黑牡丹",
+      "change_pct": 9.973,
+      "price": 8.16,
       "category": "短线选股"
      },
      {
@@ -12133,13 +12168,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "雷尔伟",
       "change_pct": 3.433,
       "price": 12.05,
-      "category": "短线选股"
-     },
-     {
-      "code": "600278",
-      "name": "东方创业",
-      "change_pct": 4.598,
-      "price": 8.19,
       "category": "短线选股"
      },
      {
@@ -12226,13 +12254,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "雷尔伟",
       "change_pct": 3.433,
       "price": 12.05,
-      "category": "强势股"
-     },
-     {
-      "code": "600278",
-      "name": "东方创业",
-      "change_pct": 4.598,
-      "price": 8.19,
       "category": "强势股"
      },
      {
