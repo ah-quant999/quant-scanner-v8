@@ -225,6 +225,7 @@ def freshness_guard(last_date, stale_days=15):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true", help="即使无新交易日也重算并推送")
+    ap.add_argument("--no-render", action="store_true", help="跳过 gen_wave_report 渲染（云端仅推数据，报告本地出）")
     args = ap.parse_args()
 
     # 1) 拉上证
@@ -280,7 +281,8 @@ def main():
     old_last_date = old.get("series", {}).get("dates", [""])[-1]
     if (not args.force) and new_last_date == old_last_date and sync_ok:
         print("· 无新交易日（最新 %s == 已记录 %s，且远端已确认一致），跳过推送，仅校验+渲染" % (new_last_date, old_last_date))
-        render()
+        if not args.no_render:
+            render()
         sys.exit(0)
 
     # 5) 组装新对象（客观刷新 + marks 保留）
@@ -324,8 +326,9 @@ def main():
     # 8) 推送（防覆盖，单文件）
     raw_push("data/WAVE_ELLIOTT.js", DATA, "data(wave): 日频刷新波浪客观序列(截至%s)" % new_last_date)
 
-    # 9) 渲染报告
-    render()
+    # 9) 渲染报告（--no-render 时跳过，云端仅推数据）
+    if not args.no_render:
+        render()
 
 
 if __name__ == "__main__":

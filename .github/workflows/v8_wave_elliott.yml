@@ -1,0 +1,56 @@
+name: "🌊 v8 艾略特波浪 日频refresh(云端)"
+
+# 🔴 2026-11-10 一劳永逸根因修复（主人令「运维/看板失败·一劳永逸修复」）：
+#   原 WAVE_ELLIOTT 由「小九机 WorkBuddy automation 日频 16:00」独家经 HTTPS 直推 origin/main。
+#   小九机处于代理后，HTTPS POST 推送被静默丢弃（502）→ 波浪卡数据冻结（历史：10-09/10-15/11-04/11-09
+#   多次复现），看板「艾略特波浪·深度分析」恒亮红叉。
+#   本工作流改为**云端 ubuntu-latest 常驻运行器**独家生产并推送，彻底脱离家用机 HTTPS 依赖：
+#     - 标准库 urllib 三级降级取数（腾讯 ifzq → 新浪 → 东财），无需任何连接器；
+#     - 推送用 GITHUB_TOKEN（x-access-token），云端网络稳定，不再有代理 502；
+#     - 推完显式 `gh workflow run deploy-v8-site.yml` 唤起 Pages 部署（GITHUB_TOKEN 的 push 不触发下游 workflow_run，必须手动唤起）；
+#     - 幂等：无新交易日时 raw_push 的范围守卫判定无变化 → 跳过推送，安全。
+#   调度：交易日 19:15（北京）盘后数据齐 + workflow_dispatch 手动兜底。
+
+on:
+  schedule:
+    - cron: '15 11 * * 1-5'    # 11:15 UTC = 北京 19:15（交易日）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  wave:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "⬇️ Checkout（浅，fetch-depth 1）"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🔑 配置推送令牌（GITHUB_TOKEN → origin HTTPS）"
+        run: |
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ah-quant999/quant-scanner-v8.git"
+
+      - name: "🐍 Set up Python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: "🌊 刷新并推送 WAVE_ELLIOTT（含幂等重试）"
+        run: |
+          for i in 1 2 3; do
+            echo "· 第 $i 次尝试"
+            if python v8/fetch_wave_elliott.py --no-render; then
+              echo "✓ 波浪数据已刷新/校验通过"
+              break
+            fi
+            echo "· 推送冲突或暂态失败，10s 后重试"
+            sleep 10
+          done
+
+      - name: "🚀 触发 Pages 部署（GITHUB_TOKEN push 不触发 workflow_run，须手动唤起）"
+        run: gh workflow run deploy-v8-site.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
