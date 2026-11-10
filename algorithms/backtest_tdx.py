@@ -101,8 +101,74 @@ OPTIMIZED = {
 }
 
 
+def _read_index_cache(code):
+    """离线兜底：读已推送的指数日K缓存 raw_data/index_ohlc_cache/{code}.json。
+
+    🔴 2026-11-10 一劳永逸修复（P0 · 优化层恒空根因闭环）：
+      云端 V8_NO_NET=1 且所有网络源均不可达时的最后一道防线——只要本地/云端
+      曾成功写回该缓存（≥22 根），regime 仍能算出来，绝不返回空。
+    """
+    try:
+        p = os.path.join(DATA_DIR, "index_ohlc_cache", "%s.json" % code)
+        if os.path.exists(p):
+            d = json.load(open(p, encoding="utf-8"))
+            rows = [(r[0], float(r[1])) for r in d if len(r) >= 2 and r[0]]
+            if len(rows) >= 22:
+                rows.sort(key=lambda x: x[0])
+                return rows
+    except Exception:
+        pass
+    return None
+
+
+def _fetch_index_ohlc_tencent(prefix, code):
+    """腾讯 ifzq 降级源（无需 baostock 登录，云端 runner 有网即可用）。"""
+    tcode = "%s%s" % (prefix, code)
+    try:
+        import urllib.request
+        url = "https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=%s,day,,,600,qfq" % tcode
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0",
+            "Referer": "https://stockapp.finance.qq.com/"})
+        with urllib.request.urlopen(req, timeout=25) as r:
+            j = json.loads(r.read().decode("utf-8"))
+        d = (j.get("data") or {}).get(tcode) or {}
+        k = d.get("qfqday") or d.get("day") or []
+        rows = [(row[0], float(row[2])) for row in k if len(row) > 2 and row[0]]
+        if rows:
+            rows.sort(key=lambda x: x[0])
+            return rows
+    except Exception as e:
+        log(f"  [_fetch_index_ohlc_tencent] {code}: {e}")
+    return []
+
+
+def _fetch_index_ohlc_sina(prefix, code):
+    """新浪降级源（腾讯失败兜底）。"""
+    tcode = "%s%s" % (prefix, code)
+    try:
+        import urllib.request
+        url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+               "CN_MarketData.getKLineData?symbol=%s&scale=240&ma=no&datalen=600" % tcode)
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=25) as r:
+            arr = json.loads(r.read().decode("utf-8"))
+        rows = []
+        for it in arr:
+            try:
+                rows.append((it["day"], float(it["close"])))
+            except Exception:
+                pass
+        if rows:
+            rows.sort(key=lambda x: x[0])
+            return rows
+    except Exception as e:
+        log(f"  [_fetch_index_ohlc_sina] {code}: {e}")
+    return []
+
+
 def _fetch_index_ohlc(code, prefix, days=None):
-    """从 baostock 拉取指数日K，返回 [(date, close)]。
+    """从指数日K拉取 [(date, close)]，供 _compute_regime_series 计算市场 regime。
 
     🔴 2026-09-14 小九审计修复（P0 · regime 序列窗口短于信号窗口）：
       原默认 `days=150`（自然日）⇒ 扣掉 regime 自身预热只剩约 76 个交易日，
@@ -110,91 +176,70 @@ def _fetch_index_ohlc(code, prefix, days=None):
       **一个样本都匹配不到**（优化策略汇总整块消失，下游导出脚本 exit 1）。
       现默认覆盖「K线窗口 + 最长持有期 + 预热余量」，随 TDX_BARS 自动伸缩，
       以后扩档不会再次失配。
+
+    🔴 2026-11-10 一劳永逸修复（P0 · 云端 regime 恒空→optimized 层 0 信号真因）：
+      原实现**只用 baostock**，且本函数**无** V8_NO_NET 缓存分支（那只在 tdx_kline
+      里有）。云端 V8_NO_NET=1 下 baostock 取数必失败且本函数无降级 ⇒ 返回 [] ⇒
+      _compute_regime_series([]) n<22 ⇒ 空 ⇒ market_regime={} ⇒
+      optimized_summary_note='empty:no_market_regime' ⇒ 优化层整块消失、择时真源停更。
+      现改为多级降级，确保 regime 在任何有网/有缓存环境都能算出来：
+        ① 本地：baostock（主）→ 缓存 → 腾讯 ifzq → 新浪
+        ② 云端 V8_NO_NET：缓存 → 腾讯 ifzq → 新浪（跳过 baostock，2 次轻量请求即可）
     """
     if days is None:
         days = int((TDX_BARS + max(HOLD_DAYS)) * 365 / 244) + 90
+
+    # ① 云端：跳过 baostock，直接走缓存/网络降级源（runner 有网即可）
+    if os.environ.get("V8_NO_NET"):
+        cached = _read_index_cache(code)
+        if cached:
+            return cached
+        rows = _fetch_index_ohlc_tencent(prefix, code)
+        if rows:
+            return rows
+        return _fetch_index_ohlc_sina(prefix, code)
+
+    # ② 本地：baostock 为主，失败/熔断降级到缓存→腾讯→新浪
     from fetch_source import socket_timeout, SOURCE_BREAKER
     if SOURCE_BREAKER.is_open("baostock"):
-        log(f"  [_fetch_index_ohlc] {code}: baostock 熔断冷却中，跳过")
-        return []
-    import baostock as bs
-    end = datetime.now().strftime("%Y-%m-%d")
-    start = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
-    try:
-        with socket_timeout(25):
-            bs.login()
-            rs = bs.query_history_k_data_plus(
-                f"{prefix}.{code}", "date,close", start_date=start, end_date=end,
-                frequency="d", adjustflag="3"
-            )
-            bs.logout()
-        rows = []
-        if rs is not None:
-            while (rs.error_code == "0") & rs.next():
-                r = rs.get_row_data()
-                try:
-                    rows.append((r[0], float(r[1])))
-                except Exception:
-                    pass
-        SOURCE_BREAKER.mark_success("baostock")
-        rows.sort(key=lambda x: x[0])
+        log(f"  [_fetch_index_ohlc] {code}: baostock 熔断冷却中，走降级源")
+    else:
+        import baostock as bs
+        end = datetime.now().strftime("%Y-%m-%d")
+        start = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        try:
+            with socket_timeout(25):
+                bs.login()
+                rs = bs.query_history_k_data_plus(
+                    f"{prefix}.{code}", "date,close", start_date=start, end_date=end,
+                    frequency="d", adjustflag="3"
+                )
+                bs.logout()
+            rows = []
+            if rs is not None:
+                while (rs.error_code == "0") & rs.next():
+                    r = rs.get_row_data()
+                    try:
+                        rows.append((r[0], float(r[1])))
+                    except Exception:
+                        pass
+            SOURCE_BREAKER.mark_success("baostock")
+            rows.sort(key=lambda x: x[0])
+            if len(rows) >= 22:
+                return rows
+            log(f"  [_fetch_index_ohlc] {code}: baostock 样本不足({len(rows)})，降级源补")
+        except Exception as e:
+            SOURCE_BREAKER.mark_failure("baostock")
+            log(f"  [_fetch_index_ohlc] {code}: baostock 失败({e})，降级源补")
+
+    # ③ 降级源（本地缓存 → 腾讯 ifzq → 新浪）
+    cached = _read_index_cache(code)
+    if cached:
+        return cached
+    rows = _fetch_index_ohlc_tencent(prefix, code)
+    if rows:
         return rows
-    except Exception as e:
-        SOURCE_BREAKER.mark_failure("baostock")
-        log(f"  [_fetch_index_ohlc] {code}: baostock 失败({e})，降级到备用源")
-        return _fetch_index_ohlc_fallback(prefix, code)
-
-
-def _fetch_index_ohlc_fallback(prefix, code):
-    """baostock 不可用时的降级源：腾讯 ifzq → 新浪。
-
-    🔴 2026-11-10 一劳永逸修复：原 `_fetch_index_ohlc` 在 baostock 异常时直接 `return []`
-       → `market_regime={}` → OPTIMIZED 汇总 `note="empty:no_market_regime"`、total_signals=0，
-       提高收益率选股层整层失效（2026-11-09 / 2026-11-10 连续两晚 0 信号）。
-       现 baostock 熔断/异常时降级到腾讯 ifzq（与 fetch_wave_elliott 同源，已验证稳定），
-       再不行降级新浪，确保 regime 序列永远能拿到，OPTIMIZED 不再因数据源抖动而 0 信号。
-    """
-    tcode = "%s%s" % (prefix, code)
-    # ① 腾讯 ifzq
-    try:
-        import urllib.request
-        url = "https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=%s,day,,,600,qfq" % tcode
-        req = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0", "Referer": "https://stockapp.finance.qq.com/"})
-        with urllib.request.urlopen(req, timeout=25) as r:
-            j = json.loads(r.read().decode("utf-8"))
-        d = (j.get("data") or {}).get(tcode) or {}
-        k = d.get("qfqday") or d.get("day") or []
-        rows = [(row[0], float(row[2])) for row in k if len(row) > 2]
-        if rows:
-            rows.sort(key=lambda x: x[0])
-            log(f"  [_fetch_index_ohlc_fallback] {tcode}: 腾讯 ifzq 取到 {len(rows)} 根K")
-            return rows
-    except Exception as e2:
-        log(f"  [_fetch_index_ohlc_fallback] {tcode}: 腾讯 ifzq 失败({e2})")
-    # ② 新浪
-    try:
-        import urllib.request
-        url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
-               "CN_MarketData.getKLineData?symbol=%s&scale=240&ma=no&datalen=600" % tcode)
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=25) as r:
-            j = json.loads(r.read().decode("utf-8"))
-        k = j if isinstance(j, list) else []
-        rows = []
-        for row in k:
-            try:
-                rows.append((row["d"], float(row["c"])))
-            except Exception:
-                pass
-        if rows:
-            rows.sort(key=lambda x: x[0])
-            log(f"  [_fetch_index_ohlc_fallback] {tcode}: 新浪取到 {len(rows)} 根K")
-            return rows
-    except Exception as e2:
-        log(f"  [_fetch_index_ohlc_fallback] {tcode}: 新浪失败({e2})")
-    log(f"  [_fetch_index_ohlc_fallback] {tcode}: 全部降级源失败")
-    return []
+    return _fetch_index_ohlc_sina(prefix, code)
 
 
 def _compute_regime_series(rows):
