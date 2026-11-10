@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-11-10 22:26",
+  "update_time": "2026-11-11 01:36",
   "data_type": "real",
   "summary": {
     "in_count": 31,
     "out_count": 49,
     "in_text": "融资融券(144.3亿)、深股通(131.3亿)、机器人概念(94.6亿)、基金减仓(92.7亿)、电子(92.0亿)",
     "out_text": "东方财富热股(20.5亿)、标准普尔(11.5亿)、百日新高(5.0亿)、趋势股(4.8亿)、消费风格(4.3亿)",
-    "alert": "🔥 31个板块大幅流入；⚠️ 49个板块大幅流出；🚀 融资融券+144.3亿、深股通+131.3亿、机器人概念+94.6亿"
+    "alert": "🔥 31个板块大幅流入；⚠️ 49个板块大幅流出；🚀 融资融券+144.3亿、深股通+131.3亿、机器人概念+94.6亿(连2天)"
   },
   "sectors_in": [
     {
@@ -57,7 +57,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -74,7 +74,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -91,7 +91,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -125,7 +125,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -159,7 +159,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -176,7 +176,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -193,7 +193,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -278,7 +278,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -363,7 +363,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -380,7 +380,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -414,7 +414,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -431,7 +431,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -482,7 +482,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -516,7 +516,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in"
     },
     {
@@ -603,7 +603,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -671,7 +671,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -688,7 +688,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -739,7 +739,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -790,7 +790,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 18,
+      "consecutive_days": 19,
       "trend": "out"
     },
     {
@@ -807,7 +807,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -841,7 +841,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -858,7 +858,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -892,7 +892,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -926,7 +926,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -960,7 +960,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -994,7 +994,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -1011,7 +1011,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -1028,7 +1028,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
@@ -1045,7 +1045,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -1062,7 +1062,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -1079,7 +1079,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -1113,7 +1113,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -1130,7 +1130,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -1147,7 +1147,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -1164,7 +1164,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "out"
     },
     {
@@ -1181,7 +1181,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 17,
+      "consecutive_days": 18,
       "trend": "out"
     },
     {
@@ -1198,7 +1198,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "out"
     },
     {
@@ -1249,7 +1249,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -1351,7 +1351,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 15,
+      "consecutive_days": 1,
       "trend": "out"
     },
     {
@@ -1368,7 +1368,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 5,
+      "consecutive_days": 1,
       "trend": "out"
     }
   ],
@@ -1421,7 +1421,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1438,7 +1438,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1455,7 +1455,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1489,7 +1489,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1523,7 +1523,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1540,7 +1540,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1557,7 +1557,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1642,7 +1642,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1727,7 +1727,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1744,7 +1744,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1778,7 +1778,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1795,7 +1795,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1863,7 +1863,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -1914,7 +1914,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in"
     },
     {
@@ -1948,7 +1948,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -2016,7 +2016,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -2033,7 +2033,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -2084,7 +2084,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2135,7 +2135,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 18,
+      "consecutive_days": 19,
       "trend": "out"
     },
     {
@@ -2169,7 +2169,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2203,7 +2203,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2220,7 +2220,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2254,7 +2254,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2288,7 +2288,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -2322,7 +2322,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -2356,7 +2356,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2373,7 +2373,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2390,7 +2390,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
@@ -2407,7 +2407,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -2424,7 +2424,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2441,7 +2441,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2475,7 +2475,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2492,7 +2492,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -2509,7 +2509,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -2526,7 +2526,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "out"
     },
     {
@@ -2543,7 +2543,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 17,
+      "consecutive_days": 18,
       "trend": "out"
     },
     {
@@ -2560,7 +2560,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "out"
     },
     {
@@ -2611,7 +2611,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "out"
     },
     {
@@ -2713,7 +2713,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 15,
+      "consecutive_days": 1,
       "trend": "out"
     },
     {
@@ -2730,7 +2730,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 5,
+      "consecutive_days": 1,
       "trend": "out"
     }
   ],
@@ -2744,15 +2744,15 @@
       "trend": "in"
     },
     "机器人概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "基金减仓": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "电子": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "创业板综": {
@@ -2760,7 +2760,7 @@
       "trend": "in"
     },
     "华为概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "百元股": {
@@ -2768,15 +2768,15 @@
       "trend": "in"
     },
     "通信技术": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "专精特新": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "国产芯片": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "科技风格": {
@@ -2796,7 +2796,7 @@
       "trend": "in"
     },
     "半导体概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "基金重仓": {
@@ -2816,11 +2816,11 @@
       "trend": "in"
     },
     "半导体": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "基金增仓": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "高市净率": {
@@ -2828,11 +2828,11 @@
       "trend": "in"
     },
     "QFII重仓": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "算力概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "沪股通": {
@@ -2848,7 +2848,7 @@
       "trend": "in"
     },
     "先进封装": {
-      "days": 4,
+      "days": 5,
       "trend": "in"
     },
     "中芯概念": {
@@ -2860,7 +2860,7 @@
       "trend": "in"
     },
     "半导体设备": {
-      "days": 6,
+      "days": 7,
       "trend": "in"
     },
     "百日新高": {
@@ -2868,7 +2868,7 @@
       "trend": "in"
     },
     "趋势股": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "消费风格": {
@@ -2884,11 +2884,11 @@
       "trend": "in"
     },
     "行业龙头": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "央视50_": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "工程机械整机": {
@@ -2900,7 +2900,7 @@
       "trend": "in"
     },
     "氟化工": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "超级品牌": {
@@ -2912,7 +2912,7 @@
       "trend": "out"
     },
     "ST股": {
-      "days": 18,
+      "days": 19,
       "trend": "out"
     },
     "工业气体": {
@@ -2920,7 +2920,7 @@
       "trend": "out"
     },
     "食品饮料": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "科创板做市商": {
@@ -2928,11 +2928,11 @@
       "trend": "out"
     },
     "白酒Ⅲ": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "白酒Ⅱ": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "酿酒概念": {
@@ -2940,7 +2940,7 @@
       "trend": "out"
     },
     "近期新高": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "化工原料": {
@@ -2948,7 +2948,7 @@
       "trend": "out"
     },
     "参股期货": {
-      "days": 3,
+      "days": 4,
       "trend": "out"
     },
     "民爆概念": {
@@ -2956,7 +2956,7 @@
       "trend": "out"
     },
     "医药生物": {
-      "days": 3,
+      "days": 4,
       "trend": "out"
     },
     "民爆制品": {
@@ -2964,27 +2964,27 @@
       "trend": "out"
     },
     "证券Ⅲ": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "证券Ⅱ": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "昨日打二板以上表现": {
-      "days": 1,
+      "days": 2,
       "trend": "out"
     },
     "最近多板": {
-      "days": 3,
+      "days": 4,
       "trend": "out"
     },
     "周期股": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "化学制品": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "金融地产风格": {
@@ -2992,27 +2992,27 @@
       "trend": "out"
     },
     "非银金融": {
-      "days": 4,
-      "trend": "out"
-    },
-    "券商概念": {
-      "days": 3,
-      "trend": "out"
-    },
-    "互联网金融": {
-      "days": 3,
-      "trend": "out"
-    },
-    "航运": {
       "days": 5,
       "trend": "out"
     },
+    "券商概念": {
+      "days": 4,
+      "trend": "out"
+    },
+    "互联网金融": {
+      "days": 4,
+      "trend": "out"
+    },
+    "航运": {
+      "days": 6,
+      "trend": "out"
+    },
     "昨日连板_含一字": {
-      "days": 17,
+      "days": 18,
       "trend": "out"
     },
     "昨日连板": {
-      "days": 2,
+      "days": 3,
       "trend": "out"
     },
     "雅下水电概念": {
@@ -3024,7 +3024,7 @@
       "trend": "out"
     },
     "石油石化": {
-      "days": 4,
+      "days": 5,
       "trend": "out"
     },
     "大盘价值": {
@@ -3048,11 +3048,11 @@
       "trend": "out"
     },
     "央国企改革": {
-      "days": 15,
+      "days": 1,
       "trend": "out"
     },
     "一带一路": {
-      "days": 5,
+      "days": 1,
       "trend": "out"
     }
   },
@@ -3082,7 +3082,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3099,7 +3099,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3156,7 +3156,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3190,7 +3190,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3223,7 +3223,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3289,7 +3289,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in"
     },
     {
@@ -3385,7 +3385,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3725,7 +3725,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -3787,7 +3787,7 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财实时",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     }
   ]

@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-10 15:53",
-  "republish_time": "2026-11-10 19:48:14",
+  "republish_time": "2026-11-11 02:02:50",
   "data_date": "2026-11-09",
   "rule_ver": 2,
   "top_n": 5,
@@ -1941,7 +1941,7 @@
       "match": "norm"
     }
   ],
-  "fr_count": 10,
+  "fr_count": 11,
   "fr_sectors": [
     {
       "name": "光伏设备",
@@ -1987,6 +1987,92 @@
       "match": "exact"
     },
     {
+      "name": "光学光电子",
+      "bk": "BK1038",
+      "cons_count": 99,
+      "leaders": [
+        {
+          "code": "688781",
+          "name": "视涯科技-UW",
+          "price": 56.16,
+          "chg": 20.0,
+          "main_net": 62261496.0
+        },
+        {
+          "code": "920001",
+          "name": "纬达光电",
+          "price": 11.34,
+          "chg": 17.15,
+          "main_net": 5046848.0
+        },
+        {
+          "code": "300752",
+          "name": "隆利科技",
+          "price": 11.17,
+          "chg": 12.04,
+          "main_net": 15170926.0
+        },
+        {
+          "code": "300808",
+          "name": "久量股份",
+          "price": 20.17,
+          "chg": 11.93,
+          "main_net": 6349597.0
+        },
+        {
+          "code": "002036",
+          "name": "联创电子",
+          "price": 5.68,
+          "chg": 10.08,
+          "main_net": 109992120.0
+        }
+      ],
+      "match": "exact"
+    },
+    {
+      "name": "其他电子",
+      "bk": "BK1223",
+      "cons_count": 33,
+      "leaders": [
+        {
+          "code": "002729",
+          "name": "好利科技",
+          "price": 13.45,
+          "chg": 7.0,
+          "main_net": 7929586.0
+        },
+        {
+          "code": "300493",
+          "name": "润欣科技",
+          "price": 14.32,
+          "chg": 6.15,
+          "main_net": 56575201.0
+        },
+        {
+          "code": "001298",
+          "name": "好上好",
+          "price": 15.23,
+          "chg": 5.4,
+          "main_net": 14930427.0
+        },
+        {
+          "code": "301563",
+          "name": "云汉芯城",
+          "price": 98.7,
+          "chg": 4.89,
+          "main_net": 6022856.0
+        },
+        {
+          "code": "300650",
+          "name": "太龙股份",
+          "price": 10.41,
+          "chg": 4.83,
+          "main_net": -920134.0
+        }
+      ],
+      "match": "norm"
+    },
+    {
       "name": "半导体",
       "bk": "BK1036",
       "cons_count": 100,
@@ -2025,49 +2111,6 @@
           "price": 29.57,
           "chg": 10.42,
           "main_net": 226140859.0
-        }
-      ],
-      "match": "exact"
-    },
-    {
-      "name": "厨卫电器",
-      "bk": "BK1240",
-      "cons_count": 9,
-      "leaders": [
-        {
-          "code": "300911",
-          "name": "亿田智能",
-          "price": 26.08,
-          "chg": 14.24,
-          "main_net": 22546657.0
-        },
-        {
-          "code": "603366",
-          "name": "日出东方",
-          "price": 10.88,
-          "chg": 10.01,
-          "main_net": 42409315.0
-        },
-        {
-          "code": "300894",
-          "name": "火星人",
-          "price": 9.59,
-          "chg": 3.01,
-          "main_net": 1615737.0
-        },
-        {
-          "code": "002677",
-          "name": "浙江美大",
-          "price": 5.89,
-          "chg": 1.03,
-          "main_net": -3873257.0
-        },
-        {
-          "code": "002543",
-          "name": "万和电气",
-          "price": 7.2,
-          "chg": 0.14,
-          "main_net": -13497044.0
         }
       ],
       "match": "exact"
@@ -2202,90 +2245,133 @@
       "match": "alias:exact"
     },
     {
-      "name": "电池",
-      "bk": "BK1033",
-      "cons_count": 100,
+      "name": "消费电子",
+      "bk": "BK1037",
+      "cons_count": 99,
       "leaders": [
         {
-          "code": "301210",
-          "name": "金杨精密",
-          "price": 34.26,
-          "chg": 7.26,
-          "main_net": 55143753.0
+          "code": "300951",
+          "name": "博硕科技",
+          "price": 55.5,
+          "chg": 16.06,
+          "main_net": 86412356.0
         },
         {
-          "code": "300953",
-          "name": "震裕科技",
-          "price": 114.05,
-          "chg": 7.13,
-          "main_net": 91667344.0
+          "code": "301387",
+          "name": "光大同创",
+          "price": 42.76,
+          "chg": 13.15,
+          "main_net": 9808881.0
         },
         {
-          "code": "688772",
-          "name": "珠海冠宇",
-          "price": 17.8,
-          "chg": 6.71,
-          "main_net": 40600799.0
+          "code": "002045",
+          "name": "国光电器",
+          "price": 11.41,
+          "chg": 10.03,
+          "main_net": 104995331.0
         },
         {
-          "code": "300530",
-          "name": "领湃科技",
-          "price": 25.5,
-          "chg": 5.24,
-          "main_net": -5708611.0
+          "code": "001314",
+          "name": "亿道信息",
+          "price": 42.55,
+          "chg": 10.01,
+          "main_net": 45502282.0
         },
         {
-          "code": "301513",
-          "name": "尚水智能",
-          "price": 60.95,
-          "chg": 4.8,
-          "main_net": 29465204.0
+          "code": "002981",
+          "name": "朝阳科技",
+          "price": 24.2,
+          "chg": 10.0,
+          "main_net": 36134331.0
         }
       ],
       "match": "exact"
     },
     {
-      "name": "种植业与林业",
-      "bk": null,
-      "cons_count": 20,
+      "name": "电子化学品",
+      "bk": "BK1039",
+      "cons_count": 37,
       "leaders": [
         {
-          "code": "000592",
-          "name": "平潭发展",
-          "price": 6.96,
-          "chg": 4.04,
-          "main_net": null
+          "code": "688371",
+          "name": "菲沃泰",
+          "price": 19.35,
+          "chg": 17.99,
+          "main_net": 15982752.0
         },
         {
-          "code": "601118",
-          "name": "海南橡胶",
-          "price": 5.39,
-          "chg": 2.86,
-          "main_net": null
+          "code": "300429",
+          "name": "强力新材",
+          "price": 9.22,
+          "chg": 5.49,
+          "main_net": 14493458.0
         },
         {
-          "code": "002679",
-          "name": "福建金森",
-          "price": 10.07,
-          "chg": 2.65,
-          "main_net": null
+          "code": "300398",
+          "name": "飞凯材料",
+          "price": 30.72,
+          "chg": 4.81,
+          "main_net": 146772190.0
         },
         {
-          "code": "600883",
-          "name": "博闻科技",
-          "price": 7.14,
-          "chg": 2.59,
-          "main_net": null
+          "code": "688359",
+          "name": "三孚新科",
+          "price": 62.5,
+          "chg": 4.45,
+          "main_net": 17921660.0
         },
         {
-          "code": "600359",
-          "name": "新农开发",
-          "price": 6.16,
-          "chg": 2.16,
-          "main_net": null
+          "code": "688603",
+          "name": "天承科技",
+          "price": 70.12,
+          "chg": 4.42,
+          "main_net": 2551287.0
         }
       ],
-      "match": "ths"
+      "match": "norm"
+    },
+    {
+      "name": "自动化设备",
+      "bk": "BK1237",
+      "cons_count": 96,
+      "leaders": [
+        {
+          "code": "688090",
+          "name": "瑞松科技",
+          "price": 53.5,
+          "chg": 12.3,
+          "main_net": 42355083.0
+        },
+        {
+          "code": "688698",
+          "name": "伟创电气",
+          "price": 47.5,
+          "chg": 10.67,
+          "main_net": -11172132.0
+        },
+        {
+          "code": "301510",
+          "name": "固高科技",
+          "price": 30.75,
+          "chg": 10.45,
+          "main_net": 86541824.0
+        },
+        {
+          "code": "603283",
+          "name": "赛腾股份",
+          "price": 40.23,
+          "chg": 10.01,
+          "main_net": 173400151.0
+        },
+        {
+          "code": "603666",
+          "name": "亿嘉和",
+          "price": 28.51,
+          "chg": 9.99,
+          "main_net": 39107096.0
+        }
+      ],
+      "match": "exact"
     },
     {
       "name": "贵金属",
@@ -2329,49 +2415,6 @@
         }
       ],
       "match": "exact"
-    },
-    {
-      "name": "风电设备",
-      "bk": "BK1032",
-      "cons_count": 31,
-      "leaders": [
-        {
-          "code": "301232",
-          "name": "飞沃科技",
-          "price": 80.05,
-          "chg": 3.61,
-          "main_net": 38434809.0
-        },
-        {
-          "code": "301040",
-          "name": "中环海陆",
-          "price": 21.45,
-          "chg": 3.42,
-          "main_net": -2067986.0
-        },
-        {
-          "code": "301163",
-          "name": "宏德股份",
-          "price": 20.33,
-          "chg": 3.09,
-          "main_net": 1045099.0
-        },
-        {
-          "code": "300904",
-          "name": "威力传动",
-          "price": 38.36,
-          "chg": 2.05,
-          "main_net": -1477725.0
-        },
-        {
-          "code": "301557",
-          "name": "常友科技",
-          "price": 76.6,
-          "chg": 1.92,
-          "main_net": 1284638.0
-        }
-      ],
-      "match": "exact"
     }
   ],
   "nomatch_count": 0,
@@ -2379,5 +2422,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-10 19:33:05 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-10 19:48:14 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-11 02:02:50 跟随 FINAL 重算(一劳永逸)"
 }

@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-10 19:34:53",
+ "generated": "2026-11-11 02:04:40",
  "window": "2026-06-10 ~ 2026-11-09",
  "criteria": "龙虎榜: inst_net>0 且 yz_net>0 且 (inst+yz)≥8000万; 转债剔除",
  "entry": "T+1 开盘买入, 单边成本0.15%, 净口径; 未成熟期限标 pending",
  "benchmark": "880003 平均股价(等权全A)·同成本口径",
- "n_signals": 393,
+ "n_signals": 394,
  "n_tracked": 354,
  "per_horizon": {
   "T+1": {
@@ -8553,10 +8553,21 @@
    "date": "2026-11-09",
    "code": "300825",
    "name": "阿尔特",
-   "pct": 15.4275,
+   "pct": 15.428,
    "inst_yi": 0.257,
    "yz_yi": 0.698,
    "sum_yi": 0.955,
+   "entry": null,
+   "status": "pending_t1"
+  },
+  {
+   "date": "2026-11-09",
+   "code": "688801",
+   "name": "燧原科技",
+   "pct": 17.261,
+   "inst_yi": 1.205,
+   "yz_yi": 0.746,
+   "sum_yi": 1.951,
    "entry": null,
    "status": "pending_t1"
   }
