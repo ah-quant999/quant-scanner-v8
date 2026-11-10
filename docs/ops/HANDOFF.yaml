@@ -34,9 +34,33 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 183
+  next_id_seq: 184
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
+  - id: watchdog-schedule-deregistered-4th-1110
+    owner: 小九机AI（落码）
+    priority: P1
+    status: todo
+    created: 2026-11-10
+    title: v8_cn_fetch_watchdog GitHub schedule 第4次静默注销（11-10 实测缺席5.5h+20槽全缺）+ 唤起器双保险全哑 ⇒ 自愈环零触发
+    note: >-
+      登记方：阿狸咪的工程师（11-10 11:43 CST 巡检实证，主人外出期自主处置）。现象：看门狗 cron
+      '7,22 * * * 0-4'/'37,52 * * * 0-4'（11-09 扩段 UTC 全24h，与 ab274d80bbd9 同批落 main），
+      11-09 22:15Z/22:39Z 两轮 schedule 跑的是修复前旧 head（2f4bdf8d99/09106f5014，漏 checkout 必败）；
+      ab274d80bbd9 补 checkout 后 23:14Z dispatch 42718784027 success 证明代码本身 OK；
+      但 23:07Z 起至 11-10 03:37Z 理论 20 个 schedule 槽全缺（11-10 03:43Z 复核仍 0）——既非失败也非排队，整段静默不触发。
+      同族史第4次：09-01 全天0次 / 09-21 intraday-chain-cron-deregistered / 09-29 intraday-snapshot-schedule-deregistered-again-0929 / 本次。
+      双保险现状：yml 注释引用的 WorkBuddy 唤起器 2d9121c8 不在阿狸咪机 automations 表（宿主待查）；
+      白天数据面靠 cn_fetch 高频 dispatch 顶住（11-10 10:27-11:42 密集正常）。
+      数据面影响：11-10 盘中四关键 raw（experiment/sector_leaders/algo_run_report/algo_heartbeat）均 <24h 正常，未酿成事故；
+      但 11-09 扩段目的就是覆盖夜间（阿狸咪时段），cron 哑火 ⇒ 夜间自愈层空窗，只靠阿狸咪 2h 巡检兜底。
+    verify_how: >-
+      恢复判据：看门狗 workflow runs 出现 event=schedule 新 run（head ≥ ab274d80bbd9）即恢复。
+      若 24h 仍 0 schedule：①查 2d9121c8 唤起器宿主与状态；②按 09-21 已验证做法对 cron 行再拆分/改条目数强制重注册
+      （09-21 拆两条曾恢复，11-09 改内容后先复又哑 ⇒ 条目数招数可能钝化，需评估 GitHub App/外部触发类方案）；
+      ③评估 intraday_liveness_guard 是否覆盖 watchdog 自身存活。
+    updated: "2026-11-10 11:57"
+    updated_by: 阿狸咪的工程师
   - id: jinzuan-track-cron-audit-block-1109
     owner: 小九（双登记+文档源落码）+ 阿狸咪（盯 Gate 恢复）
     priority: P0
