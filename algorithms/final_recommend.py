@@ -256,10 +256,10 @@ def load_json(name):
 #   真实 excess5 真值（金钻/缠论实测负、趋势/机构实测正），与 generate_top10.py 严格同值
 #   （全站同口径铁律）。读不到回测文件时亦不再静默用「信念反转」错值。
 SIGNAL_EDGE_DEFAULT = {
-    "jinzuan": -1.108,
-    "chan":    -0.089,
-    "trend":    0.697,
-    "jigou":    0.807,
+    "jinzuan": -0.522,
+    "chan":    0.155,
+    "trend":    0.339,
+    "jigou":    0.449,
 }
 # 信号英文键 → by_factor 中的键名
 _SIG_FACTOR_KEY = {
