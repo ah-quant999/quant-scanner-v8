@@ -141,8 +141,60 @@ def _fetch_index_ohlc(code, prefix, days=None):
         return rows
     except Exception as e:
         SOURCE_BREAKER.mark_failure("baostock")
-        log(f"  [_fetch_index_ohlc] {code}: {e}")
-        return []
+        log(f"  [_fetch_index_ohlc] {code}: baostock 失败({e})，降级到备用源")
+        return _fetch_index_ohlc_fallback(prefix, code)
+
+
+def _fetch_index_ohlc_fallback(prefix, code):
+    """baostock 不可用时的降级源：腾讯 ifzq → 新浪。
+
+    🔴 2026-11-10 一劳永逸修复：原 `_fetch_index_ohlc` 在 baostock 异常时直接 `return []`
+       → `market_regime={}` → OPTIMIZED 汇总 `note="empty:no_market_regime"`、total_signals=0，
+       提高收益率选股层整层失效（2026-11-09 / 2026-11-10 连续两晚 0 信号）。
+       现 baostock 熔断/异常时降级到腾讯 ifzq（与 fetch_wave_elliott 同源，已验证稳定），
+       再不行降级新浪，确保 regime 序列永远能拿到，OPTIMIZED 不再因数据源抖动而 0 信号。
+    """
+    tcode = "%s%s" % (prefix, code)
+    # ① 腾讯 ifzq
+    try:
+        import urllib.request
+        url = "https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=%s,day,,,600,qfq" % tcode
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0", "Referer": "https://stockapp.finance.qq.com/"})
+        with urllib.request.urlopen(req, timeout=25) as r:
+            j = json.loads(r.read().decode("utf-8"))
+        d = (j.get("data") or {}).get(tcode) or {}
+        k = d.get("qfqday") or d.get("day") or []
+        rows = [(row[0], float(row[2])) for row in k if len(row) > 2]
+        if rows:
+            rows.sort(key=lambda x: x[0])
+            log(f"  [_fetch_index_ohlc_fallback] {tcode}: 腾讯 ifzq 取到 {len(rows)} 根K")
+            return rows
+    except Exception as e2:
+        log(f"  [_fetch_index_ohlc_fallback] {tcode}: 腾讯 ifzq 失败({e2})")
+    # ② 新浪
+    try:
+        import urllib.request
+        url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+               "CN_MarketData.getKLineData?symbol=%s&scale=240&ma=no&datalen=600" % tcode)
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=25) as r:
+            j = json.loads(r.read().decode("utf-8"))
+        k = j if isinstance(j, list) else []
+        rows = []
+        for row in k:
+            try:
+                rows.append((row["d"], float(row["c"])))
+            except Exception:
+                pass
+        if rows:
+            rows.sort(key=lambda x: x[0])
+            log(f"  [_fetch_index_ohlc_fallback] {tcode}: 新浪取到 {len(rows)} 根K")
+            return rows
+    except Exception as e2:
+        log(f"  [_fetch_index_ohlc_fallback] {tcode}: 新浪失败({e2})")
+    log(f"  [_fetch_index_ohlc_fallback] {tcode}: 全部降级源失败")
+    return []
 
 
 def _compute_regime_series(rows):
