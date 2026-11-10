@@ -150,6 +150,12 @@ MUST_HAVE_CRON = {
     #   产 data/FUTURES_REALTIME.js）—— 11-09 早建链漏双登记 ⇒ 门禁自 6e3c452b 起连红
     #   （含后续 watchdog 修复提交被连坐）。本轮与 watchdog 盲区修复同批收口。
     "v8_futures_realtime": "期指主力实时(新浪vip+东财现货·cn runner盘中每30分)",
+    # 2026-11-11 阿狸咪的工程师补登记（门禁 [4/8] 拦截补漏）：🌊 艾略特波浪日频 refresh 云端链
+    #   （cron '15 11 * * 1-5' = 交易日北京 19:15，云端 ubuntu-latest 产 data/WAVE_ELLIOTT.js，
+    #   主人令「运维/看板失败·一劳永逸修复」将波浪卡生产自小九机 HTTPS 直推迁云端，
+    #   见 .github/workflows/v8_wave_elliott.yml 头注）—— ab04d17993 建链漏双登记 ⇒
+    #   build_deploy [4/8] 自 11-10 23:13 CST 连红阻断 deploy（4 轮 gate 绿/build 红）。本项收口。
+    "v8_wave_elliott": "艾略特波浪日频refresh(云端ubuntu·交易日19:15)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
