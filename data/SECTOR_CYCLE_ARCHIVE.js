@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-10 09:27:29
+// 最后更新：2026-11-10 09:38:42
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-10 09:27:29",
+  "update_time": "2026-11-10 09:38:42",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1696,
+      "total": 1706,
       "ongoing": true
     },
     {
@@ -84,14 +84,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "新能源车",
       "start": "09/22",
-      "end": "11/09",
+      "end": "11/10",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 25,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 26,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 273,
+      "total": 285,
       "ongoing": true
     },
     {
@@ -104,7 +104,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 512,
+      "total": 522,
       "ongoing": true
     },
     {
@@ -117,7 +117,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 23,
       "peak_date": "09/22",
-      "total": 244,
+      "total": 246,
       "ongoing": true
     },
     {
