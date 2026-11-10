@@ -25,6 +25,7 @@ on:
   workflow_run:
     workflows:
       - "📈 v8 STOCK_QUOTE 轻量 refresh"
+      - "📈 v8 期指实时 refresh (cn)"
       - "🇨🇳 v8 中国数据抓取(云端)"
       - "🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)"
       - "☁️ v8 盘中算法追踪(轻量)"
