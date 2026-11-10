@@ -375,10 +375,10 @@ def rank_neutralize(vals, scale):
 #   真实 excess5 真值（金钻/缠论实测负、趋势/机构实测正），与 final_recommend.py 严格同值
 #   （全站同口径铁律）。读不到回测文件时亦不再静默用「信念反转」错值。
 SIGNAL_EDGE_DEFAULT = {
-    "jinzuan": -1.108,
-    "chan":    -0.089,
-    "trend":    0.697,
-    "jigou":    0.807,
+    "jinzuan": -0.522,
+    "chan":    0.155,
+    "trend":    0.339,
+    "jigou":    0.449,
 }
 SIGNAL_EDGE_TO_SCORE = 2.5   # 每 1% edge ≈ 2.5 分
 SIGNAL_SCORE_CAP, SIGNAL_SCORE_FLOOR = 30, -30
