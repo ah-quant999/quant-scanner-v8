@@ -73,6 +73,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "fetch_fundamental_quality.py": 5400,  # 🛡 2026-09-09 并发根治：单线程串行 baostock 必超 40min 预算被杀→盘后选股链整瘫；改 ProcessPoolExecutor(12) 后实测分钟级，预算放宽到 90min 留足余量
     "refresh_dividend_cninfo.py": 2400,    # ~500 只 × cninfo ×3 重试，无超时
     "fetch_lhb.py": 2400,                  # 逐股 ×2flag ×3attempt 东财 akshare
+    "track_resonance.py": 900,              # 🆕 2026-11-10 主人令「科学修复」：最强共振跟踪接入主链 E 批（与 STAGES["E"]/ORDER 成对）
     "build_candidate_pool.py": 2400,       # missing[:200] 串行东财补全行业
     "fetch_sector_rs.py": 1800,            # ~90 同花顺板块串行
     "calc_volatility_watch.py": 1800,      # 多源兜底，源慢时串行拉长
@@ -378,6 +379,7 @@ ORDER = [
     #   final_recommend 真实信号归档 final_recommend_history + 当日 FINAL_RECOMMEND_DATA）；与 STAGES["E"] 成对。
     #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
     "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
+    "track_resonance.py",   # 🆕 2026-11-10 主人令「科学修复」：与 STAGES["E"] 末步成对补挂（否则 assert _STAGE_UNION==set(ORDER) 崩链）
     ]
 
 
@@ -500,6 +502,7 @@ STAGES = {
         "generate_factor_combo.py",  # → raw_data/factor_combo.json + data/FACTOR_COMBO.js（window.FACTOR_COMBO）
         # 🆕 2026-10-19 主人令「最终推荐回测日更」：与 ORDER 成对补挂（gen_final_recommend_backtest.py）。
         "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
+        "track_resonance.py",   # 🆕 2026-11-10 主人令「科学修复」：最强共振跟踪接入主链 E 批；update_v8 随后自动重建 data/RESONANCE_TRACK.js
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 前置到 B 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）

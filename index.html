@@ -1315,7 +1315,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
 <script src="data/DO_T_SPACE.js?v=b9055a6d61" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
-<script src="data/RESONANCE_TRACK.js?v=e8a9ef5846" defer></script>
+<script src="data/RESONANCE_TRACK.js?v=648220a685" defer></script>
 <script src="data/WEEKEND_RUN.js?v=869056ee43" defer></script>
 <script src="data/W52_HIGH.js?v=a1eaa5a111" defer></script>
 <!-- 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填） -->
@@ -2879,7 +2879,7 @@ window.STRATEGY_WALKFORWARD = {
         <div id="limitUpFoldBody" style="display:none">
           <div class="lu-part">
           <div class="lu-part">
-            <div class="lu-part-title">📚 板块周期档案 · <span id="limitUpFoldCycN">—</span></div>
+            <div class="lu-part-title">📚 板块周期档案 · <span id="limitUpFoldCycN">—</span></div> <span style="font-size:10.5px;color:var(--dim);font-weight:400">（历史归档·静态参考，非每日刷新）</span>
             <div id="limitUpCycleArchive" class="limit-up-content"></div>
           </div>
         </div>
@@ -2908,7 +2908,7 @@ window.STRATEGY_WALKFORWARD = {
 
       <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：与「主力日监控」T+0 联动） -->
       <div style="margin-bottom:16px;border-top:1px dashed rgba(71,85,105,.35);padding-top:12px">
-        <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#c084fc;font-weight:600">↕ 与「盘后数据」页 主力日监控 T+0 联动</span></h3>
+        <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#c084fc;font-weight:600">↕ 板块/ETF 各自口径·仅可比不可叠加</span></h3>
         <!-- 🛡 2026-08-19 主人令一劳永逸修复：legend div 加底部分隔线 + 下边距，与下方 ECharts 图表彻底视觉隔离；
              并把快照时间范围（旧的 ECharts title 文字）搬进 legend 文本，删除 ECharts 内冗余 title 以减少图表上方空白。 -->
         <div id="sfIntradayLegend" style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:8px 10px 10px;margin-bottom:6px;font-size:11px;color:#cbd5e1;border-bottom:1px solid rgba(71,85,105,.35)"></div>
@@ -3207,7 +3207,7 @@ function fmtSigned(v){
     <!-- 🚚 日监控·主力净流入（2026-09-11 主人令：自「实时数据」页 ETF 三合一 Block3 迁来，置于市场宽度卡上方）
          容器 id="etfDailyBlock" 与 renderEtfDaily() 保持不变，仅 DOM 位置移动；跨页与「实时数据」页主力净额分时曲线 T+0 联动。 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+0·盘后定基（盘前显示昨收·盘中累积·15:10/15:30 定基）</span> <span style="font-size:10px;color:#c084fc;font-weight:600">↕ 与「实时数据」页 主力净额分时曲线 T+0 联动</span> · <span class="fresh" id="etfDailyTime">—</span></h3>
+      <h3><span class="ic">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+0·盘后定基（盘前显示昨收·盘中累积·15:10/15:30 定基）</span> <span style="font-size:10px;color:#c084fc;font-weight:600">↕ 板块/ETF 各自口径·仅可比不可叠加</span> · <span class="fresh" id="etfDailyTime">—</span></h3>
       <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
       <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
     </div>
@@ -11058,8 +11058,8 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       h3 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin:16px 0 8px">💰 资金净额趋势</div>';
       if (sft.data_note) h3 += '<div style="font-size:11px;color:var(--dim);margin:-2px 0 6px">⚠️ ' + sft.data_note + '</div>';
       h3 += '<div class="sf-trend-grid">';
-      h3 += sfMiniTrend('5日', allTrend, 'net_5d');
-      h3 += sfMiniTrend('20日', allTrend, 'net_20d');
+      h3 += sfMiniTrend('5日·不含当日', allTrend, 'net_5d');
+      h3 += sfMiniTrend('20日·不含当日', allTrend, 'net_20d');
       h3 += '</div>';
       h3 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin:14px 0 8px">📈 价格相对强度</div>';
       h3 += '<div class="sf-trend-grid">';
@@ -15001,6 +15001,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           hh+='</div>';
         });
         hh+='</div>';
+        hh += '<div style="margin-top:8px;font-size:10.5px;color:var(--dim);line-height:1.5">🎯 ETF映射/龙头为<span style="color:var(--gold)">静态参考（2026-08-18 归档，非每日刷新）</span>；板块净额/涨跌为实时口径。</div>';
         cEl.innerHTML = hh;
       }
       // 🚀 2026-09-18 主人令：已升为独立卡 #sectorLeadersCard（置于本卡上方）。
@@ -17741,7 +17742,7 @@ hm += '</div>'; // /ulPaneBacktest
       /* 2026-10-29 主人令：平均股价 这一行只显示真实字段（距峰回撤 / 站上·跌破均线），
          不再自创「超卖」标签——超买超卖口径以「平均股价·超买超卖」权威卡(position_vs_ma 阈值)为准，杜绝双口径矛盾。 */
       h += _cbRow('平均股价', (apDD!=null?('距峰 '+apDD.toFixed(1)+'%'):(pos==null?'未到位':(pos>=0?'站上均线':'跌破均线'))), (pos==null?C_DIM:(apDD!=null?(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN)):(pos>=0?C_GRN:C_RED))));
-      h += _cbRow('主力净额·单日', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿'+(netDate?(' · '+String(netDate).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')):'')):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
+      h += _cbRow('主力净额·日频', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿'+(netDate?(' · '+String(netDate).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')):'')):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
       h += '</div>';
       h += '<div style="margin-top:8px;font-size:11.5px;line-height:1.7;color:'+C_SUB+'">'
         + '📊 市场广度(hc_count)：<b style="color:'+(brState==='未到位'?C_DIM:(brState==='充足'?C_GRN:(brState==='稀薄'?C_AMB:C_RED)))+'">'+brState+'</b>（选股管线候选数，反映赚钱效应宽度）</div>';

@@ -11,7 +11,7 @@ track_resonance.py — 「最强共振」信号 T+1→T+250 持久跟踪器
 import json, re, os, statistics
 from datetime import datetime, timezone, timedelta
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw_data")
 CST = timezone(timedelta(hours=8))
 COST = 0.0015
