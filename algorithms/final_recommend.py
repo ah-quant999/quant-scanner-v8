@@ -252,13 +252,14 @@ def load_json(name):
 # ═══════════════════════════════════════════════════════════════════════════
 # 🔴 2026-09-20 口径改造（改动15）：默认值同步为「可实盘 T+5 超额 excess5」口径。
 #   旧默认是 T+10 edge（β 假象），沿用会在「回测文件读不到」时静默退回错口径。
-#   取值 = 2026-09-20 新口径重跑（46 日 2026-06-08~09-18）by_factor.excess5，
-#   与 generate_top10.py::SIGNAL_EDGE_DEFAULT 严格同值（全站同口径铁律）。
+# 🔴 2026-11-10 整改（主人令·一劳永逸）：回退默认值改为 canonical backtest_expectancy.json
+#   真实 excess5 真值（金钻/缠论实测负、趋势/机构实测正），与 generate_top10.py 严格同值
+#   （全站同口径铁律）。读不到回测文件时亦不再静默用「信念反转」错值。
 SIGNAL_EDGE_DEFAULT = {
-    "jinzuan": 0.532,
-    "chan":    0.759,
-    "trend":  -1.532,
-    "jigou":  -0.660,
+    "jinzuan": -1.108,
+    "chan":    -0.089,
+    "trend":    0.697,
+    "jigou":    0.807,
 }
 # 信号英文键 → by_factor 中的键名
 _SIG_FACTOR_KEY = {
@@ -346,17 +347,13 @@ def _load_signal_edge_dynamic():
 
 
 SIGNAL_EDGE, SIGNAL_EDGE_META = _load_signal_edge_dynamic()
-# 🔴 2026-11-07 根因修复（signal_edge 反号）：next_open 入场口径对买点型信号(jinzuan/chan)
-#   系统性偏差（买点次日高开低走→回测全负；趋势型追涨反而正），与铁律「只有金钻+缠论赚钱、
-#   trend/jigou 负期望」完全反号。按铁律钉死四信号 edge 符号：jinzuan/chan 正、trend/jigou 负，
-#   幅度保留回测相对大小（仅修正符号）。杜绝反号污染 src_score / 最终推荐排序。
-_EDGE_SIGN = {"jinzuan": 1, "chan": 1, "trend": -1, "jigou": -1}
-for _n, _s in _EDGE_SIGN.items():
-    if _n in SIGNAL_EDGE:
-        _e = SIGNAL_EDGE[_n]
-        SIGNAL_EDGE[_n] = abs(_e) if _s > 0 else -abs(_e)
-print(f"[信号edge] 🔒 符号按铁律锚定: " + "  ".join(
-    f"{_n}={SIGNAL_EDGE.get(_n,0):+.3f}({'+' if _s>0 else '-'}期望)" for _n, _s in _EDGE_SIGN.items()))
+# 🔴 2026-11-10 整改（主人令·一劳永逸修复）：删除 2026-11-07 的「符号按铁律锚定」块。
+#   原块把 jinzuan/chan 强制正、trend/jigou 强制负，覆盖 backtest_expectancy.json 真实 edge
+#   （金钻/缠论实测负、趋势/机构实测正），使 composite 把亏钱信号排高、赚钱信号排低，
+#   与「选最高收益率」宗旨彻底背道而驰，且违反修复铁律（用信念临时打补丁而非修根因）。
+#   根因 = next_open 入场对买点型信号(jinzuan/chan)有「次日高开低走」偏差；正确修法是回测
+#   改用无偏入场（见 algorithms/backtest_expectancy.py 长回测口径），而非硬编符号。
+#   ⇒ 此处不再做任何符号翻转，SIGNAL_EDGE 完全由上方动态加载器按真实 excess5 驱动。
 
 
 def _signal_edge_of(code_signals):
