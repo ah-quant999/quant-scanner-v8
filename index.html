@@ -13009,7 +13009,7 @@ function drawUpDownChart(){
         const sourceMissing = c.sourceMissing === true && (!dataFound || !hasDataToday);
 
         // 🛡 2026-08-19 一劳永逸：sourceMissing 卡显示「待配置」而非「无」（避免误导）
-        const lastStr = sourceMissing ? '待配置' : (!lastTs ? '无' : (isToday(lastTs) ? fmtHm(lastTs) : (window._fmtAshareRel ? window._fmtAshareRel(String(_tsRaw)) : '昨日')));
+        const lastStr = sourceMissing ? '待配置' : (!lastTs ? '无' : (window._fmtAshareRel ? window._fmtAshareRel(String(_tsRaw)) : (lastTs ? fmtHm(lastTs) : '无')));  // 🛠 2026-11-11 主人令：任务看板更新时间统一走 _fmtAshareRel，今日/昨日/其他用日期（修止以前今日只显粗时间、无“今日”标签的 bug）
 
         let slotsHtml = '';
 
