@@ -1,6 +1,6 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-10 19:55:24",
+  "generated": "2026-11-10 19:59:15",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
@@ -11565,8 +11565,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "t1_gain_pct": 1.2,
      "t3_gain_pct": 1.28,
      "t5_gain_pct": -19.21,
-     "t10_gain_pct": -3.33,
-     "last_gain_pct": -3.33,
+     "t10_gain_pct": -9.14,
+     "last_gain_pct": -9.14,
      "pattern": "波动大",
      "note": "连涨前0天 回撤19.21%",
      "daily_returns": [
@@ -11617,8 +11617,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+10",
-       "date": "",
-       "gain": null
+       "date": "2026-11-06",
+       "gain": -9.14
       }
      ],
      "entry_price": 11.71
@@ -11885,8 +11885,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "t1_gain_pct": 1.48,
      "t3_gain_pct": -5.8,
      "t5_gain_pct": -20.36,
-     "t10_gain_pct": -9.95,
-     "last_gain_pct": -9.95,
+     "t10_gain_pct": -13.45,
+     "last_gain_pct": -13.45,
      "pattern": "波动大",
      "note": "连涨前0天 回撤20.36%",
      "daily_returns": [
@@ -11937,8 +11937,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+10",
-       "date": "",
-       "gain": null
+       "date": "2026-11-06",
+       "gain": -13.45
       }
      ],
      "entry_price": 108.2
@@ -12445,8 +12445,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "t1_gain_pct": -0.87,
      "t3_gain_pct": -7.1,
      "t5_gain_pct": -23.95,
-     "t10_gain_pct": -8.95,
-     "last_gain_pct": -8.95,
+     "t10_gain_pct": -13.37,
+     "last_gain_pct": -13.37,
      "pattern": "波动大",
      "note": "连涨前0天 回撤23.95%",
      "daily_returns": [
@@ -12497,8 +12497,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+10",
-       "date": "",
-       "gain": null
+       "date": "2026-11-06",
+       "gain": -13.37
       }
      ],
      "entry_price": 43.92
@@ -13154,56 +13154,56 @@ window.STOCK_MOMENTUM_ENHANCED = {
       "短线选股",
       "突破"
      ],
-     "change_pct": 3.63,
-     "sel_change_pct": 3.63,
+     "change_pct": 3.66,
+     "sel_change_pct": 3.66,
      "data_available": true,
      "consec_before": 7,
      "stage": "启动",
      "consecutive_up_days": 0,
-     "max_gain_pct": 1.15,
-     "max_drawdown_pct": 4.59,
-     "t1_gain_pct": -3.23,
-     "t3_gain_pct": -2.58,
-     "t5_gain_pct": -2.42,
-     "t10_gain_pct": 0.19,
-     "last_gain_pct": 0.19,
+     "max_gain_pct": 1.16,
+     "max_drawdown_pct": 4.63,
+     "t1_gain_pct": -3.26,
+     "t3_gain_pct": -2.6,
+     "t5_gain_pct": -2.44,
+     "t10_gain_pct": -0.73,
+     "last_gain_pct": -0.73,
      "pattern": "普通",
-     "note": "连涨前7天 回撤4.59%",
+     "note": "连涨前7天 回撤4.63%",
      "daily_returns": [
       {
        "T": "T+1",
        "date": "2026-10-27",
-       "gain": -3.23
+       "gain": -3.26
       },
       {
        "T": "T+2",
        "date": "2026-10-28",
-       "gain": -4.59
+       "gain": -4.63
       },
       {
        "T": "T+3",
        "date": "2026-10-29",
-       "gain": -2.58
+       "gain": -2.6
       },
       {
        "T": "T+4",
        "date": "2026-10-30",
-       "gain": -1.08
+       "gain": -1.09
       },
       {
        "T": "T+5",
        "date": "2026-11-02",
-       "gain": -2.42
+       "gain": -2.44
       },
       {
        "T": "T+6",
        "date": "2026-11-03",
-       "gain": 1.15
+       "gain": 1.16
       },
       {
        "T": "T+7",
        "date": "2026-11-04",
-       "gain": -1.49
+       "gain": -1.5
       },
       {
        "T": "T+8",
@@ -13212,16 +13212,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+9",
-       "date": "",
-       "gain": null
+       "date": "2026-11-06",
+       "gain": 0.22
       },
       {
        "T": "T+10",
-       "date": "",
-       "gain": null
+       "date": "2026-11-09",
+       "gain": -0.73
       }
      ],
-     "entry_price": 183.74
+     "entry_price": 182.44
     },
     {
      "code": "002184",
