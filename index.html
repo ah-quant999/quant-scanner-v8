@@ -194,9 +194,9 @@ window.__domReadyFns=[];
          仍被每日洞察/情绪周期消费 ⇒ 只删卡壳不删源。 -->
         <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
-    <script src="data/MARKET_REGIME.js?v=7b362da367" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
+    <script src="data/MARKET_REGIME.js?v=b2f1f68618" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
     <script src="data/RISK_GAUGE.js?v=8e4be9f082" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
-    <script src="data/SECTOR_RECOMMENDATION.js?v=7e8586d0e4" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
+    <script src="data/SECTOR_RECOMMENDATION.js?v=c46a0243c5" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=51c8477efb" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 CN runner2号机的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
@@ -1294,7 +1294,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=02de9a7bdb" defer></script>
 <script src="data/EXPERIMENT.js?v=d2db439230" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=29703a482c" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=7adb2e0ae9" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=be51c03ce8" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
+<script src="data/FINAL_RECOMMEND_DATA.js?v=af4cf4ab04" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=7adb2e0ae9" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=be51c03ce8" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=347b03447f" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=3dd07de14c" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=913eb7f131" defer></script>

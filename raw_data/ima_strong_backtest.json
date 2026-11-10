@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-10 19:47:51",
+ "generated": "2026-11-10 23:06:22",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -63,8 +63,8 @@
    "best_return": 28.59,
    "worst_return": -15.06,
    "max_drawdown": -1.37,
-   "bench_avg_return": -0.179,
-   "bench_win_rate": 45.07,
+   "bench_avg_return": -0.1795,
+   "bench_win_rate": 45.06,
    "bench_days": 55
   },
   "2d": {
@@ -78,8 +78,8 @@
    "best_return": 31.46,
    "worst_return": -22.68,
    "max_drawdown": -2.92,
-   "bench_avg_return": -0.393,
-   "bench_win_rate": 44.82,
+   "bench_avg_return": -0.3938,
+   "bench_win_rate": 44.81,
    "bench_days": 55
   },
   "3d": {
@@ -138,8 +138,8 @@
    "best_return": 128.08,
    "worst_return": -33.53,
    "max_drawdown": -12.21,
-   "bench_avg_return": -3.1093,
-   "bench_win_rate": 39.97,
+   "bench_avg_return": -3.1066,
+   "bench_win_rate": 39.95,
    "bench_days": 54
   },
   "30d": {
@@ -153,8 +153,8 @@
    "best_return": 137.41,
    "worst_return": -29.2,
    "max_drawdown": -14.39,
-   "bench_avg_return": -2.353,
-   "bench_win_rate": 41.0,
+   "bench_avg_return": -2.3155,
+   "bench_win_rate": 41.02,
    "bench_days": 46
   },
   "45d": {
@@ -168,7 +168,7 @@
    "best_return": 202.43,
    "worst_return": -7.57,
    "max_drawdown": -18.94,
-   "bench_avg_return": -4.1218,
+   "bench_avg_return": -4.1038,
    "bench_win_rate": 36.14,
    "bench_days": 44
   },
@@ -183,8 +183,8 @@
    "best_return": 104.44,
    "worst_return": -25.49,
    "max_drawdown": -24.47,
-   "bench_avg_return": -4.9333,
-   "bench_win_rate": 33.64,
+   "bench_avg_return": -4.9183,
+   "bench_win_rate": 33.62,
    "bench_days": 32
   },
   "75d": {
@@ -198,8 +198,8 @@
    "best_return": 105.63,
    "worst_return": -27.07,
    "max_drawdown": -29.41,
-   "bench_avg_return": -9.6627,
-   "bench_win_rate": 26.96,
+   "bench_avg_return": -9.6201,
+   "bench_win_rate": 27.14,
    "bench_days": 21
   },
   "90d": {
@@ -213,8 +213,8 @@
    "best_return": 34.77,
    "worst_return": 9.47,
    "max_drawdown": -23.95,
-   "bench_avg_return": -14.4072,
-   "bench_win_rate": 21.19,
+   "bench_avg_return": -14.2372,
+   "bench_win_rate": 21.31,
    "bench_days": 9
   },
   "180d": {
