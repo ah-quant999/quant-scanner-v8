@@ -331,6 +331,7 @@ ORDER = [
     "scripts/gen_factor_progress.py",         # → raw_data/factor_progress.json（读 factor_audit，须在其后）
     "scripts/fetch_valuation_percentile.py",  # → raw_data/valuation_percentile.json（A股指数 PE 分位）
     "scripts/fetch_index_value_framework.py", # → raw_data/index_value_framework.json（指数中枢+趋势门控）
+    "v8/gen_tail_select.py",   # 🆕 2026-11-11 主人令「一劳永逸」：尾盘预选接入每日 B 批链尾（此前漏挂 → TAIL_SELECT 长期 stale 真漏跑）；依赖当日 GOLD_POOL/STOCK_MOMENTUM_STATE，幂等纯本地；update_v8 随后自动重建 data/TAIL_SELECT.js
 
     # 🆕 2026-09-11 主人令「在每日最终推荐出来后，开始回测所有算法，按前端卡名都写出来」：
     #   全算法回测汇总聚合器。放 ORDER **最末**⇒ 在 E 批内最后执行（同 stage 沿用 ORDER
@@ -445,6 +446,7 @@ STAGES = {
         "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
         "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
         "scripts/fetch_index_value_framework.py",   # → raw_data/index_value_framework.json（指数中枢+趋势门控）
+        "v8/gen_tail_select.py",   # 🆕 2026-11-11 主人令「一劳永逸」：与 ORDER 成对补挂 B 批链尾（否则 assert _STAGE_UNION==set(ORDER) 崩链）；TAIL_SELECT 现纳入每日主链刷新
         # 🔴 2026-10-23 主人令（P0-b）：backtest_expectancy 再前移到 B批内 generate_top10 之前
         #   （与 ORDER 成对）。它只读 history 归档 + kline_cache，无需等选股脚本写完；
         #   前移后 generate_top10 与 D批 final_recommend 都吃当日最新 edge。
