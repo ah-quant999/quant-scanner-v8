@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-11 07:16:24",
+  "update_time": "2026-11-11 09:33:19",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 26,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 234,
+      "total": 233,
       "ongoing": true
     },
     {
@@ -37,20 +37,20 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1683,
+      "total": 1662,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "09/23",
-      "end": "11/11",
+      "end": "11/10",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 47,
       "peak_date": "09/23",
-      "total": 347,
+      "total": 344,
       "ongoing": true
     },
     {
@@ -76,7 +76,7 @@
       "hot_days": 26,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 302,
+      "total": 292,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 29,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 524,
+      "total": 517,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 29,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 255,
+      "total": 247,
       "ongoing": true
     },
     {
@@ -121,14 +121,14 @@
     {
       "sector": "白酒消费",
       "start": "09/23",
-      "end": "11/11",
+      "end": "11/10",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 28,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 197,
+      "total": 192,
       "ongoing": true
     },
     {
@@ -232,7 +232,7 @@
       "hot_days": 6,
       "peak": 12,
       "peak_date": "11/05",
-      "total": 35,
+      "total": 36,
       "ongoing": true
     },
     {
@@ -251,27 +251,27 @@
     {
       "sector": "半导体",
       "start": "11/05",
-      "end": "11/11",
+      "end": "11/10",
       "start_idx": 25,
-      "end_idx": 29,
-      "days": 5,
-      "hot_days": 5,
+      "end_idx": 28,
+      "days": 4,
+      "hot_days": 4,
       "peak": 10,
       "peak_date": "11/05",
-      "total": 35,
+      "total": 27,
       "ongoing": true
     },
     {
       "sector": "固态电池",
       "start": "11/05",
-      "end": "11/11",
+      "end": "11/10",
       "start_idx": 25,
-      "end_idx": 29,
-      "days": 5,
-      "hot_days": 3,
+      "end_idx": 28,
+      "days": 4,
+      "hot_days": 2,
       "peak": 6,
       "peak_date": "11/05",
-      "total": 16,
+      "total": 12,
       "ongoing": true
     }
   ]
