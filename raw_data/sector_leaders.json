@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-11 20:52",
-  "republish_time": "2026-11-12 01:33:56",
+  "republish_time": "2026-11-12 01:47:33",
   "data_date": "2026-11-10",
   "rule_ver": 2,
   "top_n": 5,
@@ -2587,42 +2587,42 @@
     {
       "name": "光学光电子",
       "bk": "BK1038",
-      "cons_count": 97,
+      "cons_count": 99,
       "leaders": [
         {
           "code": "300939",
           "name": "秋田微",
           "price": 70.9,
           "chg": 13.26,
-          "main_net": null
+          "main_net": 31216493.0
         },
         {
           "code": "300489",
           "name": "光智科技",
           "price": 222.5,
           "chg": 12.37,
-          "main_net": null
+          "main_net": 123057312.0
         },
         {
           "code": "301183",
           "name": "东田微",
           "price": 161.25,
           "chg": 9.54,
-          "main_net": null
+          "main_net": 85112641.0
         },
         {
           "code": "688195",
           "name": "腾景科技",
           "price": 105.52,
           "chg": 8.83,
-          "main_net": null
+          "main_net": 73843137.0
         },
         {
-          "code": "002036",
-          "name": "联创电子",
-          "price": 6.02,
-          "chg": 5.99,
-          "main_net": null
+          "code": "920438",
+          "name": "戈碧迦",
+          "price": 55.43,
+          "chg": 8.45,
+          "main_net": 44170906.0
         }
       ],
       "match": "exact"
@@ -3063,5 +3063,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-12 01:33:56 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-12 01:33:56 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-12 01:47:33 跟随 FINAL 重算(一劳永逸)"
 }
