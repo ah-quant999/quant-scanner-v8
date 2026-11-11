@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-11 22:58",
- "generated": "2026-11-11 22:58",
+ "update_time": "2026-11-11 23:17",
+ "generated": "2026-11-11 23:17",
  "meta": {
-  "generated": "2026-11-11 22:58",
+  "generated": "2026-11-11 23:17",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -12300,13 +12300,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 20.0,
-      "price": 48.96,
-      "category": "突破"
-     },
-     {
       "code": "002328",
       "name": "新朋股份",
       "change_pct": 3.106,
@@ -12470,13 +12463,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 20.0,
-      "price": 48.96,
-      "category": "加速"
-     },
-     {
       "code": "002328",
       "name": "新朋股份",
       "change_pct": 3.106,
@@ -12560,13 +12546,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "能辉科技",
       "change_pct": 6.777,
       "price": 31.04,
-      "category": "短线选股"
-     },
-     {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 20.0,
-      "price": 48.96,
       "category": "短线选股"
      },
      {
