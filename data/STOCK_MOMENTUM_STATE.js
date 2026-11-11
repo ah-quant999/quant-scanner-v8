@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-12 01:35",
- "generated": "2026-11-12 01:35",
+ "update_time": "2026-11-12 01:45",
+ "generated": "2026-11-12 01:45",
  "meta": {
-  "generated": "2026-11-12 01:35",
+  "generated": "2026-11-12 01:45",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12769,6 +12769,48 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "000678",
+      "name": "襄阳轴承",
+      "change_pct": 10.021,
+      "price": 21.19,
+      "category": "突破"
+     },
+     {
+      "code": "600261",
+      "name": "阳光照明",
+      "change_pct": 6.838,
+      "price": 6.25,
+      "category": "突破"
+     },
+     {
+      "code": "002708",
+      "name": "光洋股份",
+      "change_pct": 10.012,
+      "price": 26.59,
+      "category": "突破"
+     },
+     {
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.175,
+      "price": 3.14,
+      "category": "突破"
+     },
+     {
+      "code": "300473",
+      "name": "德尔股份",
+      "change_pct": 20.004,
+      "price": 58.79,
+      "category": "突破"
+     },
+     {
+      "code": "601595",
+      "name": "上海电影",
+      "change_pct": 10.007,
+      "price": 46.83,
+      "category": "突破"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 6.777,
@@ -12829,6 +12871,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "恒盛能源",
       "change_pct": 3.832,
       "price": 16.53,
+      "category": "突破"
+     },
+     {
+      "code": "601689",
+      "name": "拓普集团",
+      "change_pct": 5.845,
+      "price": 51.25,
       "category": "突破"
      },
      {
@@ -12907,30 +12956,51 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.601,
       "price": 42.97,
       "category": "突破"
-     },
-     {
-      "code": "002902",
-      "name": "铭普光磁",
-      "change_pct": 5.4,
-      "price": 20.69,
-      "category": "突破"
-     },
-     {
-      "code": "603721",
-      "name": "中广天择",
-      "change_pct": 3.795,
-      "price": 23.25,
-      "category": "突破"
-     },
-     {
-      "code": "603321",
-      "name": "梅轮电梯",
-      "change_pct": 3.252,
-      "price": 6.35,
-      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "000678",
+      "name": "襄阳轴承",
+      "change_pct": 10.021,
+      "price": 21.19,
+      "category": "加速"
+     },
+     {
+      "code": "600261",
+      "name": "阳光照明",
+      "change_pct": 6.838,
+      "price": 6.25,
+      "category": "加速"
+     },
+     {
+      "code": "002708",
+      "name": "光洋股份",
+      "change_pct": 10.012,
+      "price": 26.59,
+      "category": "加速"
+     },
+     {
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.175,
+      "price": 3.14,
+      "category": "加速"
+     },
+     {
+      "code": "300473",
+      "name": "德尔股份",
+      "change_pct": 20.004,
+      "price": 58.79,
+      "category": "加速"
+     },
+     {
+      "code": "601595",
+      "name": "上海电影",
+      "change_pct": 10.007,
+      "price": 46.83,
+      "category": "加速"
+     },
      {
       "code": "301046",
       "name": "能辉科技",
@@ -12992,6 +13062,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "恒盛能源",
       "change_pct": 3.832,
       "price": 16.53,
+      "category": "加速"
+     },
+     {
+      "code": "601689",
+      "name": "拓普集团",
+      "change_pct": 5.845,
+      "price": 51.25,
       "category": "加速"
      },
      {
@@ -13018,6 +13095,48 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "000678",
+      "name": "襄阳轴承",
+      "change_pct": 10.021,
+      "price": 21.19,
+      "category": "短线选股"
+     },
+     {
+      "code": "600261",
+      "name": "阳光照明",
+      "change_pct": 6.838,
+      "price": 6.25,
+      "category": "短线选股"
+     },
+     {
+      "code": "002708",
+      "name": "光洋股份",
+      "change_pct": 10.012,
+      "price": 26.59,
+      "category": "短线选股"
+     },
+     {
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.175,
+      "price": 3.14,
+      "category": "短线选股"
+     },
+     {
+      "code": "300473",
+      "name": "德尔股份",
+      "change_pct": 20.004,
+      "price": 58.79,
+      "category": "短线选股"
+     },
+     {
+      "code": "601595",
+      "name": "上海电影",
+      "change_pct": 10.007,
+      "price": 46.83,
+      "category": "短线选股"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 6.777,
@@ -13078,6 +13197,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "恒盛能源",
       "change_pct": 3.832,
       "price": 16.53,
+      "category": "短线选股"
+     },
+     {
+      "code": "601689",
+      "name": "拓普集团",
+      "change_pct": 5.845,
+      "price": 51.25,
       "category": "短线选股"
      },
      {
@@ -13155,27 +13281,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "爱科赛博",
       "change_pct": 4.601,
       "price": 42.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "002902",
-      "name": "铭普光磁",
-      "change_pct": 5.4,
-      "price": 20.69,
-      "category": "短线选股"
-     },
-     {
-      "code": "603721",
-      "name": "中广天择",
-      "change_pct": 3.795,
-      "price": 23.25,
-      "category": "短线选股"
-     },
-     {
-      "code": "603321",
-      "name": "梅轮电梯",
-      "change_pct": 3.252,
-      "price": 6.35,
       "category": "短线选股"
      }
     ],
@@ -13234,27 +13339,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "爱科赛博",
       "change_pct": 4.601,
       "price": 42.97,
-      "category": "强势股"
-     },
-     {
-      "code": "002902",
-      "name": "铭普光磁",
-      "change_pct": 5.4,
-      "price": 20.69,
-      "category": "强势股"
-     },
-     {
-      "code": "603721",
-      "name": "中广天择",
-      "change_pct": 3.795,
-      "price": 23.25,
-      "category": "强势股"
-     },
-     {
-      "code": "603321",
-      "name": "梅轮电梯",
-      "change_pct": 3.252,
-      "price": 6.35,
       "category": "强势股"
      }
     ]
