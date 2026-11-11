@@ -4244,5 +4244,28 @@
     "message": "TAIL_SELECT.js 更新于 4天前 21:11；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-11-12",
+  "time": "05:31:28",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 125,
+   "warn": 0,
+   "fail": 1,
+   "limited": 0,
+   "info": 1,
+   "other": 0,
+   "total": 127
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "SECTOR_YEAR_FLOW",
+    "name": "板块年度主力净流入",
+    "message": "更新于 昨日 01:52；超过阈值 1394 分钟"
+   }
+  ]
  }
 ]
