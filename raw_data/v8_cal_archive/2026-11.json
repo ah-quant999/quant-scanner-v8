@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-11-11 23:34",
+ "update_time": "2026-11-12 01:24",
  "legend": [
   {
    "title": "重要政策",
@@ -329,24 +329,24 @@
     {
      "num": 11,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 美国CPI",
        "cls": "us",
-       "released": false
+       "released": true
       },
       {
        "text": "铠侠Q2财报",
        "cls": "jp",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 12,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
