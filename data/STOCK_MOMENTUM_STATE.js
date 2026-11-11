@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-12 01:45",
- "generated": "2026-11-12 01:45",
+ "update_time": "2026-11-12 01:56",
+ "generated": "2026-11-12 01:56",
  "meta": {
-  "generated": "2026-11-12 01:45",
+  "generated": "2026-11-12 01:56",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12300,6 +12300,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 20.0,
+      "price": 48.96,
+      "category": "突破"
+     },
+     {
       "code": "002328",
       "name": "新朋股份",
       "change_pct": 3.106,
@@ -12374,6 +12381,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金钟股份",
       "change_pct": 4.753,
       "price": 22.48,
+      "category": "突破"
+     },
+     {
+      "code": "603466",
+      "name": "风语筑",
+      "change_pct": 9.98,
+      "price": 16.86,
       "category": "突破"
      },
      {
@@ -12453,6 +12467,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "能辉科技",
       "change_pct": 6.777,
       "price": 31.04,
+      "category": "加速"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 20.0,
+      "price": 48.96,
       "category": "加速"
      },
      {
@@ -12542,6 +12563,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 20.0,
+      "price": 48.96,
+      "category": "短线选股"
+     },
+     {
       "code": "002328",
       "name": "新朋股份",
       "change_pct": 3.106,
@@ -12619,6 +12647,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "603466",
+      "name": "风语筑",
+      "change_pct": 9.98,
+      "price": 16.86,
+      "category": "短线选股"
+     },
+     {
       "code": "600876",
       "name": "凯盛新能",
       "change_pct": 9.971,
@@ -12690,6 +12725,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
      }
     ],
     "强势股": [
+     {
+      "code": "603466",
+      "name": "风语筑",
+      "change_pct": 9.98,
+      "price": 16.86,
+      "category": "强势股"
+     },
      {
       "code": "600876",
       "name": "凯盛新能",
