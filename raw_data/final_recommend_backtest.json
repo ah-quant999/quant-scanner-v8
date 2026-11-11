@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-11 05:08:24",
- "update_time": "2026-11-11 05:08:24",
+ "generated": "2026-11-11 21:22:09",
+ "update_time": "2026-11-11 21:22:09",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -27,12 +27,12 @@
  "attribution_rule": "update_time 小时 < 9 归前一自然日（与闸门 _NIGHT_CUT 同源）；同一入场日的多个归档版本只认最新版（旧版视为被刷新替代），杜绝周末/国庆重跑双计",
  "versions_total": 7,
  "versions_superseded": 1,
- "versions_no_entry": 3,
+ "versions_no_entry": 1,
  "signals_missing_kline": 0,
  "total_signals": 9,
  "signal_days": 3,
  "signal_date_range": "2026-11-02 ~ 2026-11-09",
- "kline_calendar_range": "2023-06-29 ~ 2026-11-09",
+ "kline_calendar_range": "2023-06-29 ~ 2026-11-11",
  "periods": {
   "1d": {
    "samples": 2,

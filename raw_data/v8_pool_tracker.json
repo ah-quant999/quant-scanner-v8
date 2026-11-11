@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-11 02:27:00",
+  "update_time": "2026-11-11 18:11:07",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,54 +9,54 @@
   "items": [],
   "sentiment_meta": {
     "phase": "狂热",
-    "score": 85.0,
-    "delta_pct": 72.22,
+    "score": 80.0,
+    "delta_pct": -8.6,
     "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "机器人概念",
-        "type": "概念",
-        "net": 94.63
-      },
-      {
-        "name": "基金减仓",
-        "type": "概念",
-        "net": 92.71
-      },
-      {
-        "name": "电子",
-        "type": "行业",
-        "net": 92.02
-      },
-      {
-        "name": "华为概念",
-        "type": "概念",
-        "net": 85.72
-      },
-      {
         "name": "通信技术",
         "type": "概念",
-        "net": 71.28
+        "net": 261.64
+      },
+      {
+        "name": "5G概念",
+        "type": "概念",
+        "net": 226.05
+      },
+      {
+        "name": "2026中报预增",
+        "type": "概念",
+        "net": 213.78
+      },
+      {
+        "name": "CPO概念",
+        "type": "概念",
+        "net": 205.54
+      },
+      {
+        "name": "光通信模块",
+        "type": "概念",
+        "net": 190.9
       }
     ],
     "top_out": [
       {
-        "name": "自然景区",
+        "name": "电网自动化设备",
         "type": "行业",
-        "net": -0.67
+        "net": -1.61
       },
       {
-        "name": "核力发电",
+        "name": "旅游零售Ⅱ",
         "type": "行业",
-        "net": -0.68
+        "net": -1.62
       },
       {
-        "name": "乘用车",
+        "name": "旅游零售Ⅲ",
         "type": "行业",
-        "net": -0.7
+        "net": -1.62
       }
     ]
   },
