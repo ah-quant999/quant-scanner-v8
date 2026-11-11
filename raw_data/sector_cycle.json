@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-11 10:29:53",
+  "update_time": "2026-11-11 10:44:28",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,14 +17,14 @@
     {
       "sector": "AI算力",
       "start": "09/23",
-      "end": "11/10",
+      "end": "11/11",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 25,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 26,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 230,
+      "total": 236,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1657,
+      "total": 1683,
       "ongoing": true
     },
     {
@@ -76,7 +76,7 @@
       "hot_days": 26,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 289,
+      "total": 300,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 29,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 508,
+      "total": 526,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 29,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 243,
+      "total": 248,
       "ongoing": true
     },
     {
@@ -212,14 +212,14 @@
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "11/10",
+      "end": "11/11",
       "start_idx": 18,
-      "end_idx": 28,
-      "days": 11,
-      "hot_days": 10,
+      "end_idx": 29,
+      "days": 12,
+      "hot_days": 11,
       "peak": 6,
       "peak_date": "11/04",
-      "total": 43,
+      "total": 48,
       "ongoing": true
     },
     {
@@ -238,27 +238,27 @@
     {
       "sector": "地产链",
       "start": "11/04",
-      "end": "11/09",
+      "end": "11/11",
       "start_idx": 24,
-      "end_idx": 27,
-      "days": 4,
-      "hot_days": 4,
+      "end_idx": 29,
+      "days": 6,
+      "hot_days": 5,
       "peak": 5,
       "peak_date": "11/05",
-      "total": 18,
-      "ongoing": false
+      "total": 23,
+      "ongoing": true
     },
     {
       "sector": "半导体",
       "start": "11/05",
-      "end": "11/10",
+      "end": "11/11",
       "start_idx": 25,
-      "end_idx": 28,
-      "days": 4,
-      "hot_days": 4,
+      "end_idx": 29,
+      "days": 5,
+      "hot_days": 5,
       "peak": 10,
       "peak_date": "11/05",
-      "total": 27,
+      "total": 30,
       "ongoing": true
     },
     {
@@ -282,9 +282,9 @@
       "end_idx": 29,
       "days": 1,
       "hot_days": 1,
-      "peak": 5,
+      "peak": 3,
       "peak_date": "11/11",
-      "total": 5,
+      "total": 3,
       "ongoing": true
     }
   ]
