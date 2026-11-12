@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-12 08:51",
- "generated": "2026-11-12 08:51",
+ "update_time": "2026-11-12 08:59",
+ "generated": "2026-11-12 08:59",
  "meta": {
-  "generated": "2026-11-12 08:51",
+  "generated": "2026-11-12 08:59",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12769,6 +12769,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "000678",
+      "name": "襄阳轴承",
+      "change_pct": 10.021,
+      "price": 21.19,
+      "category": "突破"
+     },
+     {
       "code": "600261",
       "name": "阳光照明",
       "change_pct": 6.838,
@@ -12776,10 +12783,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "002708",
+      "name": "光洋股份",
+      "change_pct": 10.012,
+      "price": 26.59,
+      "category": "突破"
+     },
+     {
       "code": "600715",
       "name": "文投控股",
       "change_pct": 10.175,
       "price": 3.14,
+      "category": "突破"
+     },
+     {
+      "code": "300473",
+      "name": "德尔股份",
+      "change_pct": 20.004,
+      "price": 58.79,
       "category": "突破"
      },
      {
@@ -12794,6 +12815,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "能辉科技",
       "change_pct": 6.777,
       "price": 31.04,
+      "category": "突破"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 20.0,
+      "price": 48.96,
       "category": "突破"
      },
      {
@@ -12928,23 +12956,16 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.884,
       "price": 30.71,
       "category": "突破"
-     },
-     {
-      "code": "688719",
-      "name": "爱科赛博",
-      "change_pct": 4.601,
-      "price": 42.97,
-      "category": "突破"
-     },
-     {
-      "code": "002902",
-      "name": "铭普光磁",
-      "change_pct": 5.4,
-      "price": 20.69,
-      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "000678",
+      "name": "襄阳轴承",
+      "change_pct": 10.021,
+      "price": 21.19,
+      "category": "加速"
+     },
      {
       "code": "600261",
       "name": "阳光照明",
@@ -12953,10 +12974,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "002708",
+      "name": "光洋股份",
+      "change_pct": 10.012,
+      "price": 26.59,
+      "category": "加速"
+     },
+     {
       "code": "600715",
       "name": "文投控股",
       "change_pct": 10.175,
       "price": 3.14,
+      "category": "加速"
+     },
+     {
+      "code": "300473",
+      "name": "德尔股份",
+      "change_pct": 20.004,
+      "price": 58.79,
       "category": "加速"
      },
      {
@@ -12971,6 +13006,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "能辉科技",
       "change_pct": 6.777,
       "price": 31.04,
+      "category": "加速"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 20.0,
+      "price": 48.96,
       "category": "加速"
      },
      {
@@ -13060,6 +13102,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "000678",
+      "name": "襄阳轴承",
+      "change_pct": 10.021,
+      "price": 21.19,
+      "category": "短线选股"
+     },
+     {
       "code": "600261",
       "name": "阳光照明",
       "change_pct": 6.838,
@@ -13067,10 +13116,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "002708",
+      "name": "光洋股份",
+      "change_pct": 10.012,
+      "price": 26.59,
+      "category": "短线选股"
+     },
+     {
       "code": "600715",
       "name": "文投控股",
       "change_pct": 10.175,
       "price": 3.14,
+      "category": "短线选股"
+     },
+     {
+      "code": "300473",
+      "name": "德尔股份",
+      "change_pct": 20.004,
+      "price": 58.79,
       "category": "短线选股"
      },
      {
@@ -13085,6 +13148,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "能辉科技",
       "change_pct": 6.777,
       "price": 31.04,
+      "category": "短线选股"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 20.0,
+      "price": 48.96,
       "category": "短线选股"
      },
      {
@@ -13219,20 +13289,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.884,
       "price": 30.71,
       "category": "短线选股"
-     },
-     {
-      "code": "688719",
-      "name": "爱科赛博",
-      "change_pct": 4.601,
-      "price": 42.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "002902",
-      "name": "铭普光磁",
-      "change_pct": 5.4,
-      "price": 20.69,
-      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -13283,20 +13339,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "ST东尼",
       "change_pct": 4.884,
       "price": 30.71,
-      "category": "强势股"
-     },
-     {
-      "code": "688719",
-      "name": "爱科赛博",
-      "change_pct": 4.601,
-      "price": 42.97,
-      "category": "强势股"
-     },
-     {
-      "code": "002902",
-      "name": "铭普光磁",
-      "change_pct": 5.4,
-      "price": 20.69,
       "category": "强势股"
      }
     ]
