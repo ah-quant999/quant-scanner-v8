@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-13 03:50:46",
+  "update_time": "2026-11-13 06:49:36",
   "universe": "重点池 A股（kline_cache）",
   "cost_roundtrip": 0.002,
   "rebalance": "每10个交易日，入场=次日开盘",
@@ -7,7 +7,7 @@
     "fetch_days": 800,
     "min_bars_required": 761,
     "universe_requested": 6115,
-    "stocks_loaded": 6097,
+    "stocks_loaded": 6096,
     "coverage_pct": 99.7,
     "max_bars_available": 1200,
     "accumulating_holds": 0,
@@ -17,7 +17,7 @@
       "1d": {
         "need_bars": 263,
         "stocks_ready": 572,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 12203,
         "status": "ready"
@@ -25,7 +25,7 @@
       "3d": {
         "need_bars": 267,
         "stocks_ready": 558,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 12132,
         "status": "ready"
@@ -33,7 +33,7 @@
       "5d": {
         "need_bars": 271,
         "stocks_ready": 551,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 12079,
         "status": "ready"
@@ -41,7 +41,7 @@
       "10d": {
         "need_bars": 281,
         "stocks_ready": 540,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 11721,
         "status": "ready"
@@ -49,7 +49,7 @@
       "20d": {
         "need_bars": 301,
         "stocks_ready": 537,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 11171,
         "status": "ready"
@@ -57,7 +57,7 @@
       "30d": {
         "need_bars": 321,
         "stocks_ready": 427,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 10632,
         "status": "ready"
@@ -65,7 +65,7 @@
       "45d": {
         "need_bars": 351,
         "stocks_ready": 179,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 9907,
         "status": "ready"
@@ -73,7 +73,7 @@
       "60d": {
         "need_bars": 381,
         "stocks_ready": 177,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 9023,
         "status": "ready"
@@ -81,7 +81,7 @@
       "75d": {
         "need_bars": 411,
         "stocks_ready": 177,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 8412,
         "status": "ready"
@@ -89,7 +89,7 @@
       "90d": {
         "need_bars": 441,
         "stocks_ready": 177,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 8008,
         "status": "ready"
@@ -97,7 +97,7 @@
       "180d": {
         "need_bars": 621,
         "stocks_ready": 176,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 6422,
         "status": "ready"
@@ -105,7 +105,7 @@
       "250d": {
         "need_bars": 761,
         "stocks_ready": 174,
-        "stocks_total": 6097,
+        "stocks_total": 6096,
         "max_bars_available": 1200,
         "samples": 5190,
         "status": "ready"
@@ -116,7 +116,7 @@
   "abnormal_volume": {
     "n_points": 94,
     "point_dates": [
-      "2026-05-25",
+      "2026-06-04",
       "",
       "",
       "",

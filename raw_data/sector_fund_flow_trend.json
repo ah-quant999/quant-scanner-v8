@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-13 03:09",
+  "update_time": "2026-11-13 06:09",
   "data_type": "real",
   "summary": {
     "in_count": 11,
@@ -1120,13 +1120,13 @@
       "name": "共封装光学(CPO)",
       "net": 95.91,
       "net_5d": 133.86,
-      "net_20d": -394.11,
-      "net_60d": -1832.04,
+      "net_20d": -394.12,
+      "net_60d": -1832.05,
       "type": "行业",
       "consecutive_days": 18,
       "trend": "in",
       "net_5d_days": 5,
-      "net_10d": -41.75,
+      "net_10d": -41.76,
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60,
@@ -1242,22 +1242,6 @@
       "net_60d_days": 60
     },
     {
-      "name": "半导体概念",
-      "net": 55.2,
-      "net_5d": 46.84,
-      "net_20d": -271.91,
-      "net_60d": -2988.91,
-      "type": "概念",
-      "consecutive_days": 2,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 137.0,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60,
-      "source": "东财日K"
-    },
-    {
       "name": "白酒",
       "net": -0.23,
       "net_5d": 71.81,
@@ -1361,6 +1345,21 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K"
+    },
+    {
+      "name": "QFII新进",
+      "net": 18.94,
+      "net_5d": 86.47,
+      "net_20d": 17.52,
+      "net_60d": 17.52,
+      "type": "行业",
+      "consecutive_days": 7,
+      "trend": "in",
+      "net_5d_days": 5,
+      "net_10d": 64.12,
+      "net_10d_days": 10,
+      "net_20d_days": 15,
+      "net_60d_days": 15
     }
   ],
   "trend_20d": [
@@ -1465,6 +1464,21 @@
       "net_20d_days": 20
     },
     {
+      "name": "DeepSeek概念",
+      "net": -55.14,
+      "net_5d": -108.14,
+      "net_20d": 139.19,
+      "net_60d": 281.11,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 7.78,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
       "name": "证金持股",
       "net": 1.29,
       "net_5d": -3.62,
@@ -1520,20 +1534,6 @@
       "trend": "out",
       "net_5d_days": 5,
       "net_10d": -10.74,
-      "net_10d_days": 10,
-      "net_20d_days": 20
-    },
-    {
-      "name": "养老概念",
-      "net": -2.71,
-      "net_5d": 10.56,
-      "net_20d": 67.24,
-      "net_60d": null,
-      "type": "概念",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 21.17,
       "net_10d_days": 10,
       "net_20d_days": 20
     }
@@ -1627,6 +1627,21 @@
       "net_60d_days": 60
     },
     {
+      "name": "DeepSeek概念",
+      "net": -55.14,
+      "net_5d": -108.14,
+      "net_20d": 139.19,
+      "net_60d": 281.11,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 7.78,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
       "name": "证金持股",
       "net": 1.29,
       "net_5d": -3.62,
@@ -1700,21 +1715,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 56
-    },
-    {
-      "name": "个护用品",
-      "net": 3.8,
-      "net_5d": 16.72,
-      "net_20d": 39.04,
-      "net_60d": 86.15,
-      "type": "行业",
-      "consecutive_days": 53,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 26.15,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 53
     }
   ]
 }

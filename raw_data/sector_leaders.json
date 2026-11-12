@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-13 00:26",
-  "republish_time": "2026-11-13 04:03:59",
+  "republish_time": "2026-11-13 06:49:32",
   "data_date": "2026-11-12",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "慈文传媒",
           "price": 10.04,
           "chg": 3.51,
-          "main_net": null
+          "main_net": 18310070.0
         },
         {
           "code": "300528",
           "name": "幸福蓝海",
           "price": 14.99,
           "chg": -0.53,
-          "main_net": null
+          "main_net": 10039894.0
         },
         {
           "code": "002905",
           "name": "金逸影视",
           "price": 9.0,
           "chg": -0.55,
-          "main_net": null
+          "main_net": 96807.0
         },
         {
           "code": "002739",
           "name": "儒意电影",
           "price": 9.14,
           "chg": -0.76,
-          "main_net": null
+          "main_net": -7897387.0
         },
         {
           "code": "603103",
           "name": "横店影视",
           "price": 17.55,
           "chg": -2.55,
-          "main_net": null
+          "main_net": -7114073.0
         }
       ],
       "match": "exact"
@@ -60,42 +60,42 @@
       "phase": "启动",
       "pct_5d": 7.44,
       "pct_20d": 2.61,
-      "cons_count": 29,
+      "cons_count": 31,
       "leaders": [
         {
           "code": "603706",
           "name": "东方环宇",
           "price": 26.87,
           "chg": 9.99,
-          "main_net": null
+          "main_net": 17562025.0
         },
         {
           "code": "605169",
           "name": "洪通燃气",
           "price": 13.55,
           "chg": 9.98,
-          "main_net": null
+          "main_net": 34368032.0
         },
         {
           "code": "603318",
           "name": "水发燃气",
           "price": 8.83,
           "chg": 4.5,
-          "main_net": null
+          "main_net": -8828214.0
         },
         {
           "code": "603080",
           "name": "新疆火炬",
           "price": 20.58,
           "chg": 3.05,
-          "main_net": null
+          "main_net": 17701838.0
         },
         {
           "code": "600617",
           "name": "国新能源",
           "price": 3.26,
           "chg": 2.19,
-          "main_net": null
+          "main_net": 3296697.0
         }
       ],
       "match": "norm"
@@ -113,35 +113,35 @@
           "name": "日出东方",
           "price": 13.17,
           "chg": 10.03,
-          "main_net": null
+          "main_net": -276251904.0
         },
         {
           "code": "002543",
           "name": "万和电气",
           "price": 7.23,
           "chg": -0.28,
-          "main_net": null
+          "main_net": -1177458.0
         },
         {
           "code": "605336",
           "name": "*ST帅电",
           "price": 9.41,
           "chg": -0.84,
-          "main_net": null
+          "main_net": 29574.0
         },
         {
           "code": "603551",
           "name": "奥普科技",
           "price": 8.73,
           "chg": -1.36,
-          "main_net": null
+          "main_net": -834263.0
         },
         {
           "code": "002035",
           "name": "华帝股份",
           "price": 4.31,
           "chg": -1.37,
-          "main_net": null
+          "main_net": 10481.0
         }
       ],
       "match": "exact"
@@ -152,45 +152,45 @@
       "phase": "启动",
       "pct_5d": 3.33,
       "pct_20d": -5.44,
-      "cons_count": 20,
+      "cons_count": 94,
       "leaders": [
+        {
+          "code": "920374",
+          "name": "云里物里",
+          "price": 18.01,
+          "chg": 11.38,
+          "main_net": 9182832.0
+        },
         {
           "code": "301165",
           "name": "锐捷网络",
           "price": 81.25,
           "chg": 5.92,
-          "main_net": null
+          "main_net": 119679098.0
         },
         {
           "code": "603083",
           "name": "剑桥科技",
           "price": 122.85,
           "chg": 5.04,
-          "main_net": null
+          "main_net": 278174208.0
         },
         {
           "code": "002396",
           "name": "星网锐捷",
           "price": 25.47,
           "chg": 4.13,
-          "main_net": null
+          "main_net": 458662512.0
         },
         {
-          "code": "300548",
-          "name": "长芯博创",
-          "price": 130.46,
-          "chg": 2.27,
-          "main_net": null
-        },
-        {
-          "code": "300620",
-          "name": "光库科技",
-          "price": 211.34,
-          "chg": 1.26,
-          "main_net": null
+          "code": "920157",
+          "name": "宇特光电",
+          "price": 59.18,
+          "chg": 2.58,
+          "main_net": -20673809.0
         }
       ],
-      "match": "ths"
+      "match": "exact"
     },
     {
       "name": "黑色家电",
@@ -205,35 +205,35 @@
           "name": "辰奕智能",
           "price": 33.1,
           "chg": 7.12,
-          "main_net": null
+          "main_net": -11833.0
         },
         {
           "code": "002848",
           "name": "高斯贝尔",
           "price": 13.41,
           "chg": -1.03,
-          "main_net": null
+          "main_net": -790204.0
         },
         {
           "code": "600839",
           "name": "四川长虹",
           "price": 5.03,
           "chg": -1.57,
-          "main_net": null
+          "main_net": -7777604.0
         },
         {
           "code": "600060",
           "name": "海信视像",
           "price": 25.28,
           "chg": -1.86,
-          "main_net": null
+          "main_net": 11025389.0
         },
         {
           "code": "000801",
           "name": "四川九洲",
           "price": 10.26,
           "chg": -2.47,
-          "main_net": null
+          "main_net": 3703647.0
         }
       ],
       "match": "exact"
@@ -861,7 +861,7 @@
     {
       "name": "通信设备",
       "bk": "BK0448",
-      "cons_count": 20,
+      "cons_count": 88,
       "leaders": [
         {
           "code": "301165",
@@ -899,7 +899,7 @@
           "main_net": null
         }
       ],
-      "match": "ths"
+      "match": "exact"
     },
     {
       "name": "银行",
@@ -993,5 +993,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-13 03:50:35 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-13 04:03:59 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-13 06:49:32 跟随 FINAL 重算(一劳永逸)"
 }
