@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-12 01:30:54",
+  "update_time": "2026-11-12 08:47:03",
   "crisis_score": 33.5,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,13 +7,13 @@
   "top_n": 3,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-11 23:52:50",
+    "source": "backtest_expectancy@2026-11-12 07:01:11",
     "degraded": false,
     "effective": {
-      "jinzuan": -0.523,
-      "chan": 0.155,
-      "trend": 0.339,
-      "jigou": 0.449
+      "jinzuan": -0.543,
+      "chan": 0.165,
+      "trend": 0.32,
+      "jigou": 0.47
     },
     "hardcoded_default": {
       "jinzuan": -0.522,
@@ -22,10 +22,10 @@
       "jigou": 0.449
     },
     "n_on10": {
-      "jinzuan": 549,
-      "chan": 761,
+      "jinzuan": 557,
+      "chan": 773,
       "trend": 276,
-      "jigou": 504
+      "jigou": 506
     },
     "consistent": {
       "jinzuan": true,
@@ -34,7 +34,7 @@
       "jigou": true
     },
     "loaded": {
-      "generated": "2026-11-11 23:52:50",
+      "generated": "2026-11-12 07:01:11",
       "hit": 4,
       "n_snapshots": 107,
       "date_range": [
@@ -64,8 +64,8 @@
     "note": "09-18 walk-forward 曾测「高手跟踪」作四量加分项边际 −1.76pp（n=13、回放口径、四量池上下文）——与本处「IMA 自身信号真实流」非同口径同场景，如实并列不隐瞒；回退开关 V8_IMA_INTAKE=0"
   },
   "price_source": {
-    "date": "2026-11-11",
-    "source": "STOCK_QUOTE",
+    "date": null,
+    "source": null,
     "covered": 0,
     "total": 0,
     "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"
@@ -88,7 +88,7 @@
   "consensus_stocks": [],
   "all_candidates": [],
   "factor_chain": {
-    "update_time": "2026-11-12 01:30:54",
+    "update_time": "2026-11-12 08:47:03",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
