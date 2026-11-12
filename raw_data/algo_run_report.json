@@ -1,8 +1,25 @@
 {
-  "update_time": "2026-11-12 19:05:35",
-  "run_start": "2026-11-12 18:06:19",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-11-12 22:27:56",
+  "run_start": "2026-11-12 19:21:17",
+  "ok": 42,
+  "fail": 4,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout failed!"
+    },
+    {
+      "script": "scripts/fetch_multiyear_kline.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+    }
+  ],
   "skipped_by_time_gate": []
 }

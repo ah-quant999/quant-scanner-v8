@@ -1,18 +1,18 @@
 {
-  "update_time": "2026-11-12 08:51:11",
-  "source": "baostock 四指数日K（上证/沪深300/中证500/中证1000）",
+  "update_time": "2026-11-12 22:26:42",
+  "source": "INDEX_HISTORY.js 兜底（上证指数 走 INDEX_HISTORY.js 兜底）",
   "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位",
   "indices": [
     {
       "name": "上证指数",
       "code": "000001",
-      "latest_date": "2026-11-11",
-      "latest_close": 3680.64,
-      "ema20": 3692.47,
-      "ema60": 3792.77,
-      "ema120": 3865.66,
-      "ema250": 3867.36,
-      "boll_position": -0.807,
+      "latest_date": "2026-11-12",
+      "latest_close": 3655.83,
+      "ema20": 3688.98,
+      "ema60": 3788.28,
+      "ema120": 3862.19,
+      "ema250": 3865.72,
+      "boll_position": -0.879,
       "bucket": "极度低估",
       "trend_short": "下降",
       "trend_long": "下降",
@@ -22,50 +22,20 @@
     {
       "name": "沪深300",
       "code": "000300",
-      "latest_date": "2026-11-11",
-      "latest_close": 4075.71,
-      "ema20": 4114.65,
-      "ema60": 4316.84,
-      "ema120": 4461.51,
-      "ema250": 4492.54,
-      "boll_position": -0.902,
-      "bucket": "极度低估",
-      "trend_short": "下降",
-      "trend_long": "下降",
-      "gate": "空头/观望",
-      "gate_color": "绿"
+      "available": false,
+      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
     },
     {
       "name": "中证500",
       "code": "000905",
-      "latest_date": "2026-11-11",
-      "latest_close": 6713.18,
-      "ema20": 6722.81,
-      "ema60": 7192.76,
-      "ema120": 7514.87,
-      "ema250": 7522.03,
-      "boll_position": -0.792,
-      "bucket": "低估",
-      "trend_short": "下降",
-      "trend_long": "下降",
-      "gate": "空头/观望",
-      "gate_color": "绿"
+      "available": false,
+      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
     },
     {
       "name": "中证1000",
       "code": "000852",
-      "latest_date": "2026-11-11",
-      "latest_close": 6669.55,
-      "ema20": 6637.71,
-      "ema60": 7074.79,
-      "ema120": 7404.5,
-      "ema250": 7487.64,
-      "boll_position": -0.681,
-      "bucket": "低估",
-      "trend_short": "下降",
-      "trend_long": "下降",
-      "gate": "空头/观望",
-      "gate_color": "绿"
+      "available": false,
+      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
     }
   ]
 }
