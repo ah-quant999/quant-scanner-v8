@@ -1,45 +1,51 @@
 {
-  "update_time": "2026-11-12 21:39:08",
+  "update_time": "2026-11-13 03:09:02",
   "suspended": [
     {
       "code": "688496",
       "name": "*ST清越",
-      "days": 62,
+      "days": 63,
       "reason": "刊登重要公告"
     },
     {
       "code": "002717",
       "name": "*ST岭南",
-      "days": 30,
+      "days": 31,
       "reason": "刊登重要公告"
     },
     {
       "code": "688121",
       "name": "*ST卓然",
-      "days": 14,
+      "days": 15,
       "reason": "刊登重要公告"
     },
     {
       "code": "000831",
       "name": "中国稀土",
-      "days": 10,
+      "days": 11,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "002129",
       "name": "TCL中环",
-      "days": 10,
+      "days": 11,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "688798",
       "name": "艾为电子",
-      "days": 2,
+      "days": 3,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "600185",
       "name": "珠免集团",
+      "days": 1,
+      "reason": "拟筹划重大资产重组"
+    },
+    {
+      "code": "000635",
+      "name": "英力特",
       "days": 0,
       "reason": "拟筹划重大资产重组"
     }
