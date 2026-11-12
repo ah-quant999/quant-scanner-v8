@@ -1,6 +1,6 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-13 06:52:37",
+  "generated": "2026-11-13 06:57:13",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
@@ -14189,86 +14189,6 @@ window.STOCK_MOMENTUM_ENHANCED = {
    "count": 37,
    "leaders": [
     {
-     "code": "600510",
-     "symbol": "sh600510",
-     "name": "黑牡丹",
-     "date": "2026-11-10",
-     "count": 1,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 9.97,
-     "sel_change_pct": 9.97,
-     "data_available": true,
-     "consec_before": 3,
-     "stage": "启动",
-     "consecutive_up_days": 1,
-     "max_gain_pct": 0.49,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.49,
-     "t3_gain_pct": 0.49,
-     "t5_gain_pct": 0.49,
-     "t10_gain_pct": 0.49,
-     "last_gain_pct": 0.49,
-     "pattern": "普通",
-     "note": "连涨前3天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "2026-11-11",
-       "gain": 0.49
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 8.16
-    },
-    {
      "code": "300741",
      "symbol": "sz300741",
      "name": "华宝股份",
@@ -14987,6 +14907,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 13.53
+    },
+    {
+     "code": "002489",
+     "symbol": "sz002489",
+     "name": "浙江永强",
+     "date": "2026-11-02",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 10.14,
+     "sel_change_pct": 10.14,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "震荡",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 3.04
     }
    ],
    "all": [
@@ -16768,14 +16768,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "stage": "启动",
      "consecutive_up_days": 1,
      "max_gain_pct": 0.49,
-     "max_drawdown_pct": 0.0,
+     "max_drawdown_pct": 2.7,
      "t1_gain_pct": 0.49,
-     "t3_gain_pct": 0.49,
-     "t5_gain_pct": 0.49,
-     "t10_gain_pct": 0.49,
-     "last_gain_pct": 0.49,
+     "t3_gain_pct": -2.7,
+     "t5_gain_pct": -2.7,
+     "t10_gain_pct": -2.7,
+     "last_gain_pct": -2.7,
      "pattern": "普通",
-     "note": "连涨前3天 回撤0.0%",
+     "note": "连涨前3天 回撤2.7%",
      "daily_returns": [
       {
        "T": "T+1",
@@ -16784,8 +16784,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+2",
-       "date": "",
-       "gain": null
+       "date": "2026-11-12",
+       "gain": -2.7
       },
       {
        "T": "T+3",
