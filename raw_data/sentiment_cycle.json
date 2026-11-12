@@ -1,42 +1,43 @@
 {
-  "update_time": "2026-11-12 16:52:19",
+  "update_time": "2026-11-12 19:09:53",
   "data_date": "2026-11-12",
   "source": "LIMIT_UP_HEATMAP",
-  "phase": "狂热",
-  "color": "#ef4444",
-  "score": 80.0,
-  "delta_pct": 0.0,
-  "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
+  "phase": "退潮",
+  "color": "#f97316",
+  "score": 62.0,
+  "delta_pct": -56.47,
+  "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 85,
-    "max_ladder": 4,
-    "high_ladder_count": 7,
+    "total_up": 37,
+    "max_ladder": 5,
+    "high_ladder_count": 6,
     "sectors_count": 13
   },
   "ladder_dist": {
-    "1": 66,
-    "2": 12,
-    "3": 5,
-    "4": 2
+    "1": 26,
+    "2": 5,
+    "3": 2,
+    "4": 2,
+    "5": 2
   },
   "leaders": [
     {
       "code": "603366",
       "name": "日出东方",
-      "lbc": 4,
-      "chg": 10.02
+      "lbc": 5,
+      "chg": 10.03
     },
     {
       "code": "600327",
       "name": "大东方",
-      "lbc": 4,
-      "chg": 9.93
+      "lbc": 5,
+      "chg": 9.95
     },
     {
       "code": "002623",
       "name": "亚玛顿",
-      "lbc": 3,
-      "chg": 10.0
+      "lbc": 4,
+      "chg": 9.99
     }
   ],
   "prev_total": 85,
