@@ -2414,7 +2414,7 @@ _LOW_FREQ_FILES = {
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
     "WEEKEND_RUN",
     "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警
-    "MAHORO_INSIGHTS",  # 2026-11-08 主人令一劳永逸：与 CARD_DEFS id 对齐（本机 cookie 拉取，云端无权限）-> 7天容忍仅告警
+    "MAHORO_INSIGHTS", "maharo_insights",  # 2026-11-13 一劳永逸：补小写键（all_ 扫描用文件名小写 vid）；与 CARD_DEFS id 对齐（本机 cookie 拉取，云端无权限）-> 7天容忍仅告警
     "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
     # 🛡 2026-09-16 主人令一劳永逸：候选池 / 金股池是算法**上游水源**不是策略 ⇒ 不需要回测
     #   （09-14 已摘 CARD_DEFS 登记 + 删 algorithms/backtest_pools.py），但两份产物当时漏删，
@@ -2539,6 +2539,8 @@ _LOW_FREQ_MAX_AGE = {
     "HUIJIN_HOLDINGS": 90 * 24 * 60,   # 汇金持仓季报披露（季度级更新，底层数据为季报；90天红线容忍季报空窗，超季未更仍报真故障）
     "HUIJIN_ETF_DRILL": 90 * 24 * 60,  # 汇金ETF下钻（公开披露季报级，静态研究型，与HUIJIN_HOLDINGS同族；此前被通用1620min红线误杀为fail，现进低频白名单+90天红线，超季未更仍报真故障）
     "RESONANCE_TRACK": 30 * 24 * 60,   # 龙虎榜共振回测研究集（手动/周期重算，无自动调度；30天红线，超月未重算即告警）
+    "MAHORO_INSIGHTS": 7 * 24 * 60,    # 机构研究·AI解析（本机 cookie 拉取，云端无权限；小九离线即无法刷新）→ 7天容忍仅告警，超 7 天仍 fail 保留真故障可见性（2026-11-13 一劳永逸：原仅入白名单未给红线，致 CARD_DEFS 按 24h 误判 fail）
+    "maharo_insights": 7 * 24 * 60,    # 同上；all_ 通用扫描以文件名小写 vid 命中，补小写键使白名单+红线对 all_maharo_insights 生效（原大小写不匹配→白名单失效→落通用 24h 红线 fail）
 }
 
 
@@ -2651,6 +2653,25 @@ def check_all_data_files():
                 "heal_cat": "peer",
                 "message": (f"阿狸咪心跳 last={_last}（{_silent}）—— 阿狸咪暂停待命/非在岗窗口，"
                             f"心跳陈旧为**设计预期**（主人令：阿狸咪任务须 PAUSED；双机分时：对方已接管）。"
+                            f"真实活体由 v8_peer_monitor 双机互看负责，健康巡检不重复判此文件"),
+            })
+            continue
+        if vid == "HB_XIAOJIU":
+            # 🛡 2026-11-13 一劳永逸：HB_XIAOJIU 是**小九（白天机）心跳**（由小九侧自动化推送 raw_data/hb_xiaojiu.json → 云端 build 映射）。
+            #   双机分时铁律：小九白天 7:45-17:45、阿狸咪夜间 18:00-次日 7:30 + 周末；小九非在岗窗口由阿狸咪接管
+            #   ⇒ 小九心跳陈旧与 HB_ALIMI 同口径（彼此离线=对方已接管，不判故障）。此前 all_HB_XIAOJIU 被「全量数据」
+            #   通用红线平铺误杀 → 每段必亮红灯，属假红（与 HB_ALIMI 不对称）。真实活体由 RUNNER_STATUS /
+            #   v8_peer_monitor 双机互看负责（RUNNER_STATUS.worker=false 已如实呈现小九自托管进程离线），健康巡检不重复判此文件。
+            _last = str(ts)[:19] if ts and ts != "--" else "—"
+            _age_hb = (now_cst() - dt).total_seconds() / 60 if dt is not None else None
+            _silent = f"沉默 {_age_hb:.0f}min" if _age_hb is not None else "无时间戳"
+            results.append({
+                "id": f"all_{vid}", "name": "HB_XIAOJIU（小九心跳）", "page": "双机互看", "freq": "—",
+                "status": "ok", "last_update": _last,
+                "age_min": round(_age_hb, 1) if _age_hb is not None else None,
+                "heal_cat": "peer",
+                "message": (f"小九心跳 last={_last}（{_silent}）—— 小九非在岗窗口/自托管 runner 离线时"
+                            f"心跳陈旧为**设计预期**（双机分时：对方已接管；详见 RUNNER_STATUS）。"
                             f"真实活体由 v8_peer_monitor 双机互看负责，健康巡检不重复判此文件"),
             })
             continue
