@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-13 08:48",
- "generated": "2026-11-13 08:48",
+ "update_time": "2026-11-13 15:55",
+ "generated": "2026-11-13 15:55",
  "meta": {
-  "generated": "2026-11-13 08:48",
+  "generated": "2026-11-13 15:55",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12685,135 +12685,177 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "002172",
-      "name": "澳洋健康",
-      "change_pct": 10.083,
-      "price": 6.66,
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.032,
+      "price": 3.4,
+      "category": "突破"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 5.036,
+      "price": 46.09,
+      "category": "突破"
+     },
+     {
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 3.281,
+      "price": 21.72,
       "category": "突破"
      },
      {
       "code": "600857",
       "name": "宁波中百",
-      "change_pct": 9.971,
-      "price": 15.0,
+      "change_pct": 8.667,
+      "price": 16.3,
       "category": "突破"
      },
      {
       "code": "301133",
       "name": "金钟股份",
-      "change_pct": 7.206,
-      "price": 24.1,
+      "change_pct": 3.278,
+      "price": 24.89,
       "category": "突破"
      },
      {
-      "code": "301252",
-      "name": "同星科技",
-      "change_pct": 7.825,
-      "price": 43.27,
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 19.853,
+      "price": 3.26,
       "category": "突破"
      },
      {
-      "code": "600698",
-      "name": "湖南天雁",
-      "change_pct": 4.225,
-      "price": 7.4,
+      "code": "002819",
+      "name": "东方中科",
+      "change_pct": 9.985,
+      "price": 21.7,
       "category": "突破"
      },
      {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 8.664,
-      "price": 119.53,
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 10.057,
+      "price": 3.83,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "002172",
-      "name": "澳洋健康",
-      "change_pct": 10.083,
-      "price": 6.66,
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.032,
+      "price": 3.4,
+      "category": "加速"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 5.036,
+      "price": 46.09,
+      "category": "加速"
+     },
+     {
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 3.281,
+      "price": 21.72,
       "category": "加速"
      },
      {
       "code": "600857",
       "name": "宁波中百",
-      "change_pct": 9.971,
-      "price": 15.0,
+      "change_pct": 8.667,
+      "price": 16.3,
       "category": "加速"
      },
      {
       "code": "301133",
       "name": "金钟股份",
-      "change_pct": 7.206,
-      "price": 24.1,
+      "change_pct": 3.278,
+      "price": 24.89,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "002172",
-      "name": "澳洋健康",
-      "change_pct": 10.083,
-      "price": 6.66,
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.032,
+      "price": 3.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 5.036,
+      "price": 46.09,
+      "category": "短线选股"
+     },
+     {
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 3.281,
+      "price": 21.72,
       "category": "短线选股"
      },
      {
       "code": "600857",
       "name": "宁波中百",
-      "change_pct": 9.971,
-      "price": 15.0,
+      "change_pct": 8.667,
+      "price": 16.3,
       "category": "短线选股"
      },
      {
       "code": "301133",
       "name": "金钟股份",
-      "change_pct": 7.206,
-      "price": 24.1,
+      "change_pct": 3.278,
+      "price": 24.89,
       "category": "短线选股"
      },
      {
-      "code": "301252",
-      "name": "同星科技",
-      "change_pct": 7.825,
-      "price": 43.27,
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 19.853,
+      "price": 3.26,
       "category": "短线选股"
      },
      {
-      "code": "600698",
-      "name": "湖南天雁",
-      "change_pct": 4.225,
-      "price": 7.4,
+      "code": "002819",
+      "name": "东方中科",
+      "change_pct": 9.985,
+      "price": 21.7,
       "category": "短线选股"
      },
      {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 8.664,
-      "price": 119.53,
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 10.057,
+      "price": 3.83,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "301252",
-      "name": "同星科技",
-      "change_pct": 7.825,
-      "price": 43.27,
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 19.853,
+      "price": 3.26,
       "category": "强势股"
      },
      {
-      "code": "600698",
-      "name": "湖南天雁",
-      "change_pct": 4.225,
-      "price": 7.4,
+      "code": "002819",
+      "name": "东方中科",
+      "change_pct": 9.985,
+      "price": 21.7,
       "category": "强势股"
      },
      {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 8.664,
-      "price": 119.53,
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 10.057,
+      "price": 3.83,
       "category": "强势股"
      }
     ]
