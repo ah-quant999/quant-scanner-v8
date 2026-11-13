@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-14 02:24",
- "generated": "2026-11-14 02:24",
+ "update_time": "2026-11-14 03:39",
+ "generated": "2026-11-14 03:39",
  "meta": {
-  "generated": "2026-11-14 02:24",
+  "generated": "2026-11-14 03:39",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -12321,17 +12321,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 5.811,
-      "price": 46.43,
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 3.281,
+      "price": 21.72,
+      "category": "突破"
+     },
+     {
+      "code": "600857",
+      "name": "宁波中百",
+      "change_pct": 8.667,
+      "price": 16.3,
       "category": "突破"
      },
      {
       "code": "301133",
       "name": "金钟股份",
-      "change_pct": 3.361,
-      "price": 24.91,
+      "change_pct": 3.278,
+      "price": 24.89,
       "category": "突破"
      },
      {
@@ -12358,15 +12365,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603587",
       "name": "地素时尚",
-      "change_pct": 3.375,
-      "price": 15.01,
+      "change_pct": 3.444,
+      "price": 15.02,
       "category": "突破"
      },
      {
       "code": "688010",
       "name": "福光股份",
-      "change_pct": 4.51,
-      "price": 23.87,
+      "change_pct": 4.729,
+      "price": 23.92,
       "category": "突破"
      }
     ],
@@ -12379,17 +12386,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 5.811,
-      "price": 46.43,
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 3.281,
+      "price": 21.72,
+      "category": "加速"
+     },
+     {
+      "code": "600857",
+      "name": "宁波中百",
+      "change_pct": 8.667,
+      "price": 16.3,
       "category": "加速"
      },
      {
       "code": "301133",
       "name": "金钟股份",
-      "change_pct": 3.361,
-      "price": 24.91,
+      "change_pct": 3.278,
+      "price": 24.89,
       "category": "加速"
      }
     ],
@@ -12402,17 +12416,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 5.811,
-      "price": 46.43,
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 3.281,
+      "price": 21.72,
+      "category": "短线选股"
+     },
+     {
+      "code": "600857",
+      "name": "宁波中百",
+      "change_pct": 8.667,
+      "price": 16.3,
       "category": "短线选股"
      },
      {
       "code": "301133",
       "name": "金钟股份",
-      "change_pct": 3.361,
-      "price": 24.91,
+      "change_pct": 3.278,
+      "price": 24.89,
       "category": "短线选股"
      },
      {
@@ -12439,15 +12460,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603587",
       "name": "地素时尚",
-      "change_pct": 3.375,
-      "price": 15.01,
+      "change_pct": 3.444,
+      "price": 15.02,
       "category": "短线选股"
      },
      {
       "code": "688010",
       "name": "福光股份",
-      "change_pct": 4.51,
-      "price": 23.87,
+      "change_pct": 4.729,
+      "price": 23.92,
       "category": "短线选股"
      }
     ],
@@ -12476,15 +12497,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603587",
       "name": "地素时尚",
-      "change_pct": 3.375,
-      "price": 15.01,
+      "change_pct": 3.444,
+      "price": 15.02,
       "category": "强势股"
      },
      {
       "code": "688010",
       "name": "福光股份",
-      "change_pct": 4.51,
-      "price": 23.87,
+      "change_pct": 4.729,
+      "price": 23.92,
       "category": "强势股"
      }
     ]
