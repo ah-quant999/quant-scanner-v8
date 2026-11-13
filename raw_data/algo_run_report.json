@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-11-13 06:51:13",
-  "run_start": "2026-11-13 04:13:11",
-  "ok": 44,
-  "fail": 2,
+  "update_time": "2026-11-13 21:42:18",
+  "run_start": "2026-11-13 18:40:30",
+  "ok": 43,
+  "fail": 3,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
@@ -11,6 +11,10 @@
     {
       "script": "scripts/fetch_multiyear_kline.py",
       "reason": "超时 >40min"
+    },
+    {
+      "script": "market_regime.py",
+      "reason": "退出码 1 |   [market_regime] 缺 /home/runner/work/quant-scanner-v8/quant-scanner-v8/out/macro.json，自举 fetch_macro.py 后仍不存在，放弃"
     }
   ],
   "skipped_by_time_gate": []

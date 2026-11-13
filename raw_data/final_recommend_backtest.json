@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-13 06:51:03",
- "update_time": "2026-11-13 06:51:03",
+ "generated": "2026-11-13 21:42:08",
+ "update_time": "2026-11-13 21:42:08",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -27,12 +27,12 @@
  "attribution_rule": "update_time 小时 < 9 归前一自然日（与闸门 _NIGHT_CUT 同源）；同一入场日的多个归档版本只认最新版（旧版视为被刷新替代），杜绝周末/国庆重跑双计",
  "versions_total": 9,
  "versions_superseded": 1,
- "versions_no_entry": 3,
+ "versions_no_entry": 1,
  "signals_missing_kline": 0,
  "total_signals": 9,
  "signal_days": 3,
  "signal_date_range": "2026-11-02 ~ 2026-11-09",
- "kline_calendar_range": "2023-06-29 ~ 2026-11-11",
+ "kline_calendar_range": "2023-06-29 ~ 2026-11-13",
  "periods": {
   "1d": {
    "samples": 3,
@@ -83,16 +83,16 @@
    "max_drawdown": -9.77
   },
   "10d": {
-   "samples": 0,
-   "immature": true,
-   "win": null,
-   "loss": null,
-   "win_rate": null,
-   "avg_return": null,
-   "median_return": null,
-   "best_return": null,
-   "worst_return": null,
-   "max_drawdown": null
+   "samples": 1,
+   "immature": false,
+   "win": 0,
+   "loss": 1,
+   "win_rate": 0.0,
+   "avg_return": -17.14,
+   "median_return": -17.14,
+   "best_return": -17.14,
+   "worst_return": -17.14,
+   "max_drawdown": -18.05
   },
   "20d": {
    "samples": 0,
