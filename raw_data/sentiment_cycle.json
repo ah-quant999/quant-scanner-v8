@@ -1,43 +1,42 @@
 {
-  "update_time": "2026-11-13 06:58:11",
+  "update_time": "2026-11-13 14:53:10",
   "data_date": "2026-11-13",
   "source": "LIMIT_UP_HEATMAP",
-  "phase": "高潮",
-  "color": "#f59e0b",
-  "score": 62.0,
-  "delta_pct": 0.0,
-  "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
+  "phase": "回暖",
+  "color": "#10b981",
+  "score": 52.0,
+  "delta_pct": -13.51,
+  "advice": "🌱 情绪回暖：可适度参与，盯紧最高板扩展",
   "metrics": {
-    "total_up": 37,
-    "max_ladder": 5,
-    "high_ladder_count": 6,
+    "total_up": 32,
+    "max_ladder": 4,
+    "high_ladder_count": 3,
     "sectors_count": 13
   },
   "ladder_dist": {
-    "1": 26,
-    "2": 5,
+    "1": 25,
+    "2": 4,
     "3": 2,
-    "4": 2,
-    "5": 2
+    "4": 1
   },
   "leaders": [
     {
-      "code": "603366",
-      "name": "日出东方",
-      "lbc": 5,
-      "chg": 10.03
-    },
-    {
-      "code": "600327",
-      "name": "大东方",
-      "lbc": 5,
-      "chg": 9.95
-    },
-    {
-      "code": "002623",
-      "name": "亚玛顿",
+      "code": "605255",
+      "name": "天普股份",
       "lbc": 4,
-      "chg": 9.99
+      "chg": 10.0
+    },
+    {
+      "code": "002148",
+      "name": "北纬科技",
+      "lbc": 3,
+      "chg": 9.96
+    },
+    {
+      "code": "603396",
+      "name": "金辰股份",
+      "lbc": 3,
+      "chg": 10.0
     }
   ],
   "prev_total": 37,
