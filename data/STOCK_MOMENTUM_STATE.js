@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-13 16:52",
- "generated": "2026-11-13 16:52",
+ "update_time": "2026-11-13 18:35",
+ "generated": "2026-11-13 18:35",
  "meta": {
-  "generated": "2026-11-13 16:52",
+  "generated": "2026-11-13 18:35",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12692,13 +12692,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 5.036,
-      "price": 46.09,
-      "category": "突破"
-     },
-     {
       "code": "301227",
       "name": "森鹰窗业",
       "change_pct": 3.281,
@@ -12739,6 +12732,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.057,
       "price": 3.83,
       "category": "突破"
+     },
+     {
+      "code": "603587",
+      "name": "地素时尚",
+      "change_pct": 3.444,
+      "price": 15.02,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -12747,13 +12747,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "文投控股",
       "change_pct": 10.032,
       "price": 3.4,
-      "category": "加速"
-     },
-     {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 5.036,
-      "price": 46.09,
       "category": "加速"
      },
      {
@@ -12787,13 +12780,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 5.036,
-      "price": 46.09,
-      "category": "短线选股"
-     },
-     {
       "code": "301227",
       "name": "森鹰窗业",
       "change_pct": 3.281,
@@ -12834,6 +12820,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.057,
       "price": 3.83,
       "category": "短线选股"
+     },
+     {
+      "code": "603587",
+      "name": "地素时尚",
+      "change_pct": 3.444,
+      "price": 15.02,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -12856,6 +12849,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金新农",
       "change_pct": 10.057,
       "price": 3.83,
+      "category": "强势股"
+     },
+     {
+      "code": "603587",
+      "name": "地素时尚",
+      "change_pct": 3.444,
+      "price": 15.02,
       "category": "强势股"
      }
     ]
