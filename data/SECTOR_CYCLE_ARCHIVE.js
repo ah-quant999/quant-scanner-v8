@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-13 10:06:54
+// 最后更新：2026-11-13 10:32:37
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-13 10:06:54",
+  "update_time": "2026-11-13 10:32:37",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -32,14 +32,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "AI算力",
       "start": "09/28",
-      "end": "11/12",
+      "end": "11/13",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 26,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 27,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 230,
+      "total": 233,
       "ongoing": true
     },
     {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1639,
+      "total": 1670,
       "ongoing": true
     },
     {
@@ -91,7 +91,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 26,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 315,
+      "total": 313,
       "ongoing": true
     },
     {
@@ -104,20 +104,20 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 512,
+      "total": 517,
       "ongoing": true
     },
     {
       "sector": "消费电子",
       "start": "09/28",
-      "end": "11/12",
+      "end": "11/13",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 29,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 30,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 247,
+      "total": 252,
       "ongoing": true
     },
     {
@@ -136,14 +136,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "白酒消费",
       "start": "09/28",
-      "end": "11/12",
+      "end": "11/13",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 28,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 29,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 187,
+      "total": 191,
       "ongoing": true
     },
     {
@@ -214,14 +214,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "11/12",
+      "end": "11/13",
       "start_idx": 16,
-      "end_idx": 28,
-      "days": 13,
-      "hot_days": 12,
+      "end_idx": 29,
+      "days": 14,
+      "hot_days": 13,
       "peak": 6,
       "peak_date": "11/04",
-      "total": 51,
+      "total": 55,
       "ongoing": true
     },
     {
@@ -279,14 +279,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "通信设备",
       "start": "11/11",
-      "end": "11/13",
+      "end": "11/12",
       "start_idx": 27,
-      "end_idx": 29,
-      "days": 3,
-      "hot_days": 3,
+      "end_idx": 28,
+      "days": 2,
+      "hot_days": 2,
       "peak": 6,
       "peak_date": "11/12",
-      "total": 14,
+      "total": 10,
       "ongoing": true
     }
   ]
