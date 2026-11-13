@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-14 01:50:12",
+  "update_time": "2026-11-14 04:49:08",
   "data_date": "2026-11-13",
   "meta": {
     "data_date": "2026-11-13",
@@ -472,6 +472,18 @@
         "asof_ym": "2026-09"
       },
       {
+        "code": "sh.603703",
+        "name": "盛洋科技",
+        "close": 10.56,
+        "close_date": "2026-11-13",
+        "liquid": true,
+        "abn": 2.24,
+        "factor_at": -2.2404,
+        "roe_ttm": null,
+        "size_proxy": 4446858269.0,
+        "asof_ym": "2026-11"
+      },
+      {
         "code": "sh.601599",
         "name": "浙文影业",
         "close": 5.6,
@@ -481,18 +493,6 @@
         "factor_at": -2.2194,
         "roe_ttm": null,
         "size_proxy": 2749600857.5,
-        "asof_ym": "2026-11"
-      },
-      {
-        "code": "sh.600189",
-        "name": "泉阳泉",
-        "close": 8.97,
-        "close_date": "2026-11-10",
-        "liquid": true,
-        "abn": 2.182,
-        "factor_at": -2.182,
-        "roe_ttm": null,
-        "size_proxy": 2481181535.4,
         "asof_ym": "2026-11"
       }
     ]
