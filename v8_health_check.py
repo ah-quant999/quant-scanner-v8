@@ -455,23 +455,30 @@ def last_trade_day_close(now_cst_dt):
 
 
 def fmt_rel_time(ts):
-    """把 'YYYY-MM-DD HH:MM:SS' 格式化为相对时间：今日/昨日/X天前 HH:MM。"""
+    """把 'YYYY-MM-DD HH:MM:SS' 格式化为相对时间：今日/昨日/MM-DD HH:MM。
+
+    2026-11-14 一劳永逸根因修复：与前端 window._fmtAshareRel 口径完全一致，
+    绝不输出「N天前」。此前本函数对 2~6 天前的条目输出「X天前 HH:MM」，
+    被嵌入 HEALTH_CHECK.message（如「更新于 X天前 HH:MM」），与前端胶囊的
+    「MM-DD HH:MM」分叉并列、互相矛盾（主人截图「2天前 14:12 / 超过阈值 1659 分钟」
+    正源于此）。现统一为同一规则，前端诊断面板无需再剥离时间。"""
     if not ts:
         return "--"
     dt = parse_time(ts)
     if not dt:
         return str(ts)[:16]
     now = now_cst()
+    # 未来时间戳：防误导（与前端 _fmtAshareRel 的 ⚠️未来 对齐）
+    if dt > now + timedelta(minutes=1):
+        return "⚠️ 未来 " + dt.strftime("%Y-%m-%d %H:%M")
     today = datetime(now.year, now.month, now.day, tzinfo=timezone(timedelta(hours=8)))
     date_only = datetime(dt.year, dt.month, dt.day, tzinfo=timezone(timedelta(hours=8)))
     diff = (today - date_only).days
     hm = dt.strftime("%H:%M")
-    if diff == 0:
+    if diff <= 0:
         return f"今日 {hm}"
     if diff == 1:
         return f"昨日 {hm}"
-    if diff < 7:
-        return f"{diff}天前 {hm}"
     return dt.strftime("%m-%d %H:%M")
 
 
