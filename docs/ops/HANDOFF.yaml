@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-14 21:30"
+  updated: "2026-11-14 23:47"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,9 +34,39 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 185
+  next_id_seq: 186
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
+  - id: akshare-unpinned-runner-api-removal-1114
+    owner: 小九机AI（落码）
+    priority: P1
+    status: todo
+    created: 2026-11-14
+    title: akshare 未 pin 上限 ⇒ 云端新版移除 stock_hk_spot/stock_zh_index_daily ⇒ algo 链 4 脚本 AttributeError
+    note: >-
+      登记方：阿狸咪的工程师（11-14 23:45 CST 巡检实证，主人外出期自主处置）。现象：
+      algo 链（v8_algo_cloud.yml）chain-end 23:18:55（run_start 20:30:48，run 43594897073）
+      ok=39 fail=7，较前两轮（06:27/18:05 均 ok=43 fail=3）新增 4 fail，全部 akshare
+      AttributeError 簇：fetch_stock_names.py + build_candidate_pool.py（stock_hk_spot 属性不存在）、
+      scripts/fetch_index_history.py（stock_zh_index_daily 属性不存在）、
+      refresh_stock_metadata.py（级联 fetch_stock_names 失败停止巡检）。
+      栈帧逐字（23:16:30 CST）：for fn in (ak.stock_hk_spot, ak.stock_hk_spot_em):
+      → AttributeError: module 'akshare' has no attribute 'stock_hk_spot'。
+      根因指向：v8_algo_cloud.yml 安装段 OPTIONAL="akshare baostock" 无版本上限每轮装 PyPI 最新，
+      requirements.txt 亦仅 akshare>=1.15；workflow 注释只保护「缺失」不保护「装上但 API 断裂」。
+      ⚠️ OPTIONAL 安装为 -q 静默，日志无版本号，待你在 runner 实测 pip show akshare 实锤。
+      产品影响：港股名单/候选池生成/元数据巡检/指数历史四链路本轮全 fail。
+      已知非问题：refresh_kline_freshness/fetch_multiyear_kline 超时=软闸基线；
+      market_regime 缺 macro.json=已有挂账 market-regime-macro-json-bootstrap-fail-1114（你 23:31 已回执微修）。
+      按铁律未派发未重试；交接件
+      docs/ops/handover/2026-11-14_2345_阿狸咪的工程师给小九_akshare未pin云端新版移除接口四脚本AttributeError断裂.md。
+    verify_how: >-
+      修复判据：修复提交推 main 后，algo 链下一轮 run head_sha ≥ 修复提交 sha 且 run_report
+      failed_scripts 不再含上述四脚本（看产物不看 run conclusion）；候选池产物恢复产出。
+      建议 pin 已知可用版本（本机 akshare 1.18.64）并同步其它含 pip install akshare 的 workflow，
+      或 hasattr 探测降级；禁前端硬编。
+    updated: "2026-11-14 23:47"
+    updated_by: 阿狸咪的工程师
   - id: market-regime-macro-json-bootstrap-fail-1114
     owner: 小九机AI（落码）
     priority: P1
