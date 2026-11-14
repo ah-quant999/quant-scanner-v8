@@ -618,13 +618,13 @@ window.V8_CAL = {weeks:[],legend:[]};
      阈值固定 72h（与 _staleSlaHours 的「其它/空→72h」兜底同源），远宽于 09-14 删除的 22h 盘后 SLA，
      专门捕捉真·多日中断（如 backtest 卡 10-24→10-28 冻 4 天），不误伤日频「今日批次未产出」的正常中间态。
      返回 '' 表示未中断（调用方自行决定补不补常规徽章）。默认全站不触发，仅 backtest/历史类日更卡显式 opt-in。 */
-  window._staleInterrupt = function(ts){
+  window._staleInterrupt = function(ts, hours){
     if(!ts) return '';
     try{
       var d = new Date(String(ts).replace(/-/g,'/'));
       if(isNaN(d.getTime())) return '';
       var ageH = (Date.now() - d.getTime())/36e5;
-      if(ageH <= 72) return '';
+      if(ageH <= (hours||72)) return '';
       var dd = Math.floor(ageH/24), hh = Math.floor(ageH%24);
       var ago = dd>0 ? (dd+'天'+((hh>0)?hh+'小时':'')) : (hh+'小时');
       return '<span title="数据源已 '+ago+'未更新，疑似上游中断。最近更新：'+String(ts)+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(255,82,82,0.10);color:#ff5252;border:1px solid rgba(255,82,82,0.63);white-space:nowrap">⚠️ 数据中断 · 最近更新 '+ago+'前</span>';
@@ -702,13 +702,13 @@ function _uBadge(slot, horizon, ts, sub, pageSlot, staleGuard){
   }
   // 🛡 2026-10-28 主人令「一劳永逸」护栏（opt-in, staleGuard）：数据 >72h 未更新 → 以红字「数据中断」替换常规徽章（图1：而非干巴巴的陈旧时间戳）
   if(staleGuard){
-    var _si = (typeof window._staleInterrupt === 'function') ? window._staleInterrupt(ts) : '';
+    var _si = (typeof window._staleInterrupt === 'function') ? window._staleInterrupt(ts, (typeof staleGuard==='number'?staleGuard:undefined)) : '';
     if(_si) return _si;
   }
   return '<span title="'+_okTitle+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+_livePart+_cadNote+'</span>'
     + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
 }
-function setBadge(id, slot, horizon, ts, sub, pageSlot){
+function setBadge(id, slot, horizon, ts, sub, pageSlot, staleGuard){
   try{
     var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
     if(!el){
@@ -719,7 +719,7 @@ function setBadge(id, slot, horizon, ts, sub, pageSlot){
     }
   // ts/sub 都缺失时 → 显示「更新于 已加载」兜底
   if(!ts && !sub){ ts = '已加载'; }
-  el.innerHTML = _uBadge(slot, horizon, ts, sub, pageSlot);
+  el.innerHTML = _uBadge(slot, horizon, ts, sub, pageSlot, staleGuard);
   // 调试钩子：写入后立即验证长度（已降级 log 减少噪音）
   try{ if(!el.innerHTML || el.innerHTML.length < 30){ console.log('[setBadge] innerHTML short id=' + id + ' len=' + el.innerHTML.length); } }catch(_){}
   }catch(e){
@@ -8792,7 +8792,7 @@ window.__renderShareholderChange = function(){
     body.innerHTML = h;
     /* 🛡 2026-11-09 主人令「统一版式」：shcFresh 徽标由手写 textContent 改走全站统一 setBadge/_uBadge
        （与 重要公告速览/严重异动雷达 同款：更新于 + 时段档说明胶囊），旧版「更新 11-08 05:46」裸文本退役。 */
-    if(window.setBadge) setBadge('shcFresh','auto','',D.update_time,'');
+    if(window.setBadge) setBadge('shcFresh','auto','',D.update_time,'', undefined, 72);
     else { var fr = document.getElementById('shcFresh'); if(fr) fr.textContent = '更新 '+(window._fmtAshareRel?window._fmtAshareRel(D.update_time):_e((D.update_time||'').slice(5,16))); }
     card.style.display = 'block';
   }catch(e){ console.warn('[renderShareholderChange]', e); }
@@ -13426,7 +13426,7 @@ function drawUpDownChart(){
       return;
     }
     /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；口径说明降为胶囊后缀小字 */
-    if(window.setBadge) setBadge('sectorYearFlowTime','auto','',data.update_time||data.data_date||'','观测类 · 盘后口径（自建累积表'+(data.partial?'·仅约121交易日':'')+'）');
+    if(window.setBadge) setBadge('sectorYearFlowTime','auto','',data.update_time||data.data_date||'','观测类 · 盘后口径（自建累积表'+(data.partial?'·仅约121交易日':'')+'）', undefined, 40);
     else $t.textContent=(data.data_date||'')+(data.partial?' · 真实累计(覆盖区间·仅约121交易日)':' · '+data.year+'年累计');
     var _chip=function(v){
       if(v==null) return '<span style="color:var(--dim)">—</span>';
@@ -13779,8 +13779,8 @@ function drawUpDownChart(){
     //   现优先读 FUTURES_REALTIME（新浪vip实时期指 + 东财push2实时现货，盘中刷新）；缺失时回退 CFFEX_HOLDINGS（日频），绝不空卡。
     //   徽标：实时源→「实时盘中」（不显示"不刷新"误导）；回退日频→「日更 收盘」（如实反映数据节奏）。
     if($t){
-      if(d && d.realtime) $t.innerHTML=_uBadge('auto','盘中',d.update_time,'实时盘中');
-      else $t.innerHTML=_uBadge('日更','收盘',d.update_time);
+      if(d && d.realtime) $t.innerHTML=_uBadge('auto','盘中',d.update_time,'实时盘中', undefined, 72);
+      else $t.innerHTML=_uBadge('日更','收盘',d.update_time, undefined, undefined, 72);
     }
   }
   window.renderFuturesMain = renderFuturesMain;
