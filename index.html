@@ -541,7 +541,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     s = s.replace(/更新于\s*(今日|昨日|\d+\s*天前|\d{1,2}-\d{1,2})\s*\d{1,2}:\d{2}/g, '')
          .replace(/最后档\s*(今日|昨日|\d+\s*天前|\d{1,2}-\d{1,2})\s*\d{1,2}:\d{2}/g, '最后档')
          .replace(/\d+\s*天前\s*\d{1,2}:\d{2}/g, '')
-         .replace(/\s+·\s+/g, ' · ').replace(/^\s*·\s*/, '').replace(/\s*·\s*$/, '').replace(/\s{2,}/g, ' ').trim();
+         .replace(/\s*[；;·]\s*/g, ' · ').replace(/^\s*·\s*/, '').replace(/\s*·\s*$/, '').replace(/\s{2,}/g, ' ').trim();
     return s;
   };
   /* 🛡 2026-09-04 主人令「一劳永逸」：全站「更新于」胶囊内置陈旧度自判。
