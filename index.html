@@ -1065,7 +1065,7 @@ function _buildJudgmentEnvHTML(d){
     + '<div style="font-size:10.5px;margin-top:6px;color:var(--sub)">生成后会自动刷新，无需手动操作</div>'
     + '</div>';
   var h = '';
-  // 0) 红黄绿灯总览（红涨绿跌语义：🔴积极 / 🟡观望 / 🟢防守）
+  // 0) 红黄绿灯总览（交通灯语义：🔴防守/不能买 · 🟡观望 · 🟢积极/可买；与红涨绿跌价格语义分离）
   var LIGHT = {green:'#26d9c2', yellow:'#ffd024', red:'#ff5252'};
   function lightDot(c,size){
     size = size || 10;
@@ -1074,11 +1074,11 @@ function _buildJudgmentEnvHTML(d){
   /* 2026-08-30 主人令：今日判定卡不再重复展示 verdict + warning（避免与 AI 速览冲突重复）。
      仅保留信号灯主色 + 灯语义图例，读盘参考保持单一来源。 */
   var _cons = (typeof d==='object' && d) ? (d.consensus||'') : '';
-  // 2026-11-02 主人令：信号灯并入红涨绿跌 —— 偏多=红(up) / 偏空=绿(dn)
-  var lvColor = LIGHT[_cons.indexOf('偏多')>=0 ? 'red' : (_cons.indexOf('偏空')>=0 ? 'green' : 'yellow')];
+  // 2026-11-14 主人令修正：信号灯改交通灯语义 —— 偏多/积极=绿(可买) / 偏空/防守=红(不能买)
+  var lvColor = LIGHT[_cons.indexOf('偏多')>=0 ? 'green' : (_cons.indexOf('偏空')>=0 ? 'red' : 'yellow')];
   h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:'+lvColor+'12;border:1px solid '+lvColor+'45;border-radius:8px;font-size:13px;flex-wrap:wrap">'
     + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+_cons+'</span>'
-    + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🔴 积极 · 🟡 观望 · 🟢 防守</span></div>';
+    + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🔴 防守 · 🟡 观望 · 🟢 积极</span></div>';
   /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
      今日判定不再重复展示择时结论，仅保留盘前读盘参考（共识/星级/时事），避免多处评判混乱。 */
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
@@ -1332,7 +1332,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=7cffee8b99" defer></script>
 <script src="data/W52_HIGH.js?v=50c3143e8f" defer></script>
 <!-- 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填） -->
-<script src="data/SECTOR_YEAR_FLOW.js?v=de3533069a" defer></script>
+<script src="data/SECTOR_YEAR_FLOW.js?v=acfdb925c7" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=c75b82f9a2" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=06b16ca1c0" defer></script>
@@ -16409,22 +16409,23 @@ window.__renderComprehensiveSynthesis = function(){
   var nUp=0,nDn=0,nNt=0;
   votes.forEach(function(v){ if(v.s==='up')nUp++; else if(v.s==='dn')nDn++; else nNt++; });
   var concl, cc;
-  if(nUp>=4 && nDn<=1){ concl='多信号共振，环境友好，可按仓位中枢积极运作'; cc=UP; }
-  else if(nUp>=3 && nDn<=1){ concl='偏多格局占优，顺势而为，注意节奏'; cc=UP; }
-  else if(nDn>=4){ concl='空信号占优，防守为主，降仓规避'; cc=DN; }
-  else if(nDn>=3){ concl='偏空压力明显，防御轻仓，等待信号修复'; cc=DN; }
+  if(nUp>=4 && nDn<=1){ concl='多信号共振，环境友好，可按仓位中枢积极运作'; cc=DN; }
+  else if(nUp>=3 && nDn<=1){ concl='偏多格局占优，顺势而为，注意节奏'; cc=DN; }
+  else if(nDn>=4){ concl='空信号占优，防守为主，降仓规避'; cc=UP; }
+  else if(nDn>=3){ concl='偏空压力明显，防御轻仓，等待信号修复'; cc=UP; }
   else if(nUp>=2 && nDn>=2){ concl='多空分歧，结构性机会为主，控制仓位精选方向'; cc=NT; }
   else { concl='中性震荡，观察为主，等待方向选择'; cc=NT; }
-  if(RG_ov==='red'){ concl += '；⚠ 环境高风险，仓位上限再压一档'; cc=DN; }
+  if(RG_ov==='red'){ concl += '；⚠ 环境高风险，仓位上限再压一档'; cc=UP; }
   var html='';
   html += '<div style="background:'+cc+'14;border:1px solid '+cc+'40;border-radius:8px;padding:9px 12px;margin-bottom:10px;font-size:13.5px;font-weight:700;color:'+cc+'">结论：'+esc(concl)+'</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:8px">';
   votes.forEach(function(v){
     var col, dot;
-    // 2026-11-02 主人令：信号灯卡并入「红涨绿跌」统一语义（推翻 2026-10-28 风险灯）。
-    //   环境风险/个股避雷 已统一按 v.s（up=红 / dn=绿 / nt=黄）渲染；文字改「高/中/低风险」，不再写「红灯」自相矛盾。
-    col = v.s==='up'?UP: v.s==='dn'?DN:NT;
-    dot = v.s==='up'?'&#x1F534;': v.s==='dn'?'&#x1F7E2;':'&#x1F7E1;';
+    // 2026-11-14 主人令修正：信号灯（含环境风险/个股避雷/板块资金）按「交通灯」语义，
+    //   红=危险/利空/防守（不能买），绿=安全/利好/积极（可买），黄=中性——与红涨绿跌(价格)严格分离。
+    //   v.s 语义：'up'=利好信号(绿) / 'dn'=利空信号(红) / 'nt'=中性(黄)。
+    col = v.s==='up'?DN: v.s==='dn'?UP:NT;
+    dot = v.s==='up'?'&#x1F7E2;': v.s==='dn'?'&#x1F534;':'&#x1F7E1;';
     html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 9px">'
            + '<div style="font-size:11.5px;color:'+col+';font-weight:700">'+dot+' '+esc(v.n)+'</div>'
            + '<div style="font-size:11.5px;color:var(--txt);margin-top:2px">'+v.d+'</div></div>';
