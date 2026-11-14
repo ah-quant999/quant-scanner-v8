@@ -11,29 +11,29 @@
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 31342,
+    "total_signals": 30885,
     "periods": {
       "T+5": {
         "win_rate_pct": 49.2,
-        "avg_return_pct": 0.13
+        "avg_return_pct": 0.12
       },
       "T+10": {
         "win_rate_pct": 50.2,
-        "avg_return_pct": 0.39
+        "avg_return_pct": 0.38
       }
     },
     "data_ok": true
   },
   "baseline_ge3": {
     "T+5": {
-      "win_rate_pct": 47.5,
-      "avg_return_pct": -0.18
+      "win_rate_pct": 47.4,
+      "avg_return_pct": -0.19
     },
     "T+10": {
       "win_rate_pct": 49.2,
-      "avg_return_pct": 0.02
+      "avg_return_pct": 0.0
     },
-    "total_signals": 91216
+    "total_signals": 89225
   },
   "config": {
     "enabled": true,

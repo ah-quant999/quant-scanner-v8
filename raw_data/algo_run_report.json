@@ -1,13 +1,9 @@
 {
-  "update_time": "2026-11-15 02:17:27",
-  "run_start": "2026-11-14 23:36:10",
-  "ok": 39,
-  "fail": 7,
+  "update_time": "2026-11-15 04:45:14",
+  "run_start": "2026-11-15 02:40:38",
+  "ok": 28,
+  "fail": 6,
   "failed_scripts": [
-    {
-      "script": "fetch_stock_names.py",
-      "reason": "退出码 1 | AttributeError: stock_hk_spot 已在 1.20.46 更名为 stock_hk_spot_sina，请改用 ak.stock_hk_spot_sina；参数与返回的列也可能有调整，用 ak.interface_info(\"stock_hk_spot_sina\") 查看。完整对照见 https"
-    },
     {
       "script": "scripts/fetch_index_history.py",
       "reason": "退出码 1 |   [fetch_index_history] akshare 拉取失败: stock_zh_index_daily 已在 1.20.44 更名为 index_zh_daily_sina，请改用 ak.index_zh_daily_sina；参数与返回的列也可能有调整，用 ak.interface_info(\"inde"
@@ -33,5 +29,18 @@
       "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
-  "skipped_by_time_gate": []
+  "skipped_by_time_gate": [
+    "fetch_fundamental_quality.py",
+    "fetch_stock_names.py",
+    "fetch_stock_quote_v8.py",
+    "fetch_sh_index_fib.py",
+    "fetch_inst_trade.py",
+    "fetch_sector_rs.py",
+    "fetch_lhb.py",
+    "fetch_orphan_suspension.py",
+    "fetch_orphan_market_alerts.py",
+    "fetch_orphan_nt_data.py",
+    "fetch_orphan_sector_fund_flow.py",
+    "fetch_weekend_run.py"
+  ]
 }
