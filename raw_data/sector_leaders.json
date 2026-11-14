@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-11-14 21:36",
-  "republish_time": "2026-11-15 02:31:06",
+  "update_time": "2026-11-14 23:58",
+  "republish_time": "2026-11-15 06:55:30",
   "data_date": "2026-11-13",
   "rule_ver": 2,
   "top_n": 5,
   "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
   "phase": "主升+启动",
-  "sector_count": 8,
+  "sector_count": 9,
   "sectors": [
     {
       "name": "影视院线",
@@ -49,6 +49,52 @@
           "name": "儒意电影",
           "price": 10.05,
           "chg": 9.96,
+          "main_net": null
+        }
+      ],
+      "match": "exact"
+    },
+    {
+      "name": "黑色家电",
+      "bk": "BK1241",
+      "phase": "主升",
+      "pct_5d": 5.0,
+      "pct_20d": 5.5,
+      "cons_count": 9,
+      "leaders": [
+        {
+          "code": "301578",
+          "name": "辰奕智能",
+          "price": 35.82,
+          "chg": 8.22,
+          "main_net": null
+        },
+        {
+          "code": "688696",
+          "name": "极米科技",
+          "price": 100.95,
+          "chg": 3.84,
+          "main_net": null
+        },
+        {
+          "code": "600060",
+          "name": "海信视像",
+          "price": 25.68,
+          "chg": 1.58,
+          "main_net": null
+        },
+        {
+          "code": "000801",
+          "name": "四川九洲",
+          "price": 10.34,
+          "chg": 0.78,
+          "main_net": null
+        },
+        {
+          "code": "600839",
+          "name": "四川长虹",
+          "price": 5.04,
+          "chg": 0.2,
           "main_net": null
         }
       ],
@@ -901,5 +947,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "cache",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-15 02:15:10 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-15 02:31:06 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-15 06:55:30 跟随 FINAL 重算(一劳永逸)"
 }
