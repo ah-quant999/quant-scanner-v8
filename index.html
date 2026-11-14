@@ -531,6 +531,19 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(diff === 1) return '昨日 ' + hm;
     return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-') + ' ' + hm;
   };
+  /* 🛡 2026-11-14 主人令「全部统一根治」：HEALTH_CHECK.message 由后端 fmt_rel_time 预格式化，
+     历史曾含「更新于 X天前 HH:MM」「最后档 X天前 HH:MM」等与前端口径冲突的相对时间。
+     _normHealthMsg 统一剥离这些嵌入的相对时间短语（根因已在 v8_health_check.py 的 fmt_rel_time 改为 MM-DD 同口径，
+     本函数作为防御层，兼容尚未重跑的老 HEALTH_CHECK 数据）。只去重时间、绝不改写诊断语义。 */
+  window._normHealthMsg = function(msg){
+    if(!msg) return '';
+    var s = String(msg);
+    s = s.replace(/更新于\s*(今日|昨日|\d+\s*天前|\d{1,2}-\d{1,2})\s*\d{1,2}:\d{2}/g, '')
+         .replace(/最后档\s*(今日|昨日|\d+\s*天前|\d{1,2}-\d{1,2})\s*\d{1,2}:\d{2}/g, '最后档')
+         .replace(/\d+\s*天前\s*\d{1,2}:\d{2}/g, '')
+         .replace(/\s+·\s+/g, ' · ').replace(/^\s*·\s*/, '').replace(/\s*·\s*$/, '').replace(/\s{2,}/g, ' ').trim();
+    return s;
+  };
   /* 🛡 2026-09-04 主人令「一劳永逸」：全站「更新于」胶囊内置陈旧度自判。
      ── 背景（主人 09-04 19:39 提问「盘后数据页每个卡时间都不对…是不是数据也是错的啊」）──
      多张卡的数据停留在凌晨/前一日批次（如 FACTOR_LAB 停 09-03、CONCEPT_ETF_MAP 停 08-18），
@@ -6608,7 +6621,7 @@ c.innerHTML = h;
       var _sdCol = (_sdNum != null && _sdNum >= 5) ? '#ff5252' : ((_sdNum != null && _sdNum > 0) ? '#ffd024' : '#94a3b8');
       html += '<span title="数据日 = 源报告「'+_e(D.source_title||'')+'」的报告日；上方「已更新」是抓取时刻，不是数据新鲜度" '
         + 'style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:' + _sdCol + '1a;color:' + _sdCol + ';border:1px solid ' + _sdCol + '55;white-space:nowrap">📅 数据日 ' + _e(D.data_date)
-        + ((_sdNum != null && _sdNum > 0) ? ('<span style="font-size:10px;opacity:.75;font-weight:500;margin-left:2px"> · ' + _sdNum + ' 天前</span>') : '')
+        + ''
         + '</span>';
     }
     /* 源停更红胶囊（判据 = 生产者 source_stale，沿用 09-17 杜绝假成功语义） */
@@ -11939,7 +11952,7 @@ function drawUpDownChart(){
       var lastDate = lastDateStr ? new Date(lastDateStr+'T15:00:00+08:00') : null;
       var today = new Date();
       var daysOld = lastDate ? Math.floor((today - lastDate) / 86400000) : 0;
-      var staleHint = daysOld > 1 ? ' · <span style="color:var(--gold)">数据 '+daysOld+' 天前</span>' : '';
+      var staleHint = daysOld > 1 ? ' · <span style="color:var(--gold)">数据 ' + (window._fmtAshareRel ? window._fmtAshareRel(lastDateStr + ' 15:00:00') : (daysOld+' 天前')) + '</span>' : '';
       sumEl.innerHTML = '当前 <b style="color:var(--txt)">'+cnt+'</b> 天总览 · 最新 <b style="color:'+(last.net_yi>=0?'var(--up)':'var(--down)')+'">'+last.net_yi.toFixed(0)+'</b>亿 · 累计 <b style="color:'+(cumLast>=0?'var(--up)':'var(--down)')+'">'+(cumLast/10000).toFixed(2)+'</b>万亿' + staleHint;
     }
     renderMffChart();
@@ -13378,7 +13391,7 @@ function drawUpDownChart(){
 
         html += '<span style="font-size:12px;font-weight:600;color:var(--txt)">'+it.name+'</span></div>';
 
-        html += '<div style="font-size:11px;color:var(--sub);line-height:1.35">'+it.message+'</div>';
+        html += '<div style="font-size:11px;color:var(--sub);line-height:1.35">'+(window._normHealthMsg?window._normHealthMsg(it.message):it.message)+'</div>';
 
         html += '</div>';
 
@@ -17367,7 +17380,9 @@ h+='<div style="padding:8px 14px;font-size:13px;font-weight:700;color:#c084fc;bo
                 : '';
       /* 🛡 2026-09-21 CN runner1号机：上方已白名单化（只 fail 可达）⇒ 原三元链的「待更新」分支是**死代码**，
          按主人令彻底删除，不留半截引用（此前它正是把 info 项显成「文件 local_sync 待更新」的执行体）。 */
-      diags.push('文件 <b>'+it.id+'</b> 失败：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : '')+( _hint ? '<br><span style="color:#7dd3fc;font-weight:400;font-size:11px;display:inline-block;margin-top:3px">🔧 '+_hint+'</span>' : '' ));
+      var _relTs = (window._fmtAshareRel ? window._fmtAshareRel(it.last_update) : (it.last_update || '--'));
+      var _msg = (window._normHealthMsg ? window._normHealthMsg(it.message) : (it.message || ''));
+      diags.push('文件 <b>'+it.id+'</b> 失败：最后更新 '+_relTs+(_msg ? ' · '+_msg : '')+( _hint ? '<br><span style="color:#7dd3fc;font-weight:400;font-size:11px;display:inline-block;margin-top:3px">🔧 '+_hint+'</span>' : '' ));
     });
     // 3) 候选股池来源归零
     var cand = window.CANDIDATE || {};
