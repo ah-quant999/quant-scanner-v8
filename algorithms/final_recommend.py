@@ -1892,6 +1892,26 @@ def main():
         sys.exit(1)
     print("  [硬断言✅] 最终推荐与因子积分榜同序同分（%d 只）" % len(out_stocks))
 
+    # 🆕 2026-11-14 主人令「一劳永逸」：最终推荐产物有效性闸门
+    # ima_intake 断（zsxq token 过期）→ 候选池=0 → 因子榜分辩度塌缩的根因之一；
+    # 写入 validity 让前端把该依赖显式标红，绝不静默。
+    _ima = result.get("ima_intake", {}) or {}
+    _ima_dd = _ima.get("data_date") or ""
+    _ima_pool = _ima.get("pool_total", 0) or 0
+    _ima_stale = bool(_ima_dd) and (_ima_dd < (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d"))
+    _vr = []
+    if _ima_pool == 0:
+        _vr.append("观澜台/IMA 候选池为空（zsxq token 可能过期，强势跟踪源不可用）")
+    elif _ima_stale:
+        _vr.append("观澜台/IMA 数据陈旧（data_date=%s）" % _ima_dd)
+    result["validity"] = {
+        "status": "ok" if not _vr else "degraded",
+        "reason": ("候选源正常" if not _vr else "；".join(_vr)),
+        "ima_data_date": _ima_dd,
+        "ima_pool_total": _ima_pool,
+        "assessed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
     # 写 raw_data json
     out_path = os.path.join(RAW, "final_recommend.json")
     with open(out_path, "w", encoding="utf-8") as f:
