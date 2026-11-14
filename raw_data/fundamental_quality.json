@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-14 14:41:44",
+  "update_time": "2026-11-14 20:32:06",
   "total": 1332,
   "grade_summary": {
     "A": 28,
@@ -4238,9 +4238,10 @@
       "cfo_to_asset": 7.62,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "回购"
         ]
       }
     },
@@ -6089,9 +6090,10 @@
       "cfo_to_asset": 49.3,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "回购"
         ]
       }
     },
@@ -6911,9 +6913,10 @@
       "cfo_to_asset": 3.94,
       "cf_queried": true,
       "news": {
-        "score": 5,
+        "score": 13,
         "tags": [
-          "中报略增"
+          "中报略增",
+          "回购"
         ]
       }
     },
@@ -8356,7 +8359,13 @@
       "revenue_growth": 10.263300000000001,
       "reason": "ROE差(-12.8%) | 营收增长(10.3%)",
       "cfo_to_asset": 0.27,
-      "cf_queried": true
+      "cf_queried": true,
+      "news": {
+        "score": -5,
+        "tags": [
+          "诉讼"
+        ]
+      }
     },
     "sz_000620": {
       "score": 25,
@@ -9849,7 +9858,13 @@
       "revenue_growth": 90.3292,
       "reason": "ROE偏低(7.0%) | 营收高增(90.3%)",
       "cfo_to_asset": -12.72,
-      "cf_queried": true
+      "cf_queried": true,
+      "news": {
+        "score": 8,
+        "tags": [
+          "中标"
+        ]
+      }
     },
     "sz_002536": {
       "score": 30,
@@ -9998,9 +10013,10 @@
       "cfo_to_asset": 9.81,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "回购"
         ]
       }
     },
@@ -10141,9 +10157,10 @@
       "cfo_to_asset": 0.45,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "回购"
         ]
       }
     },
@@ -10915,9 +10932,11 @@
       "cfo_to_asset": 8.16,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 18,
         "tags": [
-          "三季报扭亏"
+          "三季报扭亏",
+          "回购",
+          "诉讼"
         ]
       }
     },
@@ -12180,7 +12199,13 @@
       "revenue_growth": 16.1581,
       "reason": "ROE差(0.4%) | 营收增长(16.2%)",
       "cfo_to_asset": 6.18,
-      "cf_queried": true
+      "cf_queried": true,
+      "news": {
+        "score": 8,
+        "tags": [
+          "回购"
+        ]
+      }
     },
     "sz_300759": {
       "score": 30,
@@ -12481,9 +12506,10 @@
       "cfo_to_asset": 1.86,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "增持"
         ]
       }
     },

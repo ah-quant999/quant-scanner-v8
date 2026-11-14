@@ -1,11 +1,27 @@
 {
-  "update_time": "2026-11-14 18:05:01",
-  "run_start": "2026-11-14 14:40:13",
-  "ok": 43,
-  "fail": 3,
+  "update_time": "2026-11-14 23:18:55",
+  "run_start": "2026-11-14 20:30:48",
+  "ok": 39,
+  "fail": 7,
   "failed_scripts": [
     {
+      "script": "fetch_stock_names.py",
+      "reason": "退出码 1 | AttributeError: module 'akshare' has no attribute 'stock_hk_spot'"
+    },
+    {
+      "script": "scripts/fetch_index_history.py",
+      "reason": "退出码 1 |   [fetch_index_history] akshare 拉取失败: module 'akshare' has no attribute 'stock_zh_index_daily'"
+    },
+    {
       "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "build_candidate_pool.py",
+      "reason": "退出码 1 | AttributeError: module 'akshare' has no attribute 'stock_hk_spot'"
+    },
+    {
+      "script": "scripts/fetch_multiyear_kline.py",
       "reason": "超时 >40min"
     },
     {
@@ -13,8 +29,8 @@
       "reason": "退出码 1 |   [market_regime] 缺 /home/runner/work/quant-scanner-v8/quant-scanner-v8/out/macro.json，自举 fetch_macro.py 后仍不存在，放弃"
     },
     {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "refresh_stock_metadata.py",
+      "reason": "退出码 1 |   ❌ fetch_stock_names 失败，停止元数据巡检"
     }
   ],
   "skipped_by_time_gate": []
