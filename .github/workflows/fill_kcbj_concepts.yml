@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install akshare
-        run: pip install akshare
+        run: pip install akshare==1.20.42  # pin：1.20.43+ 移除 stock_hk_spot 等接口（2026-11-14 事故）
       - name: Run fill
         run: |
           # 🐛 修复：原先硬编码 --apply，导致 apply input 形同虚设（dry-run 无法生效）

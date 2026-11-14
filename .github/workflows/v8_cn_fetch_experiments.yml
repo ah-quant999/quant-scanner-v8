@@ -79,7 +79,7 @@ jobs:
           # 🔴 2026-09-13：补 baostock / numpy —— scripts/fetch_index_value_framework.py
           #   已改用 baostock 取上证/沪深300/中证500/中证1000 四指数真实日K；
           #   缺这两个包会退化回 available:false 假占位（即本次修复要根除的现象）。
-          pip install --quiet akshare requests baostock numpy
+          pip install --quiet akshare==1.20.42 requests baostock numpy  # pin：1.20.43+ 移除接口（2026-11-14 事故）
 
       - name: "📡 跑 3 个 fetcher"
         run: |

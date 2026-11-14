@@ -1928,7 +1928,8 @@ jobs:
           #   akshare/baostock 仅 A 批取数用（cn 自托管机已预装），云端 ubuntu 偶发安装失败→降级为可选非致命，
           #   绝不再让取数依赖的偶发失败阻塞最终推荐重建。
           REQUIRED="pandas numpy requests"
-          OPTIONAL="akshare baostock"
+          # 2026-11-15 pin：1.20.43+ 移除 stock_hk_spot/stock_zh_index_daily 致 A 批 4 脚本 AttributeError（==避免 shell 对 < 的重定向歧义）
+          OPTIONAL="akshare==1.20.42 baostock"
           ok=0
           for IDX in "https://pypi.org/simple" \
                      "https://pypi.tuna.tsinghua.edu.cn/simple" \

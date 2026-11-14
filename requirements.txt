@@ -2,7 +2,7 @@
 # 注意：本地中国数据抓取 runner 还需要 akshare 完整生态（已含 pandas/numpy/requests）、
 #       baostock、pypinyin、PyMuPDF 等，由该 runner 自行安装。
 pandas>=2.0
-akshare>=1.15
+akshare==1.20.42  # 2026-11-14 17:17CST 起 1.20.43~1.20.48 连发窗口移除 stock_hk_spot/stock_zh_index_daily 致云端 4 脚本 AttributeError；1.20.42 为 11-13/11-14 两轮云端链实证可用版（pin 后升级须重验）
 requests>=2.28
 PyYAML>=6.0
 # 2026-10-21：880003 官方日K 唯一可用通道（通达信行情协议，东财恒返回空）
