@@ -314,7 +314,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       name: NAME[r] || r,
       open: open,
       icon: open ? '✅' : '⛔',
-      color: open ? '#ff5252' : '#26d9c2',
+      color: open ? '#26d9c2' : '#ff5252',  // 2026-11-14 修正：绿灯=可买(可开新仓) / 红灯=禁买(不开新仓)
       verdict: open ? '可开新仓' : '不开新仓',
       // 证据链：回测口径与数字写死在前端，避免各处复述走样
       evidence: '数据驱动：仅「阴跌磨底 / 恐慌下行」状态开仓（T+10 胜率 54.6%，无门控基准 48.1%，+6.5pp；样本 464 信号 / 296 只）',
@@ -359,7 +359,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     topFrac = topFrac || 0.2;
     var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false, name:'未知'};
     if(!mkt.open){
-      return {pass:false, reason:'择时封闭·'+mkt.name, color:'#26d9c2'};
+      return {pass:false, reason:'择时封闭·'+mkt.name, color:'#ff5252'};  // 红灯=禁买
     }
     if(!allVals || !allVals.length || factorVal==null) {
       return {pass:false, reason:'因子缺失', color:'#94a3b8'};
@@ -367,7 +367,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var sorted = allVals.slice().sort(function(a,b){return b-a;});
     var thr = sorted[Math.floor(sorted.length*topFrac)];
     if(factorVal >= thr){
-      return {pass:true, reason:'择时开放·因子前'+Math.round(topFrac*100)+'%', color:'#ff5252'};
+      return {pass:true, reason:'择时开放·因子前'+Math.round(topFrac*100)+'%', color:'#26d9c2'};  // 绿灯=可买
     }
     return {pass:false, reason:'择时开放·因子未达分位', color:'#ffd024'};
   };
@@ -2482,6 +2482,10 @@ window.STRATEGY_WALKFORWARD = {
       function fmtPct(v){ return v==null||isNaN(v)?'--':(v>0?'+':'')+Number(v).toFixed(2)+'%'; }
       // 2026-11-02 主人令：信号灯并入红涨绿跌 —— lightText 'green'(利好)=红 '#ff5252' / 'red'(利空)=绿 '#26d9c2'
       function lightText(c){ return c==='green'?'#ff5252':c==='red'?'#26d9c2':c==='yellow'?'#ffd024':c==='gray'?'#94a3b8':'#41c9ff'; }
+      // 2026-11-14 修正：警告/健康信号灯改回「交通灯语义」——红=危险/利空 #ff5252，绿=安全/利好 #26d9c2，黄=#ffd024。
+      // 与红涨绿跌(价格)严格分离：本组只用于「警告/健康/风险」类灯；价格方向(涨/跌)仍走 lightDot(红涨绿跌)。
+      function warnColor(sig){ return sig==='red'?'#ff5252':sig==='green'?'#26d9c2':sig==='yellow'?'#ffd024':'#94a3b8'; }
+      function warnDot(sig, sz){ sz=sz||11; var c=warnColor(sig); return '<span style="display:inline-block;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+c+';box-shadow:0 0 '+(sz+2)+'px '+c+'88;vertical-align:-1px;margin-left:6px"></span>'; }
       // 红黄绿灯点（signal → 颜色 → 发光圆点；用于 AI 市场速览每行标识）
       function lightDot(sig, sz){
         sz = sz || 11;
@@ -2614,7 +2618,7 @@ window.STRATEGY_WALKFORWARD = {
         var sclr=colorMap.purple;
         h+='<div style="padding:10px 18px;background:'+sclr.bg+';font-size:13px;line-height:1.7;color:var(--txt)">';
         h+='<span style="padding:2px 8px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+'">🟣 日内风向</span>';
-        h+=lightDot(sent.signal || _fallbackLight((sent.label||'')+' '+(sent.description||'')), 12);
+        h+=warnDot(sent.signal || _fallbackLight((sent.label||'')+' '+(sent.description||'')), 12);
         h+='<strong>'+sent.label+'</strong>，'+sent.description;
         if(sent.up_down_ratio!=null){
           h+=' &nbsp;|&nbsp; 涨跌比 <strong>'+sent.up_down_ratio+'</strong>（涨'+sent.up+' / 跌'+sent.down+' / 平'+sent.flat+'）';
@@ -2626,10 +2630,10 @@ window.STRATEGY_WALKFORWARD = {
         var hclr=colorMap.green;
         h+='<div style="padding:10px 18px;background:'+hclr.bg+';font-size:13px;line-height:1.7;color:var(--txt)">';
         h+='<span style="padding:2px 8px;border-radius:4px;background:'+hclr.tag+';color:'+hclr.c+'">🟢 市场健康度</span>';
-        h+=lightDot(health.signal || _fallbackLight((health.structure&&health.structure[0]||'')+' '+(health.fund&&health.fund[0]||'')+' '+(health.emotion&&health.emotion[0]||'')), 12);
+        h+=warnDot(health.signal || _fallbackLight((health.structure&&health.structure[0]||'')+' '+(health.fund&&health.fund[0]||'')+' '+(health.emotion&&health.emotion[0]||'')), 12);
         var hl=[health.structure, health.fund, health.emotion];
         var hparts=[];
-        hl.forEach(function(x){ if(x && x[0]) hparts.push('<span style="color:'+lightText(x[1])+';font-weight:700">'+x[0]+'</span>'); });
+        hl.forEach(function(x){ if(x && x[0]) hparts.push('<span style="color:'+warnColor(x[1])+';font-weight:700">'+x[0]+'</span>'); });
         h+=hparts.join(' · ');
         h+='</div>';
 
@@ -2662,7 +2666,7 @@ window.STRATEGY_WALKFORWARD = {
           var c=colorMap[a.color]||colorMap.gold;
           h+='<div style="padding:10px 18px;background:'+c.bg+';font-size:13px;line-height:1.7;color:var(--txt)">';
           h+='<span style="padding:2px 8px;border-radius:4px;background:'+c.tag+';color:'+c.c+'">'+a.emoji+' '+a.tag+'</span>';
-          h+=lightDot(a.signal || _fallbackLight(a.text||''), 11);
+          h+=warnDot(a.signal || _fallbackLight(a.text||''), 11);
           h+=a.text;
           h+='</div>';
         });
@@ -2823,7 +2827,7 @@ window.STRATEGY_WALKFORWARD = {
           var sclr=colorMap.gold;
           h+='<div style="padding:12px 16px;background:'+sclr.bg+';font-size:14px;line-height:1.7;color:var(--txt)">';
           h+='<span style="padding:3px 9px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';font-weight:700">🎯 操作建议</span>';
-          h+=lightDot(strats[0].signal || _fallbackLight(strats[0].text||strats[0]||''), 12);
+          h+=warnDot(strats[0].signal || _fallbackLight(strats[0].text||strats[0]||''), 12);
           h+='<span style="color:var(--txt)">'+strats.map(function(s){return (typeof s==='object'?s.text:s);}).join(' &nbsp;|&nbsp; ')+'</span>';
           // 2026-08-13 补：把「主线板块」和「推荐个股」结构化落地展示
           var sectors=(d.mainline_sectors||[]), picks=(d.mainline_picks||[]);
