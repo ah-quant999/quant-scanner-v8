@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-11-14 06:27:40",
-  "run_start": "2026-11-14 03:46:13",
-  "ok": 43,
-  "fail": 3,
+  "update_time": "2026-11-14 11:31:47",
+  "run_start": "2026-11-14 08:46:29",
+  "ok": 42,
+  "fail": 4,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
@@ -15,6 +15,10 @@
     {
       "script": "market_regime.py",
       "reason": "退出码 1 |   [market_regime] 缺 /home/runner/work/quant-scanner-v8/quant-scanner-v8/out/macro.json，自举 fetch_macro.py 后仍不存在，放弃"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []
