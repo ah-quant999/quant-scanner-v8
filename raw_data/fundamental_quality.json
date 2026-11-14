@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-14 20:32:06",
+  "update_time": "2026-11-14 23:38:28",
   "total": 1332,
   "grade_summary": {
     "A": 28,
@@ -5101,13 +5101,7 @@
       "revenue_growth": 13.3442,
       "reason": "ROE差(1.1%) | 营收增长(13.3%)",
       "cfo_to_asset": 5.55,
-      "cf_queried": true,
-      "news": {
-        "score": 10,
-        "tags": [
-          "收购"
-        ]
-      }
+      "cf_queried": true
     },
     "sh_688137": {
       "score": 15,
@@ -6253,13 +6247,7 @@
       "revenue_growth": 8.5298,
       "reason": "ROE差(-2.3%) | 营收持平(8.5%)",
       "cfo_to_asset": -1.49,
-      "cf_queried": true,
-      "news": {
-        "score": -5,
-        "tags": [
-          "诉讼"
-        ]
-      }
+      "cf_queried": true
     },
     "sh_688372": {
       "score": 25,
@@ -8908,10 +8896,9 @@
       "cfo_to_asset": -30.74,
       "cf_queried": true,
       "news": {
-        "score": 20,
+        "score": 15,
         "tags": [
-          "三季报扭亏",
-          "战略合作"
+          "三季报扭亏"
         ]
       }
     },
@@ -9709,10 +9696,9 @@
       "cfo_to_asset": 3.49,
       "cf_queried": true,
       "news": {
-        "score": 20,
+        "score": 15,
         "tags": [
-          "三季报预增",
-          "回购"
+          "三季报预增"
         ]
       }
     },
@@ -10408,13 +10394,7 @@
       "revenue_growth": 33.2911,
       "reason": "ROE差(3.7%) | 营收高增(33.3%)",
       "cfo_to_asset": 6.16,
-      "cf_queried": true,
-      "news": {
-        "score": 8,
-        "tags": [
-          "回购"
-        ]
-      }
+      "cf_queried": true
     },
     "sz_002959": {
       "score": 30,
@@ -10650,13 +10630,7 @@
       "revenue_growth": 8.8148,
       "reason": "ROE差(-8.6%) | 营收持平(8.8%)",
       "cfo_to_asset": -1.01,
-      "cf_queried": true,
-      "news": {
-        "score": -5,
-        "tags": [
-          "诉讼"
-        ]
-      }
+      "cf_queried": true
     },
     "sz_300054": {
       "score": 45,
@@ -11838,10 +11812,9 @@
       "cfo_to_asset": 7.48,
       "cf_queried": true,
       "news": {
-        "score": 20,
+        "score": 15,
         "tags": [
-          "中报预增",
-          "回购"
+          "中报预增"
         ]
       }
     },

@@ -1,16 +1,16 @@
 {
-  "update_time": "2026-11-14 23:18:55",
-  "run_start": "2026-11-14 20:30:48",
+  "update_time": "2026-11-15 02:17:27",
+  "run_start": "2026-11-14 23:36:10",
   "ok": 39,
   "fail": 7,
   "failed_scripts": [
     {
       "script": "fetch_stock_names.py",
-      "reason": "退出码 1 | AttributeError: module 'akshare' has no attribute 'stock_hk_spot'"
+      "reason": "退出码 1 | AttributeError: stock_hk_spot 已在 1.20.46 更名为 stock_hk_spot_sina，请改用 ak.stock_hk_spot_sina；参数与返回的列也可能有调整，用 ak.interface_info(\"stock_hk_spot_sina\") 查看。完整对照见 https"
     },
     {
       "script": "scripts/fetch_index_history.py",
-      "reason": "退出码 1 |   [fetch_index_history] akshare 拉取失败: module 'akshare' has no attribute 'stock_zh_index_daily'"
+      "reason": "退出码 1 |   [fetch_index_history] akshare 拉取失败: stock_zh_index_daily 已在 1.20.44 更名为 index_zh_daily_sina，请改用 ak.index_zh_daily_sina；参数与返回的列也可能有调整，用 ak.interface_info(\"inde"
     },
     {
       "script": "refresh_kline_freshness.py",
@@ -18,11 +18,7 @@
     },
     {
       "script": "build_candidate_pool.py",
-      "reason": "退出码 1 | AttributeError: module 'akshare' has no attribute 'stock_hk_spot'"
-    },
-    {
-      "script": "scripts/fetch_multiyear_kline.py",
-      "reason": "超时 >40min"
+      "reason": "退出码 1 | AttributeError: stock_hk_spot 已在 1.20.46 更名为 stock_hk_spot_sina，请改用 ak.stock_hk_spot_sina；参数与返回的列也可能有调整，用 ak.interface_info(\"stock_hk_spot_sina\") 查看。完整对照见 https"
     },
     {
       "script": "market_regime.py",
@@ -31,6 +27,10 @@
     {
       "script": "refresh_stock_metadata.py",
       "reason": "退出码 1 |   ❌ fetch_stock_names 失败，停止元数据巡检"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []
