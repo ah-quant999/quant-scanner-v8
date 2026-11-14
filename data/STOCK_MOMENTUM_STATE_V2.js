@@ -1,6 +1,6 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-14 20:28:37",
+  "generated": "2026-11-14 21:06:02",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
@@ -9481,14 +9481,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "stage": "震荡",
      "consecutive_up_days": 1,
      "max_gain_pct": 3.49,
-     "max_drawdown_pct": 7.07,
+     "max_drawdown_pct": 2.89,
      "t1_gain_pct": 3.49,
      "t3_gain_pct": -0.6,
-     "t5_gain_pct": -7.07,
-     "t10_gain_pct": -7.07,
-     "last_gain_pct": -7.07,
+     "t5_gain_pct": -2.25,
+     "t10_gain_pct": -2.25,
+     "last_gain_pct": -2.25,
      "pattern": "普通",
-     "note": "连涨前0天 回撤7.07%",
+     "note": "连涨前0天 回撤2.89%",
      "daily_returns": [
       {
        "T": "T+1",
@@ -9512,8 +9512,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+5",
-       "date": "2026-10-27",
-       "gain": -7.07
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+6",
@@ -10361,14 +10361,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "stage": "启动",
      "consecutive_up_days": 0,
      "max_gain_pct": -0.98,
-     "max_drawdown_pct": 10.54,
+     "max_drawdown_pct": 4.12,
      "t1_gain_pct": -0.98,
-     "t3_gain_pct": -10.54,
-     "t5_gain_pct": -10.54,
-     "t10_gain_pct": -10.54,
-     "last_gain_pct": -10.54,
+     "t3_gain_pct": -4.12,
+     "t5_gain_pct": -4.12,
+     "t10_gain_pct": -4.12,
+     "last_gain_pct": -4.12,
      "pattern": "普通",
-     "note": "连涨前4天 回撤10.54%",
+     "note": "连涨前4天 回撤4.12%",
      "daily_returns": [
       {
        "T": "T+1",
@@ -10382,8 +10382,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+3",
-       "date": "2026-10-27",
-       "gain": -10.54
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+4",
@@ -10841,14 +10841,14 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "stage": "启动",
      "consecutive_up_days": 0,
      "max_gain_pct": -2.81,
-     "max_drawdown_pct": 5.26,
+     "max_drawdown_pct": 2.81,
      "t1_gain_pct": -2.81,
-     "t3_gain_pct": -5.26,
-     "t5_gain_pct": -5.26,
-     "t10_gain_pct": -5.26,
-     "last_gain_pct": -5.26,
+     "t3_gain_pct": -2.81,
+     "t5_gain_pct": -2.81,
+     "t10_gain_pct": -2.81,
+     "last_gain_pct": -2.81,
      "pattern": "普通",
-     "note": "连涨前5天 回撤5.26%",
+     "note": "连涨前5天 回撤2.81%",
      "daily_returns": [
       {
        "T": "T+1",
@@ -10857,8 +10857,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+2",
-       "date": "2026-10-27",
-       "gain": -5.26
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+3",
@@ -12364,9 +12364,9 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "max_drawdown_pct": 17.5,
      "t1_gain_pct": -5.54,
      "t3_gain_pct": -9.85,
-     "t5_gain_pct": -13.19,
-     "t10_gain_pct": -15.48,
-     "last_gain_pct": -15.48,
+     "t5_gain_pct": -17.5,
+     "t10_gain_pct": -17.5,
+     "last_gain_pct": -17.5,
      "pattern": "波动大",
      "note": "连涨前5天 回撤17.5%",
      "daily_returns": [
@@ -12392,33 +12392,33 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+5",
-       "date": "2026-11-02",
-       "gain": -13.19
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+6",
-       "date": "2026-11-03",
-       "gain": -14.25
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+7",
-       "date": "2026-11-04",
-       "gain": -12.84
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+8",
-       "date": "2026-11-05",
-       "gain": -11.35
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+9",
-       "date": "2026-11-06",
-       "gain": -13.54
+       "date": "",
+       "gain": null
       },
       {
        "T": "T+10",
-       "date": "2026-11-09",
-       "gain": -15.48
+       "date": "",
+       "gain": null
       }
      ],
      "entry_price": 11.37
