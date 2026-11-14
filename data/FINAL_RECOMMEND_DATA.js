@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-11-14 14:18:29",
+  "update_time": "2026-11-14 18:00:11",
   "crisis_score": 33.9,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,7 +7,7 @@ window.FINAL_RECOMMEND_DATA = {
   "top_n": 3,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-14 12:48:03",
+    "source": "backtest_expectancy@2026-11-14 16:21:10",
     "degraded": false,
     "effective": {
       "jinzuan": -0.763,
@@ -34,7 +34,7 @@ window.FINAL_RECOMMEND_DATA = {
       "jigou": true
     },
     "loaded": {
-      "generated": "2026-11-14 12:48:03",
+      "generated": "2026-11-14 16:21:10",
       "hit": 4,
       "n_snapshots": 109,
       "date_range": [
@@ -88,7 +88,7 @@ window.FINAL_RECOMMEND_DATA = {
   "consensus_stocks": [],
   "all_candidates": [],
   "factor_chain": {
-    "update_time": "2026-11-14 14:18:29",
+    "update_time": "2026-11-14 18:00:11",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
@@ -134,13 +134,5 @@ window.FINAL_RECOMMEND_DATA = {
     "evidence_note": "计分依据分级：①「未回测」= 无任何样本外证据（放量弱势）；②「薄样本」= 9 信号日实测边际，样本不足以定权重，故不计分（异常换手率/ROE_TTM/高手跟踪）；③「walk-forward」= ≥4/5 年 OOS 检验通过才给分（候选池层 P5 的 amt60/turntrend，+6/+3）。本层当前**没有任何因子持有第③级证据** ⇒ 除放量弱势外全部为 0 分，属**有意的保守**。　🔴 结论（2026-09-18 主人问「扣分标准科学吗？别一开始就犯错」）：本层唯一记分的「放量弱势 −0.5」有**三重问题** —— ①无回测依据（bottom 榜从未回测）；②设计上不相交（bottom=极端放量股 vs 候选池=缩量强势，实测交集 0 ⇒ 几乎恒不触发）；③上游 _weak 集合曾因 norm_code 未剥点而恒失配（29 轮命中 0 次，本补丁已修）。⇒ **因子在本层的实际计分影响 = 0**，现状等于「全部只做标注」；要让它真正成为加减分项，须先补 walk-forward 回测（流程见下方 ③ 待接入队列 / 明细见本页 🧪 因子审计卡）。",
     "dedup_note": "因子只对**池内已有票**动作（_factor_in_pool 只查不建）⇒ 不产池、不决定谁能进榜"
   },
-  "factor_trace": [],
-  "republish_time": "2026-11-14 14:27:40",
-  "validity": {
-    "status": "degraded",
-    "reason": "观澜台/IMA 候选池为空（zsxq token 可能过期，强势跟踪源不可用）",
-    "ima_data_date": "2026-11-06",
-    "ima_pool_total": 0,
-    "assessed_at": "2026-11-14 16:10 (backfilled)"
-  }
+  "factor_trace": []
 };

@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-14 13:39",
+  "update_time": "2026-11-14 17:23",
   "data_type": "real",
   "summary": {
     "in_count": 29,
@@ -1159,6 +1159,22 @@
       "net_5d_days": 5
     },
     {
+      "name": "半导体",
+      "net": -75.28,
+      "net_5d": 88.74,
+      "net_20d": -23.84,
+      "net_60d": -1669.12,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 214.02,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60,
+      "source": "东财日K"
+    },
+    {
       "name": "银行",
       "net": 61.79,
       "net_5d": 81.25,
@@ -1206,7 +1222,7 @@
       "net": -117.57,
       "net_5d": 57.52,
       "net_20d": -430.92,
-      "net_60d": -2885.28,
+      "net_60d": -2885.29,
       "type": "概念",
       "consecutive_days": 3,
       "trend": "out",
@@ -1222,7 +1238,7 @@
       "net": -169.06,
       "net_5d": 55.06,
       "net_20d": -555.0,
-      "net_60d": -2027.46,
+      "net_60d": -2027.44,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "out",
@@ -1238,7 +1254,7 @@
       "net": 95.91,
       "net_5d": 55.06,
       "net_20d": -555.0,
-      "net_60d": -2027.46,
+      "net_60d": -2027.44,
       "type": "行业",
       "consecutive_days": 18,
       "trend": "in",
@@ -1248,25 +1264,25 @@
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K"
-    },
+    }
+  ],
+  "trend_10d": [
     {
-      "name": "电子",
-      "net": -235.07,
-      "net_5d": 48.7,
-      "net_20d": -564.03,
-      "net_60d": -3371.33,
+      "name": "半导体",
+      "net": -75.28,
+      "net_5d": 88.74,
+      "net_20d": -23.84,
+      "net_60d": -1669.12,
       "type": "行业",
       "consecutive_days": 2,
       "trend": "out",
       "net_5d_days": 5,
-      "net_10d": 51.67,
+      "net_10d": 214.02,
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60,
       "source": "东财日K"
-    }
-  ],
-  "trend_10d": [
+    },
     {
       "name": "半导体设备",
       "net": 10.4,
@@ -1345,21 +1361,6 @@
       "net_60d_days": 60
     },
     {
-      "name": "半导体",
-      "net": -75.28,
-      "net_5d": 48.51,
-      "net_20d": 28.04,
-      "net_60d": 239.64,
-      "type": "行业",
-      "consecutive_days": 2,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 78.16,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
-    },
-    {
       "name": "DeepSeek概念",
       "net": 21.69,
       "net_5d": -22.56,
@@ -1408,7 +1409,7 @@
       "net": -235.07,
       "net_5d": 48.7,
       "net_20d": -564.03,
-      "net_60d": -3371.33,
+      "net_60d": -3371.34,
       "type": "行业",
       "consecutive_days": 2,
       "trend": "out",
@@ -1714,21 +1715,6 @@
       "net_60d_days": 5
     },
     {
-      "name": "半导体",
-      "net": -75.28,
-      "net_5d": 48.51,
-      "net_20d": 28.04,
-      "net_60d": 239.64,
-      "type": "行业",
-      "consecutive_days": 2,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 78.16,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
-    },
-    {
       "name": "先进封装",
       "net": -45.83,
       "net_5d": 74.25,
@@ -1802,6 +1788,21 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 54
+    },
+    {
+      "name": "医疗服务",
+      "net": -18.69,
+      "net_5d": -44.6,
+      "net_20d": -55.69,
+      "net_60d": 85.97,
+      "type": "行业",
+      "consecutive_days": 3,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": -42.23,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
     }
   ]
 }

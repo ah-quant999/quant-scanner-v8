@@ -1,15 +1,11 @@
 {
-  "update_time": "2026-11-14 14:23:09",
-  "run_start": "2026-11-14 11:47:41",
-  "ok": 42,
-  "fail": 4,
+  "update_time": "2026-11-14 18:05:01",
+  "run_start": "2026-11-14 14:40:13",
+  "ok": 43,
+  "fail": 3,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    },
-    {
-      "script": "scripts/fetch_multiyear_kline.py",
       "reason": "超时 >40min"
     },
     {

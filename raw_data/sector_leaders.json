@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-14 03:59",
-  "republish_time": "2026-11-14 11:40:40",
+  "update_time": "2026-11-14 08:52",
+  "republish_time": "2026-11-14 18:02:51",
   "data_date": "2026-11-13",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "幸福蓝海",
           "price": 17.99,
           "chg": 20.01,
-          "main_net": null
+          "main_net": 224442764.0
         },
         {
           "code": "603103",
           "name": "横店影视",
           "price": 19.31,
           "chg": 10.03,
-          "main_net": null
+          "main_net": 56050449.0
         },
         {
           "code": "600977",
           "name": "中国电影",
           "price": 17.05,
           "chg": 10.0,
-          "main_net": null
+          "main_net": 348572784.0
         },
         {
           "code": "002905",
           "name": "金逸影视",
           "price": 9.9,
           "chg": 10.0,
-          "main_net": null
+          "main_net": 37052228.0
         },
         {
           "code": "002739",
           "name": "儒意电影",
           "price": 10.05,
           "chg": 9.96,
-          "main_net": null
+          "main_net": 451634386.0
         }
       ],
       "match": "exact"
@@ -946,6 +946,6 @@
   "leaders_fail_count": 0,
   "neo_fallback_count": 0,
   "retained_count": 0,
-  "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-14 11:29:39 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-14 11:40:40 跟随 FINAL 重算(一劳永逸)"
+  "em_boards_source": "cache",
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-14 18:02:51 跟随 FINAL 重算(一劳永逸)"
 }

@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-14 14:18:29",
+  "update_time": "2026-11-14 18:00:11",
   "crisis_score": 33.9,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,7 +7,7 @@
   "top_n": 3,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-14 12:48:03",
+    "source": "backtest_expectancy@2026-11-14 16:21:10",
     "degraded": false,
     "effective": {
       "jinzuan": -0.763,
@@ -34,7 +34,7 @@
       "jigou": true
     },
     "loaded": {
-      "generated": "2026-11-14 12:48:03",
+      "generated": "2026-11-14 16:21:10",
       "hit": 4,
       "n_snapshots": 109,
       "date_range": [
@@ -88,7 +88,7 @@
   "consensus_stocks": [],
   "all_candidates": [],
   "factor_chain": {
-    "update_time": "2026-11-14 14:18:29",
+    "update_time": "2026-11-14 18:00:11",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
