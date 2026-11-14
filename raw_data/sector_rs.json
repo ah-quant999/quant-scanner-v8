@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-14 20:34",
+  "update_time": "2026-11-14 21:25",
   "data_date": "2026-11-13",
   "data_date_source": "kline",
   "fetch_date": "2026-11-14",
@@ -1463,6 +1463,24 @@
       "relative_90d": 18.05,
       "relative_180d": 9.56,
       "relative_52w": 10.42
+    },
+    {
+      "name": "医药商业",
+      "pct_day": -2.33,
+      "pct_5d": -2.09,
+      "pct_20d": -2.05,
+      "pct_30d": -4.03,
+      "pct_60d": -8.96,
+      "pct_90d": 6.52,
+      "pct_180d": -18.3,
+      "pct_52w": -7.32,
+      "relative_5d": -2.09,
+      "relative_20d": -2.05,
+      "relative_30d": -4.03,
+      "relative_60d": -8.96,
+      "relative_90d": 6.52,
+      "relative_180d": -18.3,
+      "relative_52w": -7.32
     },
     {
       "name": "养殖业",
@@ -3211,6 +3229,24 @@
       "relative_52w": -16.17
     },
     {
+      "name": "医药商业",
+      "pct_day": -2.33,
+      "pct_5d": -2.09,
+      "pct_20d": -2.05,
+      "pct_30d": -4.03,
+      "pct_60d": -8.96,
+      "pct_90d": 6.52,
+      "pct_180d": -18.3,
+      "pct_52w": -7.32,
+      "relative_5d": -2.09,
+      "relative_20d": -2.05,
+      "relative_30d": -4.03,
+      "relative_60d": -8.96,
+      "relative_90d": 6.52,
+      "relative_180d": -18.3,
+      "relative_52w": -7.32
+    },
+    {
       "name": "饮料制造",
       "pct_day": -2.0,
       "pct_5d": -1.55,
@@ -3227,24 +3263,6 @@
       "relative_90d": 6.36,
       "relative_180d": -13.65,
       "relative_52w": -9.8
-    },
-    {
-      "name": "农产品加工",
-      "pct_day": -0.75,
-      "pct_5d": -0.92,
-      "pct_20d": -2.9,
-      "pct_30d": -4.99,
-      "pct_60d": 0.03,
-      "pct_90d": 5.88,
-      "pct_180d": -19.0,
-      "pct_52w": -19.16,
-      "relative_5d": -0.92,
-      "relative_20d": -2.9,
-      "relative_30d": -4.99,
-      "relative_60d": 0.03,
-      "relative_90d": 5.88,
-      "relative_180d": -19.0,
-      "relative_52w": -19.16
     }
   ],
   "strong_relative_90d": [
@@ -3393,6 +3411,24 @@
       "relative_52w": -16.17
     },
     {
+      "name": "医药商业",
+      "pct_day": -2.33,
+      "pct_5d": -2.09,
+      "pct_20d": -2.05,
+      "pct_30d": -4.03,
+      "pct_60d": -8.96,
+      "pct_90d": 6.52,
+      "pct_180d": -18.3,
+      "pct_52w": -7.32,
+      "relative_5d": -2.09,
+      "relative_20d": -2.05,
+      "relative_30d": -4.03,
+      "relative_60d": -8.96,
+      "relative_90d": 6.52,
+      "relative_180d": -18.3,
+      "relative_52w": -7.32
+    },
+    {
       "name": "饮料制造",
       "pct_day": -2.0,
       "pct_5d": -1.55,
@@ -3409,24 +3445,6 @@
       "relative_90d": 6.36,
       "relative_180d": -13.65,
       "relative_52w": -9.8
-    },
-    {
-      "name": "农产品加工",
-      "pct_day": -0.75,
-      "pct_5d": -0.92,
-      "pct_20d": -2.9,
-      "pct_30d": -4.99,
-      "pct_60d": 0.03,
-      "pct_90d": 5.88,
-      "pct_180d": -19.0,
-      "pct_52w": -19.16,
-      "relative_5d": -0.92,
-      "relative_20d": -2.9,
-      "relative_30d": -4.99,
-      "relative_60d": 0.03,
-      "relative_90d": 5.88,
-      "relative_180d": -19.0,
-      "relative_52w": -19.16
     }
   ],
   "strong_180d": [
