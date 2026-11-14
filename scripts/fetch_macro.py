@@ -10,6 +10,7 @@ import json
 import os
 import datetime
 import sys
+import traceback
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(BASE, "out", "macro.json")
@@ -24,7 +25,10 @@ def main():
     try:
         df = ak.bond_zh_us_rate()
     except Exception as e:
-        log(f"bond_zh_us_rate 失败: {e}")
+        # 🔧 2026-11-14 小九机：log 走 stdout，被 market_regime 自举 capture_output 吞掉
+        #   ⇒ 运行日志只见「退出码 1 且 stderr 为空」。现把真实栈帧打到 stderr 透传。
+        log(f"bond_zh_us_rate 失败: {e!r}")
+        traceback.print_exc()
         return 1
     df = df.dropna(subset=["日期"]).copy()
     df["date"] = df["日期"].astype(str)

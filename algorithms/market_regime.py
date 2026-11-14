@@ -63,7 +63,9 @@ def _bootstrap_macro():
         r = subprocess.run([sys.executable, fetcher], cwd=BASE,
                            capture_output=True, text=True, timeout=600)
         if r.returncode != 0:
-            log(f"fetch_macro.py 退出码 {r.returncode}: {(r.stderr or '')[-300:]}")
+            # 🔧 2026-11-14 小九机：fetch_macro 的报错 log 走 stdout，只打 stderr 会漏掉真实死因
+            #   （11-14 连续 4 轮「退出码 1 且 stderr 为空」即此因）。out/err 双透传。
+            log(f"fetch_macro.py 退出码 {r.returncode}: out={(r.stdout or '')[-300:]} err={(r.stderr or '')[-300:]}")
     except Exception as e:
         log(f"fetch_macro.py 异常: {e}")
     return os.path.exists(IN)
