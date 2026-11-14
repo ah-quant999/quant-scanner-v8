@@ -776,6 +776,32 @@ def freshness_warn(name, obj, max_age_days=1.0):
     return True
 
 
+def _assess_validity(top10, max_score, missing):
+    """🆕 2026-11-14 主人令「一劳永逸」：榜单有效性闸门。
+    根因：~11-05 起因子榜 total_score 从 max 43 塌缩到 12、Top5 分差 <1，
+    因上游因子输入（kline/基本面/IMA）停更 → 榜首被噪声霸占、同一对票连天霸屏，
+    却无任何提示仍装作权威榜单。现落盘前计算分辩度 + 缺失维度，写入 validity，
+    前端据此在「最终推荐/终选输出/因子榜」顶部红色「榜单有效性预警·暂不可全信」。"""
+    _ts = [s.get("total_score", 0) or 0 for s in (top10 or [])[:5]]
+    _spread = (_ts[0] - _ts[-1]) if len(_ts) >= 5 else None
+    _r = []
+    if max_score < 25:
+        _r.append(f"分辩度不足（max_score={max_score:.1f}，健康阈值≥25）")
+    if _spread is not None and _spread < 3:
+        _r.append(f"头部无区分（Top5 分差={_spread:.1f}，健康阈值≥3）")
+    if len(missing or []) >= 3:
+        _r.append("缺失因子维度≥3（" + "、".join((missing or [])[:5]) + "）")
+    return {
+        "status": "ok" if not _r else "degraded",
+        "reason": ("榜单有效" if not _r else "；".join(_r)),
+        "max_score": round(max_score, 1),
+        "top_spread": (round(_spread, 1) if _spread is not None else None),
+        "data_missing_count": len(missing or []),
+        "data_missing": list(missing or []),
+        "assessed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-08-28 修复：真实 20 日涨幅
 # 实测 top10 近 10 日 180/180 条信号的 pct_chg_20d 全为 0，且 gold_pool 中
@@ -2596,6 +2622,9 @@ def main():
         #   消费者（前端「每日因子计算」/最终推荐页）可据此把该维度显示为「无数据」，
         #   杜绝「数据缺失」被读成「数据差」。打分数学未变（见 _dim_src_empty 处注释）。
         "data_missing": [k for k, v in _dim_src_empty.items() if v],
+        # 🆕 2026-11-14 主人令「一劳永逸」：榜单有效性闸门（分辩度/缺失维度），
+        # 前端「最终推荐/终选输出/因子榜」据此显示红色「榜单有效性预警·暂不可全信」。
+        "validity": _assess_validity(top10, max_score, [k for k, v in _dim_src_empty.items() if v]),
     }
 
     # 保存当日文件
