@@ -14711,6 +14711,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       if(moreWrap) moreWrap.style.display = 'none';
       return;
     }
+    // 🆕 2026-11-14 有效性预警横幅
+    var _vbFS = (window.__validityBanner ? window.__validityBanner(TD) : '');
     // 摘要 pills
     if(sumEl){
       const mode = TD.selection_mode || '';
@@ -14727,7 +14729,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 列表（Top5 标 🏷）
     const limit = _finalSelExpanded ? arr.length : 12;
     const top5 = arr.slice(0,5).map(s=>String(s.code));
-    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">';
+    let h = (_vbFS||'') + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">';
     arr.slice(0, limit).forEach(function(s){
       const code = String(s.code||''), name = s.name||'', board = s.board_label || s.board || '';
       const sc = (typeof s.total_score === 'number') ? s.total_score : 0;
@@ -18940,6 +18942,23 @@ window.__renderV8CalToday();
         '</code></div>';
     }
   }
+  // 🆕 2026-11-14 主人令「一劳永逸」：榜单有效性预警横幅。
+  // 读取生成链写入 TOP10_DAILY.validity（分辩度/缺失维度闸门）：
+  // 因子输入停更→榜首被噪声霸占（同一对票连天霸屏）时，顶部红色警示
+  // 「最终推荐暂不可全信」，杜绝静默把退化榜单当权威推荐。
+  window.__validityBanner = function(TD){
+    if(!TD || !TD.validity || TD.validity.status === 'ok') return '';
+    var v = TD.validity;
+    var col = '#ff5252', bord = 'rgba(255,82,82,.45)', bg = 'rgba(255,82,82,.12)';
+    var extra = '';
+    if(v.max_score != null) extra += '（max_score=' + v.max_score;
+    if(v.top_spread != null) extra += ' · Top5分差=' + v.top_spread;
+    if(extra) extra += '）';
+    return '<div style="margin-bottom:12px;padding:10px 13px;background:'+bg+';border:1px solid '+bord+';border-radius:9px;font-size:12.5px;color:var(--sub);line-height:1.65">'
+      + '<b style="color:'+col+'">⚠️ 榜单有效性预警</b>：当前因子榜分辩度不足 / 输入数据陈旧，<b style="color:'+col+'">最终推荐暂不可全信</b>。<br>'
+      + '原因：' + (v.reason || '未知') + extra + '</div>';
+  };
+
   function renderFinalRecInner(){
     var el=document.getElementById('finalRecBody'); if(!el) return;
     var D=window.FINAL_RECOMMEND_DATA||null;
@@ -19000,6 +19019,8 @@ window.__renderV8CalToday();
       var _tgN=document.getElementById('finalHeaderTag'); if(_tgN) _tgN.textContent='今日未算出';
       return;
     }
+    // 🆕 2026-11-14 有效性预警横幅（榜单退化时顶部红条）
+    var _vb = (window.__validityBanner ? window.__validityBanner(TD) : '');
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(mainStocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
     // 🔴 2026-10-20 主人令「要口径和评分都一致」：卡头标签回到唯一口径——
@@ -19046,7 +19067,7 @@ window.__renderV8CalToday();
       sb.innerHTML=b1+b2+b3;
     })();
 
-    var h='';
+    var h=_vb||'';
     if(strongSec && strongSec.length){
       h+='<div style="margin-bottom:12px;padding:8px 12px;border:1px solid rgba(255,208,36,0.63);border-radius:9px;font-size:12px;color:var(--sub)">';
       h+='<b style="color:var(--gold)">📊 当前强势板块（相对强度 TOP）：</b>'+_fe(strongSec.join(' · '));
