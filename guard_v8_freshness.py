@@ -266,6 +266,13 @@ WARN_SOURCES = {
     #   盘后 daily（工作日20:50 v8_national_team.yml 产出 data/NATIONAL_TEAM.js），
     #   阈值 48h 与 SECTOR_RS / LHB_DATA 等同档；周末/节假日由交易日口径豁免，不会误报。
     "NATIONAL_TEAM": 48,
+    # 🎉 2026-11-14 盲区补盲：以下源此前游离于硬编码监控字典之外（CORE/WARN/FROZEN/ALGO 均不含），
+    #   旧版 guard 完全不看 → 它们若陈旧也恒绿、无人知晓。现显式纳入 WARN 并给长阈值，
+    #   使其进入「已知陈旧源」清单、由盲区捕获块兜底一致性校验，不再漏报。
+    "PORTFOLIO": 24 * 30,        # 持仓组合（周/事件节奏，非每日刷新）
+    "maharo_insights": 24 * 10,  # 高手洞察（周/事件节奏）
+    "SECTOR_YEAR_FLOW": 72,      # 板块年度资金流（季度级）
+    "HUIJIN_ETF_DRILL": 24 * 14, # 汇金 ETF 演练（前端零引用，长阈值仅捕真冻结）
 }
 
 # 🛡 2026-08-20 主人令·一劳永逸：策略回测（统一）卡片依赖选股算法产出，
@@ -306,6 +313,10 @@ FROZEN_SOURCES = {
     #    前端零引用（index.html「停止注入」）、raw 无消费方 ⇒ 无生产者亦无消费者。
     #    回滚：从 09-14 及更早的提交取回 data/LHB_7D.js，并把本条与
     #    run_algorithms.py 的 step_gen_lhb_7d 一并恢复。
+    # 🎉 2026-11-14 主人令·盲区补盲：历史回放卡无自动调度生产者，其数据按事件节奏刷新，
+    #   旧版 guard 完全不看 → 若其陈旧恒绿。纳入 FROZEN（无生产者冻结快照类），
+    #   长阈值 90 天仅用于捕获「真·冻结」（如生产者永久停摆），日常事件节奏刷新不误报。
+    "FINAL_RECOMMEND_REPLAY": 24 * 90,  # 历史回放·无自动调度·长阈值仅捕真冻结
 }
 
 # 引入 update_v8.py 的时段映射，用于输出"每个模块由哪个定时任务更新"
@@ -818,6 +829,33 @@ def main():
         print(f"  已检 CORE={len(core_stale)} / WARN={len(warn_stale)}；FROZEN 未检（总时限）")
         return 2
     frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading, token=check_token, use_cloud=True)
+
+    # ── 🎉 2026-11-14 盲区捕获（根因修复：硬编码监控字典漏检 data/*.js 全部文件）──
+    # 旧版 guard 仅查 CORE/WARN/FROZEN/ALGO 四张硬编码表，任何未列入的 data/*.js
+    # 若陈旧也恒绿（如 CONCEPT_ETF_MAP 冻 08-18 却在状态页显示「新鲜」）。
+    # 本块全量扫描 data/*.js：凡不在四表、不在静态白名单、update_time 落后 >30 个交易日者，
+    # 一律并入 warn_stale（WARN 黄区可见 + 进 FRESHNESS_STATUS），彻底消除「漏报盲区」。
+    _MONITORED = set(CORE_SOURCES) | set(CORE_SOURCES_ALGO) | set(WARN_SOURCES) | set(FROZEN_SOURCES)
+    _STATIC_WHITELIST = {"SECTOR_PHASE_HISTORY", "CONCEPT_ETF_MAP"}  # 设计即静态参考，豁免避免结构性恒红
+    _SKIP_PREFIX = ("all_",)
+    _SKIP_EXACT = {"FRESHNESS_STATUS", "HEALTH_CHECK", "DO_NOT_DELETE", "AUDIT_TRAIL"}
+    _CATCHALL_MAX_DAYS = 30
+    _blind = []
+    for _p in sorted(DATA_DIR.glob("*.js")):
+        _var = _p.stem
+        if _var in _MONITORED or _var in _STATIC_WHITELIST or _var in _SKIP_EXACT:
+            continue
+        if _var.startswith(_SKIP_PREFIX):
+            continue
+        _ts = extract_update_time(_p)
+        if _ts is None:
+            continue
+        _td = trading_days_between(_ts.date(), close.date())
+        if _td > _CATCHALL_MAX_DAYS:
+            _blind.append((_var, f"未纳入监控清单(盲区)，已落后 {_td} 个交易日（约 {_td} 交易日），疑似真陈旧"))
+    if _blind:
+        warn_stale += _blind
+        print(f"  [盲区捕获] 新增 {len(_blind)} 个未监控但陈旧的源：{', '.join(v for v, _ in _blind)}")
 
     def _with_cat(items):
         def _cat(var):
