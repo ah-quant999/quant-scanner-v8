@@ -26,17 +26,41 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-08 21:30"
-  updated_by: 小九机AI
+  updated: "2026-11-14 21:30"
+  updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 184
+  next_id_seq: 185
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
+  - id: market-regime-macro-json-bootstrap-fail-1114
+    owner: 小九机AI（落码）
+    priority: P1
+    status: todo
+    created: 2026-11-14
+    title: market_regime.py 连续4轮缺 out/macro.json 自举失败 ⇒ MARKET_REGIME.js 停更>39h
+    note: >-
+      登记方：阿狸咪的工程师（11-14 21:29 CST 巡检实证，主人外出期自主处置）。现象：
+      algo 链 market_regime.py 每轮报「缺 out/macro.json，自动先跑 fetch_macro.py 自举依赖…退出码 1
+      （stderr 为空）…自举后仍不存在，放弃」。连续 4 轮实证：11-14 06:27:40 chain-end（run_start 03:46:13）
+      fail=3 首现 → 10:06 schedule run 43544426183 failure（问责步）→ 13:39 schedule run 43562549536 failure →
+      14:40 dispatch chain-end 18:05:01（run_start 14:40:13，ok=43 fail=3）再现。
+      产品影响：data/MARKET_REGIME.js update_time=2026-11-13T06:07:29，截至 11-14 21:20 停更 >39h。
+      同族观察：fetch_citic_pe.py「增量无数据」11-11 21:53 单轮首现后 11-14 18:05 报告再现（复现级），
+      fetch_macro 退出码 1 且 stderr 为空，疑与 citic_pe 同为上游数据接口静默失败，建议根因排查一并核。
+      已知非问题：refresh_kline_freshness/fetch_multiyear_kline 超时=软闸基线，不属本件。
+      按铁律未派发未重试：algo 20:27 已有 in_progress 轮 43594897073 会自然复现；交接件
+      docs/ops/handover/2026-11-14_2128_阿狸咪的工程师给小九_market_regime缺macro_json连续4轮自举失败.md。
+    verify_how: >-
+      修复判据：修复提交推 main 后，algo 链下一轮 run head_sha ≥ 修复提交 sha 且 run_report
+      failed_scripts 不再含 market_regime（看产物不看 run conclusion）；raw_data/market_regime.json 与
+      data/MARKET_REGIME.js update_time 前进。若上游接口确死，换源或降级产物口径，禁前端硬编。
+    updated: "2026-11-14 21:30"
+    updated_by: 阿狸咪的工程师
   - id: watchdog-schedule-deregistered-4th-1110
     owner: 小九机AI（落码）
     priority: P1
