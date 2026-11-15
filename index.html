@@ -188,6 +188,7 @@ window.__domReadyFns=[];
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261111） -->
     <!-- 🔴 2026-10-03 CN runner2号机更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
     <script src="data/maharo_insights.js?v=37dbdd5893" defer></script>
+    <script src="data/maharo_wm.js?v=7551d553b8" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -16515,6 +16516,16 @@ window.__renderComprehensiveSynthesis = function(){
     //   整卡降级（主人 10-04 08:39 截图实锤）。d.sources 徽章块与原始条目录 details 块
     //   均为 maharo_macro 孤儿 UI，随数据源一并退役删除。
     var ins = ins0;
+    /* 2026-11-15 一劳永逸修复：周/月解析与 daily 刷稿解耦。
+       历史坑：3 档 daily 高频重算把 maharo_insights.js 整体重写成只剩 daily，
+       连带 weekly/monthly 一起消失；前端 blocks.forEach 又对缺失块静默 return，
+       导致「本周解析/本月解析」整块不见。此处从独立种子库 window.MAHORO_WM 兜底，
+       daily 再怎么刷都不会冲掉种子库里的周/月。 */
+    (function(){ var wm = window.MAHORO_WM || {};
+      ["weekly","monthly"].forEach(function(k){
+        if(!ins[k] || !ins[k].text){ if(wm[k] && wm[k].text) ins[k] = wm[k]; }
+      });
+    })();
     var blocks = [
       {k:'daily',   icon:'\ud83d\udccc', name:'\u4eca\u65e5\u89e3\u6790', col:'#22c55e', bg:'rgba(52,211,153,.06)', bd:'rgba(52,211,153,.35)'},
       {k:'weekly',  icon:'\ud83d\udcc5', name:'\u672c\u5468\u89e3\u6790', col:'#41c9ff', bg:'rgba(96,165,250,.06)', bd:'rgba(96,165,250,.35)'},
@@ -16523,7 +16534,14 @@ window.__renderComprehensiveSynthesis = function(){
     var anyIns = false;
     blocks.forEach(function(b){
       var it = ins[b.k];
-      if(!it || !it.text) return;
+      if(!it || !it.text){
+        if(b.k==='weekly' || b.k==='monthly'){
+          h += '<div style="background:'+b.bg+';border:1px dashed '+b.bd+';border-radius:7px;padding:10px 13px;margin-bottom:10px">'
+             + '<div style="font-size:12.5px;font-weight:700;color:'+b.col+'">'+b.icon+' '+b.name+'</div>'
+             + '<div style="font-size:11px;color:var(--dim);margin-top:4px">解析待重建（insights 与独立种子库均缺此块）</div></div>';
+        }
+        return;
+      }
       anyIns = true;
       var meta = it.generated_at || it.date || it.period || '';
       h += '<div style="background:'+b.bg+';border:1px solid '+b.bd+';border-radius:7px;padding:10px 13px;margin-bottom:10px">'
