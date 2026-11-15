@@ -14,6 +14,10 @@ import traceback
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(BASE, "out", "macro.json")
+# 🛡 2026-11-15 一劳永逸：out/ 是 .gitignore 目录，云端全新 checkout 没有 ⇒ market_regime
+#   在云端永远读不到、每轮都靠 bootstrap 现拉。补写受 git 跟踪的 raw_data/macro.json，
+#   与 docstring「输出：out/macro.json + raw_data/macro.json」口径对齐（原本名不副实）。
+OUT_TRACKED = os.path.join(BASE, "raw_data", "macro.json")
 
 
 def log(msg):
@@ -79,10 +83,11 @@ def main():
         "lpr": lpr[-50:],   # 近 50 次
         "interbank": ir,
     }
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False, default=str, separators=(",", ":"))
-    log(f"已写入 {OUT}, {os.path.getsize(OUT)} B")
+    for _path in (OUT, OUT_TRACKED):
+        os.makedirs(os.path.dirname(_path), exist_ok=True)
+        with open(_path, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, default=str, separators=(",", ":"))
+        log(f"已写入 {_path}, {os.path.getsize(_path)} B")
     return 0
 
 

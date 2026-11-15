@@ -15,7 +15,12 @@ import sys
 import datetime
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 🛡 2026-11-15 一劳永逸（三级兜底）：out/ 是 .gitignore 目录，云端全新 checkout 永远没有
+#   out/macro.json；原 IN 只指向 out/ ⇒ 每轮都靠 _bootstrap_macro 现拉 akshare，
+#   一旦 akshare 版本窗口期失败（11-14 连败4轮）就整链冻结。
+#   现改为「out/ 新鲜优先 → raw_data/ 受 git 跟踪副本兜底 → bootstrap 自举」三级链。
 IN = os.path.join(BASE, "out", "macro.json")
+IN_TRACKED = os.path.join(BASE, "raw_data", "macro.json")  # 受 git 跟踪，云端 checkout 必有
 # 🛡 2026-08-29 一劳永逸：输出到 raw_data，与 update_v8 DATA_SOURCES 对齐。
 #   原 out/market_regime.json 在 .gitignore 目录，云端 checkout 不存在，
 #   且 update_v8 只扫描 raw_data/ → 该卡自 8/19 起事实上冻结。
@@ -71,11 +76,27 @@ def _bootstrap_macro():
     return os.path.exists(IN)
 
 
+def _resolve_macro_path():
+    """三级兜底解析 macro.json 路径：out/（新鲜）→ raw_data/（受跟踪）→ bootstrap 自举。
+    返回可读文件路径；全失败返回 None。任一级成功即短路，不再依赖单一 akshare 成功点。"""
+    if os.path.exists(IN):
+        return IN
+    if os.path.exists(IN_TRACKED):
+        log(f"缺 {IN}，回退到受 git 跟踪的 {IN_TRACKED}（云端 checkout 必有）")
+        return IN_TRACKED
+    log(f"out/ 与 raw_data/ 均无 macro.json，尝试 fetch_macro.py 自举…")
+    if _bootstrap_macro():
+        # 自举会双写 out/ + raw_data/（见 fetch_macro.py 2026-11-15 修复）；优先取 out/
+        return IN if os.path.exists(IN) else (IN_TRACKED if os.path.exists(IN_TRACKED) else None)
+    return None
+
+
 def main():
-    if not os.path.exists(IN) and not _bootstrap_macro():
-        log(f"缺 {IN}，自举 fetch_macro.py 后仍不存在，放弃")
+    macro_path = _resolve_macro_path()
+    if not macro_path:
+        log(f"macro.json 三级兜底全失败，放弃（本轮 market_regime 不产出）")
         return 1
-    with open(IN, encoding="utf-8") as f:
+    with open(macro_path, encoding="utf-8") as f:
         data = json.load(f)
 
     # 中国 10Y 趋势（20 日窗口）

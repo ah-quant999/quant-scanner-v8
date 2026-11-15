@@ -542,8 +542,15 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         })
 
     # 6. 涨停家数异动
+    # 🛡 2026-11-15 一劳永逸（P0 断链根治，与 algorithms/ 版同批）：数据源 fetch_limit_up_heatmap_v8.py
+    #   result["total"] = daily_totals（list）⇒ total>=80 对 list 比较抛 TypeError ⇒ 整链断。
+    #   归一化：list 取最新一日家数，非数值降级 0。两份脚本行为一致，禁止特立独行。
     if limitup and limitup.get("total"):
         total = limitup["total"]
+        if isinstance(total, (list, tuple)):
+            total = total[-1] if total else 0
+        if not isinstance(total, (int, float)):
+            total = 0
         if total >= 80:
             text = f"涨停 {total} 家，短线情绪炽热"
             anomalies.append({
