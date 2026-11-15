@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-11-15 22:42",
+ "update_time": "2026-11-16 02:54",
  "legend": [
   {
    "title": "重要政策",
@@ -370,7 +370,7 @@
     {
      "num": 15,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     }
    ]
@@ -382,7 +382,7 @@
     {
      "num": 16,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇨🇳 工业增加值/社零/固投",
