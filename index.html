@@ -1308,7 +1308,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EXPERIMENT.js?v=3e4b176571" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=556cc02d77" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=0052e29968" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=c0d774ec81" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=b875fe7fc1" defer></script>
-    <script src="data/IMA_STRONG_STOCK.js?v=fd094d2c6b" defer></script>
+    <script src="data/IMA_STRONG_STOCK.js?v=fe5172f057" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=296ffa8763" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <!-- 🗑 2026-11-08 主人令：盘前预案卡整卡下线，对应数据注入一并移除 -->
@@ -2049,7 +2049,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=56e1412f19" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=d453cd2964" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=abaf0df7b6" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=25b9b5a3db" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三因子（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三因子已并入因子实验室主评分 P5（amt60/turntrend/ivol60 纯加分项、walk-forward 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
