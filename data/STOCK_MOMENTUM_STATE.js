@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-16 01:23",
- "generated": "2026-11-16 01:23",
+ "update_time": "2026-11-16 01:48",
+ "generated": "2026-11-16 01:48",
  "meta": {
-  "generated": "2026-11-16 01:23",
+  "generated": "2026-11-16 01:48",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11971,6 +11971,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "002205",
+      "name": "国统股份",
+      "change_pct": 10.04,
+      "price": 12.93,
+      "category": "突破"
+     },
+     {
       "code": "002819",
       "name": "东方中科",
       "change_pct": 9.98,
@@ -12052,6 +12059,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "002205",
+      "name": "国统股份",
+      "change_pct": 10.04,
+      "price": 12.93,
+      "category": "短线选股"
+     },
+     {
       "code": "002819",
       "name": "东方中科",
       "change_pct": 9.98,
@@ -12086,6 +12100,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "中国电影",
       "change_pct": 10.0,
       "price": 17.05,
+      "category": "强势股"
+     },
+     {
+      "code": "002205",
+      "name": "国统股份",
+      "change_pct": 10.04,
+      "price": 12.93,
       "category": "强势股"
      },
      {
