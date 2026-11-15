@@ -142,10 +142,10 @@ MUST_HAVE_CRON = {
     #   推送者解耦·定时保底部署」给 deploy-v8-site 挂 cron（交易日 09:00-16:59 每15分 +
     #   盘外每小时保底）漏双登记 ⇒ build_deploy [4/8] 15:05 起连红阻断 deploy。
     "deploy-v8-site": "Pages 定时保底部署(交易日09:00-16:59每15分+盘外每小时)",
-    # 2026-11-08 补登记（门禁 [4/8] 拦截补漏）：💎 金钻跟踪 monitor 云端链（cron '0 10 * * *'
-    #   = 北京 18:00 每日，产 data/JINZUAN_TRACK.js）建链时漏双登记 ⇒ build_deploy [4/8]
-    #   红灯阻断 deploy。与上方同批对齐修复。
-    "v8_jinzuan_track": "💎 金钻跟踪monitor(云端ubuntu·每日北京18:00)",
+    # 🗑 2026-11-15 金钻跟踪卡整支退役：该卡回测实证「无稳定盈利边缘·非买卖建议」，
+    #   主人令「不能给建议就删除」⇒ 前端 st-jztrack 已删、workflow 每日 18:00 cron 已停。
+    #   v8_jinzuan_track 从 MUST_HAVE_CRON 移出至下方 ALLOW_NO_CRON（保留文件/workflow_dispatch
+    #   供回滚手动复用，无 cron）。若仍留 MUST 则门禁方向1判「期望有cron但实际无」红。
     # 2026-11-09 补登记（门禁 [4/8] 连红收口）：期指主力实时链（cron 交易时段每 30 分，
     #   产 data/FUTURES_REALTIME.js）—— 11-09 早建链漏双登记 ⇒ 门禁自 6e3c452b 起连红
     #   （含后续 watchdog 修复提交被连坐）。本轮与 watchdog 盲区修复同批收口。
@@ -168,6 +168,9 @@ ALLOW_NO_CRON = {
     #   由它在 workflow/logic.html 变更的那一次 push 上立即验证双登记（不等下一次 data push）。
     #   刻意无 cron（纯 push 事件驱动），故归 ALLOW_NO_CRON 而非 MUST_HAVE_CRON。
     "v8_align_gate": "门禁前移·双登记校验(push 触发,无 cron)",
+    # 🗑 2026-11-15 金钻跟踪卡整支退役后停每日 cron，仅留 workflow_dispatch 手动复用；
+    #   文件保留供回滚，故归 ALLOW_NO_CRON（文件在、无 cron，方向3自净校验通过）。
+    "v8_jinzuan_track": "💎 金钻跟踪monitor(已退役·停cron·仅dispatch)",
 }
 
 
