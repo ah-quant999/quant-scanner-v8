@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-15 10:44"
+  updated: "2026-11-15 13:01"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -37,6 +37,32 @@ meta:
   next_id_seq: 186
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
+  - id: cred-ledger-js-build-race-deleted-1115
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: pending-verify
+    created: 2026-11-15
+    title: CRED_LEDGER.js 被 build 竞态旧树推送删除 ⇒ audit[6/8] 断链 ⇒ build_deploy 连败
+    note: >-
+      登记方：阿狸咪的工程师（11-15 巡检，主人外出期自主处置）。现象：build_deploy 12:14/12:26/12:27 CST
+      三连败（run 43675873968/43676778397/43676869812），build job 均死于「🛡️ Pre-deploy audit」步 [6/8]：
+      index.html -> data/CRED_LEDGER.js 404 断链。根因链：a21c83114c（11:17:40 凭证台账修复）新增
+      data/CRED_LEDGER.js（部署镜像，由 scripts/cred_expiry_watch.py 从 gitignore 的 token json 生成，
+      文件本身必须进仓）；仅 14 秒后 3ff95799f0「v8 build fast-forward retry #2」以不含该文件的旧树推送
+      将其删除（commit diff 实证 removed data/CRED_LEDGER.js +0/-15），而 index.html 引用仍在 ⇒ 断链。
+      属 build 旧树竞态推送误删「非 build 生成 data 文件」家族（与既有 build_deploy 推送竞态挂账同源；
+      该 12 文件 diff 同时含 HEALTH_CHECK.js +112/-112，runner 侧 checkout 窗口早于 a21c 落地）。
+      处置：阿狸咪同日以 Git Data API 恢复原 blob ae6df0b38c6a（内容=生成器 DEFAULTS 输出，与
+      a21c83114c 版逐字节一致），同提交登记本件；内容源取自远端 a21c83114c blob，未读本机 clone。
+      防复发残留（结构性，未根治）：①build 流对 data/ 的删除感知并集未落地 ⇒ 竞态窗口内新落地的
+      手工/watcher 生成文件仍可能被误删（owner 小九落码方向）；②CRED_LEDGER.js 重写依赖本机
+      cred_expiry_watch 自动化，无 workflow 调度（audit 只查存在性不阻断，陈旧可容忍）。
+    verify_how: >-
+      恢复提交推 main 后，build_deploy 下一轮 run head_sha ≥ 恢复提交 sha 且 build job 的 Pre-deploy
+      audit [6/8] 绿（看 build job 真跑结论，不看 run conclusion）；主站台账卡读 window.CRED_LEDGER 正常
+      （token json 均 gitignore，文件内容=DEFAULTS 为预期）。
+    updated: "2026-11-15 13:01"
+    updated_by: 阿狸咪的工程师
   - id: akshare-unpinned-runner-api-removal-1114
     owner: 小九机AI（落码）
     priority: P1
