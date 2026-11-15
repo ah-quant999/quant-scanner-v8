@@ -2362,6 +2362,7 @@ def main():
             "winrate_score": (_wr_score_raw if _wr_score_raw is not None else None),
             "win5": (_wr_win5 if _wr_win5 is not None else None),
             "avg5": ((_h5.get("avg") if _h5 else None)),
+            "win_rate": win_rate,
             "current_regime": current_regime,
             "regime_ok": _regime_ok,
             "regime_reason": _regime_reason,
@@ -2473,6 +2474,14 @@ def main():
     if scored:
         _neut = rank_neutralize([s["_form_raw"] for s in scored], FORM_NEUT_SCALE)
         for s, fn in zip(scored, _neut):
+            # 🔴 2026-11-14 一劳永逸修复（选股逻辑落地根因）：
+            #   收益率+胜率实绩票(_wr_score_raw 非空)的 total_score 已在循环内按
+            #   _perf_raw(=winrate_score 优先、无记录回退融合分)正确归一化并叠加 regime 微调；
+            #   此处横截面中性化重建原仅为纯融合分口径设计（_raw_noform + fn），若强行覆盖
+            #   会把正确的「收益率最高+胜率最高」排名值改回旧纯因子融合分（如 688059 由 32.9 改回 13.3），
+            #   使「收益率优先选股」名存实亡。→ 实绩票直接保留循环内 total_score，不进中性化覆盖分支。
+            if s.get("_wr_score_raw") is not None:
+                continue
             raw_eff = (s["_raw_noform"] + fn) * s["_gate"]
             s["total_score"] = round(min(100, max(0, raw_eff / NORM_DIVISOR * 100)) * s.get("regime_adjust", 1.0), 1)
             s["breakdown"]["form"] = round(fn, 2)   # 展示与排序口径一致（有效 form）
@@ -2577,6 +2586,10 @@ def main():
             "winrate_demote": bd.get("winrate_demote", False),
             "wr_win5": s.get("_wr_win5"),
             "wr_n5": s.get("_wr_n5"),
+            "winrate_score": s.get("winrate_score"),
+            "win5": s.get("win5"),
+            "avg5": s.get("avg5"),
+            "wr_score_raw": s.get("_wr_score_raw"),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
