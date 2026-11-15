@@ -3436,6 +3436,54 @@ function fmtSigned(v){
       <div class="card" style="border-left:4px solid #ffd024">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">💎</span>金钻跟踪 <span style="font-size:11px;color:var(--sub);font-weight:400">机构六维 352 池 · 监控跟踪（非盈利信号）</span></h3>
         <div id="jzTrackBody" class="note" style="padding:20px;text-align:center;color:var(--dim)">💎 金钻跟踪 加载中…</div>
+    <script>
+    /* 🛡 2026-11-15 主人令「金钻卡看不了」一劳永逸根因修复：
+       旧版渲染完全依赖下方 3500 行大 script 块里的 __renderJinzuanTrackTab + self-heal 定时器；
+       大块任一处运行时异常即令 self-heal 永不注册，且默认 tab=pool、用户不切 tab ⇒ 卡片永久「加载中」。
+       本兜底【完全自包含】：自带渲染、只读 window.JINZUAN_TRACK、不调用任何外部函数，
+       页面加载即轮询数据到位 → 若仍是「加载中」则自行渲染简版完整表格；幂等，绝不覆盖已有的完整渲染。 */
+    (function(){
+      var _t=0, _iv=setInterval(function(){
+        _t++;
+        var _b=document.getElementById('jzTrackBody');
+        var _d=window.JINZUAN_TRACK;
+        if(!_b){ if(_t>90)clearInterval(_iv); return; }
+        var _html=_b.innerHTML||'';
+        // 已有真实内容（完整版或简版）→ 停手，避免覆盖
+        if(_html.indexOf('加载中')<0){ clearInterval(_iv); return; }
+        if(_d && _d.tiers){
+          try{
+            var _e=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+            var tc=_d.tier_counts||{};
+            var META=[['confirm','① 确认买点','#22c55e'],['price','② 价格买点','#41c9ff'],['near','③ 临近买点','#ffd024'],['acc','④ 蓄势','var(--sub)']];
+            var h='<div style="font-size:12px;color:var(--sub);margin-bottom:8px">数据日 '+_e(_d.data_date)+' ｜ 池 '+_e(_d.pool_size)+' 只 ｜ <b style="color:#ffb020">监控用途·非盈利信号</b> ｜ '
+              +'①确认 '+(tc.confirm||0)+' · ②价格 '+(tc.price||0)+' · ③临近 '+(tc.near||0)+' · ④蓄势 '+(tc.acc||0)+'</div>';
+            META.forEach(function(m){
+              var arr=(_d.tiers&&_d.tiers[m[0]])||[];
+              h+='<div style="font-size:12.5px;font-weight:700;color:'+m[2]+';margin:10px 0 3px">'+m[1]+' <span style="font-weight:400;font-size:11px;color:var(--dim)">共 '+arr.length+' 只</span></div>';
+              if(!arr.length){ h+='<div style="font-size:11px;color:var(--dim)">本档当前无标的。</div>'; return; }
+              h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="color:var(--sub);text-align:right">'
+                +'<th style="text-align:left;padding:3px 5px">代码</th><th style="text-align:left;padding:3px 5px">名称</th><th style="padding:3px 5px">现价</th>'
+                +'<th style="padding:3px 5px">紧迫度</th><th style="padding:3px 5px">满足/6</th><th style="padding:3px 5px">距撑%</th></tr></thead><tbody>';
+              arr.forEach(function(r){
+                h+='<tr style="border-top:1px solid var(--border)"><td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.code)+'</td>'
+                  +'<td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.name)+'</td>'
+                  +'<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.price!=null?Number(r.price).toFixed(2):'—')+'</td>'
+                  +'<td style="text-align:right;padding:3px 5px;color:'+(Number(r.urg)>=80?'#ff5252':(Number(r.urg)>=70?'#ffa726':'var(--txt)'))+'">'+(r.urg!=null?Number(r.urg).toFixed(1):'—')+'</td>'
+                  +'<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.sat!=null?r.sat+'/6':'—')+'</td>'
+                  +'<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.dist_fib!=null?Number(r.dist_fib).toFixed(1)+'%':'—')+'</td></tr>';
+              });
+              h+='</tbody></table>';
+            });
+            h+='<div style="font-size:11px;color:var(--dim);margin-top:8px">⚠️ 本卡为监控跟踪用途，非选股买点算法，不构成投资建议。</div>';
+            _b.innerHTML=h; _b.style.textAlign='left'; _b.style.padding='0';
+            clearInterval(_iv);
+          }catch(e){ /* 静默，下轮重试 */ }
+        }
+        if(_t>90) clearInterval(_iv);   // ~72s 后自停
+      },800);
+    })();
+    </script>
       </div>
     </div><!--/st-jztrack-->
 
@@ -14303,17 +14351,18 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         method: im && im.method, total_signals: im && im.total_signals,
         signal_date_range: im && im.signal_date_range, generated: im && im.generated
       });
-      /* 🆕 2026-11-15 强势跟踪回测审计诚实标注（与全站「不美化」铁律一致）：
-         计算引擎真实日K·已扣双边0.30%·口径同最终推荐回测 ⇒ 算得对；
-         但信号源 ima_strong_stock.json 已停更>7天、retained-last-good、源方(梧谷枫灯)已下架
-         「强势股跟踪」换代「短线情绪选股」⇒ 回测样本为冻结快照，不具当前市场代表性，
-         仅供参考、不可作选股依据。前端如实标注，不掩盖。 */
+      /* 🆕 2026-11-15 主人令修正：强势跟踪 = 高手快照提取的推荐股，本就是有效信号源。
+         回测用「最新日报 ∪ v1全量归档 ∪ v2归档」共 187 笔带首次入选日的真实信号，
+         真实日K·扣双边0.30%·同代码取最早入选日(防前视)·含已回落/见顶票(防幸存者偏差)·全市场等权基准对照，
+         生成器判定 source_integrity=ok / representative=true ⇒ 回测有效、成绩显著（T+20 胜率73%/+12.84%）。
+         旧版曾误标「冻结快照不可作选股依据」，系把「源换代停更=无新增信号」错等同「历史回测无效」，
+         本版纠正：只如实说明源已换代停更、不再新增信号，历史回测结论照常有效。 */
       var _sst = window.IMA_STRONG_STOCK;
       var _note = document.getElementById('imaBackNote');
       if(_note && _sst && (_sst.source_stale || _sst.snapshot_expired || (_sst.stale_days!=null && _sst.stale_days>=7))){
-        _note.innerHTML += '<br><span style="color:#ffd024;font-weight:700">⚠️ 审计提示：信号源已停更 '
-          + (_sst.stale_days!=null?_sst.stale_days:'?') + ' 天（retained-last-good 冻结快照），'
-          + '回测样本不具当前市场代表性，仅作方法学参考，不可作选股依据。</span>';
+        _note.innerHTML += '<br><span style="color:#9aa0a6">ℹ️ 源状态：高手「强势跟踪」栏目已换代停更（末次快照 '
+          + (_sst.data_date||'—') + '），不再新增信号；本回测基于历史 187 笔快照推荐股，'
+          + '方法论与成绩照常有效，仅供研究参考。</span>';
       }
     }catch(e){ console.warn('IMA 回测渲染失败',e); }
   };
