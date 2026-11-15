@@ -14,6 +14,8 @@
 本机可用环境变量 V8_FLAB_WORK 指到仓库外。2026-09-04 云端适配：REPO/WORK 自适应 + 链内跳过自带推送。
 """
 import baostock as bs, json, time, datetime as dt, re, os, subprocess, sys
+# 2026-11-15 主人令「因子也要按收益率来排选」：同目录 factor_yield 提供真实收益率排选
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # 2026-09-07 一劳永逸：BaoStock 底层 socket 无超时保护，单只查询阻塞会永久挂死整轮
 #   （实测卡在 roe 进度 100/3195 静止 5 分钟+）。设全局 socket 超时 → 阻塞转为可捕获异常，
 #   配合 get_roe_ttm / 主循环的 try 兜底，卡住的个股自动跳过而不是拖死全链。
@@ -678,6 +680,23 @@ def main():
               flush=True)
         sys.exit(1)
 
+    # ---- 按收益率排选（真实回测，2026-11-15 主人令「因子也要按收益率来排选」）----
+    # 对因子实验室候选股（异常换手率重点池 + ROE 全市场主板大市值档）用本地真实日K
+    # 回测各持有期真实收益率+胜率，按 T+20 平均收益降序排选；与 FINAL_RECOMMEND_BACKTEST
+    # 同引擎同口径。计算失败绝不影响因子榜主体（降级为空 ranked，页面显「未就绪」）。
+    _ycands = []
+    for _r in list(at_valid) + list(large):
+        if _r.get("code"):
+            _ycands.append({"code": _r["code"], "name": _r.get("name", "")})
+    try:
+        import factor_yield as _fy
+        _yr = _fy.compute(_ycands, top_n=40)
+        log("收益率排选", "候选", len(_ycands), "上榜", len(_yr.get("ranked", [])))
+    except Exception as _e:
+        log("⚠️ 收益率排选计算跳过（不影响因子榜主体）", type(_e).__name__, str(_e)[:120])
+        _yr = {"update_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+               "meta": {"note": "计算失败，详见日志"}, "ranked": []}
+
     out = {
         "update_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "data_date": KL_END,
@@ -695,6 +714,7 @@ def main():
         },
         "abnormal_turnover": {"top": at_top, "bottom": at_bottom},
         "roe_largecap": {"top": top30},
+        "yield_rank": _yr,
     }
     json.dump(out, open(OUT_JSON, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
     js = "window.FACTOR_LAB = " + json.dumps(out, ensure_ascii=False) + ";\n"
