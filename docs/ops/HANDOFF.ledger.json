@@ -1,6 +1,7 @@
 {
- "max_next_id_seq": 186,
+ "max_next_id_seq": 187,
  "ids": [
+  "fix-market-regime-brief-total-1115",
   "cred-ledger-js-build-race-deleted-1115",
   "akshare-unpinned-runner-api-removal-1114",
   "market-regime-macro-json-bootstrap-fail-1114",

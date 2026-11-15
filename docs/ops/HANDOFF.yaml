@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 186
+  next_id_seq: 187
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: cred-ledger-js-build-race-deleted-1115
@@ -3822,3 +3822,19 @@ items:
       后续盘中若再停滞，GitHub 应在数分钟内开 intraday-stall issue + 触发失败邮件；恢复自动关闭。
       待办：深挖 CN 兜底 64/65 failure 根因（self-hosted 源码同步被safe-delete守卫拦截？git连接重置？抓取API失败？）针对性治疗。
     updated: "2026-11-08 21:30"
+
+  - id: fix-market-regime-brief-total-1115
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P0
+    status: done
+    created: 2026-11-15
+    title: market_regime三级兜底+fetch_macro双写+P0 AI速览涨停total断链根治
+    note: >-
+      2026-11-15 主人令『能修的都修好+改后三件套』。诊断翻转中午交接档多处误判(akshare接口未删/FILE_VAR_MAP已修/ledger已对齐/SECTOR_YEAR_FLOW已刷新),真bug三个:
+      ① P0 algorithms/gen_market_brief.py:628 total>=80 对list比较抛TypeError断链(数据源 fetch_limit_up_heatmap_v8.py:593 result[total]=daily_totals 是list);两份脚本(root+algorithms)同批加 list/tuple 取最新一日+非数值降级0归一化,行为一致。
+      ② market_regime.py 只读 out/macro.json(gitignore,云端无)每轮必bootstrap;加三级兜底 out/→raw_data/(受跟踪)→bootstrap 的 _resolve_macro_path()。
+      ③ fetch_macro.py docstring承诺双写但代码只写out/;补写受git跟踪的 raw_data/macro.json。
+      审计: py_compile 4文件全OK + total三态回归通过 + HEAD=61c1f97957。净室推送 commit=25396ae7fb, force:false, 4文件API回读逐字节一致;终验线上源码md5全匹配防churn。四方对齐:逻辑页/运维页0命中(纯后端生成器),周末无禁推。
+    verify_how: >-
+      ① 下一轮AI速览盘后批不再因涨停total TypeError断链;② 云端全新checkout market_regime 走 raw_data/macro.json 兜底不再冻结;③ fetch_macro 成功即双写两份macro.json。
+    updated: "2026-11-15 21:05"
