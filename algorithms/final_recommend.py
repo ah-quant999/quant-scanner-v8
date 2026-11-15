@@ -1190,6 +1190,42 @@ def main():
                   f"新入选 {len(_ima_new)} 只 ⇒ 入池 {_ima_in} 只（入池展示·不竞位 Top3，2026-10-20 主人令）")
         else:
             print("  [info] V8_IMA_INTAKE=0：强势跟踪入池已手动关闭")
+
+        # ═══════════════════════════════════════════════════════════════════════
+        # 🔴🔴 2026-11-15 主人令「让因子榜票进池」（覆盖 2026-09-18「因子只加减分不建票」）
+        # ───────────────────────────────────────────────────────────────────────
+        # 断流根因（2026-11-15 实证）：本脚本唯一建票源=IMA 当日新入选，而 Top3 唯一
+        #   口径=因子榜命中票 —— 两者零交集（因子榜 20 只 ∩ IMA 池 6 只 = 0），
+        #   导致 [唯一口径] 命中 0/6、Top3 恒空、最终推荐连续多日 0 只。
+        # 修法：把 top10_daily.top10 的票以独立源「因子榜」ensure() 建票进 pool，
+        #   使其进入 scored 后被 _aligned_topfactor 命中 → Top3 按因子榜原序同分产出。
+        # 守恒（不推翻历史铁令）：
+        #   · Top3 仍=因子榜前 N，口径/评分/顺序全不变（同序同分）；
+        #   · 因子榜票仅作建票源，final_score 仍=因子榜 total_score（无第二把标尺）；
+        #   · IMA 强势跟踪票保持候选/展示，因无因子榜分数不进 Top3（_aligned=False）；
+        #   · 不恢复四量终极，不改 Top3 唯一口径。
+        V8_FACTOR_INTO_POOL = os.environ.get("V8_FACTOR_INTO_POOL", "1").strip() != "0"
+        _factor_in = 0
+        _factor_dd = str((top10.get("update_time") or ""))[:10]
+        if V8_FACTOR_INTO_POOL:
+            for _s in (top10.get("top10") or []):
+                _c = _s.get("code")
+                if not _c:
+                    continue
+                _k = norm_code(_c).lstrip('.')
+                _r = ensure(_k, _s.get("name"), _s.get("market"), _s.get("board"))
+                if "因子榜" not in _r["sources"]:
+                    _r["sources"].append("因子榜")
+                    _r["source_scores"]["因子榜"] = round(safe_float(_s.get("total_score")), 2)
+                    _r["signals"].append("因子榜入选")
+                    _r["reasons"].append("因子积分榜入选（第%s名）" % _s.get("rank", "?"))
+                    _r["enter_dates"].append(_factor_dd)
+                    _factor_in += 1
+            print(f"[factor-intake] 因子榜建票：入池 {_factor_in} 只"
+                  f"（Top3 唯一口径源，同序同分；IMA 票保持候选展示）")
+        else:
+            print("  [info] V8_FACTOR_INTO_POOL=0：因子榜建票已关闭（回归断流态，仅排障用）")
+
         _hit = 0
         for key, r in pool.items():
             _k = key.lstrip('.') if key.startswith('.') else key
