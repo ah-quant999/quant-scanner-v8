@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-14 23:47"
+  updated: "2026-11-15 10:44"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -40,7 +40,7 @@ items:
   - id: akshare-unpinned-runner-api-removal-1114
     owner: 小九机AI（落码）
     priority: P1
-    status: todo
+    status: pending-verify
     created: 2026-11-14
     title: akshare 未 pin 上限 ⇒ 云端新版移除 stock_hk_spot/stock_zh_index_daily ⇒ algo 链 4 脚本 AttributeError
     note: >-
@@ -60,12 +60,21 @@ items:
       market_regime 缺 macro.json=已有挂账 market-regime-macro-json-bootstrap-fail-1114（你 23:31 已回执微修）。
       按铁律未派发未重试；交接件
       docs/ops/handover/2026-11-14_2345_阿狸咪的工程师给小九_akshare未pin云端新版移除接口四脚本AttributeError断裂.md。
+      【11-15 10:44 追加·修复验证通过】pin==1.20.42（a6e1983d69 01:46）已生效实证：
+      pin#1 run 43627249738（head 871f81d6a9，compare 祖先级确认含修复）chain-end 09:06:34 CST
+      ok=31 fail=3，failed_scripts 不再含上述四脚本、全文无「1.20.44/1.20.46 更名」报错
+      ⇒ 本件主断裂（4 脚本簇）已由你的 pin 修复闭环，本 AI 按 verify_how 判据实证后置 pending-verify。
+      ⚠️ 同族残留第二处：fetch_macro.py L26 调 ak.bond_zh_us_rate，akshare wheel 实证 1.20.42（现 pin）
+      已删该 API（1.20.22 仍在）⇒ market_regime 自举仍失败，根因与修复方向已修订进 market-regime item；
+      若后续走统一降版本方案，须实测 1.20.22~1.20.41 区间同时含「4 脚本旧 API + bond_zh_us_rate」两组接口。
     verify_how: >-
       修复判据：修复提交推 main 后，algo 链下一轮 run head_sha ≥ 修复提交 sha 且 run_report
       failed_scripts 不再含上述四脚本（看产物不看 run conclusion）；候选池产物恢复产出。
       建议 pin 已知可用版本（本机 akshare 1.18.64）并同步其它含 pip install akshare 的 workflow，
       或 hasattr 探测降级；禁前端硬编。
-    updated: "2026-11-14 23:47"
+    verified_at: "2026-11-15 10:44 CST"
+    verified_by: 阿狸咪的工程师
+    updated: "2026-11-15 10:44"
     updated_by: 阿狸咪的工程师
   - id: market-regime-macro-json-bootstrap-fail-1114
     owner: 小九机AI（落码）
@@ -85,11 +94,21 @@ items:
       已知非问题：refresh_kline_freshness/fetch_multiyear_kline 超时=软闸基线，不属本件。
       按铁律未派发未重试：algo 20:27 已有 in_progress 轮 43594897073 会自然复现；交接件
       docs/ops/handover/2026-11-14_2128_阿狸咪的工程师给小九_market_regime缺macro_json连续4轮自举失败.md。
+      【11-15 10:44 追加·根因实锤】上轮「akshare pin 生效后 fetch_macro 连带恢复」假设被证伪。
+      pin#1 run 43627249738（head 871f81d6a9，已含你 30b234583a 日志透传微修 + pin a6e1983d69）chain-end
+      09:06:34 CST market_regime 仍 fail；job 132624873862 日志抓到真实栈帧（08:36:14 CST）：
+      AttributeError: module 'akshare' has no attribute 'bond_zh_us_rate' ← fetch_macro.py L26
+      ak.bond_zh_us_rate()。akshare wheel 实证：1.20.42（现 pin）已删该 API，1.20.22 仍在 ⇒ 属
+      akshare 未 pin 同族第二处 API 删除，非上游数据静默故障（23:31 微修后 stderr 已透传到日志，本帧即证据）。
+      MARKET_REGIME.js 截至 11-15 10:40 停更 >52h（ut=2026-11-13T06:07:29）。修复方向：①改 fetch_macro.py
+      换现行 bond 收益率接口并补兜底产出（现 L30 except 捕获后仍不产出 macro.json，一并核）；②统一降
+      akshare 版本须实测 1.20.22~1.20.41 同含「4 脚本旧 API + bond_zh_us_rate」，降版本有回归风险，
+      优先①改代码（一劳永逸口径，禁前端硬编）。
     verify_how: >-
       修复判据：修复提交推 main 后，algo 链下一轮 run head_sha ≥ 修复提交 sha 且 run_report
       failed_scripts 不再含 market_regime（看产物不看 run conclusion）；raw_data/market_regime.json 与
       data/MARKET_REGIME.js update_time 前进。若上游接口确死，换源或降级产物口径，禁前端硬编。
-    updated: "2026-11-14 21:30"
+    updated: "2026-11-15 10:44"
     updated_by: 阿狸咪的工程师
   - id: watchdog-schedule-deregistered-4th-1110
     owner: 小九机AI（落码）

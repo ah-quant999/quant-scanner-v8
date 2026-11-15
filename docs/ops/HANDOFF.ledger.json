@@ -79,11 +79,11 @@
   "travel-fallback-dual-machine-1108",
   "audit-intraday-stall-1108"
  ],
- "updated": "2026-11-14 23:47",
+ "updated": "2026-11-15 10:44",
  "generated_by": "阿狸咪的工程师",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
-  "akshare-unpinned-runner-api-removal-1114": "d13da79ac9285d06",
+  "akshare-unpinned-runner-api-removal-1114": "bcbe831c2859947f",
   "algo-artifact-date-naked-now-bypass-calendar": "9e099527912be42a",
   "algo-step15-undefined-t": "b169d2ba8d28b310",
   "algoraw-mass403-crosslayer-block-1106": "b1c7aaa05edb3cb5",
@@ -138,7 +138,7 @@
   "maharo-plan-b-three-editions": "93aec8a90212e24d",
   "mail-channel-smtp-config-lost-1020": "032b5d735cf31f57",
   "main-history-truncated-by-cloudbot-1016": "5703e3612c6672e3",
-  "market-regime-macro-json-bootstrap-fail-1114": "996a763a815315d6",
+  "market-regime-macro-json-bootstrap-fail-1114": "6203bcef18f5aced",
   "national-team-4th-sub-1105": "b94de225b5dba273",
   "nolost-protocol-v2-1026": "d869ed96995ab887",
   "postclose-reliability-trio": "c1673a94fcee1e8d",
