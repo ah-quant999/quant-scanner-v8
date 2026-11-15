@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-11-16 01:56:45",
+  "check_time": "2026-11-16 07:29:08",
   "last_trade_close": "2026-11-13 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -15,19 +15,13 @@
       "category": "post_close"
     }
   ],
-  "frozen_stale": [
-    {
-      "var": "FINAL_RECOMMEND_REPLAY",
-      "reason": "文件缺失",
-      "category": "post_close"
-    }
-  ],
+  "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 45,
     "core_stale": 0,
     "warn_stale": 2,
-    "frozen_stale": 1,
+    "frozen_stale": 0,
     "no_timestamp": 0
   },
   "category_map": {
