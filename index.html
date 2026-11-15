@@ -209,8 +209,6 @@ window.__domReadyFns=[];
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=530c343774" defer></script>
-    <script src="data/JINZUAN_TRACK.js?v=de5ce8b5c3" defer></script><!-- 💎 金钻跟踪（机构六维 352 池）数据源 —— 唯一消费方：选股策略 > 💎 金钻跟踪 子页（st-jztrack）；暂未上架重复卡已于 2026-11-09 退役 -->
-    <!-- 🚀 板块龙头领涨（SECTOR_LEADERS）观测卡数据源见上方 209 行注入 -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=e2d8918eda" defer></script>
     <script>
@@ -3343,7 +3341,6 @@ function fmtSigned(v){
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
-      <button class="st-tab" data-st="jztrack" onclick="switchSt('jztrack')">💎 金钻跟踪</button>
       <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）子页 tab 随算法整支下架删除 -->
       <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 tab 随算法整支下架删除 -->
       <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
@@ -3431,61 +3428,6 @@ function fmtSigned(v){
         <table id="imaBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="imaBackBody"></tbody></table>
       </div>
     </div><!--/st-life-->
-    <!-- ===== TAB 页面：💎 金钻跟踪（2026-11-09 主人令：机构六维 352 池 · 监控跟踪；非盈利信号） ===== -->
-    <div id="st-jztrack" class="st-pane">
-      <div class="card" style="border-left:4px solid #ffd024">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">💎</span>金钻跟踪 <span style="font-size:11px;color:var(--sub);font-weight:400">机构六维 352 池 · 监控跟踪（非盈利信号）</span></h3>
-        <div id="jzTrackBody" class="note" style="padding:20px;text-align:center;color:var(--dim)">💎 金钻跟踪 加载中…</div>
-    <script>
-    /* 🛡 2026-11-15 主人令「金钻卡看不了」一劳永逸根因修复：
-       旧版渲染完全依赖下方 3500 行大 script 块里的 __renderJinzuanTrackTab + self-heal 定时器；
-       大块任一处运行时异常即令 self-heal 永不注册，且默认 tab=pool、用户不切 tab ⇒ 卡片永久「加载中」。
-       本兜底【完全自包含】：自带渲染、只读 window.JINZUAN_TRACK、不调用任何外部函数，
-       页面加载即轮询数据到位 → 若仍是「加载中」则自行渲染简版完整表格；幂等，绝不覆盖已有的完整渲染。 */
-    (function(){
-      var _t=0, _iv=setInterval(function(){
-        _t++;
-        var _b=document.getElementById('jzTrackBody');
-        var _d=window.JINZUAN_TRACK;
-        if(!_b){ if(_t>90)clearInterval(_iv); return; }
-        var _html=_b.innerHTML||'';
-        // 已有真实内容（完整版或简版）→ 停手，避免覆盖
-        if(_html.indexOf('加载中')<0){ clearInterval(_iv); return; }
-        if(_d && _d.tiers){
-          try{
-            var _e=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
-            var tc=_d.tier_counts||{};
-            var META=[['confirm','① 确认买点','#22c55e'],['price','② 价格买点','#41c9ff'],['near','③ 临近买点','#ffd024'],['acc','④ 蓄势','var(--sub)']];
-            var h='<div style="font-size:12px;color:var(--sub);margin-bottom:8px">数据日 '+_e(_d.data_date)+' ｜ 池 '+_e(_d.pool_size)+' 只 ｜ <b style="color:#ffb020">监控用途·非盈利信号</b> ｜ '
-              +'①确认 '+(tc.confirm||0)+' · ②价格 '+(tc.price||0)+' · ③临近 '+(tc.near||0)+' · ④蓄势 '+(tc.acc||0)+'</div>';
-            META.forEach(function(m){
-              var arr=(_d.tiers&&_d.tiers[m[0]])||[];
-              h+='<div style="font-size:12.5px;font-weight:700;color:'+m[2]+';margin:10px 0 3px">'+m[1]+' <span style="font-weight:400;font-size:11px;color:var(--dim)">共 '+arr.length+' 只</span></div>';
-              if(!arr.length){ h+='<div style="font-size:11px;color:var(--dim)">本档当前无标的。</div>'; return; }
-              h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="color:var(--sub);text-align:right">'
-                +'<th style="text-align:left;padding:3px 5px">代码</th><th style="text-align:left;padding:3px 5px">名称</th><th style="padding:3px 5px">现价</th>'
-                +'<th style="padding:3px 5px">紧迫度</th><th style="padding:3px 5px">满足/6</th><th style="padding:3px 5px">距撑%</th></tr></thead><tbody>';
-              arr.forEach(function(r){
-                h+='<tr style="border-top:1px solid var(--border)"><td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.code)+'</td>'
-                  +'<td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.name)+'</td>'
-                  +'<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.price!=null?Number(r.price).toFixed(2):'—')+'</td>'
-                  +'<td style="text-align:right;padding:3px 5px;color:'+(Number(r.urg)>=80?'#ff5252':(Number(r.urg)>=70?'#ffa726':'var(--txt)'))+'">'+(r.urg!=null?Number(r.urg).toFixed(1):'—')+'</td>'
-                  +'<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.sat!=null?r.sat+'/6':'—')+'</td>'
-                  +'<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.dist_fib!=null?Number(r.dist_fib).toFixed(1)+'%':'—')+'</td></tr>';
-              });
-              h+='</tbody></table>';
-            });
-            h+='<div style="font-size:11px;color:var(--dim);margin-top:8px">⚠️ 本卡为监控跟踪用途，非选股买点算法，不构成投资建议。</div>';
-            _b.innerHTML=h; _b.style.textAlign='left'; _b.style.padding='0';
-            clearInterval(_iv);
-          }catch(e){ /* 静默，下轮重试 */ }
-        }
-        if(_t>90) clearInterval(_iv);   // ~72s 后自停
-      },800);
-    })();
-    </script>
-      </div>
-    </div><!--/st-jztrack-->
 
 
 
@@ -14499,9 +14441,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     else if(tab==='fa'){
       if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
     }
-    else if(tab==='jztrack'){
-      if(typeof window.__renderJinzuanTrackTab==='function'){ try{ window.__renderJinzuanTrackTab(); }catch(e){} }
-    }
   }
 
   /* ═══ 🔴🔴 2026-09-17 主人令「统一按委员会走，就是要统一口径，不要打架」═══════
@@ -14653,8 +14592,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       setTimeout(function(){ try{ window.renderResonanceTrack(); }catch(e){ console.warn('[bt] resonTrack', e); } }, 30);
       setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[bt] backtest', e); } }, 60);
     }
-    // 2026-11-09 主人令：金钻跟踪子页（st-jztrack）—— 监控跟踪用途，非盈利信号
-    if(n==='jztrack' && typeof window.__renderJinzuanTrackTab==='function') setTimeout(window.__renderJinzuanTrackTab, 30);
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
@@ -14673,7 +14610,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
       // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
       bt:function(){return !!(window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST);},
-      jztrack:function(){return !!window.JINZUAN_TRACK;},
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};
@@ -15730,127 +15666,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     //         ⇒ 无人再叫渲染函数 ⇒ 卡面永久「加载中…」（真浏览器实测复现）。
     //   本函数即本页唯一的派发入口，`__ulSwitch` 与 `__ulSelfHealTimer` 都只调它。
     //   2026-09-15：大盘观察整页迁出至「🌍 观测平台」，本页仅剩「观测类」⇒ 分支收敛为单一 tab。
-        // ═══ 💎 2026-11-08 主人令：大资金买点三样·金钻跟踪（v8 真实监控管线，非盈利信号）═══
-    //   数据源 window.JINZUAN_TRACK（v8/gen_jinzuan_track.py 日更产出，因果 XMA 无未来函数）。
-    //   原硬编码 demo 卡已退役，统一走真实管线；如实标注「监控用途·非盈利信号」。
-    window.__buildJinzuanTrackHtml = function(D, ctx){
-      if(!D){ return '<div style="padding:20px;text-align:center;color:var(--dim)">📡 金钻跟踪管线未就绪（data/JINZUAN_TRACK.js 未加载）。</div>'; }
-      ctx = ctx || 'tab';
-      var _e=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
-      var _r='#ff5252',_o='#ffa726';
-      var _urg=function(c){c=Number(c)||0;var col=c>=80?_r:(c>=70?_o:'var(--txt)');return '<b style="color:'+col+'">'+c.toFixed(1)+'</b>';};
-      var h='';
-      h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
-         + '<span style="font-size:14px;font-weight:700;color:var(--txt)">💎 金钻跟踪 · 机构六维 352 池</span>'
-         + '<span style="font-size:10px;font-weight:700;color:#ffb020;border:1px solid rgba(255,176,32,.4);padding:1px 8px;border-radius:10px;white-space:nowrap">⚠ 监控用途·非盈利信号</span>'
-         + '<span style="font-size:11px;color:var(--sub)">数据日 '+_e(D.data_date)+' ｜ 池 '+D.pool_size+' 只</span></div>';
-      var tc=D.tier_counts||{};
-      h += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px">'
-         + '<span style="color:#22c55e">①确认 '+ (tc.confirm||0) +'</span> · '
-         + '<span style="color:#41c9ff">②价格买点 '+ (tc.price||0) +'</span> · '
-         + '<span style="color:#ffd024">③临近 '+ (tc.near||0) +'</span> · '
-         + '<span style="color:var(--sub)">④蓄势 '+ (tc.acc||0) +'</span></div>';
-      h += '<div style="background:rgba(255,208,36,.07);border-left:3px solid #ffd024;border-radius:0 8px 8px 0;padding:8px 11px;font-size:11.5px;line-height:1.65;color:var(--sub);margin-bottom:10px">'+_e(D.calib)+'</div>';
-      var TIER_META=[
-        {k:'confirm',t:'① 确认买点（金钻起涨当日触发）',c:'#22c55e'},
-        {k:'price',  t:'② 价格买点（回踩支撑≤3.5% & 紧迫≥78 & 满足≥4/6）',c:'#41c9ff'},
-        {k:'near',   t:'③ 临近买点（近支撑≤8% & 紧迫≥75 & 满足≥3/6）',c:'#ffd024'},
-        {k:'acc',    t:'④ 蓄势（紧迫≥85 & 满足≥4/6 但价未回支撑）',c:'var(--sub)'}
-      ];
-      function _row(r){
-        var dist=r.dist_fib, dcol=(dist==null)?'var(--sub)':(dist>=10?'#ff5252':'#26d9c2');
-        var unmet=(r.unmet&&r.unmet.length)?r.unmet.join('、'):'全满足';
-        return '<tr style="border-top:1px solid var(--border)">'
-          + '<td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.code)+'</td>'
-          + '<td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.name)+'</td>'
-          + '<td style="text-align:right;padding:3px 5px;color:var(--sub)">'+_e(r.mkt)+'</td>'
-          + '<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.price!=null?r.price.toFixed(2):'—')+'</td>'
-          + '<td style="text-align:right;padding:3px 5px">'+_urg(r.urg)+'</td>'
-          + '<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.sat!=null?r.sat+'/6':'—')+'</td>'
-          + '<td style="text-align:right;padding:3px 5px;color:'+dcol+'">'+(dist==null?'—':dist.toFixed(1)+'%')+'</td>'
-          + '<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.vr!=null?r.vr:'—')+'</td>'
-          + '<td style="text-align:left;padding:3px 5px;color:var(--sub);font-size:10.5px">'+_e(unmet)+'</td></tr>';
-      }
-      TIER_META.forEach(function(m){
-        var arr=(D.tiers&&D.tiers[m.k])||[];
-        h += '<div style="font-size:12.5px;font-weight:700;color:'+m.c+';margin:10px 0 3px">'+m.t+' <span style="font-weight:400;font-size:11px;color:var(--dim)">共 '+arr.length+' 只</span></div>';
-        if(!arr.length){ h += '<div style="font-size:11px;color:var(--dim);margin-bottom:4px">本档当前无标的。</div>'; return; }
-        h += '<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="color:var(--sub);text-align:right">'
-          + '<th style="text-align:left;padding:3px 5px">代码</th><th style="text-align:left;padding:3px 5px">名称</th>'
-          + '<th style="padding:3px 5px">市场</th><th style="padding:3px 5px">现价</th><th style="padding:3px 5px">紧迫度</th>'
-          + '<th style="padding:3px 5px">满足/6</th><th style="padding:3px 5px">距撑%</th><th style="padding:3px 5px">量比</th>'
-          + '<th style="text-align:left;padding:3px 5px">尚差条件</th></tr></thead><tbody>';
-        arr.forEach(function(r){ h += _row(r); });
-        h += '</tbody></table>';
-      });
-      var top=D.top||[];
-      h += '<div style="font-size:12.5px;font-weight:700;color:#ffd024;margin:14px 0 3px">★ 紧迫度 TOP 30（全局最前列）<span style="font-weight:400;font-size:11px;color:var(--dim)">　红≥80 高危 · 橙≥70 较紧迫</span></div>';
-      if(top.length){
-        h += '<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="color:var(--sub);text-align:right">'
-          + '<th style="text-align:left;padding:3px 5px">代码</th><th style="text-align:left;padding:3px 5px">名称</th>'
-          + '<th style="padding:3px 5px">市场</th><th style="padding:3px 5px">紧迫度</th><th style="padding:3px 5px">满足/6</th>'
-          + '<th style="padding:3px 5px">档位</th><th style="padding:3px 5px">现价</th><th style="padding:3px 5px">距撑%</th><th style="padding:3px 5px">量比</th></tr></thead><tbody>';
-        top.forEach(function(r){
-          h += '<tr style="border-top:1px solid var(--border)">'
-            + '<td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.code)+'</td>'
-            + '<td style="text-align:left;padding:3px 5px;color:var(--txt)">'+_e(r.name)+'</td>'
-            + '<td style="text-align:right;padding:3px 5px;color:var(--sub)">'+_e(r.mkt)+'</td>'
-            + '<td style="text-align:right;padding:3px 5px">'+_urg(r.urg)+'</td>'
-            + '<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.sat!=null?r.sat+'/6':'—')+'</td>'
-            + '<td style="text-align:right;padding:3px 5px;color:var(--sub)">'+_e(r.tier||'—')+'</td>'
-            + '<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.price!=null?r.price.toFixed(2):'—')+'</td>'
-            + '<td style="text-align:right;padding:3px 5px;color:'+((r.dist_fib==null)?'var(--sub)':(r.dist_fib>=10?'#ff5252':'#26d9c2'))+'">'+(r.dist_fib==null?'—':r.dist_fib.toFixed(1)+'%')+'</td>'
-            + '<td style="text-align:right;padding:3px 5px;color:var(--txt)">'+(r.vr!=null?r.vr:'—')+'</td></tr>';
-        });
-        h += '</tbody></table>';
-      } else { h += '<div style="font-size:11px;color:var(--dim)">暂无数据。</div>'; }
-      h += '<div style="font-size:12.5px;font-weight:700;color:#41c9ff;margin:14px 0 4px">金钻紧迫度 = 六条件「还差多少」加权（0–100）</div>';
-      h += '<div style="background:rgba(65,201,255,.06);border-left:3px solid #41c9ff;border-radius:0 8px 8px 0;padding:8px 11px;font-size:11.5px;line-height:1.7;color:var(--sub)">'
-         + '<div style="color:var(--txt);margin-bottom:4px"><b>六条件</b>（金钻起涨 · 全满足=触发）：c1 收阳 C&gt;O　c2 资金流 DY2&lt;0.02　c3 趋势 MA5&gt;MA60　c4 涨幅≥2%　c5 最高价 H&lt;金牛线　c6 最低价 L&lt;金钻趋势线</div>'
-         + '<div style="margin-bottom:4px"><b style="color:#22c55e">接近度</b>：c1/c3/c4/c5/c6 线性衰减（TOL 5%/8%/5%/8%/8%）；c2 取 120 日 DY2 分位，接近度=1−分位。</div>'
-         + '<div style="margin-bottom:4px"><b style="color:#ffd024">权重</b>：c3=c4=1.3，c2=0.8，其余=1.0；加权平均×100。</div>'
-         + '<div><b style="color:#ff5252">阈值</b>：100=全满足 ｜ ≥80 高危 ｜ ≥70 观察。</div></div>';
-      var bt=D.backtest||{};
-      h += '<div style="font-size:12.5px;font-weight:700;color:#ff9f43;margin:14px 0 4px">📉 回测实证（已排除未来函数）</div>';
-      h += '<div style="background:rgba(255,159,67,.08);border-left:3px solid #ff9f43;border-radius:0 8px 8px 0;padding:8px 11px;font-size:11.5px;line-height:1.7;color:var(--sub)">'
-         + _e(bt.verdict||'')
-         + '<div style="margin-top:5px;color:var(--txt)">方法：'+_e(bt.method||'')+'（'+_e(bt.dated||'')+'）</div></div>';
-      h += '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px">⚠️ 本卡为<b style="color:#ffb020">监控跟踪用途</b>，非选股买点算法，不构成投资建议。金钻起涨合 XMA 需 12 日定型，当日信号以收盘后复核为准。</div>';
-      return h;
-    };
-    // 🗑 2026-11-09 主人令：暂未上架「大资金买点三档·金钻跟踪（暂未上架·演示版）」卡整卡退役（渲染函数 __renderJinzuanTrack / 卡壳 jinzuanTrackCard / 派发名单同批删）
-    //   与「选股策略 > 💎 金钻跟踪」子页（st-jztrack，__renderJinzuanTrackTab）完全重复：同一 __buildJinzuanTrackHtml 构建器 + 同一 window.JINZUAN_TRACK 数据源 ⇒ 内容 100% 一致。
-    //   数据注入 data/JINZUAN_TRACK.js 保留（选股策略子页消费）；window.__renderJinzuanTrackTab / __stRetryTab.jztrack 判定原样保留。
-    window.__renderJinzuanTrackTab = function(){
-      try{
-        var body=document.getElementById('jzTrackBody');
-        if(!body) return;
-        if(!window.JINZUAN_TRACK){
-          body.innerHTML='<div style="padding:20px;text-align:center;color:var(--dim)">📡 金钻跟踪管线未就绪（data/JINZUAN_TRACK.js 未加载）。</div>';
-          return;
-        }
-        body.innerHTML=window.__buildJinzuanTrackHtml(window.JINZUAN_TRACK,'tab');
-        body.style.textAlign='left'; body.style.padding='0';
-      }catch(e){ console.warn('[renderJinzuanTrackTab]', e); }
-    };
-
-    // 🛡 2026-11-14 一劳永逸自愈：金钻跟踪卡若因任何时序/缓存/未触发原因停在「加载中…」，
-    //    只要 window.JINZUAN_TRACK 数据就绪就自动补渲（幂等，仅当 body 仍含「加载中」才动手），
-    //    最多重试 ~32s 后自停。根因：历史曾因 defer 未注入/派发遗漏导致该卡永久空卡，加此兜底从机制上根除。
-    (function(){
-      if(window.__jzTrackSelfHeal) return; window.__jzTrackSelfHeal = true;
-      var _t = 0;
-      var _iv = setInterval(function(){
-        _t++;
-        var _d = window.JINZUAN_TRACK;
-        var _b = document.getElementById('jzTrackBody');
-        if(!_b){ if(_t > 40) clearInterval(_iv); return; }
-        if(_d && (_b.innerHTML || '').indexOf('加载中') >= 0){
-          try{ window.__renderJinzuanTrackTab(); }catch(e){ /* 静默：下轮重试 */ }
-        }
-        if(_t > 40) clearInterval(_iv);
-      }, 800);
-    })();
 
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
@@ -15997,9 +15812,9 @@ h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;border-radius:9px;
 h += '<div id="judgmentCardHeader"></div>';
 h += '<div style="padding:0 0 8px"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer">&#x25B4; 展开</button></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px"></div>';
-// 🗑 2026-11-09 主人令：暂未上架「💎 大资金买点三档 · 金钻跟踪（暂未上架·演示版）」卡壳删除（jinzuanTrackCard/jinzuanTrackBody）——
-//   与「选股策略 > 💎 金钻跟踪」子页内容 100% 重复（同一 __buildJinzuanTrackHtml + 同一 window.JINZUAN_TRACK）；
-//   金钻跟踪唯一入口收敛为选股策略子页 st-jztrack。渲染函数 __renderJinzuanTrack 与派发名单引用同批删除（见上方 tombstone）。
+// 🗑 2026-11-15 主人令：金钻跟踪卡整支退役——该卡回测实证「无稳定盈利边缘·非买卖建议」（tier1确认21信号胜率33-48%中位负、tier2/3≈硬币），
+//   既不能给可执行建议，按主人令删除：选股策略 st-jztrack 子页/tab/数据注入/渲染构建器/兜底/派发/就绪判定全部移除。
+//   最终推荐四腿信号（sig_jinzuan 等）与 TOP10 融合逻辑不受影响，原样保留。此处旧墓碑（2026-11-09 删重复演示卡）一并归档。
 h += '<div id="marketStateCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
    + '<span style="font-size:15px;font-weight:700;color:#41c9ff">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'

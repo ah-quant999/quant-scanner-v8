@@ -1,0 +1,207 @@
+{
+  "generated": "2026-11-15",
+  "total_signals": 187,
+  "cost_pct": 0.3,
+  "horizons": [
+    5,
+    20,
+    45
+  ],
+  "groups": {
+    "all_t5": {
+      "ret": {
+        "n": 147,
+        "win_rate": 51.7,
+        "avg": 2.13,
+        "median": 0.31
+      },
+      "excess": {
+        "n": 147,
+        "win_rate": 59.2,
+        "avg": 3.82,
+        "median": 1.6
+      },
+      "bench_avg": -2.01
+    },
+    "all_t20": {
+      "ret": {
+        "n": 111,
+        "win_rate": 73.0,
+        "avg": 12.84,
+        "median": 6.54
+      },
+      "excess": {
+        "n": 111,
+        "win_rate": 76.6,
+        "avg": 14.29,
+        "median": 9.36
+      },
+      "bench_avg": -3.81
+    },
+    "all_t45": {
+      "ret": {
+        "n": 63,
+        "win_rate": 88.9,
+        "avg": 24.13,
+        "median": 14.98
+      },
+      "excess": {
+        "n": 63,
+        "win_rate": 93.7,
+        "avg": 26.24,
+        "median": 18.42
+      },
+      "bench_avg": -2.52
+    },
+    "strength_≥90": {
+      "n": 2,
+      "exc5": {
+        "n": 0
+      },
+      "exc20": {
+        "n": 0
+      }
+    },
+    "strength_85-89": {
+      "n": 6,
+      "exc5": {
+        "n": 4,
+        "win_rate": 0.0,
+        "avg": -3.93,
+        "median": -3.46
+      },
+      "exc20": {
+        "n": 1,
+        "win_rate": 100.0,
+        "avg": 7.05,
+        "median": 7.05
+      }
+    },
+    "strength_80-84": {
+      "n": 7,
+      "exc5": {
+        "n": 3,
+        "win_rate": 66.7,
+        "avg": 1.65,
+        "median": 1.65
+      },
+      "exc20": {
+        "n": 1,
+        "win_rate": 100.0,
+        "avg": 26.99,
+        "median": 26.99
+      }
+    },
+    "strength_<80": {
+      "n": 53,
+      "exc5": {
+        "n": 29,
+        "win_rate": 34.5,
+        "avg": -1.73,
+        "median": -5.52
+      },
+      "exc20": {
+        "n": 7,
+        "win_rate": 71.4,
+        "avg": 32.87,
+        "median": 56.97
+      }
+    },
+    "buypoint_连涨强势": {
+      "n": 7,
+      "exc20": {
+        "n": 7,
+        "win_rate": 71.4,
+        "avg": 9.81,
+        "median": 11.37
+      }
+    },
+    "status_正常": {
+      "n": 106,
+      "exc20": {
+        "n": 41,
+        "win_rate": 80.5,
+        "avg": 19.91,
+        "median": 12.33
+      }
+    },
+    "status_回落": {
+      "n": 37,
+      "exc20": {
+        "n": 36,
+        "win_rate": 83.3,
+        "avg": 11.34,
+        "median": 10.44
+      }
+    },
+    "status_强势": {
+      "n": 23,
+      "exc20": {
+        "n": 21,
+        "win_rate": 57.1,
+        "avg": 11.2,
+        "median": 5.53
+      }
+    },
+    "status_见顶": {
+      "n": 12,
+      "exc20": {
+        "n": 12,
+        "win_rate": 83.3,
+        "avg": 11.03,
+        "median": 13.53
+      }
+    },
+    "month_2026-06": {
+      "n": 19,
+      "exc20": {
+        "n": 19,
+        "win_rate": 84.2,
+        "avg": 13.58,
+        "median": 14.59
+      }
+    },
+    "month_2026-07": {
+      "n": 59,
+      "exc20": {
+        "n": 58,
+        "win_rate": 65.5,
+        "avg": 12.07,
+        "median": 5.54
+      }
+    },
+    "month_2026-08": {
+      "n": 34,
+      "exc20": {
+        "n": 25,
+        "win_rate": 96.0,
+        "avg": 14.56,
+        "median": 10.65
+      }
+    },
+    "month_2026-09": {
+      "n": 50,
+      "exc20": {
+        "n": 5,
+        "win_rate": 80.0,
+        "avg": 24.23,
+        "median": 7.05
+      }
+    },
+    "month_2026-10": {
+      "n": 18,
+      "exc20": {
+        "n": 4,
+        "win_rate": 75.0,
+        "avg": 35.76,
+        "median": 41.98
+      }
+    },
+    "month_2026-11": {
+      "n": 7,
+      "exc20": {
+        "n": 0
+      }
+    }
+  }
+}

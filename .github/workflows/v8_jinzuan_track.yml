@@ -1,4 +1,7 @@
-name: "💎 金钻跟踪 monitor (cloud)"
+name: "💎 金钻跟踪 monitor (cloud) [RETIRED 2026-11-15]"
+# 🗑 2026-11-15 主人令：金钻跟踪卡整支退役（回测无稳定盈利边缘·不能给可执行建议），前端卡与数据注入已删。
+#   本工作流每日产出的 data/JINZUAN_TRACK.js 已无消费方 ⇒ 停掉 schedule（保留 workflow_dispatch 供手动复用）。
+#   不删文件以避免双机 last-writer-wins 分歧；schedule 注释即 PAUSED 语义。
 # 🔴 2026-11-09 主人令：演示卡「大资金买点三样·金钻跟踪」升级为 v8 真实日更监控管线（非盈利信号）。
 #   本工作流在 GitHub 托管 ubuntu-latest 跑 gen_jinzuan_track.py：纯读本地 raw_data/kline_cache/*.json
 #   （已提交，6139 文件，离线可用）+ 固定 352 池 raw_data/jinzuan_pool.json，仅算最新一日金钻起涨/紧迫度/支撑/四档，
@@ -7,8 +10,9 @@ name: "💎 金钻跟踪 monitor (cloud)"
 #   铁律：akshare 仅在 --rebuild-pool 惰性导入；每日运行不联网（对齐 V8_NO_NET）。
 #   本卡为监控跟踪用途，非买点算法；回测已证无稳定盈利边缘，前端如实标注「监控用途·非盈利信号」。
 on:
-  schedule:
-    - cron: '0 10 * * *'          # 北京 18:00 每日（UTC 10:00），确保盘后 kline_cache 已更新
+  # 🗑 2026-11-15 RETIRED：金钻卡已删除，data/JINZUAN_TRACK.js 无消费方，停每日调度。
+  # schedule:
+  #   - cron: '0 10 * * *'        # 北京 18:00 每日（UTC 10:00）
   workflow_dispatch:
 
 permissions:
