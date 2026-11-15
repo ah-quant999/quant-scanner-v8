@@ -2322,7 +2322,14 @@ def main():
 
         # ── 归一化到 0~100 ──
         # 分母见模块顶部 NORM_DIVISOR 注释：250 已使 ≥80 分不可达，现校准为 130
-        total = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
+        # 🔴 2026-11-14 主人令·改主金股池为「收益率+胜率」排名（一劳永逸）：
+        #   主键 total_score 改为个股历史「收益率+胜率」实绩（STOCK_WINRATE.winrate_score，
+        #   已对小样本做收缩 conf(n)=max(0.15,min(1,n/12)) 防极端均值霸榜）→ 真正按
+        #   「收益率最高+胜率最高」降序；信号融合分 raw_total 仅作「无性能记录票」的兜底排序。
+        #   如此 FINAL_RECOMMEND(final_score:=total_score) 与跨产物一致性链闸均自动保持口径一致，无需改校验。
+        _perf_raw = _wr_score_raw if _wr_score_raw is not None else raw_total
+        total = round(min(100, max(0, _perf_raw / NORM_DIVISOR * 100)), 1)
+        _fusion_score = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
 
         # ── Regime 驱动的行业风格微调（2026-08-29 元模型升级）──
         #   根据 market_regime 推荐/规避板块，给个股 ±8% 的分数乘数。
@@ -2351,6 +2358,10 @@ def main():
             "pct_chg_20d": pct20 or 0,
             "breakout_5d": breakout_5d,
             "total_score": total,
+            "fusion_score": _fusion_score,
+            "winrate_score": (_wr_score_raw if _wr_score_raw is not None else None),
+            "win5": (_wr_win5 if _wr_win5 is not None else None),
+            "avg5": ((_h5.get("avg") if _h5 else None)),
             "current_regime": current_regime,
             "regime_ok": _regime_ok,
             "regime_reason": _regime_reason,
@@ -2473,7 +2484,7 @@ def main():
     #   诊断(by_signal 1,1,0,0) 实证全市场唯一正 edge 组合：T+10 +4.64% / 胜率 61.9%（n=171）；
     #   jinzuan / jigou / trend 单维或负组合均负期望，旧逻辑却把它们顶进 TOP10 前排。
     # 🔴 2026-11-04 主人令「不强制双共振」：V8_HIGH_CONVICTION 默认改关（"0"）。
-    #   终选输出 = 金股池按因子综合评分(total_score)降序的 top20（收益率优先），不再强制「chan & jinzuan」共振。
+    #   终选输出 = 金股池按个股历史收益率+胜率(winrate_score)降序的 top20（收益率优先·2026-11-14 改主排序），不再强制「chan & jinzuan」共振。
     #   设 V8_HIGH_CONVICTION=1 可回退高信念双共振模式（金钻+缠论，全量输出）。
     # 🔴 2026-10-30 根因修复：HC 重赋值前捕获真实金股池规模（非双共振子集），
     #   避免 total_scored 被误报为 54（双共振子集）而掩盖真实 800 池 → 主人误判「池子掉到45/冻住」。
@@ -2499,7 +2510,7 @@ def main():
     _hc = os.environ.get("V8_HIGH_CONVICTION", "0").strip() == "1"
     _hc_cap = int(os.environ.get("V8_HC_CAP", "0"))
     _hc_limit = _hc_cap if _hc_cap > 0 else None  # None=全量
-    _SELECTION_MODE = "top20_score"
+    _SELECTION_MODE = "top_by_performance"
     if _hc:
         _reso = [s for s in scored
                  if (s.get("breakdown", {}).get("signals", {}) or {}).get("jinzuan")

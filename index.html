@@ -2103,7 +2103,7 @@ window.STRATEGY_WALKFORWARD = {
     </div>
 
     <!-- 子 Pane：最终推荐 Top5（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位；🔴 2026-10-27 主人令：保留 Top5，统一口径去掉 Top3 重复展示）
-         口径 = 当日因子积分榜（TOP10_DAILY）按 total_score 降序前 3 名，同序同分；
+         口径 = 当日因子积分榜（TOP10_DAILY）按个股历史收益率+胜率(winrate_score)降序前 3 名，同序同分；
          强势跟踪当日新入选仍入候选池展示，但不凭强度分竞位 Top3（事故：迪安诊断 78.0 插队致两榜对不上）。 -->
     <div id="final-pane-rec" class="final-pane active">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #ffd024">
@@ -2162,7 +2162,7 @@ window.STRATEGY_WALKFORWARD = {
     <span id="dfcBadge" style="font-size:12px;color:var(--dim)"></span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
-    <b style="color:#41c9ff">它做什么</b>：<b>终选输出</b>（金股池按因子综合评分降序的高收益率子集，即 <code style="padding:1px 4px;border-radius:3px">TOP10_DAILY.top10</code>）里的每只票，按下列<b>全部因子</b>逐项算分、加总成 
+    <b style="color:#41c9ff">它做什么</b>：<b>终选输出</b>（金股池按个股历史收益率+胜率(winrate_score)降序的子集，即 <code style="padding:1px 4px;border-radius:3px">TOP10_DAILY.top10</code>）里的每只票，按下列<b>全部因子</b>逐项算分、加总成 
     <code style="padding:1px 4px;border-radius:3px">raw_total</code>，
     再归一化到 0~100 得 
     <code style="padding:1px 4px;border-radius:3px">total_score</code>。
@@ -2188,7 +2188,7 @@ window.STRATEGY_WALKFORWARD = {
             顺序 = 因子实验室定位卡 → 🧮 每日因子计算 → 🏆 当日因子计分榜）
            原话：「这张专门成立一张，把当天<b>终选输出</b>（金钻+缠论共振 38 只）的各因子加减分全列出来，
                   按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
-         数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按因子综合评分降序的高收益率子集，由 generate_top10.py 落盘，每票 11 维因子分 + 文字明细，已按 total_score 降序）
+         数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按个股历史收益率+胜率(winrate_score)降序的子集，由 generate_top10.py 落盘，每票 11 维因子分 + 文字明细，已按 winrate_score 降序；无性能记录的票按信号融合分兜底）
          🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码精确匹配）
          ═══════════════════════════════════════════════════════════════ -->
     <div class="card" id="dailyScoreboardCard" style="border-left:4px solid #f59e0b;margin-top:16px">
@@ -3362,7 +3362,7 @@ function fmtSigned(v){
         <div id="stFinalSelMore" style="display:none;margin:6px 0 4px">
           <button id="stFinalSelMoreBtn" onclick="window.toggleStFinalSel()" style="background:transparent;color:#26d9c2;border:1px solid #26d9c2;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer">▾ 展开全部</button>
         </div>
-        <div class="note">口径：金股池（~800 只）按因子综合评分(total_score)降序的精选子集（selection_mode=top20_score，由 generate_top10.py 每日盘前产出·盘中不刷新·收益率优先，不再强制金钻+缠论双共振）。本卡 = <b>当日终选输出全量（top20）</b>；🏷 Top5 = 本榜总分降序前 5 名（即设计上应推的「最终推荐」）。⚠️ 终选=金股池因子评分榜，非独立另建池。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
+        <div class="note">口径：金股池（~800 只）按个股历史收益率+胜率(winrate_score)降序的精选子集（selection_mode=top_by_performance，由 generate_top10.py 每日盘前产出·盘中不刷新·收益率优先，不再强制金钻+缠论双共振）。本卡 = <b>当日终选输出全量（top20）</b>；🏷 Top5 = 本榜收益率+胜率降序前 5 名（即设计上应推的「最终推荐」）。⚠️ 终选=金股池收益率+胜率榜，非独立另建池。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
       </div>
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #ffd024">
@@ -14727,7 +14727,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         + '<span title="selection_mode='+ (mode||'—') +'" style="color:#41c9ff;border:1px solid #41c9ff4d;border-radius:4px;padding:2px 7px;white-space:nowrap">模式 '+modeTxt+'</span>'
         + (TD.hc_count != null ? pill('双共振 <b>'+TD.hc_count+'</b> 只','#ffd024') : '')
         + (TD.total_scored != null ? pill('金股池 <b>'+TD.total_scored+'</b> 只','#c084fc') : '')
-        + '<span style="color:var(--dim);margin-left:auto">金股池 → 因子综合评分降序（收益率优先）</span>'
+        + '<span style="color:var(--dim);margin-left:auto">金股池 → 收益率+胜率(winrate_score)降序（收益率优先）</span>'
         + '</div>';
     }
     // 列表（Top5 标 🏷）
