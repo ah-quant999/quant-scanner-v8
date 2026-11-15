@@ -4345,5 +4345,38 @@
   },
   "warn_items": [],
   "fail_items": []
+ },
+ {
+  "date": "2026-11-16",
+  "time": "03:54:44",
+  "tz": "Asia/Shanghai",
+  "overall": "fail",
+  "summary": {
+   "ok": 122,
+   "warn": 0,
+   "fail": 3,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 125
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "DO_NOT_DELETE",
+    "name": "防误删清单",
+    "message": "更新于 11-09 03:16；超过阈值 10080 分钟"
+   },
+   {
+    "id": "MARKET_THERMO",
+    "name": "未来预测·牛转熊观测台",
+    "message": "更新于 11-13 00:46；超过阈值 4320 分钟"
+   },
+   {
+    "id": "all_maharo_wm",
+    "name": "maharo_wm",
+    "message": "maharo_wm.js 缺失或解析失败（未被 CARD_DEFS 登记）"
+   }
+  ]
  }
 ]
