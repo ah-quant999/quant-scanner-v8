@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-15 13:01"
+  updated: "2026-11-15 13:08"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -40,7 +40,7 @@ items:
   - id: cred-ledger-js-build-race-deleted-1115
     owner: 阿狸咪的工程师
     priority: P1
-    status: pending-verify
+    status: done
     created: 2026-11-15
     title: CRED_LEDGER.js 被 build 竞态旧树推送删除 ⇒ audit[6/8] 断链 ⇒ build_deploy 连败
     note: >-
@@ -61,7 +61,9 @@ items:
       恢复提交推 main 后，build_deploy 下一轮 run head_sha ≥ 恢复提交 sha 且 build job 的 Pre-deploy
       audit [6/8] 绿（看 build job 真跑结论，不看 run conclusion）；主站台账卡读 window.CRED_LEDGER 正常
       （token json 均 gitignore，文件内容=DEFAULTS 为预期）。
-    updated: "2026-11-15 13:01"
+    verified_at: "2026-11-15 13:08 CST"
+    verified_by: 阿狸咪的工程师
+    updated: "2026-11-15 13:08"
     updated_by: 阿狸咪的工程师
   - id: akshare-unpinned-runner-api-removal-1114
     owner: 小九机AI（落码）
