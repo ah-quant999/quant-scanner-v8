@@ -44,6 +44,27 @@ def _pd(s):
         return None
 
 
+def _prev_ledger():
+    """🛡 2026-11-17 一劳永逸：真源三级级联 —— token json > 上次台账 CRED_LEDGER.js > DEFAULTS。
+
+    背景：本脚本将挂进 v8_cred_expiry_watch.yml（cn runner 每日巡检）。runner 工作区
+    可能缺 .gitignore 的 token json 真源（双机不同步），若直接落 DEFAULTS 死值，
+    换新后的日期会被兜底值「倒拨」（假超期/假临近）。台账 js 本身就是**上次巡检的
+    真实快照**（非敏感：仅 updated 日期 + cycle，无 token 值），作为中间级最真实。
+    """
+    fp = os.path.join(ROOT, "data", "CRED_LEDGER.js")
+    try:
+        txt = open(fp, encoding="utf-8").read()
+        i, j = txt.find("{"), txt.rfind("}")
+        if i < 0 or j <= i:
+            return {}
+        import json as _json
+        d = _json.loads(txt[i:j + 1])
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
 def main():
     today = datetime.date.today()
     ledger = {}
@@ -60,6 +81,13 @@ def main():
                     real_cycle = d["cycle"]
             except Exception:
                 pass
+        if not updated:
+            # 🛡 三级级联（2026-11-17）：token json 缺失 → 上次台账快照 → DEFAULTS
+            _prev = _prev_ledger().get(key)
+            if isinstance(_prev, dict) and _prev.get("updated"):
+                updated = _prev.get("updated")
+                if _prev.get("cycle"):
+                    real_cycle = _prev["cycle"]
         if not updated:
             updated, real_cycle = DEFAULTS.get(key, (None, cyc))
         ud = _pd(updated)
