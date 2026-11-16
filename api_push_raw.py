@@ -69,6 +69,23 @@ def _beat(what=""):
         print("      ⏱ 心跳 " + str(what), flush=True)
 
 
+def _sleep_beat(sec, what=""):
+    """🛡 2026-11-16 一劳永逸（主人令「越错越多！一劳永逸修复」· run#3074 铁证）：
+    重试等待 ≠ 挂死——分片 sleep 并持续喂心跳。
+    【病灶】tree 创建 422 "timed out" 后旧逻辑 sleep(2^attempt) 退避且全程不喂心跳
+      ⇒ 480s 无进展看门狗把整个退避重试窗口判为「跨境挂死」os._exit(1)
+      ⇒ run#3074 实证：1071 个 blob 全推成功却在 tree 阶段被强杀、零 commit
+      （孤儿 blob）⇒ 当夜 9 张全量数据卡连锁假红 + 最终推荐链停更。
+    【铁律】任何「退避重试窗口」必须走本函数，看门狗在等待期间永不误杀。"""
+    _end = _time.time() + max(0.0, float(sec))
+    while True:
+        _remain = _end - _time.time()
+        if _remain <= 0:
+            return
+        _time.sleep(min(5.0, _remain))
+        _beat("retry-wait " + what)
+
+
 def _start_watchdog():
     def _wd():
         while True:
@@ -1448,12 +1465,12 @@ def main():
         r2 = api("GET", f"/repos/{REPO}/git/refs/heads/main")
         if "__error__" in r2 or "object" not in r2:
             last_err = f"读取 main ref 失败: {r2.get('__msg__')}"
-            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _sleep_beat(2 ** attempt, "外层attempt退避"); continue
         base_sha2 = r2["object"]["sha"]
         cmt2 = api("GET", f"/repos/{REPO}/git/commits/{base_sha2}")
         if "__error__" in cmt2 or "tree" not in cmt2:
             last_err = f"读取 base commit 失败: {cmt2.get('__msg__')}"
-            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _sleep_beat(2 ** attempt, "外层attempt退避"); continue
         base_tree2 = cmt2["tree"]["sha"]
         # 🛡🛡 2026-09-23 基线前进即重算 index.html（防「旧基线 blob 顶掉新正文」，见 _ix_sha_for）
         if extra_changed and base_sha2 != _aligned_base:
@@ -1486,7 +1503,7 @@ def main():
             _existing2, _ok4 = _remote_tree_paths(base_tree2, _GUARD_PREFIXES)
             if not _ok4 or not _existing2:
                 last_err = "基线前进后新守卫基线不可得"
-                print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
+                print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _sleep_beat(2 ** attempt, "外层attempt退避"); continue
             _kept, _dropped = {}, 0
             for _p, _sha in new_entries.items():
                 if _p not in files:
@@ -1516,19 +1533,41 @@ def main():
         tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
                       for p, s in new_entries.items()]
         # 修复②：变更文件 >100 时分批链式创建 tree（base_tree 逐批叠加），杜绝单请求超时。
-        _BATCH = 100
+        # 🛡 2026-11-16 三重加固（主人令「越错越多！一劳永逸修复」· run#3074 铁证）：
+        #   【病灶】分批1（100 entry + 巨型根 tree 作 base_tree）遭 GitHub 422
+        #     "request timed out / input too large" 后，旧逻辑只 sleep(2^attempt) 秒
+        #     即 break 回外层 attempt 全套重来（重拉基线+全量防倒退复验，耗时分钟级），
+        #     且**重试等待期间不喂心跳** ⇒ 480s 看门狗把重试窗口掐死（run#3074：
+        #     tree 卡 482s 被 os._exit，1071 blob 全推成功却零 commit ⇒ 9 卡连锁假红）。
+        #   【修法·三件】
+        #     ① 批内顽固重试：单批失败**原地**指数退避（10/30/60s，共 4 次尝试），
+        #        不再 break 回外层——422 是服务端瞬时过载，退避后重试同批成功率高，
+        #        且免去外层全套基线复验的时间成本。
+        #     ② 所有等待走 _sleep_beat()：分片 sleep + 持续喂 _beat()，看门狗不误杀。
+        #     ③ _BATCH 100→60：进一步压低单请求体（422 "input too large" 直指请求规模）。
+        _BATCH = 60
         _cur_base = base_tree2
         _tree_ok = True
         for _bi in range(0, len(tree_items), _BATCH):
             _batch = tree_items[_bi:_bi + _BATCH]
-            _nt = api("POST", f"/repos/{REPO}/git/trees",
-                      {"base_tree": _cur_base, "tree": _batch})
-            if "__error__" in _nt or "sha" not in _nt:
+            _nt = None
+            for _ttry in range(4):        # 批内顽固重试：1 首发 + 3 退避（10/30/60s）
+                if _ttry:
+                    _sleep_beat((10, 30, 60)[_ttry - 1],
+                                f"tree分批{_bi // _BATCH + 1}第{_ttry + 1}次尝试前退避")
+                _nt = api("POST", f"/repos/{REPO}/git/trees",
+                          {"base_tree": _cur_base, "tree": _batch})
+                _beat(f"tree分批{_bi // _BATCH + 1}尝试{_ttry + 1}完成")
+                if "__error__" not in _nt and "sha" in _nt:
+                    break
                 last_err = f"创建 tree 分批{_bi // _BATCH + 1}失败: {_nt.get('__msg__')}"
-                print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt)
+                print(f"⚠️ {last_err}（批内重试 {_ttry + 1}/4）", flush=True)
+                _nt = None
+            if _nt and "sha" in _nt:
+                _cur_base = _nt["sha"]
+            else:
                 _tree_ok = False
                 break
-            _cur_base = _nt["sha"]
         if not _tree_ok:
             continue
         new_tree = {"sha": _cur_base}
@@ -1536,7 +1575,7 @@ def main():
                      {"message": msg, "tree": new_tree["sha"], "parents": [base_sha2]})
         if "__error__" in commit or "sha" not in commit:
             last_err = f"创建 commit 失败: {commit.get('__msg__')}"
-            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _sleep_beat(2 ** attempt, "外层attempt退避"); continue
         # 2026-08-03 修复：改用 force=False，避免触发分支保护"Block force pushes"。
         # parent 始终为最新 main，重试逻辑已保证不会丢失他人提交。
         upd = api("PATCH", f"/repos/{REPO}/git/refs/heads/main",
