@@ -156,6 +156,12 @@ MUST_HAVE_CRON = {
     #   见 .github/workflows/v8_wave_elliott.yml 头注）—— ab04d17993 建链漏双登记 ⇒
     #   build_deploy [4/8] 自 11-10 23:13 CST 连红阻断 deploy（4 轮 gate 绿/build 红）。本项收口。
     "v8_wave_elliott": "艾略特波浪日频refresh(云端ubuntu·交易日19:15)",
+    # 2026-11-17 小九补登记（双登记铁律）：🔑 凭证到期巡检每日链（cron '10 1 * * *' = 每日
+    #   09:10 CST 全周，[self-hosted, cn]，跑 scripts/cred_expiry_watch.py 读 data/*_token.json
+    #   真源产 data/CRED_LEDGER.js；内容变才推 + 临近/超期邮件预警 2814546@qq.com）——
+    #   根因修复 2026-11-15 建链时漏挂调度（43 workflow 零引用）致 all_CRED_LEDGER 永久假红。
+    #   本轮建链时又漏本名单 ⇒ build_deploy [4/8] 恒红阻断 deploy（同族第 N 次教训），本项收口。
+    "v8_cred_expiry_watch": "凭证到期巡检(每日09:10·cn runner·真源json级联+邮件预警)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
