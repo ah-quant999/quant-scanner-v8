@@ -142,6 +142,23 @@ def fmt_amount(v):
     return f"{float(v):.0f}亿"
 
 
+def amt_b(v, txt=None, nd=2):
+    """🆕 2026-11-16 主人令「AI速览这个金额要加粗红涨绿跌显示」：AI速览金额统一样式助手。
+    正值/流入=红(#ef5350)、负值/流出=绿(#26a69a)、零=中性灰，一律 <b> 加粗。
+    红涨绿跌铁律全站执行（与暗色主题 #ef5350/#26a69a 同源）。
+    ⚠️ 仅限 anomalies 文本使用：前端渲染走 innerHTML（index.html 内 h+=a.text），
+       <b> 标签原样生效；已全仓核查无任何脚本解析 anomaly 文本
+       （update_v8 / audit_empty_cards / logic.html 均只读键名或整体存在性）。
+    """
+    try:
+        fv = float(v)
+    except (TypeError, ValueError):
+        return "--"
+    s = txt if txt is not None else f"{fv:+.{nd}f}亿"
+    c = "#ef5350" if fv > 0 else ("#26a69a" if fv < 0 else "var(--sub)")
+    return f'<b style="color:{c};">{s}</b>'
+
+
 def _sentiment_signal(label):
     """情绪 → 灯（红=防守/黄=观望/绿=积极）"""
     if label in ("情绪高涨", "情绪偏暖", "情绪温和"): return "green"
@@ -244,7 +261,8 @@ def _fmt_sector_list(items, signed=False):
     out = []
     for s in items:
         net = float(s.get("net") or 0)
-        out.append(f"{s['name']} {net:+.1f}亿" if signed else f"{s['name']} +{net:.1f}亿")
+        # 🆕 2026-11-16 主人令：金额统一加粗红涨绿跌（amt_b 自带符号，两分支语义合并）
+        out.append(f"{s['name']} {amt_b(net, nd=1)}")
     return "、".join(out)
 
 
@@ -460,7 +478,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             _out.append(
                 '<span style="display:inline-block;vertical-align:top;'
                 'margin:0 16px 0 0;line-height:1.45;white-space:nowrap;">'
-                f'<span style="font-size:12px;">{_x.get("name", "")} {_net:+.2f}亿</span><br>'
+                f'<span style="font-size:12px;">{_x.get("name", "")} {amt_b(_net)}</span><br>'
                 f'<span style="font-size:10px;color:#cbd5e1;">{_x.get("code", "")}</span></span>'
             )
             if len(_out) >= 5:
@@ -496,7 +514,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         _tn_color = "#ef5350" if _total_net_yi >= 0 else "#26a69a"   # 红涨绿跌铁律
         _etf_parts.append(
             '<span style="white-space:nowrap;">全市场ETF合计净'
-            f'<span style="color:{_tn_color};font-weight:600;">'
+            f'<span style="color:{_tn_color};font-weight:800;">'
             f'{"流入" if _total_net_yi >= 0 else "流出"} {_total_net_yi:+.2f}亿</span></span>'
         )
 
@@ -538,7 +556,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         top5 = etf_heat["industry_flow"][:5]
         if top5:
             text = "ETF 真实行业资金 TOP5：" + "、".join(
-                f"{x['name']} {x['net_inflow_yi']:+.1f}亿" for x in top5
+                f"{x['name']} {amt_b(x.get('net_inflow_yi'), nd=1)}" for x in top5
             )
             anomalies.append({
                 "tag": "ETF行业资金",
@@ -559,7 +577,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         anomalies.append({
             "tag": "概念热点",
             "emoji": "🔥",
-            "text": f"主力流向：{'、'.join(f"{s['name']}(+{float(s['net']):.1f}亿)" for s in hot_concepts)}",
+            "text": "主力流向：" + "、".join(f"{s['name']}({amt_b(s.get('net'), nd=1)})" for s in hot_concepts),
             "color": "red",
             "signal": "green",
         })
@@ -581,7 +599,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     sw1_net = sw1_industry_net(sectors)
     if sw1_net is not None or ind_in:
         parts = []
-        parts.append(f"净额(行业31)：{sw1_net:+.1f}亿" if sw1_net is not None else "净额(行业)：待更新")
+        parts.append(f"净额(行业31)：{amt_b(sw1_net, nd=1)}" if sw1_net is not None else "净额(行业)：待更新")
         if ind_in:
             parts.append("流入：" + _fmt_sector_list(ind_in))
         if ind_out:
@@ -601,7 +619,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     #       合并条件是「text 以『主力大单流入/流出』开头」——本处保持前缀不变，故前端无需改动。
     if capital and capital.get("top_inflow"):
         top = capital["top_inflow"][:5]
-        names = [f"{c['name']}(+{c['net']:.1f}亿)" for c in top]
+        names = [f"{c['name']}({amt_b(c.get('net'), nd=1)})" for c in top]
         text = f"主力大单流入：{'、'.join(names)}"
         anomalies.append({
             "tag": "个股异动",
@@ -612,7 +630,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         })
     if capital and capital.get("top_outflow"):
         bot = capital["top_outflow"][:5]
-        names = [f"{c['name']}({c['net']:.1f}亿)" for c in bot]
+        names = [f"{c['name']}({amt_b(c.get('net'), nd=1)})" for c in bot]
         text = f"主力大单流出：{'、'.join(names)}"
         anomalies.append({
             "tag": "个股异动",

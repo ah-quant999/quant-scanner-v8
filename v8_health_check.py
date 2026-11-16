@@ -130,6 +130,14 @@ CARD_DEFS = [
     #   · raw_file 交叉校验有效：raw_data/stock_quote.json 与 data/STOCK_QUOTE.js 同由专用链产出。
     #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
     {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘中每30分", "max_age": 40, "key_fields": ["update_time"], "premarket_keep": True, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
+    # 🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：FUTURES_REALTIME（期指实时）此前
+    #   CARD_DEFS 完全漏登记 ⇒ 健康面板不监控 + 自愈链够不到 ⇒ 断更只能靠主人肉眼发现
+    #   （11-13 实测：cron 静默失联 + 缓存戳不同步双重故障，两处均已修，本条补上监控盲区）。
+    #   · heal_cat="futures" —— 走专链 v8_futures_realtime.yml 自愈（self_heal 独立派发分支同批落地），
+    #     与 US_HK_MAP 专链同型；cn_fetch 盘中链刷不到它，故绝不可错配 intraday。
+    #   · weekend_update=False —— 期指周末不交易、专链 cron 仅工作日，周末免检防假红。
+    #   · premarket_keep=True —— 盘前沿用上一交易日收盘档不误报（与 STOCK_QUOTE 同型）。
+    {"id": "FUTURES_REALTIME", "name": "期指实时", "page": "实时数据", "freq": "盘中每30分", "max_age": 45, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": False, "heal_cat": "futures", "producer": "v8/gen_futures_realtime.py"},
     # 盘后数据
     # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
     # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。
@@ -832,6 +840,7 @@ LOCAL_GEN = {
     'SECTOR_YEAR_FLOW': ('v8/gen_sector_year_flow.py', 'data/SECTOR_YEAR_FLOW.js'),
 }
 US_HK_MAP_WORKFLOW = "v8_us_hk_map.yml"                 # 🆕 隔夜美股(专链·cn 自托管)：产出 data/US_HK_MAP.js（已从 cloud_fetch premarket 注册表移除，需独立派发）
+FUTURES_WORKFLOW = "v8_futures_realtime.yml"            # 🆕 2026-11-16 期指实时(专链·cn 自托管)：产出 data/FUTURES_REALTIME.js（v8/gen_futures_realtime.py，需独立派发）
 HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
 # 2026-08-11 漏洞 #1：自愈单次最多派发 N 个 workflow，防 runner 打爆/事件风暴
@@ -1218,6 +1227,40 @@ def _dispatch_us_hk_map():
             return True, f"已派发 us_hk_map(隔夜美股·cn) (HTTP {r.status})", True
     except urllib.error.HTTPError as e:
         return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+
+
+def _dispatch_futures_realtime():
+    """🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：经 GitHub API 派发 v8_futures_realtime
+    （期指实时·cn 自托管专链），刷新 FUTURES_REALTIME。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_us_hk_map。
+    背景：FUTURES_REALTIME 此前 CARD_DEFS 漏登记 ⇒ 监控盲区（11-13 断更主人肉眼发现）。
+    现纳入 CARD_DEFS（heal_cat="futures"）后，自愈经本分支派发专链。
+    cn runner 离线则跳过（防派发风暴），恢复后自愈立即补跑。
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    online, names = _cn_runner_available()
+    if not online:
+        return True, "cn 自托管 runner 全部离线，跳过 futures 派发（恢复后自愈自动补跑）", False
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    pending, since = _has_pending_run(FUTURES_WORKFLOW, headers)
+    if pending:
+        return True, (f"已有排队中的 futures 实时链运行(created {since})，"
+                      f"跳过派发（避免顶掉该 pending run）"), False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{FUTURES_WORKFLOW}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 futures(期指实时·cn) (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
     except Exception as e:
         return False, f"派发异常: {e}", False
 
@@ -1571,6 +1614,9 @@ def self_heal(report):
         elif cat == "us_hk_map":
             # 🆕 2026-11-02 一劳永逸（九宝令）：隔夜美股专链(cn 自托管)独立派发
             ok, dmsg, dispatched = _dispatch_us_hk_map()
+        elif cat == "futures":
+            # 🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：期指实时专链(cn 自托管)独立派发
+            ok, dmsg, dispatched = _dispatch_futures_realtime()
         else:
             ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
         if ok:

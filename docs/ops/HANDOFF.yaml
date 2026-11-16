@@ -3838,3 +3838,29 @@ items:
     verify_how: >-
       ① 下一轮AI速览盘后批不再因涨停total TypeError断链;② 云端全新checkout market_regime 走 raw_data/macro.json 兜底不再冻结;③ fetch_macro 成功即双写两份macro.json。
     updated: "2026-11-15 21:05"
+
+  - id: unified-selfheal-futures-brief-amt-1116
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P0
+    status: done
+    created: 2026-11-16
+    title: 统一自愈决策器落地(期指卡纳入HC+哨兵四闸)+AI速览金额加粗红涨绿跌
+    note: >-
+      2026-11-16 主人拍板『按此落地』(统一自愈决策器)+『AI速览金额要加粗红涨绿跌显示』。
+      ① v8_health_check.py: FUTURES_REALTIME(期指实时)纳入 CARD_DEFS(max_age=45/weekend_update=False/premarket_keep),
+        新 heal_cat="futures" → 新增 _dispatch_futures_realtime() 专链派发(v8_futures_realtime.yml,
+        cn runner 在线闸+pending 互斥,与 us_hk_map 同型)+self_heal 分支——补 11-13 断更才发现的监控盲区。
+      ② 本机 v8_intraday_sentinel.py(非仓文件,勿在仓内找): 新增 unified_self_heal() 唯一派发入口,
+        四闸=单一入口/组内去重/25min幂等(.selfheal_state.json)/每轮≤3+活跃run互斥;
+        cn_fetch_fallback/stock_quote_fallback/dual_inspect_freshness 三处全部改走统一入口;
+        INTRADAY_FILES 补 FUTURES_REALTIME.js(40min阈值,经 HEAL_TARGETS 注册表归组到期指专链)。
+        云端 self_heal 原有 HEAL_DEBOUNCE_MIN=25+MAX_DISPATCHES_PER_RUN=5 同口径已存在,未动。
+      ③ algorithms/gen_market_brief.py: 新增 amt_b() 金额统一样式助手(正=红#ef5350/负=绿#26a69a/零=灰,<b>加粗),
+        接入 7 处金额产出点(_fmt_sector_list/ETF TOP5品种/ETF总额提至800/ETF真实行业TOP5/主力流向概念/净额行业31/主力大单流出入);
+        anomalies 走 innerHTML 已核安全;本地跑批冒烟:概念热点/行业资金实际输出已带色加粗。
+      审计: py_compile 3 文件 OK;哨兵合成用例验证四闸(组去重2→1/上限3/25min幂等/DRY不写状态,测试态已清)。
+    verify_how: >-
+      ① 期指卡断更时 HEALTH_CHECK 报 fail 且 self_heal 自动派发 v8_futures_realtime.yml(运维页健康胶囊可见 FUTURES_REALTIME 行);
+      ② 下一轮哨兵日志派发文案带「自愈[workflow]」前缀且同轮同目标只派一次;
+      ③ 下一个盘中批次 AI速览 金额全为加粗红涨绿跌。
+    updated: "2026-11-16 11:47"
