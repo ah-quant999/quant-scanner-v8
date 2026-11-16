@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-16 16:25:52",
+  "update_time": "2026-11-17 03:48:09",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -9,10 +9,10 @@
   },
   "range": [
     "09/29",
-    "11/16"
+    "11/17"
   ],
-  "columns": 30,
-  "cycle_count": 20,
+  "columns": 31,
+  "cycle_count": 19,
   "cycles": [
     {
       "sector": "AI算力",
@@ -25,32 +25,32 @@
       "peak": 25,
       "peak_date": "10/26",
       "total": 222,
-      "ongoing": true
+      "ongoing": false
     },
     {
       "sector": "其他",
       "start": "09/29",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 31,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1713,
+      "total": 1780,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "09/29",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
+      "end_idx": 30,
+      "days": 31,
       "hot_days": 27,
       "peak": 36,
       "peak_date": "10/08",
-      "total": 294,
+      "total": 295,
       "ongoing": true
     },
     {
@@ -69,40 +69,40 @@
     {
       "sector": "新能源车",
       "start": "09/29",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 26,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 27,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 310,
+      "total": 313,
       "ongoing": true
     },
     {
       "sector": "机器人",
       "start": "09/29",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 30,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 511,
+      "total": 518,
       "ongoing": true
     },
     {
       "sector": "消费电子",
       "start": "09/29",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 31,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 256,
+      "total": 264,
       "ongoing": true
     },
     {
@@ -121,14 +121,14 @@
     {
       "sector": "白酒消费",
       "start": "09/29",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 30,
+      "days": 31,
+      "hot_days": 30,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 196,
+      "total": 203,
       "ongoing": true
     },
     {
@@ -199,27 +199,27 @@
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 15,
-      "end_idx": 29,
-      "days": 15,
-      "hot_days": 14,
+      "end_idx": 30,
+      "days": 16,
+      "hot_days": 15,
       "peak": 13,
       "peak_date": "11/16",
-      "total": 68,
+      "total": 81,
       "ongoing": true
     },
     {
       "sector": "光伏",
       "start": "11/04",
-      "end": "11/16",
+      "end": "11/17",
       "start_idx": 21,
-      "end_idx": 29,
-      "days": 9,
-      "hot_days": 9,
+      "end_idx": 30,
+      "days": 10,
+      "hot_days": 10,
       "peak": 12,
       "peak_date": "11/05",
-      "total": 46,
+      "total": 50,
       "ongoing": true
     },
     {
@@ -246,19 +246,6 @@
       "peak": 10,
       "peak_date": "11/05",
       "total": 31,
-      "ongoing": false
-    },
-    {
-      "sector": "固态电池",
-      "start": "11/05",
-      "end": "11/10",
-      "start_idx": 22,
-      "end_idx": 25,
-      "days": 4,
-      "hot_days": 2,
-      "peak": 6,
-      "peak_date": "11/05",
-      "total": 12,
       "ongoing": false
     },
     {
