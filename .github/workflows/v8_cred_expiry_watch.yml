@@ -1,0 +1,144 @@
+# 九宝量化 v8.0 — 凭证到期巡检调度（cn runner 每日一档）
+#
+# 2026-11-17 主人令「还有失败的 → 一劳永逸修复」（all_CRED_LEDGER 假红根治）：
+#   scripts/cred_expiry_watch.py（2026-11-15 建）当时**漏挂调度** —— 全仓 43 个 workflow
+#   零引用 ⇒ data/CRED_LEDGER.js 停在 11-15 13:05 永不刷新 ⇒ 落入健康巡检 all_ 通用
+#   1620min 红线必然 fail 且永不自愈（11-17 看板唯一失败项，实测坐实）。
+#   本 workflow 把巡检挂上周期（与 v8_shareholder_change_fetch.yml 同架构）。
+#
+# 节拍：每日 09:10 CST（= UTC 1:10，**全周 7 天**）—— 凭证续期与交易日无关，
+#   周末超期同样要预警；每日一档足够（台账 cycle 为 30/90 天级）。
+#   错峰：避开门禁高峰（09:08 patrol / 09:30 lemoncat）。
+#
+# 安全铁律（与 cn 系链一致）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx（cn runner 系统级拦截）；
+#   2. 严禁 git clone/fetch（cn runner 到 github.com:443 被连接重置），源码同步走 Contents API；
+#   3. 单一职责：只产出并推送 data/CRED_LEDGER.js；内容变才推（防空提交触发全量重建）。
+#
+# 语义闭环：
+#   · 真源级联 = data/*_token.json（本机）> 上次台账 CRED_LEDGER.js 快照 > DEFAULTS；
+#   · 巡检退出码 10（临近 ≤7 天/超期）→ v8_send_alert.py 发邮件 2814546@qq.com（level=stale）；
+#   · 健康巡检侧（v8_health_check.py all_CRED_LEDGER）已同步改为按台账剩余天数判定，
+#     文件 update_time 新旧不再参与判定 ⇒ 本链漏跑一天不会亮红灯，超期/临近才是真信号。
+name: "🔑 v8 凭证到期巡检 (cn runner)"
+
+on:
+  schedule:
+    - cron: '10 1 * * *'   # 每日 09:10 CST（全周；凭证与交易日无关）
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-cred-watch
+  cancel-in-progress: false
+
+jobs:
+  cred-watch:
+    runs-on: [self-hosted, cn]
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    timeout-minutes: 10
+    steps:
+      - name: "📝 Sync source (Contents API)"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repo = 'ah-quant999/quant-scanner-v8'
+          $headers = @{
+            'User-Agent'    = 'v8-cred-watch'
+            'Accept'        = 'application/vnd.github+json'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          # [ascii] 不用 Accept: raw（302 → raw.githubusercontent 可能不可达，必失败）
+          $files = @('scripts/cred_expiry_watch.py', 'scripts/api_put_file.py', 'v8_send_alert.py')
+          foreach ($f in $files) {
+            $url = "https://api.github.com/repos/$repo/contents/$f`?ref=main"
+            try {
+              $r = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 60 -Method Get
+              $b64 = ($r.content -replace "\s", "")
+              $bytes = [Convert]::FromBase64String($b64)
+              $dir = Split-Path $f -Parent
+              if ($dir) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+              [System.IO.File]::WriteAllBytes($f, $bytes)
+              Write-Host "[ok] fetched $f ($($bytes.Length) bytes)"
+            } catch {
+              Write-Host "[warn] API fetch failed for $f : $_" -ForegroundColor Yellow
+            }
+          }
+          if (-not (Test-Path 'scripts/cred_expiry_watch.py')) {
+            Write-Host "[fatal] cred_expiry_watch.py not present; chain cannot continue" -ForegroundColor Red
+            exit 1
+          }
+
+      - name: "🔑 Run cred_expiry_watch.py（exit 10 = 有凭证临近/超期）"
+        id: gen
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          python scripts/cred_expiry_watch.py *>> cred_watch_output.txt
+          Get-Content cred_watch_output.txt
+          $rc = $LASTEXITCODE
+          "rc=$rc" | Out-File -FilePath "_cred_rc.txt" -Encoding ascii
+          if ($rc -eq 10) { Write-Host "[alert] 有凭证临近到期或已超期（详见上方 ALERT 行）" -ForegroundColor Yellow }
+          elseif ($rc -ne 0) { Write-Host "[fatal] cred_expiry_watch.py returned $rc" -ForegroundColor Red; exit 1 }
+          if (-not (Test-Path 'data/CRED_LEDGER.js')) {
+            Write-Host "[fatal] data/CRED_LEDGER.js not produced" -ForegroundColor Red
+            exit 1
+          }
+          Write-Host "[ok] data/CRED_LEDGER.js ready"
+
+      - name: "🚨 凭证预警 → 邮件 2814546@qq.com"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          $rc = (Get-Content '_cred_rc.txt' -ErrorAction SilentlyContinue) -join ''
+          if ($rc -notmatch 'rc=10') { Write-Host "[skip] 无凭证预警"; exit 0 }
+          $detail = (Get-Content cred_watch_output.txt) | Where-Object { $_ -match '^\[.*\]|^ALERT:' } | Out-String
+          python v8_send_alert.py "[v8·凭证巡检] 凭证临近到期/超期，请尽快换新" $detail stale
+          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] 邮件发送失败（非阻塞，下一轮再报）" -ForegroundColor Yellow }
+          Write-Host "::warning::凭证临近到期/超期 — 详见巡检输出"
+
+      - name: "📤 Push data/CRED_LEDGER.js（内容变才推）"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          # 内容比对：与线上 blob 相同即 SKIP（台账内容只在凭证换新时变），
+          # 防空提交触发 v8_build_deploy 全量重建。
+          $same = @'
+          import base64, json, urllib.request, os
+          repo = 'ah-quant999/quant-scanner-v8'
+          path = 'data/CRED_LEDGER.js'
+          tok = os.environ.get('GH_PAT') or os.environ.get('GITHUB_TOKEN')
+          req = urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/contents/{path}?ref=main',
+              headers={'User-Agent': 'v8-cred-watch', 'Authorization': f'Bearer {tok}'})
+          local = open(path, 'rb').read()
+          try:
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  remote = base64.b64decode(json.load(r)['content'])
+          except Exception as e:
+              print(f'REMOTE_FETCH_FAIL={e}')
+              print('NEED_PUSH=1')
+              raise SystemExit(0)
+          print('NEED_PUSH=1' if local != remote else 'NEED_PUSH=0')
+          '@ | python -
+          Write-Host $same
+          if ($same -notmatch 'NEED_PUSH=1') {
+            Write-Host "[skip] content identical to remote; no push (avoid empty commit triggering a full rebuild)"
+            exit 0
+          }
+          python scripts/api_put_file.py data/CRED_LEDGER.js "cred: CRED_LEDGER refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] push failed (non-blocking; retried next round)" -ForegroundColor Yellow }
