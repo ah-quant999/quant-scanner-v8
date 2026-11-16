@@ -769,6 +769,16 @@ def _load_intraday_snapshot(max_age_days=2):
                 return None
         except Exception:
             return None
+        # 🛡 2026-11-16 主人令「标注真实交易日」：intraday_snapshot.py 用运行日打 date，
+        #   周末/节假日误跑时把周五真实盘中数据打成周六戳（实证 11-14 周六 09:29）。
+        #   这里按 UTC+8 日历把周六/周日归属日回退到紧邻周五——只改展示用 date，
+        #   快照数值(sectors_in/out)、时刻(time) 一律不动，绝不伪造数据。
+        if dd.weekday() >= 5:  # 5=周六 6=周日
+            _fri = dd - timedelta(days=(dd.weekday() - 4))
+            _fair = _fri.strftime("%Y-%m-%d")
+            print(f"  🗓 [回落] 快照 date={idate}({['周一','周二','周三','周四','周五','周六','周日'][dd.weekday()]})"
+                  f" 系周末运行日戳 ⇒ 归属交易日规范为 {_fair}（数值不变）")
+            idate = _fair
         last = snaps[-1]
         return (idate, last.get("time") or "", last.get("sectors_in") or [], last.get("sectors_out") or [])
     except Exception:
