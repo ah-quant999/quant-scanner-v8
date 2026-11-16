@@ -126,6 +126,10 @@ jobs:
               f'https://api.github.com/repos/{repo}/contents/{path}?ref=main',
               headers={'User-Agent': 'v8-cred-watch', 'Authorization': f'Bearer {tok}'})
           local = open(path, 'rb').read()
+          # 🛡 行尾归一后再比：runner(Windows) 产出台账为 CRLF，api_put_file 推送前收口为 LF
+          #   （.gitattributes text eol=lf）。若按原字节比，每日必误判 NEED_PUSH=1 →
+          #   每天空转一笔 commit 触发全量重建。归一（2026-11-17 首跑实测踩坑后修复）。
+          norm = lambda b: b.replace(b'\r\n', b'\n')
           try:
               with urllib.request.urlopen(req, timeout=30) as r:
                   remote = base64.b64decode(json.load(r)['content'])
@@ -133,7 +137,7 @@ jobs:
               print(f'REMOTE_FETCH_FAIL={e}')
               print('NEED_PUSH=1')
               raise SystemExit(0)
-          print('NEED_PUSH=1' if local != remote else 'NEED_PUSH=0')
+          print('NEED_PUSH=1' if norm(local) != norm(remote) else 'NEED_PUSH=0')
           '@ | python -
           Write-Host $same
           if ($same -notmatch 'NEED_PUSH=1') {
