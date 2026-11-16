@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-16 14:13:02
+// 最后更新：2026-11-16 14:56:37
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-16 14:13:02",
+  "update_time": "2026-11-16 14:56:37",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,20 +52,20 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1711,
+      "total": 1713,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "09/29",
-      "end": "11/13",
+      "end": "11/16",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 26,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 27,
       "peak": 36,
       "peak_date": "10/08",
-      "total": 291,
+      "total": 294,
       "ongoing": true
     },
     {
@@ -219,9 +219,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 29,
       "days": 15,
       "hot_days": 14,
-      "peak": 10,
+      "peak": 13,
       "peak_date": "11/16",
-      "total": 65,
+      "total": 68,
       "ongoing": true
     },
     {

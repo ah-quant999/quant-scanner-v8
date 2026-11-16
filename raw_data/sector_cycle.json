@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-16 14:24:26",
+  "update_time": "2026-11-16 14:56:37",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,20 +37,20 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1711,
+      "total": 1713,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "09/29",
-      "end": "11/13",
+      "end": "11/16",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 26,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 27,
       "peak": 36,
       "peak_date": "10/08",
-      "total": 291,
+      "total": 294,
       "ongoing": true
     },
     {
@@ -204,9 +204,9 @@
       "end_idx": 29,
       "days": 15,
       "hot_days": 14,
-      "peak": 10,
+      "peak": 13,
       "peak_date": "11/16",
-      "total": 65,
+      "total": 68,
       "ongoing": true
     },
     {
