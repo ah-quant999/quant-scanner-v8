@@ -3929,3 +3929,30 @@ items:
       线上 FUTURES_REALTIME.js spot 四品种有值、basis_metrics/basis_history 出现；前端情绪罗盘卡
       显示基差行+年化/分位/日变量化行+第④判断；basis_regime_backtest.py 样本不足时输出 watch。
     updated: "2026-11-16 15:33"
+
+  - id: futures-basis-source-push-whitelist-1116
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P1
+    status: done
+    created: 2026-11-16
+    title: 贴水观测最后一公里(补推生成器源码+期指workflow白名单闭环)
+    note: >-
+      2026-11-16 主人「按你的步骤科学全面落地」后终验发现：commit 0c03de825e 只推了
+      index.html/回测脚本/HANDOFF，漏推 v8/gen_futures_realtime.py（blob 457e020e47bf 仍是
+      11-09 旧版，无 fetch_spot_sina/calc_basis_metrics）。故期指 workflow 每次 success 却一直
+      跑旧生成器，Pages 的 FUTURES_REALTIME.js 恒为 spot:{}、无 basis_metrics——前端代码上线
+      但数据永不到。另 build_deploy 的 workflow_run 白名单缺「📈 v8 期指实时 refresh (cn)」，
+      期指产物推送后不触发构建部署，构成第二道断链。
+      ① 基于 main 旧版重建生成器（新浪指数主源+东财备源、年化贴水/分位/日变/三共振、
+        basis_history 400 天自持），本地端到端实测 spot 四品种+ann 四品种有值，样本不足诚实
+        输出 pctile=None/ready=false；净室补推 main（sha 6a90ff64b6bc，逐字节自证 MATCH）。
+      ② 白名单补入期指 workflow 名（sha 1bba2432f934，防覆盖基线断言+MATCH）。
+      ③ 手动 dispatch 期指(skip gate)+build：Pages 真值 len 1755，含 basis_metrics/
+        basis_history/spot/ann/新浪指数现货；再 dispatch 一次实测闭环：期指 run 43839079738
+        success 后自动新建 workflow_run build 43839150489，证明白名单修复真实生效。
+      **全程不改任何个股信号/打分/排序**，贴水仅为观测信号，守「只要收益率最高股票」宗旨。
+    verify_how: >-
+      Pages 硬抓 FUTURES_REALTIME.js 含 basis_metrics/basis_history 且 spot 四品种有值；
+      仓库生成器 sha=6a90ff64b6bc；build_deploy 白名单含期指名；期指 completed 后自动出现
+      workflow_run 类型 build_deploy run（无人工 dispatch）。
+    updated: "2026-11-16 17:23"
