@@ -3864,3 +3864,24 @@ items:
       ② 下一轮哨兵日志派发文案带「自愈[workflow]」前缀且同轮同目标只派一次;
       ③ 下一个盘中批次 AI速览 金额全为加粗红涨绿跌。
     updated: "2026-11-16 11:47"
+
+  - id: ce-card-script-reload-gate-1116
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P1
+    status: done
+    created: 2026-11-16
+    title: 商品涨价弹性榜「数据不可用」卡死修复(第四道闸:数据脚本失败自动重载)
+    note: >-
+      2026-11-16 12:17 主人报卡死「COMMODITY_ELASTICITY 数据不可用」。排查:线上数据完全正常
+      (12:13:32 批,16 品种全 available,缓存戳 v=d5673462b7 与文件 sha1 一致),根因为用户浏览器端
+      data/COMMODITY_ELASTICITY.js 加载失败(404/网络抖动/CDN 旧缓存)⇒window.COMMODITY_ELASTICITY
+      永远 undefined,而既有三重兜底(首次调用+400/1200ms 延迟重试+每秒自愈轮询)只在数据已存在时
+      才重渲染,对脚本加载失败无任何恢复手段⇒卡片永久卡死。
+      修复(index.html selfHealCeBody 轮询内):新增第四道闸——持续缺数据≥4轮(约4秒)且距上次重载
+      ≥60s,动态 append <script src="data/COMMODITY_ELASTICITY.js?v=reload2026-11-16 12:21"> 强制重载
+      (时间戳绕 CDN 缓存,60s 节流防风暴),加载成功后上方既有分支自动重渲染恢复。
+      仅前端 index.html 一处改动,数据生产链/后端零改动。
+    verify_how: >-
+      线上 index.html 含「v=reload」标记;用户侧强刷后卡片恢复分组渲染;模拟脚本 404 时卡片
+      约 4 秒内自动重载恢复。
+    updated: "2026-11-16 12:21"
