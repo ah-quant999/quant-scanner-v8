@@ -82,9 +82,10 @@
   "fix-market-regime-brief-total-1115",
   "unified-selfheal-futures-brief-amt-1116",
   "ce-card-script-reload-gate-1116",
-  "build-deploy-emergency-name-fix-1116"
+  "build-deploy-emergency-name-fix-1116",
+  "futures-basis-observation-1116"
  ],
- "updated": "2026-11-16 14:42",
+ "updated": "2026-11-16 15:33",
  "generated_by": "阿狸咪的工程师",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -126,6 +127,7 @@
   "fix-market-regime-brief-total-1115": "972377f5142c0cee",
   "fourcard-fix-1020": "aee5e57737d68139",
   "future-todo-heatmap-dates-ar-1015": "46c29b15bebcfa11",
+  "futures-basis-observation-1116": "cb529ccba9f3c04a",
   "guanlan-token-hardfail-rootfix-1014": "69a617c3b05dd5bd",
   "handoff-concurrent-write": "39deedb094328747",
   "heartbeat-files-clobbered-by-cnfetch": "6066627acc3e9dfa",

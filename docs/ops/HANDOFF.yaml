@@ -3905,3 +3905,27 @@ items:
       下一次应急链 run completed 后自动出现 build_deploy run(无人工 dispatch),线上数据时间戳
       跟随最新数据班滚动。
     updated: "2026-11-16 14:42"
+
+  - id: futures-basis-observation-1116
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P1
+    status: done
+    created: 2026-11-16
+    title: 贴水加大观测科学落地(现货源修复+量化分位/日变+前瞻回测闭环)
+    note: >-
+      2026-11-16 主人问「贴水加大是否适合加仓因子，v8 可否加观测」并令「按步骤科学全面落地」。
+      ① 现货源修复：v8/gen_futures_realtime.py 的 fetch_spot 东财 push2 实测 RemoteDisconnected
+        （线上 spot 长期 {} ⇒ 前端基差行自动隐藏=贴水观测形同虚设）。改新浪指数为主源（与期指 vip
+        同源，cn runner 必可达）、东财降备源；实测四品种现货全部取到，前端基差行恢复显示。
+      ② 贴水量化：生成器新增 calc_basis_metrics + basis_history（内嵌 FUTURES_REALTIME.js 自持，
+        随 workflow 每30分推送累积，无需 raw_data 持久化）；四品种算年化贴水率/历史分位/日变化，
+        前端情绪罗盘卡新增量化行 + 第④条「三共振」判断（分位≤35 + 日变收敛 + 现货≥-0.5%）。
+        红涨绿跌：升水红/贴水绿，分位低绿/高红。样本<20 标注仅供参考，绝不编造历史分位。
+      ③ 科学回测：新建 algorithms/basis_regime_backtest.py（独立零侵入），复用 backtest_expectancy
+        口径按贴水 regime 分组比较 T+5 收益；当前 basis_history 样本不足(0<30) ⇒ 诚实输出 watch
+        （不编造历史、不下结论），累积达标后自动可跑。**不修改任何个股信号/打分/排序**，
+        守住「只要收益率最高股票」宗旨；贴水仅作观测与加仓许可，非自动交易扳机。
+    verify_how: >-
+      线上 FUTURES_REALTIME.js spot 四品种有值、basis_metrics/basis_history 出现；前端情绪罗盘卡
+      显示基差行+年化/分位/日变量化行+第④判断；basis_regime_backtest.py 样本不足时输出 watch。
+    updated: "2026-11-16 15:33"
