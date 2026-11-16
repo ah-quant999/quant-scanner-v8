@@ -1,6 +1,6 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-13",
-  "update_time": "2026-11-16 15:42:03",
+  "update_time": "2026-11-16 15:43:09",
   "source_time": "2026-11-16 15:34:17",
   "score": 42.3,
   "verdict": "中性",
