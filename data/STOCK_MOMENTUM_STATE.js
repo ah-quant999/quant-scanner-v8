@@ -1,295 +1,15 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-16 21:55",
- "generated": "2026-11-16 21:55",
+ "update_time": "2026-11-17 01:29",
+ "generated": "2026-11-17 01:29",
  "meta": {
-  "generated": "2026-11-16 21:55",
+  "generated": "2026-11-17 01:29",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 28,
+  "total_days": 27,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
  "days": [
-  {
-   "date": "2026-10-02",
-   "categories": {
-    "突破": [
-     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 10.0,
-      "price": 16.28,
-      "category": "突破"
-     },
-     {
-      "code": "301080",
-      "name": "百普赛斯",
-      "change_pct": 14.691,
-      "price": 141.07,
-      "category": "突破"
-     },
-     {
-      "code": "002811",
-      "name": "郑中设计",
-      "change_pct": 3.35,
-      "price": 16.97,
-      "category": "突破"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 4.975,
-      "price": 17.09,
-      "category": "突破"
-     },
-     {
-      "code": "003006",
-      "name": "百亚股份",
-      "change_pct": 6.495,
-      "price": 23.12,
-      "category": "突破"
-     },
-     {
-      "code": "000523",
-      "name": "红棉股份",
-      "change_pct": 4.101,
-      "price": 3.3,
-      "category": "突破"
-     },
-     {
-      "code": "600313",
-      "name": "农发种业",
-      "change_pct": 4.341,
-      "price": 6.73,
-      "category": "突破"
-     },
-     {
-      "code": "688696",
-      "name": "极米科技",
-      "change_pct": 4.679,
-      "price": 84.79,
-      "category": "突破"
-     },
-     {
-      "code": "300162",
-      "name": "雷曼光电",
-      "change_pct": 7.92,
-      "price": 9.13,
-      "category": "突破"
-     },
-     {
-      "code": "000498",
-      "name": "山东路桥",
-      "change_pct": 4.635,
-      "price": 5.87,
-      "category": "突破"
-     },
-     {
-      "code": "000061",
-      "name": "农 产 品",
-      "change_pct": 3.253,
-      "price": 6.03,
-      "category": "突破"
-     },
-     {
-      "code": "002962",
-      "name": "五方光电",
-      "change_pct": 10.0,
-      "price": 16.17,
-      "category": "突破"
-     },
-     {
-      "code": "603008",
-      "name": "ST喜临门",
-      "change_pct": 6.212,
-      "price": 10.6,
-      "category": "突破"
-     }
-    ],
-    "加速": [
-     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 10.0,
-      "price": 16.28,
-      "category": "加速"
-     },
-     {
-      "code": "301080",
-      "name": "百普赛斯",
-      "change_pct": 14.691,
-      "price": 141.07,
-      "category": "加速"
-     },
-     {
-      "code": "002811",
-      "name": "郑中设计",
-      "change_pct": 3.35,
-      "price": 16.97,
-      "category": "加速"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 4.975,
-      "price": 17.09,
-      "category": "加速"
-     },
-     {
-      "code": "003006",
-      "name": "百亚股份",
-      "change_pct": 6.495,
-      "price": 23.12,
-      "category": "加速"
-     },
-     {
-      "code": "000523",
-      "name": "红棉股份",
-      "change_pct": 4.101,
-      "price": 3.3,
-      "category": "加速"
-     },
-     {
-      "code": "600313",
-      "name": "农发种业",
-      "change_pct": 4.341,
-      "price": 6.73,
-      "category": "加速"
-     }
-    ],
-    "短线选股": [
-     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 10.0,
-      "price": 16.28,
-      "category": "短线选股"
-     },
-     {
-      "code": "301080",
-      "name": "百普赛斯",
-      "change_pct": 14.691,
-      "price": 141.07,
-      "category": "短线选股"
-     },
-     {
-      "code": "002811",
-      "name": "郑中设计",
-      "change_pct": 3.35,
-      "price": 16.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 4.975,
-      "price": 17.09,
-      "category": "短线选股"
-     },
-     {
-      "code": "003006",
-      "name": "百亚股份",
-      "change_pct": 6.495,
-      "price": 23.12,
-      "category": "短线选股"
-     },
-     {
-      "code": "000523",
-      "name": "红棉股份",
-      "change_pct": 4.101,
-      "price": 3.3,
-      "category": "短线选股"
-     },
-     {
-      "code": "600313",
-      "name": "农发种业",
-      "change_pct": 4.341,
-      "price": 6.73,
-      "category": "短线选股"
-     },
-     {
-      "code": "688696",
-      "name": "极米科技",
-      "change_pct": 4.679,
-      "price": 84.79,
-      "category": "短线选股"
-     },
-     {
-      "code": "300162",
-      "name": "雷曼光电",
-      "change_pct": 7.92,
-      "price": 9.13,
-      "category": "短线选股"
-     },
-     {
-      "code": "000498",
-      "name": "山东路桥",
-      "change_pct": 4.635,
-      "price": 5.87,
-      "category": "短线选股"
-     },
-     {
-      "code": "000061",
-      "name": "农 产 品",
-      "change_pct": 3.253,
-      "price": 6.03,
-      "category": "短线选股"
-     },
-     {
-      "code": "002962",
-      "name": "五方光电",
-      "change_pct": 10.0,
-      "price": 16.17,
-      "category": "短线选股"
-     },
-     {
-      "code": "603008",
-      "name": "ST喜临门",
-      "change_pct": 6.212,
-      "price": 10.6,
-      "category": "短线选股"
-     }
-    ],
-    "强势股": [
-     {
-      "code": "688696",
-      "name": "极米科技",
-      "change_pct": 4.679,
-      "price": 84.79,
-      "category": "强势股"
-     },
-     {
-      "code": "300162",
-      "name": "雷曼光电",
-      "change_pct": 7.92,
-      "price": 9.13,
-      "category": "强势股"
-     },
-     {
-      "code": "000498",
-      "name": "山东路桥",
-      "change_pct": 4.635,
-      "price": 5.87,
-      "category": "强势股"
-     },
-     {
-      "code": "000061",
-      "name": "农 产 品",
-      "change_pct": 3.253,
-      "price": 6.03,
-      "category": "强势股"
-     },
-     {
-      "code": "002962",
-      "name": "五方光电",
-      "change_pct": 10.0,
-      "price": 16.17,
-      "category": "强势股"
-     }
-    ]
-   },
-   "consensus": []
-  },
   {
    "date": "2026-10-08",
    "categories": {
@@ -11932,7 +11652,7 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "consensus": []
   },
   {
-   "date": "2026-11-16",
+   "date": "2026-11-17",
    "categories": {
     "突破": [
      {
@@ -11954,6 +11674,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "国统股份",
       "change_pct": 9.977,
       "price": 14.22,
+      "category": "突破"
+     },
+     {
+      "code": "000819",
+      "name": "岳阳兴长",
+      "change_pct": 9.984,
+      "price": 14.1,
       "category": "突破"
      },
      {
@@ -12004,13 +11731,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.067,
       "price": 11.77,
       "category": "突破"
-     },
-     {
-      "code": "002095",
-      "name": "生 意 宝",
-      "change_pct": 3.979,
-      "price": 16.2,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -12026,6 +11746,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "郑中设计",
       "change_pct": 4.099,
       "price": 19.3,
+      "category": "加速"
+     },
+     {
+      "code": "002205",
+      "name": "国统股份",
+      "change_pct": 9.977,
+      "price": 14.22,
       "category": "加速"
      }
     ],
@@ -12052,6 +11779,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "000819",
+      "name": "岳阳兴长",
+      "change_pct": 9.984,
+      "price": 14.1,
+      "category": "短线选股"
+     },
+     {
       "code": "605008",
       "name": "长鸿高科",
       "change_pct": 3.081,
@@ -12098,22 +11832,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大丰实业",
       "change_pct": 4.067,
       "price": 11.77,
-      "category": "短线选股"
-     },
-     {
-      "code": "002095",
-      "name": "生 意 宝",
-      "change_pct": 3.979,
-      "price": 16.2,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "002205",
-      "name": "国统股份",
-      "change_pct": 9.977,
-      "price": 14.22,
+      "code": "000819",
+      "name": "岳阳兴长",
+      "change_pct": 9.984,
+      "price": 14.1,
       "category": "强势股"
      },
      {
@@ -12163,13 +11890,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大丰实业",
       "change_pct": 4.067,
       "price": 11.77,
-      "category": "强势股"
-     },
-     {
-      "code": "002095",
-      "name": "生 意 宝",
-      "change_pct": 3.979,
-      "price": 16.2,
       "category": "强势股"
      }
     ]
