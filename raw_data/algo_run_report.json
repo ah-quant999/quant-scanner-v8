@@ -1,34 +1,17 @@
 {
-  "update_time": "2026-11-15 09:06:34",
-  "run_start": "2026-11-15 07:24:38",
-  "ok": 31,
-  "fail": 3,
+  "update_time": "2026-11-17 01:16:55",
+  "run_start": "2026-11-16 22:25:29",
+  "ok": 44,
+  "fail": 2,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
     },
     {
-      "script": "market_regime.py",
-      "reason": "退出码 1 |   [market_regime] 缺 /home/runner/work/quant-scanner-v8/quant-scanner-v8/out/macro.json，自举 fetch_macro.py 后仍不存在，放弃"
-    },
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "scripts/fetch_multiyear_kline.py",
+      "reason": "超时 >40min"
     }
   ],
-  "skipped_by_time_gate": [
-    "fetch_fundamental_quality.py",
-    "fetch_stock_names.py",
-    "fetch_stock_quote_v8.py",
-    "fetch_sh_index_fib.py",
-    "fetch_inst_trade.py",
-    "fetch_sector_rs.py",
-    "fetch_lhb.py",
-    "fetch_orphan_suspension.py",
-    "fetch_orphan_market_alerts.py",
-    "fetch_orphan_nt_data.py",
-    "fetch_orphan_sector_fund_flow.py",
-    "fetch_weekend_run.py"
-  ]
+  "skipped_by_time_gate": []
 }
