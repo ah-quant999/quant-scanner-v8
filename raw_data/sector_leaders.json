@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-16 21:48",
-  "republish_time": "2026-11-17 01:32:48",
+  "update_time": "2026-11-17 01:32",
+  "republish_time": "2026-11-17 05:24:01",
   "data_date": "2026-11-16",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "金逸影视",
           "price": 10.89,
           "chg": 10.0,
-          "main_net": null
+          "main_net": 16161849.0
         },
         {
           "code": "603103",
           "name": "横店影视",
           "price": 21.0,
           "chg": 8.75,
-          "main_net": null
+          "main_net": 66474392.0
         },
         {
           "code": "002343",
           "name": "慈文传媒",
           "price": 10.12,
           "chg": 5.42,
-          "main_net": null
+          "main_net": 118053648.0
         },
         {
           "code": "002739",
           "name": "儒意电影",
           "price": 10.2,
           "chg": 1.49,
-          "main_net": null
+          "main_net": 225566736.0
         },
         {
           "code": "600088",
           "name": "中视传媒",
           "price": 13.71,
           "chg": -0.65,
-          "main_net": null
+          "main_net": 14906191.0
         }
       ],
       "match": "exact"
@@ -60,45 +60,45 @@
       "phase": "启动",
       "pct_5d": 2.92,
       "pct_20d": 4.83,
-      "cons_count": 20,
+      "cons_count": 42,
       "leaders": [
         {
           "code": "002966",
           "name": "苏州银行",
           "price": 10.02,
           "chg": 4.05,
-          "main_net": null
+          "main_net": -20901455.0
         },
         {
           "code": "600000",
           "name": "浦发银行",
           "price": 10.78,
           "chg": 3.65,
-          "main_net": null
+          "main_net": 45431566.0
         },
         {
           "code": "002142",
           "name": "宁波银行",
           "price": 35.23,
           "chg": 3.16,
-          "main_net": null
+          "main_net": -72717648.0
         },
         {
           "code": "601288",
           "name": "农业银行",
           "price": 7.59,
           "chg": 2.99,
-          "main_net": null
+          "main_net": 136627952.0
         },
         {
           "code": "601187",
           "name": "厦门银行",
           "price": 6.85,
           "chg": 2.85,
-          "main_net": null
+          "main_net": 12235058.0
         }
       ],
-      "match": "ths"
+      "match": "exact"
     },
     {
       "name": "黑色家电",
@@ -582,7 +582,7 @@
     {
       "name": "银行",
       "bk": "BK1283",
-      "cons_count": 20,
+      "cons_count": 42,
       "leaders": [
         {
           "code": "002966",
@@ -620,7 +620,7 @@
           "main_net": null
         }
       ],
-      "match": "ths"
+      "match": "exact"
     },
     {
       "name": "黑色家电",
@@ -671,5 +671,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-17 01:15:03 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-17 01:32:48 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-17 05:24:01 跟随 FINAL 重算(一劳永逸)"
 }

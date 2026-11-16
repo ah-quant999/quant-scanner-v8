@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-17 01:12:25",
+  "update_time": "2026-11-17 05:21:26",
   "crisis_score": 33.9,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,13 +7,13 @@
   "top_n": 3,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-16 23:40:51",
+    "source": "backtest_expectancy@2026-11-17 03:54:30",
     "degraded": false,
     "effective": {
-      "jinzuan": -0.732,
-      "chan": 0.021,
-      "trend": 0.078,
-      "jigou": 0.319
+      "jinzuan": -0.708,
+      "chan": 0.007,
+      "trend": 0.082,
+      "jigou": 0.323
     },
     "hardcoded_default": {
       "jinzuan": -0.522,
@@ -22,24 +22,24 @@
       "jigou": 0.449
     },
     "n_on10": {
-      "jinzuan": 559,
-      "chan": 779,
+      "jinzuan": 571,
+      "chan": 783,
       "trend": 276,
       "jigou": 510
     },
     "consistent": {
-      "jinzuan": false,
+      "jinzuan": true,
       "chan": true,
       "trend": false,
       "jigou": true
     },
     "loaded": {
-      "generated": "2026-11-16 23:40:51",
+      "generated": "2026-11-17 03:54:30",
       "hit": 4,
-      "n_snapshots": 109,
+      "n_snapshots": 110,
       "date_range": [
         "2026-06-06",
-        "2026-11-13"
+        "2026-11-16"
       ]
     },
     "alpha_select": {
@@ -64,8 +64,8 @@
     "note": "09-18 walk-forward 曾测「高手跟踪」作四量加分项边际 −1.76pp（n=13、回放口径、四量池上下文）——与本处「IMA 自身信号真实流」非同口径同场景，如实并列不隐瞒；回退开关 V8_IMA_INTAKE=0"
   },
   "price_source": {
-    "date": "2026-11-16",
-    "source": "STOCK_QUOTE",
+    "date": "2026-11-17",
+    "source": "CANDIDATE_QUOTES",
     "covered": 0,
     "total": 0,
     "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"
@@ -88,7 +88,7 @@
   "consensus_stocks": [],
   "all_candidates": [],
   "factor_chain": {
-    "update_time": "2026-11-17 01:12:24",
+    "update_time": "2026-11-17 05:21:26",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
@@ -140,6 +140,6 @@
     "reason": "观澜台/IMA 候选池为空（zsxq token 可能过期，强势跟踪源不可用）",
     "ima_data_date": "2026-11-13",
     "ima_pool_total": 0,
-    "assessed_at": "2026-11-17 01:12:25"
+    "assessed_at": "2026-11-17 05:21:26"
   }
 }
