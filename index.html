@@ -1326,7 +1326,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_DAILY_MONITOR.js?v=f322ccdfbd" defer></script>
 <script src="data/TOP10_DAILY.js?v=53be56a3c1" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
-<script src="data/DO_T_SPACE.js?v=b8d3d693a8" defer></script>
+<script src="data/DO_T_SPACE.js?v=e8af62263e" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=ce57cd746a" defer></script>
 <script src="data/WEEKEND_RUN.js?v=972e5a18e4" defer></script>
@@ -1341,9 +1341,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=c4c1e6c45c" defer></script>
 <script src="data/HB_XIAOJIU.js?v=fbb35471ff" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=5ad0bb0aa4" defer></script>
-<script src="data/HEALTH_CHECK.js?v=8d0ea26e04" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=28e19bee33" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=39274fac31" defer></script>
+<script src="data/HEALTH_CHECK.js?v=2a9db9aefc" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=bad2fb0b46" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=12e4baa113" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=c7d337f075" defer></script>
@@ -2044,7 +2044,7 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=e1a37f9c62" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=384c9b95b4" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=7bfc298134" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=e91695946f" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=e00ed6d605" defer></script>
@@ -18782,7 +18782,7 @@ window.__renderV8CalToday();
             __ceLastReload = _now;
             try{
               var _s = document.createElement('script');
-              _s.src = 'data/COMMODITY_ELASTICITY.js?v=28e19bee33' + _now;
+              _s.src = 'data/COMMODITY_ELASTICITY.js?v=bad2fb0b46' + _now;
               document.body.appendChild(_s);
             }catch(e){}
           }
@@ -19488,7 +19488,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=5158466280', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=d0081c312f', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=e1eb2fcb8a', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=dab12045ca', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
