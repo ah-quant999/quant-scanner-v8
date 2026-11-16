@@ -382,7 +382,14 @@ CARD_DEFS = [
     {"id": "MARKET_THERMO", "name": "未来预测·牛转熊观测台", "page": "观测平台", "freq": "每日盘后(日更)", "max_age": 1440, "key_fields": ["D", "update_time"], "heal_cat": "algo_run", "raw_file": "market_thermo.json", "producer": "v8/gen_market_thermo.py"},
     {"id": "VALUATION_PERCENTILE", "name": "A股估值分位", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices", "update_time"], "heal_cat": "experiments", "producer": "fetch_valuation_percentile.py（v8_cn_fetch_experiments.yml）"},
     {"id": "PORTFOLIO_DATA", "name": "实时持仓(westock)", "page": "运维", "freq": "盘中每30分", "max_age": 1440, "_source_file": "PORTFOLIO", "key_fields": ["positions", "account", "update_time"], "heal_cat": "westock", "producer": "fetch_portfolio_westock.py", "note": "用户真实持仓·westock MCP 刷新；前端标 sourceMissing 表示 feed 不稳，需监控而非自愈"},
-    {"id": "DO_T_SPACE", "name": "做T空间", "page": "个股查询", "freq": "盘中每30分", "max_age": 60, "key_fields": ["count", "stocks"], "heal_cat": "intraday", "producer": "v8/gen_do_t_space.py（派生 STOCK_QUOTE+STOCK_STOP_DATA）"},
+    # 🛡 2026-11-16 主人令「运维失败的一劳永逸修复」：DO_T_SPACE 实为**部署派生卡**——
+    #   v8/gen_do_t_space.py 挂在 update_v8.py::_post_build_extras()（每次 build 尾部派生，
+    #   纯本地、不联网、update_time=运行时刻），并非「盘中每30分」独立高频链。原登记
+    #   heal_cat=intraday + freq=盘中每30分 ⇒ 落入 14:55 收盘定稿窗判定：今日 11:36 派生
+    #   （数据其实新鲜，随部署刷新）却被误报「盘中档缺失·疑似跳班」（当日实测 fail）。
+    #   修正登记为部署派生口径（heal_cat=post_close、freq 如实、max_age 放宽到日频），
+    #   走正常 max_age 判定（当日更新即 ok）；真·多日不刷新仍由\max_age_fail 捕获，不丢真故障。
+    {"id": "DO_T_SPACE", "name": "做T空间", "page": "个股查询", "freq": "随部署链刷新（build 尾部派生）", "max_age": 1440, "key_fields": ["count", "stocks"], "heal_cat": "post_close", "producer": "v8/gen_do_t_space.py（派生 STOCK_QUOTE+STOCK_STOP_DATA）"},
   ]
 
 
@@ -2192,7 +2199,18 @@ def check_data_cards():
                 "message": f"找不到数据文件 {path.name} 或解析失败"
             })
             continue
-        ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
+        # 🛡 2026-11-16 主人令「运维失败的一劳永逸修复」：收盘定稿版优先按 republish_time 判新鲜度。
+        #   根因实证（当日 19:xx 线上 HEALTH_CHECK）：SECTOR_FUND_FLOW_INTRADAY 顶层
+        #   update_time=14:52 但 republish_time=15:05:40；CFFEX_HOLDINGS update_time=14:24 但
+        #   republish_time=15:01:24 —— 二者均为**收盘后重新发布的定稿版**，数据已终稿，
+        #   而 intraday 判定只读 update_time(<14:55) ⇒ 误报「盘中档缺失·疑似跳班」。
+        #   修法：凡带 republish_time 且晚于 update_time 的卡，一律取 republish_time 判龄
+        #   （通用语义，非给某两张卡打补丁；LIMIT_UP_HEATMAP 等同类定稿卡一并受益）。
+        #   真跳班（既无 republish_time、update_time 又早于定稿窗）仍照原逻辑判 fail，不丢真故障可见性。
+        _ut = data.get("update_time")
+        _rt = data.get("republish_time")
+        ts = (_rt if (_rt and (not _ut or str(_rt) > str(_ut))) else _ut) \
+            or data.get("date") or data.get("lastUpdated") or "--"
         dt = parse_time(ts)
         # 🛡 2026-09-04 主人令：周更卡（V8_CAL 每周日+月末）直接用自身 max_age（10080=7天），
         #   不走 adjust/cap 的 24h 收紧——否则周中必被「今日事件 24h cap」误判 stale。
@@ -2424,6 +2442,11 @@ _WINDOW_VAR_ALIASES = {
     #   data/maharo_insights.js -> window.MAHORO_INSIGHTS（已实证 6864B 有效）。
     #   拆分时漏登记别名 -> 全量审计解析失败 -> 长期误报「缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
     "maharo_insights": ["MAHORO_INSIGHTS", "MAHARO_INSIGHTS"],
+    # 🛡 2026-11-16 主人令「运维失败的一劳永逸修复」：文件名 maharo_wm.js 但 window 变量是
+    #   MAHORO_WM（机构研究·周/月解析判断种子库，本机 cookie 拉取、低频更新）。此前缺本别名
+    #   ⇒ check_all_data_files 先用小写变量名 maharo_wm 解析失败、别名表又无此项
+    #   ⇒ 长期误报「maharo_wm.js 缺失或解析失败（未被 CARD_DEFS 登记）」红（当日实测 fail）。
+    "maharo_wm": ["MAHORO_WM", "MAHARO_WM"],
     "PORTFOLIO": ["PORTFOLIO_DATA"],
 }
 # 低频/非每日更新数据（24h 红线不适用，但超过 7 天仍报 warn）：
@@ -2452,6 +2475,12 @@ _LOW_FREQ_FILES = {
     #   + RESONANCE_TRACK（龙虎榜共振回测研究集，track_resonance.py 手动/周期重算，index.html 有真实卡片渲染）
     #   二者均为**低频/研究型产物**，被 all_ 通用 24h 红线误杀。进白名单跳过 24h，并由 _LOW_FREQ_MAX_AGE 按节拍给红线。
     "HUIJIN_HOLDINGS", "RESONANCE_TRACK", "HUIJIN_ETF_DRILL",
+    # 🛡 2026-11-16 主人令「运维失败的一劳永逸修复」：SHAREHOLDER_CHANGE（股东增减持监控）
+    #   由 v8_shareholder_change_fetch.yml 工作日 20:30 CST 产出，周末不跑、当日 20:30 前未产出
+    #   属设计预期。此前无 CARD_DEFS 登记 ⇒ 落入 all_ 通用 24h/T+1 红线（当日 cap=4500min）
+    #   把「周五产出→周一 20:30 前」的空窗误判 fail（当日实测 all_SHAREHOLDER_CHANGE = fail）。
+    #   进白名单 + 专属 4 天红线（容忍周末+当日批次未到），超 4 天仍未更报真故障。
+    "SHAREHOLDER_CHANGE",
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
@@ -2468,6 +2497,7 @@ _LOW_FREQ_FILES = {
     "WEEKEND_RUN",
     "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警
     "MAHORO_INSIGHTS", "maharo_insights",  # 2026-11-13 一劳永逸：补小写键（all_ 扫描用文件名小写 vid）；与 CARD_DEFS id 对齐（本机 cookie 拉取，云端无权限）-> 7天容忍仅告警
+    "maharo_wm", "MAHORO_WM",  # 2026-11-16 一劳永逸：机构研究·周/月解析种子库（本机 cookie 低频拉取）-> 7天容忍，超7天仍 fail 保留真故障可见性
     "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
     # 🛡 2026-09-16 主人令一劳永逸：候选池 / 金股池是算法**上游水源**不是策略 ⇒ 不需要回测
     #   （09-14 已摘 CARD_DEFS 登记 + 删 algorithms/backtest_pools.py），但两份产物当时漏删，
@@ -2594,6 +2624,8 @@ _LOW_FREQ_MAX_AGE = {
     "RESONANCE_TRACK": 30 * 24 * 60,   # 龙虎榜共振回测研究集（手动/周期重算，无自动调度；30天红线，超月未重算即告警）
     "MAHORO_INSIGHTS": 7 * 24 * 60,    # 机构研究·AI解析（本机 cookie 拉取，云端无权限；小九离线即无法刷新）→ 7天容忍仅告警，超 7 天仍 fail 保留真故障可见性（2026-11-13 一劳永逸：原仅入白名单未给红线，致 CARD_DEFS 按 24h 误判 fail）
     "maharo_insights": 7 * 24 * 60,    # 同上；all_ 通用扫描以文件名小写 vid 命中，补小写键使白名单+红线对 all_maharo_insights 生效（原大小写不匹配→白名单失效→落通用 24h 红线 fail）
+    "maharo_wm": 7 * 24 * 60,          # 机构研究·周/月解析种子库（本机 cookie 低频拉取，与 maharo_insights 同族）→ 7天容忍，超7天仍 fail（2026-11-16 一劳永逸）
+    "SHAREHOLDER_CHANGE": 4 * 24 * 60, # 股东增减持监控（v8_shareholder_change_fetch.yml 工作日20:30批，周末不跑）→ 4天红线容忍周末+当日批次未到，超4天报真故障（2026-11-16 一劳永逸）
 }
 
 
