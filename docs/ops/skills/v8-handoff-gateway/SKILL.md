@@ -83,7 +83,7 @@ description: |
    - **云端**：GitHub Pages 主站 `index.html` / `data/*.js`（线上真身）；
    - **双机**：小九机 / 阿狸咪机工作树，均 `git show origin/main:<路径>` **现取**真身（禁写死 sha/tip，main 分钟级 churn）；
    - **运维面板**：主站「运维」相关卡 / 子页（含轻量化重构后的子页）；
-   - **逻辑详解页**：`https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/logic.full.html`（含同源 `logic.html`）。
+   - **逻辑详解页**：`https://yield-methodology.app.workbuddy.host/logic.full.html?sharecode=JD7BUVP5WM`（含同源 `logic.html`；⚠️ 2026-11-16 起 workbuddy.host 全域强制 `?sharecode=`，裸链接一律 403，访问任何页都须带 sharecode）。
    对齐维度：卡名 / 任务 / producer / 标签 / 口径 / 是否下线，四处一致、可反查。
    🔴 **该删的坚决删**：死代码、冗余卡、陈旧管线，按主人「轻量化收尾」令退役（如已删的 AI 洞察卡）。
    🔴 **核心资产绝不允许误删**：受 `DO_NOT_DELETE.md` / `PROTECTED_FILES.json` 守护的东西
@@ -105,14 +105,18 @@ description: |
 代码标识符（变量名、函数名、分支名等）可保留英文，**但禁止在中文叙述里夹带英文混答**、
 禁止用英文写交付结论或状态汇报。本守则与用户级长期记忆「🔴🔴 全程简体中文」同源，此处并入协议，双机一律执行。
 
-**5. 进入地址铁律（唯一入口 · 2026-10-30 主人令）**
+**5. 进入地址铁律（唯一入口 · 2026-10-30 主人令 · 2026-11-16 主人令更新 canonical）**
 
 > 主人 2026-10-30 原话 ——「**主站和逻辑详解页从 `https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/` 这里进入**。」
+>
+> 主人 2026-11-16 拍板 ——「**那把铁律里的换成这个（`https://yield-methodology.app.workbuddy.host/?sharecode=JD7BUVP5WM`），要不逻辑详解页找不到对齐的了。**」
 
-- 主站前端与逻辑详解页（含 `logic.full.html` 等同源页）的**统一访问入口**即上方 `dd689…app.workbuddy.host/`；所有"给人看"的入口收口到这一处。
-- 🔴 **不得新建任何其他 workbuddy.host 地址**（jiubao-nav-hub / yield-methodology 之类一律视为遗留、由小九下线）；即便 dd689 暂时返回 stub，也只是"需小九恢复原发布机"，**不是换地址的理由**。
+- **统一访问入口（canonical）**：`https://yield-methodology.app.workbuddy.host/?sharecode=JD7BUVP5WM`（九宝一站式导航门户）；**逻辑详解完整真身**：`https://yield-methodology.app.workbuddy.host/logic.full.html?sharecode=JD7BUVP5WM`（含同源 `logic.html`）。所有"给人看"的入口收口到这一处。
+- 🔴 **切换原因（2026-11-16 实测，非随意换址）**：workbuddy.host 平台已全域强制 `?sharecode=` 访问——**任何裸链接一律 403「链接不完整」**（含刚发布的链接不带码实测 403）；旧 dd689 裸域名的应用记录同时失效（借他人 sharecode 访问仍 403），域名层经多路径实测不可恢复，故经主人确认切换 canonical。
+- 🔴 **不得新建任何其他 workbuddy.host 地址**；jiubao-nav-hub 等旧遗留裸地址维持废弃口径。canonical 域名下**不得再拆分新地址**，逻辑详解始终走同一域名+sharecode。
 - 🔴 **不得让主人去 `github.io` 或其他地方找**——团队/专家内部用 GitHub Pages 部署，但给主人的入口只有上述地址。
-- 变更口径（换发布机 / 域名 / canonical）前**必须先与主人确认**，不得自行切换。
+- 变更口径（换发布机 / 域名 / canonical / sharecode）前**必须先与主人确认**，不得自行切换。
+- 真源链不变：逻辑详解内容真源仍为坚果云私享 `v8_logic_private/`（sections/ 分段 + `build` 重建），发布目录 `E:\WorkBuddy交付\导航合集`（重发布时先同步最新 `logic.full.html` 再 deploy 该目录）。
 
 **6. 交付方式铁律（只在对话框，不落一堆文件 · 2026-10-30 主人令）**
 
