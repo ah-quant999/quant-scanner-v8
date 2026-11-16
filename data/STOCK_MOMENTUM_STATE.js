@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-17 04:40",
- "generated": "2026-11-17 04:40",
+ "update_time": "2026-11-17 04:49",
+ "generated": "2026-11-17 04:49",
  "meta": {
-  "generated": "2026-11-17 04:40",
+  "generated": "2026-11-17 04:49",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 27,
+  "total_days": 28,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -11652,6 +11652,230 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "consensus": []
   },
   {
+   "date": "2026-11-16",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 5.028,
+      "price": 16.92,
+      "category": "突破"
+     },
+     {
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.0,
+      "price": 3.74,
+      "category": "突破"
+     },
+     {
+      "code": "002811",
+      "name": "郑中设计",
+      "change_pct": 4.261,
+      "price": 19.33,
+      "category": "突破"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 4.144,
+      "price": 48.0,
+      "category": "突破"
+     },
+     {
+      "code": "301636",
+      "name": "泽润新能",
+      "change_pct": 3.068,
+      "price": 42.66,
+      "category": "突破"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.922,
+      "price": 4.21,
+      "category": "突破"
+     },
+     {
+      "code": "603098",
+      "name": "森特股份",
+      "change_pct": 4.352,
+      "price": 11.03,
+      "category": "突破"
+     },
+     {
+      "code": "002286",
+      "name": "保龄宝",
+      "change_pct": 4.022,
+      "price": 9.31,
+      "category": "突破"
+     },
+     {
+      "code": "600630",
+      "name": "龙头股份",
+      "change_pct": 3.272,
+      "price": 7.26,
+      "category": "突破"
+     },
+     {
+      "code": "000921",
+      "name": "海信家电",
+      "change_pct": 7.608,
+      "price": 23.62,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 5.028,
+      "price": 16.92,
+      "category": "加速"
+     },
+     {
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.0,
+      "price": 3.74,
+      "category": "加速"
+     },
+     {
+      "code": "002811",
+      "name": "郑中设计",
+      "change_pct": 4.261,
+      "price": 19.33,
+      "category": "加速"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 4.144,
+      "price": 48.0,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 5.028,
+      "price": 16.92,
+      "category": "短线选股"
+     },
+     {
+      "code": "600715",
+      "name": "文投控股",
+      "change_pct": 10.0,
+      "price": 3.74,
+      "category": "短线选股"
+     },
+     {
+      "code": "002811",
+      "name": "郑中设计",
+      "change_pct": 4.261,
+      "price": 19.33,
+      "category": "短线选股"
+     },
+     {
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 4.144,
+      "price": 48.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "301636",
+      "name": "泽润新能",
+      "change_pct": 3.068,
+      "price": 42.66,
+      "category": "短线选股"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.922,
+      "price": 4.21,
+      "category": "短线选股"
+     },
+     {
+      "code": "603098",
+      "name": "森特股份",
+      "change_pct": 4.352,
+      "price": 11.03,
+      "category": "短线选股"
+     },
+     {
+      "code": "002286",
+      "name": "保龄宝",
+      "change_pct": 4.022,
+      "price": 9.31,
+      "category": "短线选股"
+     },
+     {
+      "code": "600630",
+      "name": "龙头股份",
+      "change_pct": 3.272,
+      "price": 7.26,
+      "category": "短线选股"
+     },
+     {
+      "code": "000921",
+      "name": "海信家电",
+      "change_pct": 7.608,
+      "price": 23.62,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "301636",
+      "name": "泽润新能",
+      "change_pct": 3.068,
+      "price": 42.66,
+      "category": "强势股"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.922,
+      "price": 4.21,
+      "category": "强势股"
+     },
+     {
+      "code": "603098",
+      "name": "森特股份",
+      "change_pct": 4.352,
+      "price": 11.03,
+      "category": "强势股"
+     },
+     {
+      "code": "002286",
+      "name": "保龄宝",
+      "change_pct": 4.022,
+      "price": 9.31,
+      "category": "强势股"
+     },
+     {
+      "code": "600630",
+      "name": "龙头股份",
+      "change_pct": 3.272,
+      "price": 7.26,
+      "category": "强势股"
+     },
+     {
+      "code": "000921",
+      "name": "海信家电",
+      "change_pct": 7.608,
+      "price": 23.62,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
    "date": "2026-11-17",
    "categories": {
     "突破": [
@@ -11670,17 +11894,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "002205",
-      "name": "国统股份",
-      "change_pct": 9.977,
-      "price": 14.22,
-      "category": "突破"
-     },
-     {
-      "code": "000819",
-      "name": "岳阳兴长",
-      "change_pct": 9.984,
-      "price": 14.1,
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 4.166,
+      "price": 48.01,
       "category": "突破"
      },
      {
@@ -11688,6 +11905,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "长鸿高科",
       "change_pct": 3.081,
       "price": 11.04,
+      "category": "突破"
+     },
+     {
+      "code": "301636",
+      "name": "泽润新能",
+      "change_pct": 3.189,
+      "price": 42.71,
       "category": "突破"
      },
      {
@@ -11749,10 +11973,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "002205",
-      "name": "国统股份",
-      "change_pct": 9.977,
-      "price": 14.22,
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 4.166,
+      "price": 48.01,
       "category": "加速"
      }
     ],
@@ -11772,17 +11996,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "002205",
-      "name": "国统股份",
-      "change_pct": 9.977,
-      "price": 14.22,
-      "category": "短线选股"
-     },
-     {
-      "code": "000819",
-      "name": "岳阳兴长",
-      "change_pct": 9.984,
-      "price": 14.1,
+      "code": "301052",
+      "name": "果麦文化",
+      "change_pct": 4.166,
+      "price": 48.01,
       "category": "短线选股"
      },
      {
@@ -11790,6 +12007,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "长鸿高科",
       "change_pct": 3.081,
       "price": 11.04,
+      "category": "短线选股"
+     },
+     {
+      "code": "301636",
+      "name": "泽润新能",
+      "change_pct": 3.189,
+      "price": 42.71,
       "category": "短线选股"
      },
      {
@@ -11837,17 +12061,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "强势股": [
      {
-      "code": "000819",
-      "name": "岳阳兴长",
-      "change_pct": 9.984,
-      "price": 14.1,
-      "category": "强势股"
-     },
-     {
       "code": "605008",
       "name": "长鸿高科",
       "change_pct": 3.081,
       "price": 11.04,
+      "category": "强势股"
+     },
+     {
+      "code": "301636",
+      "name": "泽润新能",
+      "change_pct": 3.189,
+      "price": 42.71,
       "category": "强势股"
      },
      {
