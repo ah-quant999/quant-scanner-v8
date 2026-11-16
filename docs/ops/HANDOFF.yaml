@@ -3885,3 +3885,23 @@ items:
       线上 index.html 含「v=reload」标记;用户侧强刷后卡片恢复分组渲染;模拟脚本 404 时卡片
       约 4 秒内自动重载恢复。
     updated: "2026-11-16 12:21"
+
+  - id: build-deploy-emergency-name-fix-1116
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P0
+    status: done
+    created: 2026-11-16
+    title: 主站卡13点根因修复:build_deploy workflow_run白名单补应急链真名
+    note: >-
+      2026-11-16 14:31 主人报「主站还是13点多的数据」。排查:仓内数据已到 14:12-14:18
+      (origin/main tip 14:20),但线上 Pages 停在 13:32-13:42;build_deploy 最后成功 13:49。
+      根因:14:07 数据班实际由应急链「🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)」产出,
+      而 build_deploy 的 workflow_run 白名单只有旧名「cn·应急」⇒ 名字不匹配 ⇒ 该 run
+      结束后 workflow_run 永不触发 ⇒ 数据产出无人部署(GITHUB_TOKEN push 不触发 push 类 workflow)。
+      应急:手动 dispatch build_deploy(run 43818146829 success),线上数据已恢复到 14:10-14:18。
+      根治:.github/workflows/v8_build_deploy.yml workflow_run.workflows 补应急链准确名称
+      (旧名保留兼容),今后云端/应急两条链结束后都自动构建部署。
+    verify_how: >-
+      下一次应急链 run completed 后自动出现 build_deploy run(无人工 dispatch),线上数据时间戳
+      跟随最新数据班滚动。
+    updated: "2026-11-16 14:42"
