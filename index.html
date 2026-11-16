@@ -1296,7 +1296,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=d1b55fda47" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=9acdcc636e" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=aac4c27766" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=dc75c2c30d" defer></script>
 <script src="data/VOLATILITY.js?v=6fd158036c" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=74a5ff89a3" defer></script>
@@ -1326,7 +1326,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_DAILY_MONITOR.js?v=cd625b1a72" defer></script>
 <script src="data/TOP10_DAILY.js?v=53be56a3c1" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
-<script src="data/DO_T_SPACE.js?v=04f74cc183" defer></script>
+<script src="data/DO_T_SPACE.js?v=8e126243b0" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=ce57cd746a" defer></script>
 <script src="data/WEEKEND_RUN.js?v=972e5a18e4" defer></script>
@@ -1341,9 +1341,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=5c5b6c767d" defer></script>
 <script src="data/HB_XIAOJIU.js?v=681727224b" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=6f14779772" defer></script>
-<script src="data/HEALTH_CHECK.js?v=cf3ede8c23" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=1021b33b87" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=2dfcf1166c" defer></script>
+<script src="data/HEALTH_CHECK.js?v=6a0a8cce07" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=c9156fc21f" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=12e4baa113" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=c7d337f075" defer></script>
@@ -2044,10 +2044,10 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=e1a37f9c62" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=7571c53ee9" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=c93ccb45d5" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=6e28a300db" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=10c29823f0" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=9d8422f0b7" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=0d270ee46e" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=7be8256c8e" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
@@ -15748,7 +15748,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=10c29823f0');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=9d8422f0b7');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -18782,7 +18782,7 @@ window.__renderV8CalToday();
             __ceLastReload = _now;
             try{
               var _s = document.createElement('script');
-              _s.src = 'data/COMMODITY_ELASTICITY.js?v=1021b33b87' + _now;
+              _s.src = 'data/COMMODITY_ELASTICITY.js?v=c9156fc21f' + _now;
               document.body.appendChild(_s);
             }catch(e){}
           }
