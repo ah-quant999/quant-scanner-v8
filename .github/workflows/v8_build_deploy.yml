@@ -75,6 +75,9 @@ on:
       - "☁️ v8 盘后算法链(云端)"
       - "🌍 v8 实时风险温度计"
       - "☁️ v8 盘中算法追踪(轻量)"
+      # 🛡 2026-11-16 期指卡断更根因：期指产物推送后不在白名单 ⇒ workflow_run 不触发 ⇒
+      #   Pages 的 FUTURES_REALTIME.js 恒旧（spot:{}、无 basis_metrics）。补名后自动闭环。
+      - "📈 v8 期指实时 refresh (cn)"
     types: [completed]
     branches: [main]
   workflow_dispatch:
