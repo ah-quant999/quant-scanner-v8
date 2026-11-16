@@ -2760,6 +2760,56 @@ def check_all_data_files():
                             f"真实活体由 v8_peer_monitor 双机互看负责，健康巡检不重复判此文件"),
             })
             continue
+        # 🔑 2026-11-17 一劳永逸（九宝令「还有失败的」· 本族第 5 例）：CRED_LEDGER 是**凭证到期台账**
+        #   （scripts/cred_expiry_watch.py 从 data/*_token.json 真源生成；前端 __v8CredTable 只读
+        #   updated/cycle 做倒计时，不读文件时间戳）。此前未登记任何节拍 ⇒ 落入 all_ 通用
+        #   1620min 红线：台账内容只在凭证换新时变（cycle 30/90 天级），update_time 每天必然
+        #   「超龄」→ 结构性假红（11-17 看板实测 all_CRED_LEDGER = fail，最后更新 11-15 13:05，
+        #   超过通用红线 1620 分钟，为当时唯一失败项）。
+        #   修复：监控面从「文件时间」换成「台账内容真实健康」= 各凭证剩余天数
+        #   （cycle − (today − updated)，与前端同口径 WARN_DAYS=7）：
+        #     · 任一凭证超期（left<0）→ fail；任一 ≤7 天 → warn（提示续期）；否则 ok。
+        #   配套：新建 v8_cred_expiry_watch.yml（cn runner 每日巡检、内容变才推 + 邮件预警），
+        #   台账持续跟随真源。文件 update_time 新旧**不再参与判定**（内容驱动语义）。
+        if vid == "CRED_LEDGER":
+            _last = str(ts)[:19] if ts and ts != "--" else "—"
+            creds = []
+            for k in ("zsxq", "maharo", "qqmail"):
+                it = data.get(k)
+                if isinstance(it, dict) and it.get("updated"):
+                    creds.append((k, str(it["updated"]), int(it.get("cycle") or 30)))
+            if not creds:
+                results.append({
+                    "id": f"all_{vid}", "name": "CRED_LEDGER（凭证台账）", "page": "全量数据", "freq": "—",
+                    "status": "warn", "last_update": _last, "age_min": None, "heal_cat": vid_heal,
+                    "message": f"{p.name} 台账内容为空/无 updated 条目 —— 请核查 cred_expiry_watch 真源 json",
+                })
+                continue
+            _parts, _worst = [], None
+            for k, upd, cyc in creds:
+                try:
+                    _u = datetime.strptime(upd, "%Y-%m-%d").date()
+                    left = cyc - (now_cst().date() - _u).days
+                except Exception:
+                    left = None
+                _parts.append(f"{k} 剩{left}天" if left is not None else f"{k} 日期格式坏")
+                if left is not None and (_worst is None or left < _worst):
+                    _worst = left
+            if _worst is None:
+                _st = "warn"
+            elif _worst < 0:
+                _st = "fail"
+            elif _worst <= 7:
+                _st = "warn"
+            else:
+                _st = "ok"
+            _tail = "" if _st == "ok" else " —— 请尽快换新凭证（改 data/*_token.json 的 updated）"
+            results.append({
+                "id": f"all_{vid}", "name": "CRED_LEDGER（凭证台账）", "page": "全量数据", "freq": "—",
+                "status": _st, "last_update": _last, "age_min": None, "heal_cat": vid_heal,
+                "message": f"凭证台账按剩余天数判定（非文件时间，台账内容仅在换新时变）：" + "；".join(_parts) + _tail,
+            })
+            continue
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
             if vid in _STATIC_ARCHIVE_FILES:
