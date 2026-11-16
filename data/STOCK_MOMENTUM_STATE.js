@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-17 05:10",
- "generated": "2026-11-17 05:10",
+ "update_time": "2026-11-17 05:33",
+ "generated": "2026-11-17 05:33",
  "meta": {
-  "generated": "2026-11-17 05:10",
+  "generated": "2026-11-17 05:33",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11894,13 +11894,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 4.166,
-      "price": 48.01,
-      "category": "突破"
-     },
-     {
       "code": "605008",
       "name": "长鸿高科",
       "change_pct": 3.081,
@@ -11971,13 +11964,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.099,
       "price": 19.3,
       "category": "加速"
-     },
-     {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 4.166,
-      "price": 48.01,
-      "category": "加速"
      }
     ],
     "短线选股": [
@@ -11993,13 +11979,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "郑中设计",
       "change_pct": 4.099,
       "price": 19.3,
-      "category": "短线选股"
-     },
-     {
-      "code": "301052",
-      "name": "果麦文化",
-      "change_pct": 4.166,
-      "price": 48.01,
       "category": "短线选股"
      },
      {
