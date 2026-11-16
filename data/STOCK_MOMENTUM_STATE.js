@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-16 16:33",
- "generated": "2026-11-16 16:33",
+ "update_time": "2026-11-16 16:38",
+ "generated": "2026-11-16 16:38",
  "meta": {
-  "generated": "2026-11-16 16:33",
+  "generated": "2026-11-16 16:38",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11938,15 +11938,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 5.028,
-      "price": 16.92,
+      "change_pct": 5.152,
+      "price": 16.94,
       "category": "突破"
      },
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 4.261,
-      "price": 19.33,
+      "change_pct": 4.099,
+      "price": 19.3,
       "category": "突破"
      },
      {
@@ -11954,6 +11954,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "国统股份",
       "change_pct": 9.977,
       "price": 14.22,
+      "category": "突破"
+     },
+     {
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 3.081,
+      "price": 11.04,
       "category": "突破"
      },
      {
@@ -11973,8 +11980,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002286",
       "name": "保龄宝",
-      "change_pct": 4.022,
-      "price": 9.31,
+      "change_pct": 4.134,
+      "price": 9.32,
       "category": "突破"
      },
      {
@@ -11987,15 +11994,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000921",
       "name": "海信家电",
-      "change_pct": 7.608,
-      "price": 23.62,
+      "change_pct": 7.517,
+      "price": 23.6,
       "category": "突破"
      },
      {
       "code": "603081",
       "name": "大丰实业",
-      "change_pct": 3.89,
-      "price": 11.75,
+      "change_pct": 4.067,
+      "price": 11.77,
       "category": "突破"
      },
      {
@@ -12010,15 +12017,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 5.028,
-      "price": 16.92,
+      "change_pct": 5.152,
+      "price": 16.94,
       "category": "加速"
      },
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 4.261,
-      "price": 19.33,
+      "change_pct": 4.099,
+      "price": 19.3,
       "category": "加速"
      }
     ],
@@ -12026,15 +12033,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 5.028,
-      "price": 16.92,
+      "change_pct": 5.152,
+      "price": 16.94,
       "category": "短线选股"
      },
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 4.261,
-      "price": 19.33,
+      "change_pct": 4.099,
+      "price": 19.3,
       "category": "短线选股"
      },
      {
@@ -12042,6 +12049,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "国统股份",
       "change_pct": 9.977,
       "price": 14.22,
+      "category": "短线选股"
+     },
+     {
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 3.081,
+      "price": 11.04,
       "category": "短线选股"
      },
      {
@@ -12061,8 +12075,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002286",
       "name": "保龄宝",
-      "change_pct": 4.022,
-      "price": 9.31,
+      "change_pct": 4.134,
+      "price": 9.32,
       "category": "短线选股"
      },
      {
@@ -12075,15 +12089,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000921",
       "name": "海信家电",
-      "change_pct": 7.608,
-      "price": 23.62,
+      "change_pct": 7.517,
+      "price": 23.6,
       "category": "短线选股"
      },
      {
       "code": "603081",
       "name": "大丰实业",
-      "change_pct": 3.89,
-      "price": 11.75,
+      "change_pct": 4.067,
+      "price": 11.77,
       "category": "短线选股"
      },
      {
@@ -12103,6 +12117,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 3.081,
+      "price": 11.04,
+      "category": "强势股"
+     },
+     {
       "code": "002548",
       "name": "金新农",
       "change_pct": 9.922,
@@ -12119,8 +12140,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002286",
       "name": "保龄宝",
-      "change_pct": 4.022,
-      "price": 9.31,
+      "change_pct": 4.134,
+      "price": 9.32,
       "category": "强势股"
      },
      {
@@ -12133,15 +12154,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000921",
       "name": "海信家电",
-      "change_pct": 7.608,
-      "price": 23.62,
+      "change_pct": 7.517,
+      "price": 23.6,
       "category": "强势股"
      },
      {
       "code": "603081",
       "name": "大丰实业",
-      "change_pct": 3.89,
-      "price": 11.75,
+      "change_pct": 4.067,
+      "price": 11.77,
       "category": "强势股"
      },
      {
