@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-11-17 20:36",
+ "update_time": "2026-11-18 01:06",
  "legend": [
   {
    "title": "重要政策",
@@ -409,13 +409,13 @@
     {
      "num": 17,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     },
     {
      "num": 18,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "英伟达Q3财报+指引",
