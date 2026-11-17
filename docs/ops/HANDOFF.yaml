@@ -3943,3 +3943,40 @@ items:
       仓库生成器 sha=6a90ff64b6bc；build_deploy 白名单含期指名；期指 completed 后自动出现
       workflow_run 类型 build_deploy run（无人工 dispatch）。
     updated: "2026-11-16 17:23"
+
+  - id: v8-ai-brief-etf-dedup-judgment-1117
+    owner: 小九机AI（本机落码·净室推送）
+    priority: P1
+    status: done
+    created: 2026-11-17
+    title: AI速览ETF断更根治+今日判定卡双修+回测卡去重搬家+美股链重注册
+    note: >-
+      2026-11-17 主人连续令「断更一劳永逸修复 / 改后三件套」。今日 6 笔 commit：
+      ① fdd128f5 今日判定卡折叠机制整组删除改常展开 + 外部风险语义色修正
+        （旧 red→var(--down) 把风险高危渲染成青绿；改直写语义色 红#ff5252/绿#26d9c2）。
+      ② da7960c7 因子回测卡（yield_rank）从因子实验室迁入选股策略·回测跟踪，
+        补「样本内回看·非每日真实信号流」防误导标注；v8/factor_yield.py compute()
+        按标准化代码去重（两候选池同股双行 bug）。
+      ③ a85f3624 v8_us_hk_map.yml 触改重注册 cron（今晨 05:35/08:15 双档零触发，
+        注册丢失老病；补抓两轮受东财对 runner IP 断连失败，明早 05:35 为准点验收点）。
+      ④ 89a8b4f1 f_broad_etf_volume 裸 requests→局部 import（NameError×18 致 json
+        自 11-13 断更，国家队 D 胶囊未就绪）；兜底自动化改判 data_date + 绝对路径 token。
+      ⑤ 4c36e1db ETF_DAILY_MONITOR 跨轮拼页死锁根治：降级线 16→15 页、行数线
+        1400→1300（实测稳态 16页/1346只被双闸拒写全天冻结）＋盘中页龄 45→90min；
+        algorithms/gen_market_brief.py partial 时总额加「（样本 N/N 页）」如实标注。
+      ⑥ c2d389e4 FACTOR_LAB.js 存量数据去重 40→35 条（5 同码重复行）。
+      三件套：①审计 CI gate job@HEAD=93168ed04b 全绿、align_logic_ops EXIT 0、
+        Pages 硬抓新串在位旧串 0；本地 parity 报 IMA_STRONG_BACKTEST 1 项错位
+        （远端 TIP 复核 data=11-17 12:55 / raw=11-16 15:34，非今日改动引入，待另案查）。
+        ②四方对齐：云端 workflow/cron 已上线（us_hk 重注册、ETF 链参数）；
+        双机时窗本班次小九（7:45-17:45）本机落码；运维页 index.html 三处改动硬抓在站；
+        逻辑页 logic.full.html 红黄绿灯=交通灯语义与本卡风险色不冲突，
+        新增口径（partial 样本页/判定常展开/回测卡去重）待阿狸咪班次登记，见 note_to。
+        ③推仓：6 笔均 Git Data API 逐字节自证（非 force）；本 item+ledger 同提交。
+    note_to: 阿狸咪
+    verify_how: >-
+      curl 线上 index.html 新串「亮红灯该用红色写」>0 且 judgmentToggleBtn==0；
+      curl 线上 FACTOR_LAB.js yield_rank.ranked 35 条唯一码且 dedup_note 在位；
+      curl 线上 raw_data/etf_daily_monitor.json total_etf≈1660 total_net 当日值；
+      明早 05:35 后查 v8_us_hk_map runs 准点 success + US_HK_MAP.js data_date=11-17。
+    updated: "2026-11-17 15:01"
