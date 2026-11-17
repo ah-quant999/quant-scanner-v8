@@ -3192,14 +3192,6 @@ function fmtSigned(v){
   <section id="sec-ph">
     <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag">收盘后生成</span></div>
 
-    <!-- 🔬 板块技术研判（2026-11-17 主人令「别人那张卡我也想要」；申万一级31行业，盘后1次 cn runner） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔬</span>板块技术研判 · 申万一级31 · <span class="fresh" id="sectorTechTime">—</span></h3>
-      <div id="sectorTechBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note note-insight">📌 共振置信度分级 L4(四项全满足)＞L3(三项)＞L2(两项)＞L1。四项=资金(net＞0且涨＞0)+趋势(EMA多头≥2)+位置(近60日分位≥70%)+量价(5日量比≥1.1)。压力=近20/60日高点，支撑=EMA20/波段底50%。东财一级行业指数点位，日频盘后研判非盘中实时信号；红涨绿跌。仅观测，不改选股排序。</div>
-    </div>
-
-    
     <!-- 斐波那契窗口 → 已下沉「运维→已下架·盘后观测」(2026-08-29 主人令)；商品涨价弹性榜 → 2026-09-11 主人令迁回「📡 实时数据」页（主力净额分时卡下方） -->
 
 
@@ -8662,6 +8654,14 @@ window.__renderIndexObserve = function(){
 
     <!-- 💰 平均股价（全A等权）已于 2026-08-12 主人令从暂未上架移除，仅保留在「📡 实时数据」tab 跟随 AI 市场速览的紧凑版渲染 -->
 
+    <!-- 🚚 2026-11-17 主人令：板块技术研判卡自「🌙 盘后数据」迁入「🔒 暂未上架」，置于「主题空间·概念资金热度」上方；按 L4→L1 分组，L4 默认展开、其余折叠 -->
+    <!-- 🔬 板块技术研判（2026-11-17 主人令「别人那张卡我也想要」；申万一级31行业，盘后1次 cn runner） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🔬</span>板块技术研判 · 申万一级31 · <span class="fresh" id="sectorTechTime">—</span></h3>
+      <div id="sectorTechBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note note-insight">📌 共振置信度分级 L4(四项全满足)＞L3(三项)＞L2(两项)＞L1。四项=资金(net＞0且涨＞0)+趋势(EMA多头≥2)+位置(近60日分位≥70%)+量价(5日量比≥1.1)。压力=近20/60日高点，支撑=EMA20/波段底50%。东财一级行业指数点位，日频盘后研判非盘中实时信号；红涨绿跌。仅观测，不改选股排序。</div>
+    </div>
+
     <div id="unlistedPanel"></div>
   </section>
 
@@ -8884,6 +8884,8 @@ function switchSec(sec,el){
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
   // 暂未上架：进入时渲染实验区（renderUnlisted 内部有 rendered 防重；2026-08-07 一级 Tab）
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
+  // 🚚 2026-11-17：板块技术研判卡迁入本页，进入时兜底重绘（defer 数据晚到保险）
+  try{ setTimeout(function(){ try{ window.renderSectorTech(window.SECTOR_TECH_JUDG || {}); }catch(e){} },80); }catch(e){}
   // 2026-08-29 主人令：已下架 一级 nav，渲染到独立容器（不复用 opTab4 的 delistedPanel）
   if(sec==='dl' && typeof window.renderDelisted==='function') setTimeout(function(){ try{ window.renderDelisted('delistedTopPanel'); }catch(e){} },60);
   // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
@@ -13874,6 +13876,7 @@ function drawUpDownChart(){
   window.renderBondFutures = renderBondFutures;
 
   /* ---- 板块技术研判 · 申万一级31（2026-11-17 主人令，window.SECTOR_TECH_JUDG） ---- */
+  // 🚚 2026-11-17 二次改造：搬入暂未上架·主题空间上方；按 L4→L1 分组折叠，L4 默认展开、其余折叠。
   var _TECH_LVL={"L4":{c:"var(--up)",t:"L4·四共振"},"L3":{c:"#ffb74d",t:"L3·三共振"},"L2":{c:"var(--sub)",t:"L2·两共振"},"L1":{c:"var(--dim)",t:"L1·弱"}};
   function renderSectorTech(d){
     const $b=$('sectorTechBody'), $t=$('sectorTechTime');
@@ -13881,23 +13884,32 @@ function drawUpDownChart(){
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">板块技术研判数据暂不可用</div>'; return; }
     const lvOrder={L4:0,L3:1,L2:2,L1:3};
     const items=d.items.slice().sort((a,b)=>(lvOrder[a.level]-lvOrder[b.level])||((b.net_yi||0)-(a.net_yi||0)));
+    const groups={L4:[],L3:[],L2:[],L1:[]};
+    items.forEach(it=>{ (groups[it.level]||groups.L1).push(it); });
     let h='<div style="margin-bottom:8px;font-size:12px;color:var(--sub);">'+('研判：'+(d.judgment||''))+'</div>';
-    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">';
-    items.forEach(it=>{
-      const lv=_TECH_LVL[it.level]||_TECH_LVL.L1;
-      const chg=it.chg, col=chg>0?'var(--up)':(chg<0?'var(--down)':'var(--sub)'), arrow=chg>0?'▲':(chg<0?'▼':'—');
-      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-left:3px solid '+lv.c+';border-radius:8px;padding:9px 10px;">';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
-      h+='<span style="font-size:13px;font-weight:700;color:var(--txt);">'+it.name+' <span style="font-size:9px;font-weight:500;color:'+lv.c+';border:1px solid '+lv.c+';border-radius:3px;padding:0 3px;margin-left:2px;">'+lv.t+'</span></span>';
-      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+(chg>0?'+':'')+(chg!=null?Number(chg).toFixed(2)+'%':'--')+'</span></div>';
-      h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;">';
-      h+='<div>现价 <b style="color:var(--txt);">'+Number(it.price).toFixed(1)+'</b> · EMA多头 '+it.ema_bull+'/3 · 区间分位 <b style="color:'+(it.pos_pct>=70?'var(--up)':(it.pos_pct<35?'var(--down)':'var(--sub)'))+';">'+Number(it.pos_pct).toFixed(0)+'%</b></div>';
-      h+='<div>压力 '+Number(it.resist20).toFixed(0)+'(20日)/'+Number(it.resist60).toFixed(0)+'(60日)</div>';
-      h+='<div>支撑 '+(it.support_ema20!=null?Number(it.support_ema20).toFixed(0):'—')+'(EMA20)/'+Number(it.support_swing50).toFixed(0)+'(波段50%)</div>';
-      h+='<div>5日量比 '+Number(it.vol_ratio5).toFixed(2)+' · 主力 <b style="color:'+((it.net_yi||0)>0?'var(--up)':'var(--down)')+';">'+((it.net_yi||0)>0?'+':'')+(it.net_yi!=null?Number(it.net_yi).toFixed(1):'—')+'亿</b> · '+it.state+'</div>';
-      h+='</div></div>';
+    ['L4','L3','L2','L1'].forEach(function(k){
+      const arr=groups[k], lv=_TECH_LVL[k], isOpen=(k==='L4');
+      h+='<details'+(isOpen?' open':'')+' style="margin-bottom:8px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;">';
+      h+='<summary style="cursor:pointer;padding:7px 10px;background:var(--card2);font-size:12px;font-weight:700;color:'+lv.c+';">'
+         +lv.t+' · '+arr.length+' 个行业 <span style="font-weight:500;color:var(--dim);">'+(isOpen?'（默认展开）':'（点击展开）')+'</span></summary>';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;padding:8px;">';
+      if(!arr.length) h+='<div style="grid-column:1/-1;font-size:11px;color:var(--dim);padding:6px;">今日无该档行业</div>';
+      arr.forEach(it=>{
+        const lvc=lv.c;
+        const chg=it.chg, col=chg>0?'var(--up)':(chg<0?'var(--down)':'var(--sub)'), arrow=chg>0?'▲':(chg<0?'▼':'—');
+        h+='<div style="background:var(--card2);border:1px solid var(--border2);border-left:3px solid '+lvc+';border-radius:8px;padding:9px 10px;">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
+        h+='<span style="font-size:13px;font-weight:700;color:var(--txt);">'+it.name+' <span style="font-size:9px;font-weight:500;color:'+lvc+';border:1px solid '+lvc+';border-radius:3px;padding:0 3px;margin-left:2px;">'+lv.t+'</span></span>';
+        h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+(chg>0?'+':'')+(chg!=null?Number(chg).toFixed(2)+'%':'--')+'</span></div>';
+        h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;">';
+        h+='<div>现价 <b style="color:var(--txt);">'+Number(it.price).toFixed(1)+'</b> · EMA多头 '+it.ema_bull+'/3 · 区间分位 <b style="color:'+(it.pos_pct>=70?'var(--up)':(it.pos_pct<35?'var(--down)':'var(--sub)'))+';">'+Number(it.pos_pct).toFixed(0)+'%</b></div>';
+        h+='<div>压力 '+Number(it.resist20).toFixed(0)+'(20日)/'+Number(it.resist60).toFixed(0)+'(60日)</div>';
+        h+='<div>支撑 '+(it.support_ema20!=null?Number(it.support_ema20).toFixed(0):'—')+'(EMA20)/'+Number(it.support_swing50).toFixed(0)+'(波段50%)</div>';
+        h+='<div>5日量比 '+Number(it.vol_ratio5).toFixed(2)+' · 主力 <b style="color:'+((it.net_yi||0)>0?'var(--up)':'var(--down)')+';">'+((it.net_yi||0)>0?'+':'')+(it.net_yi!=null?Number(it.net_yi).toFixed(1):'—')+'亿</b> · '+it.state+'</div>';
+        h+='</div></div>';
+      });
+      h+='</div></details>';
     });
-    h+='</div>';
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('盘后','日频',d.data_date||d.update_time);
   }
