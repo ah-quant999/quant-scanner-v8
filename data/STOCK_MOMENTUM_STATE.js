@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-17 08:24",
- "generated": "2026-11-17 08:24",
+ "update_time": "2026-11-17 08:29",
+ "generated": "2026-11-17 08:29",
  "meta": {
-  "generated": "2026-11-17 08:24",
+  "generated": "2026-11-17 08:29",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11894,6 +11894,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "000819",
+      "name": "岳阳兴长",
+      "change_pct": 9.984,
+      "price": 14.1,
+      "category": "突破"
+     },
+     {
       "code": "605008",
       "name": "长鸿高科",
       "change_pct": 3.081,
@@ -11982,6 +11989,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "000819",
+      "name": "岳阳兴长",
+      "change_pct": 9.984,
+      "price": 14.1,
+      "category": "短线选股"
+     },
+     {
       "code": "605008",
       "name": "长鸿高科",
       "change_pct": 3.081,
@@ -12039,6 +12053,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
      }
     ],
     "强势股": [
+     {
+      "code": "000819",
+      "name": "岳阳兴长",
+      "change_pct": 9.984,
+      "price": 14.1,
+      "category": "强势股"
+     },
      {
       "code": "605008",
       "name": "长鸿高科",
