@@ -37,16 +37,28 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGES = "https://ah-quant999.github.io/quant-scanner-v8/data"
 API = "https://api.github.com/repos/ah-quant999/quant-scanner-v8"
 
-# 第一批必需卡（缺一即判「第一批未上线」）
-REQUIRED = [
+# 🔴 2026-11-17 一劳永逸修复（主人令「小九机还是在发邮件报警」）：
+#   旧版 7 张卡共用盘中 now-25 动态判定线，但其中 2 张是低频档位批，
+#   实测推送节奏：SECTOR_FUND_FLOW_INTRADAY 日内快照一天仅 13:30 档一次
+#   （11-17: 13:29/14:09/14:33/14:34），CANDIDATE_QUOTES 候选池为盘前/盘后批
+#   （11-17: 15:05/15:27/15:27/15:58），盘中根本不刷新。二者永远追不上
+#   now-25 线 ⇒ 10:25/13:25/14:25 三档天天判红、天天误派发重抓取+误发邮件。
+#   修复：按真实 cadence 分层——高频卡仍用 now-25；低频卡只要求「今日已生成」，
+#   真断更（update_time 停在前一日）仍判红，不再误报。
+# 第一批必需卡·高频盘中卡（now-25 动态判定线）
+REQUIRED_INTRADAY = [
     ("STOCK_QUOTE", "个股行情"),
     ("SECTOR_FUND_FLOW", "板块资金全量"),
-    ("SECTOR_FUND_FLOW_INTRADAY", "板块资金日内快照"),
     ("LIMIT_UP_HEATMAP", "涨停热力"),
     ("MARKET_FUND_FLOW_DATA", "大盘资金流向"),
-    ("CANDIDATE_QUOTES", "候选池行情"),
     ("AI_MARKET_BRIEF", "AI盘面速览"),
 ]
+# 第一批必需卡·低频档位卡（只要求 update_time 是今日；停昨日仍判红）
+REQUIRED_SCHEDULED = [
+    ("SECTOR_FUND_FLOW_INTRADAY", "板块资金日内快照"),
+    ("CANDIDATE_QUOTES", "候选池行情"),
+]
+REQUIRED = REQUIRED_INTRADAY + REQUIRED_SCHEDULED  # 兼容原 7 卡清单/外部引用
 # 可选卡（陈旧只告警不判红）
 OPTIONAL = [
     ("VALUATION_PERCENTILE", "估值分位"),
@@ -129,17 +141,22 @@ def parse_ts(s):
     return None
 
 
-def check(slot_cutoff):
-    """返回 (是否全绿, 明细行列表)"""
+def check(slot_cutoff, today_date):
+    """返回 (是否全绿, 明细行列表)。
+    高频卡判定线 = slot_cutoff（盘中 now-25 动态线）；
+    低频档位卡判定线 = 今日 00:00（只要数据日期是今天即达标，真断更停昨日仍判红）。
+    """
     rows = []
     ok = True
+    sched_set = {v for v, _ in REQUIRED_SCHEDULED}
     for var, label in REQUIRED:
         ts, err = fetch_update_time(var)
         t = parse_ts(ts)
-        green = bool(t and t >= slot_cutoff)
+        cut = today_date if var in sched_set else slot_cutoff
+        green = bool(t and t >= cut)
         if not green:
             ok = False
-        rows.append((green, var, label, ts or (err or "无"), slot_cutoff))
+        rows.append((green, var, label, ts or (err or "无"), cut))
     return ok, rows
 
 
@@ -219,11 +236,12 @@ def main():
         if dyn > cutoff:
             cutoff = dyn
 
-    print("══ v8 第一批盘中数据守门 ══  %s  档位=%s 判定线=%s" % (
+    today_date = n.replace(hour=0, minute=0, second=0, microsecond=0)
+    print("══ v8 第一批盘中数据守门 ══  %s  档位=%s 高频线=%s 低频线=今日" % (
         n.strftime("%Y-%m-%d %H:%M:%S"), slot, cutoff.strftime("%H:%M")))
 
     for rnd in range(1, max(1, args.rounds) + 1):
-        ok, rows = check(cutoff)
+        ok, rows = check(cutoff, today_date)
         print("── 第 %d 次检查 ──" % rnd)
         for green, var, label, ts, cut in rows:
             print("  %s %-26s %-16s %s" % ("✅" if green else "❌", var, label, ts))
@@ -249,7 +267,7 @@ def main():
     grace = min(args.wait, 120)
     print("  ⏳ 末轮宽限复查（%ds）…" % grace)
     time.sleep(grace)
-    ok2, rows2 = check(cutoff)
+    ok2, rows2 = check(cutoff, today_date)
     if ok2:
         print("✅ 宽限复查达标（≥%s）→ 不告警，守门通过" % cutoff.strftime("%H:%M"))
         for var, label, ts in optional_rows():
