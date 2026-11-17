@@ -1249,7 +1249,9 @@ function _buildJudgmentEnvHTML(d){
   var _rg = (typeof window !== 'undefined' && window.RISK_GAUGE) || {};
   if(_rg.overall && typeof _rg === 'object'){
     var _jEsc = function(s){return String(s==null?'':s).replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});};
-    var _rgC = _rg.overall==='red' ? 'var(--down)' : (_rg.overall==='yellow' ? 'var(--gold)' : 'var(--up)');
+    // 🔴 2026-11-17 主人令「亮红灯该用红色写」：风险语义色 ≠ 涨跌调色板——旧映射 red→var(--down)(#26d9c2 青绿)、
+    //   green→var(--up)(#ff5252 红) 整个反了（高危显青、正常显红）。改直写语义色：红#ff5252 / 黄#ffd024 / 绿#26d9c2。
+    var _rgC = _rg.overall==='red' ? '#ff5252' : (_rg.overall==='yellow' ? '#ffd024' : '#26d9c2');
     h += '<div style="margin-bottom:10px;padding:7px 10px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.2);border-left:3px solid '+_rgC+';border-radius:8px">';
     h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">';
     h += '<b style="color:var(--txt);font-size:12px">🌡️ 外部风险</b>';
@@ -1263,7 +1265,7 @@ function _buildJudgmentEnvHTML(d){
       _rg.indicators.forEach(function(x){
         // 北向资金自 2024-05 起无实时披露，值为 null 时不展示，避免占格误导
         if(x.value===null || x.value===undefined) return;
-        var c = x.status==='red' ? 'var(--down)' : (x.status==='yellow' ? 'var(--gold)' : (x.status==='green' ? 'var(--up)' : 'var(--dim)'));
+        var c = x.status==='red' ? '#ff5252' : (x.status==='yellow' ? '#ffd024' : (x.status==='green' ? '#26d9c2' : 'var(--dim)'));
         var v = x.value + (x.unit||'');
         h += '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:5px;background:rgba(148,163,184,.08);font-size:10.5px">'
            + '<span style="color:var(--sub)">'+_jEsc(x.label||x.name)+'</span>'
@@ -2339,14 +2341,11 @@ window.STRATEGY_WALKFORWARD = {
       head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
         {update_time:ts, slot:_jdSlot.slot, horizon:_jdSlot.horizon}, false);
     };
-    // 🆕 2026-10-28 主人令「这卡折叠」：今日判定·环境综合 卡默认折叠（收起省空间），按钮可一键展开。
-    //   按钮 sibling 挂在 judgmentCardHeader 之后，v8CardHeader 自愈只重写 header 内部 ⇒ 按钮不被冲掉；
-    //   折叠只切 judgmentBodyOp 的 display，不影响 body 自愈重渲 innerHTML（display 状态独立保留）。
-    window.__judgmentCardCollapsed = true;   // 默认折叠（收起）；展开后由此标记翻转
+    // 🔄 2026-11-17 主人令「这卡不用折叠了，直接展开」：折叠机制整组移除（开关标记/折叠按钮/toggle 函数），
+    //   卡片常展开；body 自愈重渲逻辑原样保留（不再切 display）。
     window.__renderJudgmentBody = function(){
       var opBody=document.getElementById('judgmentBodyOp');
       if(!opBody) return;
-      opBody.style.display = window.__judgmentCardCollapsed ? 'none' : '';
       try{
         var jd = window.JUDGMENT_DATA || {};
         if(!jd.update_time || typeof window._buildJudgmentEnvHTML !== 'function'){
@@ -2357,14 +2356,6 @@ window.STRATEGY_WALKFORWARD = {
         }
         opBody.innerHTML = window._buildJudgmentEnvHTML(jd);
       }catch(e){ console.error('renderJudgmentBody error',e); }
-    };
-    window.__toggleJudgmentCard = function(){
-      var b = document.getElementById('judgmentBodyOp');
-      var btn = document.getElementById('judgmentToggleBtn');
-      if(!b || !btn) return;
-      window.__judgmentCardCollapsed = !window.__judgmentCardCollapsed;
-      b.style.display = window.__judgmentCardCollapsed ? 'none' : '';
-      btn.innerHTML = window.__judgmentCardCollapsed ? '&#x25B4; 展开' : '&#x25BE; 折叠';
     };
     // 🛡️ 2026-08-19 主人令「补回来，别一直被覆盖掉」一劳永逸：
     //   放弃 setTimeout 一次性猜测 / 30 次重试的旧方案，改为**永久自愈轮询**——
@@ -15819,7 +15810,6 @@ h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;border-radius:9px;
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px">&#x26A0;&#xFE0F; 全部结论由规则从下方各卡真实数据自动汇总，<b style="color:#ffd024">非人工观点、不构成投资建议</b>。</div></div>';
 // ── 今日判定·环境综合（2026-10-28 主人令：自「今日事件」迁入合并；渲染走永久自愈轮询）──
 h += '<div id="judgmentCardHeader"></div>';
-h += '<div style="padding:0 0 8px"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer">&#x25B4; 展开</button></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px"></div>';
 // 🗑 2026-11-15 主人令：金钻跟踪卡整支退役——该卡回测实证「无稳定盈利边缘·非买卖建议」（tier1确认21信号胜率33-48%中位负、tier2/3≈硬币），
 //   既不能给可执行建议，按主人令删除：选股策略 st-jztrack 子页/tab/数据注入/渲染构建器/兜底/派发/就绪判定全部移除。
