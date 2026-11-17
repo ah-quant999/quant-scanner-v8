@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-18 06:34",
- "generated": "2026-11-18 06:34",
+ "update_time": "2026-11-18 07:20",
+ "generated": "2026-11-18 07:20",
  "meta": {
-  "generated": "2026-11-18 06:34",
+  "generated": "2026-11-18 07:20",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -12251,6 +12251,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "000533",
+      "name": "顺钠股份",
+      "change_pct": 9.98,
+      "price": 10.8,
+      "category": "突破"
+     },
+     {
       "code": "002771",
       "name": "真视通",
       "change_pct": 10.0,
@@ -12339,6 +12346,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "000533",
+      "name": "顺钠股份",
+      "change_pct": 9.98,
+      "price": 10.8,
+      "category": "短线选股"
+     },
+     {
       "code": "002771",
       "name": "真视通",
       "change_pct": 10.0,
@@ -12380,6 +12394,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "华胜天成",
       "change_pct": 10.0,
       "price": 15.29,
+      "category": "强势股"
+     },
+     {
+      "code": "000533",
+      "name": "顺钠股份",
+      "change_pct": 9.98,
+      "price": 10.8,
       "category": "强势股"
      },
      {
