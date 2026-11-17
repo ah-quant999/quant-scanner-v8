@@ -23,6 +23,7 @@ name: "🌐 v8 隔夜美股映射 fetcher (cn runner)"
 on:
   schedule:
     # 工作日 05:35 CST（UTC 21:35 前一日）= 美股收盘后首抓；08:15 CST（UTC 00:15）= 盘前兜底。
+    # 🔁 2026-11-17 10:17 触改重注册：今晨两档 cron 零触发（GitHub schedule 注册丢失老病，期指卡 11-13 / 国家队链同款）⇒ 触改本行强制重新注册 schedule，验收=11-18 05:35 CST 档准点触发。
     - cron: '35 21 * * 1-5'
     - cron: '15 0 * * 1-5'
   workflow_dispatch:
