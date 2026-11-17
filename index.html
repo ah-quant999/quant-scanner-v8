@@ -2142,25 +2142,6 @@ window.STRATEGY_WALKFORWARD = {
     <b style="color:#f59e0b">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
     </div>
     </div>
-    <!-- ═══════════════════════════════════════════════════════════════
-    <!-- ═══════════════════════════════════════════════════
-         📈 按收益率排选（真实回测）（2026-11-15 主人令「因子也要按收益率来排选」）
-         读 window.FACTOR_LAB.yield_rank（v8/factor_lab_gen.py + v8/factor_yield.py 产出）：
-         对因子实验室候选股用本地真实日K回测各持有期真实收益率+胜率，按 T+20 平均收益降序排选；
-         与「回测跟踪页·最终推荐真实收益率回测」同引擎同口径（本榜=因子候选池，那卡=终选真实信号流）。
-         ═══════════════════════════════════════════════════ -->
-    <div class="card" id="factorYieldCard" style="border-left:4px solid #22c55e;margin-top:16px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-        <span style="font-size:15px;font-weight:700;color:var(--txt)">📈 按收益率排选（真实回测）</span>
-        <span id="fyUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
-        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#22c55e;border:1px solid #22c55e4d">真实日K · 扣成本0.30%</span>
-      </div>
-      <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:8px">
-        <b style="color:#22c55e">怎么读</b>：本榜把因子实验室的候选股，用<b>真实历史日K</b>回测各持有期收益（入场=次一交易日开盘、出场=t+N 收盘、双边成本 0.30%），按 <b>T+20 平均收益降序</b>排选——<b style="color:var(--gold)">因子也要按收益率来排</b>。
-        与「回测跟踪页·最终推荐真实收益率」同引擎同口径：本榜=因子候选池，那卡=终选真实信号流（算法链每日真实选股快照）。
-      </div>
-      <div id="factorYieldBody" style="padding:4px 2px 2px"><div class="note">加载中…</div></div>
-    </div>
 
     <!-- ═══════════════════════════════════════════════════
          🧮 每日因子计算（2026-09-19 主人令新建；2026-09-20 主人令：原「已纳入因子」第二步已删，
@@ -3467,6 +3448,27 @@ function fmtSigned(v){
         回测已证<b style="color:var(--down)">无稳定超额</b>——次日买入≈抛硬币、中期持有单调负超额；<b>不参与你的选股排选</b>，仅作结构性观察。
       </div>
       <div id="resonTrackContainer"></div>
+
+    <!-- ═══════════════════════════════════════════════════
+         📈 按收益率排选（真实回测）（2026-11-15 主人令「因子也要按收益率来排选」）
+         读 window.FACTOR_LAB.yield_rank（v8/factor_lab_gen.py + v8/factor_yield.py 产出）：
+         对因子实验室候选股用本地真实日K回测各持有期真实收益率+胜率，按 T+20 平均收益降序排选；
+         与「回测跟踪页·最终推荐真实收益率回测」同引擎同口径（本榜=因子候选池，那卡=终选真实信号流）。
+         📦 2026-11-17 主人令「怎么放到因子实验室了」：本卡整卡迁入「🎯 选股策略 → 📊 回测跟踪」（最强共振卡之后）；渲染触发同步迁移（__renderFactorPane 摘出 → switchSt bt 分支 + st-bt 就绪重试）。
+         ═══════════════════════════════════════════════════ -->
+    <div class="card" id="factorYieldCard" style="border-left:4px solid #22c55e;margin-top:16px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <span style="font-size:15px;font-weight:700;color:var(--txt)">📈 按收益率排选（真实回测）</span>
+        <span id="fyUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
+        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#22c55e;border:1px solid #22c55e4d">真实日K · 扣成本0.30%</span>
+      </div>
+      <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:8px">
+        <b style="color:#22c55e">怎么读</b>：本榜把因子实验室的候选股，用<b>真实历史日K</b>回测各持有期收益（入场=次一交易日开盘、出场=t+N 收盘、双边成本 0.30%），按 <b>T+20 平均收益降序</b>排选——<b style="color:var(--gold)">因子也要按收益率来排</b>。
+        与「回测跟踪页·最终推荐真实收益率」同引擎同口径：本榜=因子候选池，那卡=终选真实信号流（算法链每日真实选股快照）。
+        <b style="color:#ffd024">⚠️ 口径提示：样本内回看 · 非每日真实信号流</b>——因子候选池自带强势股偏置（本榜回看的是历史趋势延续），<b>非未来收益预期</b>；与上方「最终推荐·真实收益率回测」（每日真实终选信号流）性质不同，勿混读。
+      </div>
+      <div id="factorYieldBody" style="padding:4px 2px 2px"><div class="note">加载中…</div></div>
+    </div>
     </div><!--/st-bt-->
 
   </section>
@@ -14591,6 +14593,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(n==='bt'){
       setTimeout(function(){ try{ window.renderResonanceTrack(); }catch(e){ console.warn('[bt] resonTrack', e); } }, 30);
       setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[bt] backtest', e); } }, 60);
+      setTimeout(function(){ try{ window.__renderFactorYield(); }catch(e){ console.warn('[bt] factorYield', e); } }, 90);  // 📦 2026-11-17 迁入：因子候选池收益率排选（第三张）
     }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
@@ -14609,7 +14612,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       /* 🔴 2026-10-11 主人令「完全下架」：tc/crds 就绪判定随两策略下架移除 */
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
       // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
-      bt:function(){return !!(window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST);},
+      bt:function(){return !!((window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST)||(window.FACTOR_LAB&&window.FACTOR_LAB.yield_rank));},  // 📦 2026-11-17 迁入第三卡：FACTOR_LAB.yield_rank 任一源到位即可补渲
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};
@@ -17468,7 +17471,7 @@ hm += '</div>'; // /ulPaneBacktest
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
     try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
     try{ if(typeof window.__renderExecAlgo==='function') window.__renderExecAlgo(); }catch(e){ console.warn('收益转化算法渲染失败', e); }
-    try{ if(typeof window.__renderFactorYield==='function') window.__renderFactorYield(); }catch(e){ console.warn('因子收益率排选渲染失败', e); }
+    /* 📦 2026-11-17 主人令：按收益率排选卡迁入「选股策略→回测跟踪」(st-bt)，渲染触发随之迁出（见 switchSt bt 分支）。 */
   };
   // ═══ 🧪 斐波那契观测窗（2026-09-15 主人令：由「🔒 已下架」盘前区迁入「🌍 观测平台 > 📊 大盘观测」）═══
   //   卡位：紧贴「📊 艾略特波浪 · 深度分析」卡下方（主人令：两卡都盘后更新，差别不大，**不合卡**）

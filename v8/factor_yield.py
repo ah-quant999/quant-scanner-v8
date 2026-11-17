@@ -80,10 +80,17 @@ def compute(codes, top_n=40, window=SIGNAL_WINDOW):
     """codes: list of {code, name}。返回 {update_time, meta, ranked}。"""
     from datetime import datetime
     ranked = []
+    # 🔴 2026-11-17 主人令「修重复行」：候选池两来源（异常换手率重点池 + ROE 全市场主板大市值档）
+    #   同股各入一次未去重 ⇒ 榜上百合花/宝鼎科技等各出现两行。按标准化代码去重，同股只保一条——
+    #   回测结果只取决于代码与日K、与来源无关，先到先得无损。
+    _seen = set()
     for item in codes:
         code = item.get("code")
         name = item.get("name", "") or ""
         ncode = _norm_code(code)
+        if ncode in _seen:
+            continue
+        _seen.add(ncode)
         rows = _load_klines(code)
         rec = {"code": code, "name": name, "n_klines": len(rows) if rows else 0}
         if not rows or len(rows) < NEED_MIN:
