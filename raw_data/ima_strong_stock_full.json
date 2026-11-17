@@ -1,13 +1,12 @@
 {
-  "fetched_at": "2026-11-17 08:18:10",
+  "fetched_at": "2026-11-17 17:02:25",
   "fetched_tz": "CST+8",
-  "title": "短线情绪选股 2026-11-16",
-  "media_id": "note_cls1_85134884db3b8b9fc366f1c5dcf8fab3_75279966006429627500816604757970",
+  "title": "短线情绪选股 2026-11-17",
+  "media_id": "note_cls1_85134884db3b8b9fc366f1c5dcf8fab3_75283595211824657500816604757970",
   "kb_id": "ima_kb_gmergquh",
   "kb_name": "顺势交易",
   "kb_creator": "梧谷枫灯",
   "folder_id": "folder_7507701210837524",
   "folder_name": "短线情绪选股",
-  "channel": "member-full-text-snapshot",
-  "note": "2026-11-17 08:18 本机 ima 连接器（fetch_media_content）实抓「短线情绪选股 2026-11-16」全文回填：源库 ima_kb_gmergquh 高手实际已更新到 11-16（11-14/15/16 三日主报告+竞价校验全在，源侧从未断更）；断更根因=本机快照抓取自动化停摆（11-15 19:13 抓 11-13 时 ima 连接器返回正文错位[标题11-13/正文11-02]，此后快照未再刷新→retained-last-good 空转4天→IMA 候选池 0→终选 degraded）。本次 meta 与正文日期一致(2026-11-16)，media_id 更新为 11-16 报告。"
+  "channel": "member-full-text-snapshot"
 }

@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-11-17 08:18:54",
+  "update_time": "2026-11-17 17:02:30",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7507701210837524",
   "source_kind": "wiki",
   "detail_channel": "full-snapshot",
-  "source_title": "短线情绪选股 2026-11-16",
+  "source_title": "短线情绪选股 2026-11-17",
   "source_updated_at": "",
-  "data_date": "2026-11-16",
-  "stale_days": 1,
+  "data_date": "2026-11-17",
+  "stale_days": 0,
   "source_stale": false,
   "snapshot_expired": false,
   "snapshot_meta_mismatch": false,
@@ -16,44 +16,44 @@
   "position_advice": "20-40%",
   "themes_top": [
     [
-      "国企",
-      3
-    ],
-    [
-      "AI应用",
-      3
-    ],
-    [
-      "北京国资",
+      "电子化学品",
       2
     ],
     [
-      "生猪养殖",
-      1
+      "湿电子化学品",
+      2
     ],
     [
-      "猪饲料",
-      1
+      "存储芯片",
+      2
     ],
     [
-      "养殖机器人",
-      1
+      "上海国资",
+      2
     ],
     [
-      "小家电",
-      1
+      "AI眼镜",
+      2
     ],
     [
-      "跨境电商",
-      1
+      "消费电子",
+      2
     ],
     [
-      "母婴产品",
-      1
+      "AI算力",
+      2
     ],
     [
-      "百货零售",
-      1
+      "光刻胶",
+      2
+    ],
+    [
+      "光刻机",
+      2
+    ],
+    [
+      "商业航天",
+      2
     ]
   ],
   "summary": {
@@ -63,13 +63,13 @@
     "rows_parsed": 8,
     "expected": null,
     "source_channel": "full-snapshot",
-    "snapshot_fetched_at": "2026-11-17 08:18:10",
-    "snapshot_age_h": 0.01,
+    "snapshot_fetched_at": "2026-11-17 17:02:25",
+    "snapshot_age_h": 0.0,
     "truncated": false,
     "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
   },
   "detail_complete": true,
-  "wiki_latest": "短线情绪选股 2026-11-16",
+  "wiki_latest": "短线情绪选股 2026-11-17",
   "parse_health": {
     "total": 8,
     "no_score": 0,
@@ -79,131 +79,131 @@
   "stocks": [
     {
       "rank": 1,
-      "code": "002425",
+      "code": "000533",
       "market": "SZ",
-      "name": "凯撒文化",
-      "score": 77,
-      "turnover_pct": 20.3,
-      "vol_ratio": 1.5,
-      "mktcap_yi": 40.1,
-      "seal_yi": 1.09,
-      "theme": "AI游戏/手游IP储备",
-      "note": "题材有跟随（合计 3 家）；换手 20.3%（心法优质区间）；量比 1.50（温和放量）；封单 1.09 亿（封板坚决）；非一字板，可参与",
+      "name": "顺钠股份",
+      "score": 75,
+      "turnover_pct": 25.5,
+      "vol_ratio": 3.63,
+      "mktcap_yi": 74.0,
+      "seal_yi": 0.19,
+      "theme": "回购/员工持股计划",
+      "note": "题材有跟随（合计 3 家）；换手 25.5%（心法优质区间）；量比 3.63（显著放量）；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-16",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 2,
-      "code": "002205",
+      "code": "002861",
       "market": "SZ",
-      "name": "国统股份",
-      "score": 75,
-      "turnover_pct": 20.4,
-      "vol_ratio": 3.28,
-      "mktcap_yi": 26.4,
-      "seal_yi": 0.12,
-      "theme": "PCCP管道/风电混塔",
-      "note": "题材有跟随（合计 3 家）；换手 20.4%（心法优质区间）；量比 3.28（显著放量）；非一字板，可参与",
+      "name": "瀛通通讯",
+      "score": 73,
+      "turnover_pct": 21.1,
+      "vol_ratio": 2.11,
+      "mktcap_yi": 21.2,
+      "seal_yi": 0.4,
+      "theme": "AI眼镜/智能声学",
+      "note": "题材有跟随（合计 5 家）；换手 21.1%（心法优质区间）；量比 2.11（温和放量）；封单 0.40 亿；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-13",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 3,
-      "code": "600715",
-      "market": "SH",
-      "name": "文投控股",
-      "score": 67,
-      "turnover_pct": 37.8,
-      "vol_ratio": 2.0,
-      "mktcap_yi": 107.1,
-      "seal_yi": 0.29,
-      "theme": "AI漫剧/剧集发行",
-      "note": "题材有跟随（合计 4 家）；换手 37.8%（心法优质区间）；量比 2.00（温和放量）；非一字板，可参与",
+      "code": "920489",
+      "market": "BJ",
+      "name": "佳先股份",
+      "score": 65,
+      "turnover_pct": 20.3,
+      "vol_ratio": 10.78,
+      "mktcap_yi": 10.9,
+      "seal_yi": 0.16,
+      "theme": "光刻胶单体/环保热稳定剂",
+      "note": "题材有跟随（合计 3 家）；换手 20.3%（心法优质区间）；量比 10.78（显著放量）；非一字板，可参与；流通市值 10.9 亿（偏离游资偏好区间）",
       "_parse_missing": [],
-      "first_selected": "2026-11-02",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 4,
-      "code": "002685",
-      "market": "SZ",
-      "name": "华东重机",
-      "score": 67,
+      "code": "600936",
+      "market": "SH",
+      "name": "北投科技",
+      "score": 65,
       "turnover_pct": 14.4,
-      "vol_ratio": 2.65,
-      "mktcap_yi": 61.4,
-      "seal_yi": 1.64,
-      "theme": "GPU芯片/港口装卸设备",
-      "note": "题材有跟随（合计 3 家）；换手 14.4%（尚可）；量比 2.65（温和放量）；封单 1.64 亿（封板坚决）；非一字板，可参与",
+      "vol_ratio": 10.28,
+      "mktcap_yi": 73.9,
+      "seal_yi": 0.06,
+      "theme": "AI应用/平陆运河",
+      "note": "题材有跟随（合计 4 家）；换手 14.4%（尚可）；量比 10.28（显著放量）；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-13",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 5,
-      "code": "300824",
+      "code": "301288",
       "market": "SZ",
-      "name": "北鼎股份",
+      "name": "清研环境",
       "score": 65,
-      "turnover_pct": 10.5,
-      "vol_ratio": 13.38,
-      "mktcap_yi": 27.4,
-      "seal_yi": 0.03,
-      "theme": "高端厨小家电/自主品牌",
-      "note": "题材有跟随（合计 3 家）；换手 10.5%（尚可）；量比 13.38（显著放量）；非一字板，可参与",
+      "turnover_pct": 15.1,
+      "vol_ratio": 4.53,
+      "mktcap_yi": 15.7,
+      "seal_yi": 0.09,
+      "theme": "金属镍/固危废资源化",
+      "note": "题材有跟随（合计 3 家）；换手 15.1%（尚可）；量比 4.53（显著放量）；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-16",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 6,
-      "code": "002148",
-      "market": "SZ",
-      "name": "北纬科技",
-      "score": 65,
-      "turnover_pct": 42.6,
-      "vol_ratio": 4.13,
-      "mktcap_yi": 39.5,
-      "seal_yi": 0.26,
-      "theme": "四足机器人/物联网",
-      "note": "题材有跟随（合计 3 家）；换手 42.6%（尚可）；量比 4.13（显著放量）；非一字板，可参与",
+      "code": "600467",
+      "market": "SH",
+      "name": "好当家",
+      "score": 63,
+      "turnover_pct": 16.7,
+      "vol_ratio": 1.6,
+      "mktcap_yi": 40.2,
+      "seal_yi": 0.44,
+      "theme": "海参/水产养殖",
+      "note": "题材有跟随（合计 3 家）；换手 16.7%（尚可）；量比 1.60（温和放量）；封单 0.44 亿；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-16",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-13",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 7,
-      "code": "000819",
+      "code": "300786",
       "market": "SZ",
-      "name": "岳阳兴长",
-      "score": 65,
-      "turnover_pct": 16.0,
-      "vol_ratio": 3.9,
-      "mktcap_yi": 51.6,
-      "seal_yi": 0.2,
-      "theme": "MOFs材料/茂金属聚烯烃",
-      "note": "题材有跟随（合计 3 家）；换手 16.0%（心法优质区间）；量比 3.90（显著放量）；非一字板，可参与",
+      "name": "国林科技",
+      "score": 63,
+      "turnover_pct": 14.0,
+      "vol_ratio": 2.6,
+      "mktcap_yi": 19.7,
+      "seal_yi": 0.49,
+      "theme": "半导体设备/臭氧设备",
+      "note": "题材有跟随（合计 4 家）；换手 14.0%（尚可）；量比 2.60（温和放量）；封单 0.49 亿；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-16",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     },
     {
       "rank": 8,
-      "code": "603118",
+      "code": "600261",
       "market": "SH",
-      "name": "共进股份",
-      "score": 63,
-      "turnover_pct": 19.2,
-      "vol_ratio": 2.78,
-      "mktcap_yi": 115.8,
-      "seal_yi": 0.81,
-      "theme": "数据中心交换机/具身机器人代工",
-      "note": "题材有跟随（合计 5 家）；换手 19.2%（尚可）；量比 2.78（温和放量）；封单 0.81 亿；非一字板，可参与",
+      "name": "阳光照明",
+      "score": 61,
+      "turnover_pct": 26.7,
+      "vol_ratio": 1.36,
+      "mktcap_yi": 76.1,
+      "seal_yi": 0.85,
+      "theme": "商业航天/激光通信",
+      "note": "题材有跟随（合计 6 家）；换手 26.7%（心法优质区间）；封单 0.85 亿；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-16",
-      "trade_date": "2026-11-16"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-17"
     }
   ],
   "kb": {
