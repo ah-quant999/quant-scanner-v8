@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-17 16:49:03",
+  "update_time": "2026-11-17 19:45:15",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -10,7 +10,7 @@
   "sentiment_meta": {
     "phase": "回暖",
     "score": 52.0,
-    "delta_pct": 0.0,
+    "delta_pct": 15.62,
     "advice": "🌱 情绪回暖：可适度参与，盯紧最高板扩展",
     "source": "LIMIT_UP_HEATMAP"
   },

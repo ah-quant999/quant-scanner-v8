@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-17 18:59",
+  "update_time": "2026-11-17 21:57",
   "data_type": "real",
   "summary": {
     "in_count": 30,
@@ -781,7 +781,7 @@
       "code": "BK0802",
       "type": "概念",
       "net": -25.88,
-      "net_5d": -174.08,
+      "net_5d": -174.09,
       "net_10d": -134.56,
       "net_20d": -404.38,
       "net_60d": -1111.74,
@@ -2143,7 +2143,7 @@
       "code": "BK0802",
       "type": "概念",
       "net": -25.88,
-      "net_5d": -174.08,
+      "net_5d": -174.09,
       "net_10d": -134.56,
       "net_20d": -404.38,
       "net_60d": -1111.74,
@@ -3159,17 +3159,6 @@
       "net_60d_days": 60
     },
     {
-      "name": "智能家居",
-      "net": 2.06,
-      "net_5d": 61.11,
-      "net_20d": 0,
-      "net_60d": null,
-      "type": "行业",
-      "consecutive_days": 5,
-      "trend": "in",
-      "net_5d_days": 5
-    },
-    {
       "name": "消费电子零部件及组装",
       "net": -4.29,
       "net_5d": 43.25,
@@ -3209,6 +3198,21 @@
       "consecutive_days": 1,
       "trend": "out",
       "net_5d_days": 5
+    },
+    {
+      "name": "通用设备",
+      "net": -3.73,
+      "net_5d": 40.38,
+      "net_20d": -20.34,
+      "net_60d": -34.81,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": -24.34,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
     }
   ],
   "trend_10d": [
@@ -3315,6 +3319,21 @@
       "trend": "in"
     },
     {
+      "name": "AI智能体",
+      "net": -10.49,
+      "net_5d": 24.87,
+      "net_20d": 218.36,
+      "net_60d": 521.3,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 88.46,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
       "name": "光刻机",
       "code": "BK0884",
       "type": "概念",
@@ -3392,26 +3411,24 @@
       "net_5d_days": 5,
       "net_10d": 37.45,
       "net_10d_days": 10
-    },
-    {
-      "name": "私募重仓",
-      "code": "BK1695",
-      "type": "概念",
-      "net": 16.67,
-      "net_5d": -38.88,
-      "net_10d": 31.69,
-      "net_20d": -157.24,
-      "net_60d": 65.85,
-      "net_5d_days": 5,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 3,
-      "trend": "in"
     }
   ],
   "trend_20d": [
+    {
+      "name": "AI智能体",
+      "net": -10.49,
+      "net_5d": 24.87,
+      "net_20d": 218.36,
+      "net_60d": 521.3,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 88.46,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
     {
       "name": "DeepSeek概念",
       "net": -8.29,
@@ -3423,6 +3440,21 @@
       "trend": "out",
       "net_5d_days": 5,
       "net_10d": 54.63,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
+      "name": "AI应用",
+      "net": -11.01,
+      "net_5d": -71.88,
+      "net_20d": 141.94,
+      "net_60d": 329.72,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 6.21,
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60
@@ -3565,38 +3597,6 @@
       "source": "东财日K",
       "consecutive_days": 3,
       "trend": "in"
-    },
-    {
-      "name": "集成电路制造",
-      "code": "BK1329",
-      "type": "行业",
-      "net": 18.08,
-      "net_5d": 10.25,
-      "net_10d": 26.69,
-      "net_20d": 20.19,
-      "net_60d": -77.97,
-      "net_5d_days": 5,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 2,
-      "trend": "in"
-    },
-    {
-      "name": "家用电器",
-      "net": 3.22,
-      "net_5d": 21.16,
-      "net_20d": 17.5,
-      "net_60d": -21.19,
-      "type": "行业",
-      "consecutive_days": 6,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 22.47,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
     }
   ],
   "trend_60d": [
@@ -3616,6 +3616,36 @@
       "source": "东财日K",
       "consecutive_days": 2,
       "trend": "out"
+    },
+    {
+      "name": "AI智能体",
+      "net": -10.49,
+      "net_5d": 24.87,
+      "net_20d": 218.36,
+      "net_60d": 521.3,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 88.46,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
+      "name": "AI应用",
+      "net": -11.01,
+      "net_5d": -71.88,
+      "net_20d": 141.94,
+      "net_60d": 329.72,
+      "type": "行业",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 6.21,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
     },
     {
       "name": "DeepSeek概念",
@@ -3747,32 +3777,6 @@
       "trend": "out",
       "net_5d_days": 5,
       "net_10d": 18.18,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
-    },
-    {
-      "name": "种植业",
-      "net": -1.72,
-      "net_5d": 0,
-      "net_20d": 0,
-      "net_60d": 71.52,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_60d_days": 56
-    },
-    {
-      "name": "房地产",
-      "net": -1.36,
-      "net_5d": -7.14,
-      "net_20d": -0.01,
-      "net_60d": 70.61,
-      "type": "行业",
-      "consecutive_days": 2,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": -14.27,
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60
