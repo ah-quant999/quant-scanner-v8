@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-17 19:37",
- "generated": "2026-11-17 19:37",
+ "update_time": "2026-11-17 19:41",
+ "generated": "2026-11-17 19:41",
  "meta": {
-  "generated": "2026-11-17 19:37",
+  "generated": "2026-11-17 19:41",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11880,10 +11880,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
+      "category": "突破"
+     },
+     {
       "code": "920690",
       "name": "捷众科技",
       "change_pct": 6.884,
       "price": 17.08,
+      "category": "突破"
+     },
+     {
+      "code": "688036",
+      "name": "传音控股",
+      "change_pct": 4.367,
+      "price": 66.44,
       "category": "突破"
      },
      {
@@ -11927,16 +11941,16 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.868,
       "price": 45.9,
       "category": "突破"
-     },
-     {
-      "code": "001201",
-      "name": "东瑞股份",
-      "change_pct": 4.323,
-      "price": 18.1,
-      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
+      "category": "加速"
+     },
      {
       "code": "920690",
       "name": "捷众科技",
@@ -11947,6 +11961,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
+      "category": "短线选股"
+     },
+     {
       "code": "920690",
       "name": "捷众科技",
       "change_pct": 6.884,
@@ -11954,6 +11975,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688036",
+      "name": "传音控股",
+      "change_pct": 4.367,
+      "price": 66.44,
+      "category": "短线选股"
+     },
+     {
       "code": "002652",
       "name": "扬子新材",
       "change_pct": 10.0,
@@ -11993,18 +12021,18 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "意华股份",
       "change_pct": 6.868,
       "price": 45.9,
-      "category": "短线选股"
-     },
-     {
-      "code": "001201",
-      "name": "东瑞股份",
-      "change_pct": 4.323,
-      "price": 18.1,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
+      "code": "688036",
+      "name": "传音控股",
+      "change_pct": 4.367,
+      "price": 66.44,
+      "category": "强势股"
+     },
+     {
       "code": "002652",
       "name": "扬子新材",
       "change_pct": 10.0,
@@ -12044,13 +12072,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "意华股份",
       "change_pct": 6.868,
       "price": 45.9,
-      "category": "强势股"
-     },
-     {
-      "code": "001201",
-      "name": "东瑞股份",
-      "change_pct": 4.323,
-      "price": 18.1,
       "category": "强势股"
      }
     ]
