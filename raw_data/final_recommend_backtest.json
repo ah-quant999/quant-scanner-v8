@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-17 08:23:35",
- "update_time": "2026-11-17 08:23:35",
+ "generated": "2026-11-17 19:25:05",
+ "update_time": "2026-11-17 19:25:05",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -32,7 +32,7 @@
  "total_signals": 9,
  "signal_days": 3,
  "signal_date_range": "2026-11-02 ~ 2026-11-09",
- "kline_calendar_range": "2023-06-29 ~ 2026-11-16",
+ "kline_calendar_range": "2023-06-29 ~ 2026-11-17",
  "periods": {
   "1d": {
    "samples": 4,

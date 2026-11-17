@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-17 05:41:50",
+  "update_time": "2026-11-17 16:49:03",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -10,53 +10,53 @@
   "sentiment_meta": {
     "phase": "回暖",
     "score": 52.0,
-    "delta_pct": -13.51,
+    "delta_pct": 0.0,
     "advice": "🌱 情绪回暖：可适度参与，盯紧最高板扩展",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "红利破净股",
+        "name": "中芯概念",
         "type": "概念",
-        "net": 10.44
+        "net": 41.82
       },
       {
-        "name": "超级品牌",
-        "type": "概念",
-        "net": 8.58
-      },
-      {
-        "name": "红利股",
-        "type": "概念",
-        "net": 8.19
-      },
-      {
-        "name": "电视广播Ⅲ",
+        "name": "半导体",
         "type": "行业",
-        "net": 6.79
+        "net": 29.63
       },
       {
-        "name": "电视广播Ⅱ",
+        "name": "大基金持股",
+        "type": "概念",
+        "net": 28.23
+      },
+      {
+        "name": "先进封装",
+        "type": "概念",
+        "net": 27.25
+      },
+      {
+        "name": "半导体设备",
         "type": "行业",
-        "net": 6.79
+        "net": 19.05
       }
     ],
     "top_out": [
       {
-        "name": "核污染防治",
+        "name": "托育服务",
+        "type": "概念",
+        "net": -0.02
+      },
+      {
+        "name": "社保重仓",
+        "type": "概念",
+        "net": -0.03
+      },
+      {
+        "name": "激光雷达",
         "type": "概念",
         "net": -0.06
-      },
-      {
-        "name": "2026三季报首亏",
-        "type": "概念",
-        "net": -0.18
-      },
-      {
-        "name": "染料",
-        "type": "概念",
-        "net": -0.21
       }
     ]
   },

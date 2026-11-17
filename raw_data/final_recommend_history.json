@@ -1,13 +1,13 @@
 {
-  "generated": "2026-11-17 08:26:39",
-  "update_time": "2026-11-17 08:26:39",
+  "generated": "2026-11-17 19:21:33",
+  "update_time": "2026-11-17 19:21:33",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
   "n_top": 3,
-  "days": 41,
+  "days": 42,
   "date_from": "2026-09-03",
-  "date_to": "2026-11-08",
+  "date_to": "2026-11-17",
   "by_date": {
     "2026-09-03": {
       "date": "2026-09-03",
@@ -1806,6 +1806,50 @@
           "resonance": 1,
           "sources": [
             "强势跟踪"
+          ]
+        }
+      ]
+    },
+    "2026-11-17": {
+      "date": "2026-11-17",
+      "update_time": "2026-11-17 19:21:15",
+      "file": "final_recommend_20261117.json",
+      "degraded": false,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "300666",
+          "name": "江丰电子",
+          "close": 211.87,
+          "close_date": "2026-11-17",
+          "final_score": 35.6,
+          "resonance": 1,
+          "sources": [
+            "因子榜"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "688019",
+          "name": "安集科技",
+          "close": 216.3,
+          "close_date": "2026-11-17",
+          "final_score": 35.4,
+          "resonance": 1,
+          "sources": [
+            "因子榜"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "688059",
+          "name": "华锐精密",
+          "close": 70.8,
+          "close_date": "2026-11-17",
+          "final_score": 32.9,
+          "resonance": 1,
+          "sources": [
+            "因子榜"
           ]
         }
       ]
