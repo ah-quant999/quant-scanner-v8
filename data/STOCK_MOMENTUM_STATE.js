@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-17 08:43",
- "generated": "2026-11-17 08:43",
+ "update_time": "2026-11-17 15:45",
+ "generated": "2026-11-17 15:45",
  "meta": {
-  "generated": "2026-11-17 08:43",
+  "generated": "2026-11-17 15:45",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11880,240 +11880,177 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 5.152,
-      "price": 16.94,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 6.884,
+      "price": 17.08,
       "category": "突破"
      },
      {
-      "code": "002811",
-      "name": "郑中设计",
-      "change_pct": 4.099,
-      "price": 19.3,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.0,
+      "price": 4.4,
       "category": "突破"
      },
      {
-      "code": "000819",
-      "name": "岳阳兴长",
-      "change_pct": 9.984,
-      "price": 14.1,
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.0,
+      "price": 15.29,
       "category": "突破"
      },
      {
-      "code": "605008",
-      "name": "长鸿高科",
-      "change_pct": 3.081,
-      "price": 11.04,
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.0,
+      "price": 11.88,
       "category": "突破"
      },
      {
-      "code": "301636",
-      "name": "泽润新能",
-      "change_pct": 3.189,
-      "price": 42.71,
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 4.48,
+      "price": 41.98,
       "category": "突破"
      },
      {
-      "code": "002548",
-      "name": "金新农",
-      "change_pct": 9.922,
-      "price": 4.21,
+      "code": "688010",
+      "name": "福光股份",
+      "change_pct": 6.681,
+      "price": 24.43,
       "category": "突破"
      },
      {
-      "code": "603098",
-      "name": "森特股份",
-      "change_pct": 4.352,
-      "price": 11.03,
+      "code": "002897",
+      "name": "意华股份",
+      "change_pct": 6.868,
+      "price": 45.9,
       "category": "突破"
      },
      {
-      "code": "002286",
-      "name": "保龄宝",
-      "change_pct": 4.134,
-      "price": 9.32,
-      "category": "突破"
-     },
-     {
-      "code": "600630",
-      "name": "龙头股份",
-      "change_pct": 3.272,
-      "price": 7.26,
-      "category": "突破"
-     },
-     {
-      "code": "000921",
-      "name": "海信家电",
-      "change_pct": 7.517,
-      "price": 23.6,
-      "category": "突破"
-     },
-     {
-      "code": "603081",
-      "name": "大丰实业",
-      "change_pct": 4.067,
-      "price": 11.77,
+      "code": "001201",
+      "name": "东瑞股份",
+      "change_pct": 4.323,
+      "price": 18.1,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 5.152,
-      "price": 16.94,
-      "category": "加速"
-     },
-     {
-      "code": "002811",
-      "name": "郑中设计",
-      "change_pct": 4.099,
-      "price": 19.3,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 6.884,
+      "price": 17.08,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 5.152,
-      "price": 16.94,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 6.884,
+      "price": 17.08,
       "category": "短线选股"
      },
      {
-      "code": "002811",
-      "name": "郑中设计",
-      "change_pct": 4.099,
-      "price": 19.3,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.0,
+      "price": 4.4,
       "category": "短线选股"
      },
      {
-      "code": "000819",
-      "name": "岳阳兴长",
-      "change_pct": 9.984,
-      "price": 14.1,
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.0,
+      "price": 15.29,
       "category": "短线选股"
      },
      {
-      "code": "605008",
-      "name": "长鸿高科",
-      "change_pct": 3.081,
-      "price": 11.04,
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.0,
+      "price": 11.88,
       "category": "短线选股"
      },
      {
-      "code": "301636",
-      "name": "泽润新能",
-      "change_pct": 3.189,
-      "price": 42.71,
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 4.48,
+      "price": 41.98,
       "category": "短线选股"
      },
      {
-      "code": "002548",
-      "name": "金新农",
-      "change_pct": 9.922,
-      "price": 4.21,
+      "code": "688010",
+      "name": "福光股份",
+      "change_pct": 6.681,
+      "price": 24.43,
       "category": "短线选股"
      },
      {
-      "code": "603098",
-      "name": "森特股份",
-      "change_pct": 4.352,
-      "price": 11.03,
+      "code": "002897",
+      "name": "意华股份",
+      "change_pct": 6.868,
+      "price": 45.9,
       "category": "短线选股"
      },
      {
-      "code": "002286",
-      "name": "保龄宝",
-      "change_pct": 4.134,
-      "price": 9.32,
-      "category": "短线选股"
-     },
-     {
-      "code": "600630",
-      "name": "龙头股份",
-      "change_pct": 3.272,
-      "price": 7.26,
-      "category": "短线选股"
-     },
-     {
-      "code": "000921",
-      "name": "海信家电",
-      "change_pct": 7.517,
-      "price": 23.6,
-      "category": "短线选股"
-     },
-     {
-      "code": "603081",
-      "name": "大丰实业",
-      "change_pct": 4.067,
-      "price": 11.77,
+      "code": "001201",
+      "name": "东瑞股份",
+      "change_pct": 4.323,
+      "price": 18.1,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "000819",
-      "name": "岳阳兴长",
-      "change_pct": 9.984,
-      "price": 14.1,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.0,
+      "price": 4.4,
       "category": "强势股"
      },
      {
-      "code": "605008",
-      "name": "长鸿高科",
-      "change_pct": 3.081,
-      "price": 11.04,
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.0,
+      "price": 15.29,
       "category": "强势股"
      },
      {
-      "code": "301636",
-      "name": "泽润新能",
-      "change_pct": 3.189,
-      "price": 42.71,
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.0,
+      "price": 11.88,
       "category": "强势股"
      },
      {
-      "code": "002548",
-      "name": "金新农",
-      "change_pct": 9.922,
-      "price": 4.21,
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 4.48,
+      "price": 41.98,
       "category": "强势股"
      },
      {
-      "code": "603098",
-      "name": "森特股份",
-      "change_pct": 4.352,
-      "price": 11.03,
+      "code": "688010",
+      "name": "福光股份",
+      "change_pct": 6.681,
+      "price": 24.43,
       "category": "强势股"
      },
      {
-      "code": "002286",
-      "name": "保龄宝",
-      "change_pct": 4.134,
-      "price": 9.32,
+      "code": "002897",
+      "name": "意华股份",
+      "change_pct": 6.868,
+      "price": 45.9,
       "category": "强势股"
      },
      {
-      "code": "600630",
-      "name": "龙头股份",
-      "change_pct": 3.272,
-      "price": 7.26,
-      "category": "强势股"
-     },
-     {
-      "code": "000921",
-      "name": "海信家电",
-      "change_pct": 7.517,
-      "price": 23.6,
-      "category": "强势股"
-     },
-     {
-      "code": "603081",
-      "name": "大丰实业",
-      "change_pct": 4.067,
-      "price": 11.77,
+      "code": "001201",
+      "name": "东瑞股份",
+      "change_pct": 4.323,
+      "price": 18.1,
       "category": "强势股"
      }
     ]
