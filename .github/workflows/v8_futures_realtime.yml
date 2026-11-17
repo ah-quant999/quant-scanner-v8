@@ -23,9 +23,17 @@ name: "📈 v8 期指实时 refresh (cn)"
 
 on:
   schedule:
-    # 09:00-16:30 北京时间（UTC 01:00-08:30），每 30 分钟一次（结构拆分强制重新注册 cron）
-    - cron: '0 1-8 * * 1-5'
-    - cron: '30 1-8 * * 1-5'
+    # 🔴 2026-11-18 一劳永逸修复（主人令「收盘的数据怎么没有」）：
+    #   现象=卡停在 14:45 盘中定稿，收盘后（15:00-16:30）无任何一档成功落盘。
+    #   根因（双杀）：① 15:00/15:30/16:00/16:30 四个 schedule 档全部被 GitHub 静默注销；
+    #                 ② 唯一补跑的 16:49（08:30 档漂移）又被「09:00-16:30 交易时间 gate」拒掉。
+    #   修法（结构性，与 11-17 thermo/快照修复同范式）：
+    #     a) cron 改显式分钟列表、加密到每 15 分钟一档（15:00/15:15/15:30/15:45 必有收盘定稿档，
+    #        收盘后新浪报价冻结在 15:00 ticktime，update_time 即真实收盘时点）；
+    #     b) 交易时间 gate 放宽到 09:00-16:59 —— 漂移到 16:49 的档不再被闸门误杀。
+    # 09:00-15:45 北京时间（UTC 01:00-07:45），每 15 分钟一次（显式分钟列表，强制重新注册防静默注销）
+    - cron: '0,15,30,45 1-7 * * 1-5'
+    - cron: '0 8 * * 1-5'   # 北京 16:00 收盘锚点兜底档
   workflow_dispatch:
     inputs:
       skip_trading_day_gate:
@@ -105,7 +113,7 @@ jobs:
           PYEOF
           python "$RUNNER_TEMP/sync_futures_src.py"
 
-      - name: "🕘 交易时间 gate（09:00-16:30 北京时间）"
+      - name: "🕘 交易时间 gate（09:00-16:59 北京时间 · 11-18 放宽收漂移档）"
         id: trading_hours
         run: |
           if [ "${{ github.event.inputs.skip_trading_day_gate }}" = "true" ]; then
@@ -116,8 +124,8 @@ jobs:
           from datetime import datetime, timedelta
           now = datetime.utcnow() + timedelta(hours=8)
           hm = now.hour * 60 + now.minute
-          ok = 540 <= hm <= 990  # 09:00..16:30
-          print(f"  Beijing time: {now:%H:%M} ({'inside' if ok else 'outside'} 09:00-16:30)")
+          ok = 540 <= hm <= 1019  # 09:00..16:59（11-18 放宽：漂移档 16:49 不再被 16:30 闸门误杀）
+          print(f"  Beijing time: {now:%H:%M} ({'inside' if ok else 'outside'} 09:00-16:59)")
           import os
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               f.write(f"is_trading_hours={'true' if ok else 'false'}\n")
