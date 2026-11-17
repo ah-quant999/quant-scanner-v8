@@ -184,6 +184,61 @@ def _purge_after_close(today):
     return True
 
 
+def _ensure_close_anchor(today):
+    """🛡 2026-11-17 一劳永逸（主人令·两条规则打架根治）：
+    健康面板要求 intraday 卡「最后档 ≥14:55」，而本脚本 G2 同内容去重会在源档
+    未刷新时跳过写盘（实证 11-17 14:49 run：源与 14:31 末档一致 → 跳过；
+    14:55~15:05 又无运行 ⇒ 末档永远停在 14:31 ⇒ 面板必红）。
+    修法：收盘后 15:10–16:25 的任一运行（post_close 抓取链经 workflow_run 必达）
+    若发现当日末档 <14:55，补一笔「15:00 收盘锚点」：
+      · 源档为当日真收盘数据 → 用源档进/出榜（真值，非伪造）；
+      · 源档非当日 → 沿用末档真实板块值并写 source_update_time 溯源；
+      · 已有 ≥14:55 档则完全不动（幂等）。
+    与 _purge_after_close 同在时段守卫之前执行，确保盘后运行也能自愈。
+    """
+    hhmm = now_cst().strftime("%H:%M")
+    if not ("15:10" <= hhmm <= "16:25"):
+        return False
+    ex = _load_today_intraday(today)
+    if not ex:
+        return False
+    snaps = ex.get("snapshots") or []
+    if any(str(s.get("time") or "") >= "14:55" for s in snaps):
+        return False
+
+    si, so, src_ts = [], [], ""
+    if os.path.exists(SECTOR_PATH):
+        try:
+            src = json.loads(open(SECTOR_PATH, encoding="utf-8").read())
+            if str(src.get("update_time") or "").startswith(today):
+                si, so = src.get("sectors_in") or [], src.get("sectors_out") or []
+                src_ts = str(src.get("update_time"))
+        except Exception:
+            pass
+    if si:
+        top_in = [{"name": s["name"], "net": round(float(s.get("net", 0)), 2)}
+                  for s in si[:15] if s.get("name") not in _NOISE]
+        top_out = [{"name": s["name"], "net": round(float(s.get("net", 0)), 2)}
+                   for s in so[:5] if s.get("name") not in _NOISE]
+    elif snaps:
+        _last = snaps[-1]
+        top_in = list(_last.get("sectors_in") or [])
+        top_out = list(_last.get("sectors_out") or [])
+        src_ts = "继承末档 %s（源档非今日）" % _last.get("time")
+    else:
+        return False
+    if not top_in:
+        return False
+
+    anchor = {"time": "15:00", "sectors_in": top_in, "sectors_out": top_out,
+              "index_chg": get_index_chg(), "source_update_time": src_ts}
+    ex["snapshots"] = [s for s in snaps if str(s.get("time") or "") != "15:00"] + [anchor]
+    ex["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+    _write_outputs(ex)
+    print("🩹 尾盘锚点自愈：末档早于 14:55 → 补 15:00 收盘点（源 %s）" % src_ts)
+    return True
+
+
 def main():
     t = now_cst()
     hhmm = t.strftime("%H:%M")
@@ -192,6 +247,7 @@ def main():
     # 🛡 自愈①（2026-09-29）：归并盘后离群点 —— 必须放在时段守卫**之前**，
     #   否则 15:05 后脚本直接 return，已污染的盘后点永远清不掉。
     _purge_after_close(today)
+    _ensure_close_anchor(today)  # 🛡 2026-11-17：尾盘锚点自愈（须在时段守卫之前）
 
     # 🛡 交易时段守卫：仅 09:25–15:05 写快照（A股 09:30 开盘 / 15:00 收盘，两端各留 5 分钟余量）。
     #   2026-09-29 修：上界原为 16:05（过宽）⇒ 15:00 后的运行点（15:29/15:59/16:03）污染曲线。
@@ -299,7 +355,10 @@ def main():
     #   ⇒ 曲线平坦重影段 + x 轴不规则密刻度（「10:17、10:20、10:36、10:37」）。与末条
     #   快照的板块数据（进/出）完全一致即判定无新信息，跳过写盘；指数涨跌幅每次实时取、
     #   不作为去重判据（避免指数线被板块刷新率绑架）。源更新后下一档自然补点，曲线连续不断。
-    if data["snapshots"]:
+    # 🛡 2026-11-17 一劳永逸：14:55 之后为「收盘定稿窗」，健康判据以最后档 ≥14:55
+    #   认定当日盘中链未跳班 ⇒ 本窗内即使源档未刷新也必须写锚点，不能被 G2 去重吞掉。
+    #   （尾盘锚点由 _ensure_close_anchor 在盘后自愈兜底，双保险、真值不伪造。）
+    if data["snapshots"] and hhmm < "14:55":
         _last = data["snapshots"][-1]
         if (_last.get("sectors_in") == snap["sectors_in"]
                 and _last.get("sectors_out") == snap["sectors_out"]):

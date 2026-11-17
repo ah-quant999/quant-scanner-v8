@@ -1854,6 +1854,52 @@ def run_experiment_cards():
     #   位于聚合器之前）。此处保留墓志铭以防被误当"仍需生成"而重复挂链。
 
 
+def _sync_maharo_wm_from_insights():
+    """🛡 2026-11-17 主人令一劳永逸（all_maharo_wm 必红根治）：
+    旧种子库 data/maharo_wm.js 于 11-15 建库时继承 11-10 快照时间戳，之后无任何生产者，
+    7 天低频红线一到必 fail；而其权威源稿 data/maharo_insights.js 每天三档真实刷新，
+    weekly/monthly 均为当期真身。本函数让 WM 每次 build 都从 insights 同源同步：
+      · 只同步 weekly/monthly/compare + update_time，不动 daily（保持解耦设计）；
+      · 源稿周/月缺块时拒绝写盘（防把兜底副本刷空）；
+      · 内容一致时不写盘（幂等，不制造无谓 diff / ?v 抖动）。
+    """
+    src = DATA_DIR / "maharo_insights.js"
+    dst = DATA_DIR / "maharo_wm.js"
+    if not src.exists():
+        return
+    text = src.read_text(encoding="utf-8")
+    m = re.match(r"^\s*window\.(\w+)\s*=\s*", text)
+    if not m:
+        print("  ⚠️ maharo_insights.js 非 window.XXX 结构，跳过 WM 同步")
+        return
+    obj = json.loads(text[m.end():].strip().rstrip(";"))
+    wm = {
+        "update_time": obj.get("update_time") or now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+        "role": "机构研究·周/月解析判断独立种子库（与 daily 解耦；每次 build 从 insights 权威源稿同源同步，2026-11-17）",
+        "weekly": obj.get("weekly"),
+        "monthly": obj.get("monthly"),
+        "compare": obj.get("compare") or {"weekly": None, "monthly": None},
+        "_meta": {
+            "source_snapshot": obj.get("update_time") or "",
+            "note": "前端 renderMahoroCard 在 MAHORO_INSIGHTS 缺 weekly/monthly 时从本文件兜底；禁止手工回填旧稿，由 update_v8.py 同源同步",
+        },
+    }
+    if not all(isinstance(wm.get(k), dict) and str(wm[k].get("text") or "").strip()
+               for k in ("weekly", "monthly")):
+        print("  ⚠️ 源稿周/月解析缺失，保留 WM 旧种子库（防把权威副本刷空）")
+        return
+    blob = "window.MAHORO_WM = " + json.dumps(wm, ensure_ascii=False, indent=2) + ";\n"
+    try:
+        if dst.exists() and dst.read_text(encoding="utf-8") == blob:
+            return
+        tmp = dst.with_name("maharo_wm.js.tmp")
+        tmp.write_text(blob, encoding="utf-8", newline="\n")
+        os.replace(tmp, dst)
+        print("✅ maharo_wm 种子库已从 insights 同步（update_time=%s）" % wm["update_time"])
+    except Exception as e:
+        print("  ⚠️ maharo_wm 同步失败（不影响构建）：%s" % e)
+
+
 def main():
     import argparse
     # 🔴 2026-09-13 一劳永逸（阿狸咪的工程师）：跑批前「工作区 vs 远端」一致性守卫。
@@ -1921,6 +1967,8 @@ def main():
                 import traceback as _tb
                 print(f"  ⚠️ {label} 异常(已隔离，不影响部署)：{_e}")
                 _tb.print_exc()
+        # 0) 🛡 2026-11-17：WM 种子库从 insights 权威源稿同源同步（低频陈旧必红根治）
+        _safe("sync_maharo_wm", _sync_maharo_wm_from_insights)
         # 1) 缓存戳重写：部署上线必需，最先执行且独立隔离
         _safe("缓存戳重写", lambda: (_ensure_momentum_loader(),
                                       _rewrite_cache_busters_for(ROOT / "logic.html"),

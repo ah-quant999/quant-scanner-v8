@@ -2703,6 +2703,27 @@ def check_all_data_files():
             meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
             ts = (meta.get("generated") or meta.get("update_time") or meta.get("updated")
                   or data.get("data_date") or data.get("updated_at") or "--")
+        # 🛡 2026-11-17 主人令一劳永逸：maharo_wm 是 maharo_insights 的周/月派生镜像，
+        #   本身无独立生产者；镜像时间戳可能滞后于源稿（11-15 建库继承 11-10 快照实证）。
+        #   新鲜度改按「镜像与其权威源稿中较新者」判定：源稿当期周/月真身在 ⇒ 镜像陈旧不算真故障；
+        #   源稿与镜像都陈旧 ⇒ 仍按原红线 fail，真停摆照样可见。同步逻辑在 update_v8.py。
+        if vid == "maharo_wm":
+            try:
+                _ip = DATA_DIR / "maharo_insights.js"
+                _it = _ip.read_text(encoding="utf-8", errors="replace")
+                _im = re.match(r"^\s*window\.(\w+)\s*=\s*", _it)
+                if _im:
+                    _io = json.loads(_it[_im.end():].strip().rstrip(";"))
+                    if (isinstance(_io.get("weekly"), dict) and isinstance(_io.get("monthly"), dict)
+                            and str(_io["weekly"].get("text") or "").strip()
+                            and str(_io["monthly"].get("text") or "").strip()):
+                        _its = str(_io.get("update_time") or "")
+                        _idt = parse_time(_its) if _its else None
+                        _odt = parse_time(ts) if isinstance(ts, str) else None
+                        if _idt and (_odt is None or _idt > _odt):
+                            ts = _its
+            except Exception:
+                pass
         dt = parse_time(ts) if isinstance(ts, str) else None
         # 🛡 2026-08-18 一劳永逸式修复：把 _LOW_FREQ_FILES 判断前移到「无时间戳」分支之前。
         #   原 line 1114 `if dt is None: warn + continue` 永远先 return，
