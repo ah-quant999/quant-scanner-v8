@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-17 22:07",
- "generated": "2026-11-17 22:07",
+ "update_time": "2026-11-17 22:34",
+ "generated": "2026-11-17 22:34",
  "meta": {
-  "generated": "2026-11-17 22:07",
+  "generated": "2026-11-17 22:34",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11880,6 +11880,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
+      "category": "突破"
+     },
+     {
+      "code": "688169",
+      "name": "石头科技",
+      "change_pct": 5.005,
+      "price": 140.35,
+      "category": "突破"
+     },
+     {
       "code": "920690",
       "name": "捷众科技",
       "change_pct": 6.884,
@@ -11927,16 +11941,23 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.681,
       "price": 24.43,
       "category": "突破"
-     },
-     {
-      "code": "002897",
-      "name": "意华股份",
-      "change_pct": 6.868,
-      "price": 45.9,
-      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
+      "category": "加速"
+     },
+     {
+      "code": "688169",
+      "name": "石头科技",
+      "change_pct": 5.005,
+      "price": 140.35,
+      "category": "加速"
+     },
      {
       "code": "920690",
       "name": "捷众科技",
@@ -11947,6 +11968,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
+      "category": "短线选股"
+     },
+     {
+      "code": "688169",
+      "name": "石头科技",
+      "change_pct": 5.005,
+      "price": 140.35,
+      "category": "短线选股"
+     },
+     {
       "code": "920690",
       "name": "捷众科技",
       "change_pct": 6.884,
@@ -11993,13 +12028,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "福光股份",
       "change_pct": 6.681,
       "price": 24.43,
-      "category": "短线选股"
-     },
-     {
-      "code": "002897",
-      "name": "意华股份",
-      "change_pct": 6.868,
-      "price": 45.9,
       "category": "短线选股"
      }
     ],
@@ -12044,13 +12072,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "福光股份",
       "change_pct": 6.681,
       "price": 24.43,
-      "category": "强势股"
-     },
-     {
-      "code": "002897",
-      "name": "意华股份",
-      "change_pct": 6.868,
-      "price": 45.9,
       "category": "强势股"
      }
     ]
