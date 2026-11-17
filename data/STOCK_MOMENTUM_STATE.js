@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-18 03:27",
- "generated": "2026-11-18 03:27",
+ "update_time": "2026-11-18 05:02",
+ "generated": "2026-11-18 05:02",
  "meta": {
-  "generated": "2026-11-18 03:27",
+  "generated": "2026-11-18 05:02",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -11880,31 +11880,73 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "002242",
-      "name": "九阳股份",
-      "change_pct": 10.017,
-      "price": 31.52,
-      "category": "突破"
-     },
-     {
-      "code": "688169",
-      "name": "石头科技",
-      "change_pct": 5.005,
-      "price": 140.35,
+      "code": "301086",
+      "name": "鸿富瀚",
+      "change_pct": 3.043,
+      "price": 99.23,
       "category": "突破"
      },
      {
       "code": "920690",
       "name": "捷众科技",
-      "change_pct": 6.884,
-      "price": 17.08,
+      "change_pct": 8.761,
+      "price": 17.38,
       "category": "突破"
      },
      {
-      "code": "688036",
-      "name": "传音控股",
-      "change_pct": 4.367,
-      "price": 66.44,
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 7.957,
+      "price": 25.37,
+      "category": "突破"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 4.928,
+      "price": 11.71,
+      "category": "突破"
+     },
+     {
+      "code": "301376",
+      "name": "致欧科技",
+      "change_pct": 4.449,
+      "price": 23.24,
+      "category": "突破"
+     },
+     {
+      "code": "300992",
+      "name": "泰福泵业",
+      "change_pct": 4.25,
+      "price": 22.32,
+      "category": "突破"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 4.878,
+      "price": 107.08,
+      "category": "突破"
+     },
+     {
+      "code": "301149",
+      "name": "隆华新材",
+      "change_pct": 3.03,
+      "price": 6.46,
+      "category": "突破"
+     },
+     {
+      "code": "688620",
+      "name": "安凯微",
+      "change_pct": 3.802,
+      "price": 12.56,
+      "category": "突破"
+     },
+     {
+      "code": "002518",
+      "name": "科士达",
+      "change_pct": 3.825,
+      "price": 26.06,
       "category": "突破"
      },
      {
@@ -11912,6 +11954,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "扬子新材",
       "change_pct": 10.0,
       "price": 4.4,
+      "category": "突破"
+     },
+     {
+      "code": "003004",
+      "name": "声迅股份",
+      "change_pct": 5.043,
+      "price": 48.32,
+      "category": "突破"
+     },
+     {
+      "code": "300727",
+      "name": "润禾材料",
+      "change_pct": 5.231,
+      "price": 22.73,
       "category": "突破"
      },
      {
@@ -11926,73 +11982,101 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "真视通",
       "change_pct": 10.0,
       "price": 11.88,
-      "category": "突破"
-     },
-     {
-      "code": "920015",
-      "name": "锦华新材",
-      "change_pct": 4.48,
-      "price": 41.98,
-      "category": "突破"
-     },
-     {
-      "code": "688010",
-      "name": "福光股份",
-      "change_pct": 6.681,
-      "price": 24.43,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "002242",
-      "name": "九阳股份",
-      "change_pct": 10.017,
-      "price": 31.52,
-      "category": "加速"
-     },
-     {
-      "code": "688169",
-      "name": "石头科技",
-      "change_pct": 5.005,
-      "price": 140.35,
+      "code": "301086",
+      "name": "鸿富瀚",
+      "change_pct": 3.043,
+      "price": 99.23,
       "category": "加速"
      },
      {
       "code": "920690",
       "name": "捷众科技",
-      "change_pct": 6.884,
-      "price": 17.08,
+      "change_pct": 8.761,
+      "price": 17.38,
+      "category": "加速"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 7.957,
+      "price": 25.37,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "002242",
-      "name": "九阳股份",
-      "change_pct": 10.017,
-      "price": 31.52,
-      "category": "短线选股"
-     },
-     {
-      "code": "688169",
-      "name": "石头科技",
-      "change_pct": 5.005,
-      "price": 140.35,
+      "code": "301086",
+      "name": "鸿富瀚",
+      "change_pct": 3.043,
+      "price": 99.23,
       "category": "短线选股"
      },
      {
       "code": "920690",
       "name": "捷众科技",
-      "change_pct": 6.884,
-      "price": 17.08,
+      "change_pct": 8.761,
+      "price": 17.38,
       "category": "短线选股"
      },
      {
-      "code": "688036",
-      "name": "传音控股",
-      "change_pct": 4.367,
-      "price": 66.44,
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 7.957,
+      "price": 25.37,
+      "category": "短线选股"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 4.928,
+      "price": 11.71,
+      "category": "短线选股"
+     },
+     {
+      "code": "301376",
+      "name": "致欧科技",
+      "change_pct": 4.449,
+      "price": 23.24,
+      "category": "短线选股"
+     },
+     {
+      "code": "300992",
+      "name": "泰福泵业",
+      "change_pct": 4.25,
+      "price": 22.32,
+      "category": "短线选股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 4.878,
+      "price": 107.08,
+      "category": "短线选股"
+     },
+     {
+      "code": "301149",
+      "name": "隆华新材",
+      "change_pct": 3.03,
+      "price": 6.46,
+      "category": "短线选股"
+     },
+     {
+      "code": "688620",
+      "name": "安凯微",
+      "change_pct": 3.802,
+      "price": 12.56,
+      "category": "短线选股"
+     },
+     {
+      "code": "002518",
+      "name": "科士达",
+      "change_pct": 3.825,
+      "price": 26.06,
       "category": "短线选股"
      },
      {
@@ -12000,6 +12084,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "扬子新材",
       "change_pct": 10.0,
       "price": 4.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "003004",
+      "name": "声迅股份",
+      "change_pct": 5.043,
+      "price": 48.32,
+      "category": "短线选股"
+     },
+     {
+      "code": "300727",
+      "name": "润禾材料",
+      "change_pct": 5.231,
+      "price": 22.73,
       "category": "短线选股"
      },
      {
@@ -12014,29 +12112,57 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "真视通",
       "change_pct": 10.0,
       "price": 11.88,
-      "category": "短线选股"
-     },
-     {
-      "code": "920015",
-      "name": "锦华新材",
-      "change_pct": 4.48,
-      "price": 41.98,
-      "category": "短线选股"
-     },
-     {
-      "code": "688010",
-      "name": "福光股份",
-      "change_pct": 6.681,
-      "price": 24.43,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "688036",
-      "name": "传音控股",
-      "change_pct": 4.367,
-      "price": 66.44,
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 4.928,
+      "price": 11.71,
+      "category": "强势股"
+     },
+     {
+      "code": "301376",
+      "name": "致欧科技",
+      "change_pct": 4.449,
+      "price": 23.24,
+      "category": "强势股"
+     },
+     {
+      "code": "300992",
+      "name": "泰福泵业",
+      "change_pct": 4.25,
+      "price": 22.32,
+      "category": "强势股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 4.878,
+      "price": 107.08,
+      "category": "强势股"
+     },
+     {
+      "code": "301149",
+      "name": "隆华新材",
+      "change_pct": 3.03,
+      "price": 6.46,
+      "category": "强势股"
+     },
+     {
+      "code": "688620",
+      "name": "安凯微",
+      "change_pct": 3.802,
+      "price": 12.56,
+      "category": "强势股"
+     },
+     {
+      "code": "002518",
+      "name": "科士达",
+      "change_pct": 3.825,
+      "price": 26.06,
       "category": "强势股"
      },
      {
@@ -12044,6 +12170,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "扬子新材",
       "change_pct": 10.0,
       "price": 4.4,
+      "category": "强势股"
+     },
+     {
+      "code": "003004",
+      "name": "声迅股份",
+      "change_pct": 5.043,
+      "price": 48.32,
+      "category": "强势股"
+     },
+     {
+      "code": "300727",
+      "name": "润禾材料",
+      "change_pct": 5.231,
+      "price": 22.73,
       "category": "强势股"
      },
      {
@@ -12058,20 +12198,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "真视通",
       "change_pct": 10.0,
       "price": 11.88,
-      "category": "强势股"
-     },
-     {
-      "code": "920015",
-      "name": "锦华新材",
-      "change_pct": 4.48,
-      "price": 41.98,
-      "category": "强势股"
-     },
-     {
-      "code": "688010",
-      "name": "福光股份",
-      "change_pct": 6.681,
-      "price": 24.43,
       "category": "强势股"
      }
     ]
