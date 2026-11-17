@@ -162,6 +162,12 @@ MUST_HAVE_CRON = {
     #   根因修复 2026-11-15 建链时漏挂调度（43 workflow 零引用）致 all_CRED_LEDGER 永久假红。
     #   本轮建链时又漏本名单 ⇒ build_deploy [4/8] 恒红阻断 deploy（同族第 N 次教训），本项收口。
     "v8_cred_expiry_watch": "凭证到期巡检(每日09:10·cn runner·真源json级联+邮件预警)",
+
+    # 2026-11-17 主人令「TL 接入 / 板块技术研判卡」双登记（建链漏挂 ⇒ build_deploy [4/8] 连红阻断 deploy）：
+    #   · v8_bond_futures（cron 交易日 09:00-16:30 每30分，cn runner，产 data/BOND_FUTURES.js）
+    #   · v8_sector_tech（cron 交易日 16:00，cn runner，产 data/SECTOR_TECH_JUDG.js）
+    "v8_bond_futures": "国债期货利率罗盘(TL30Y·cn盘中30分)",
+    "v8_sector_tech": "板块技术研判(申万一级31·L4分级·cn盘后16:00)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
