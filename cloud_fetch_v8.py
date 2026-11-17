@@ -5930,6 +5930,12 @@ def main(category=None, only=None):
                   全断 ⇒ {}，gen_national_team 侧 D 标未就绪、权重自动重分。
         """
         import time as _t
+        # 🔴 2026-11-17 一劳永逸修复（主人令）：本函数原用裸 requests.get 但全文件无模块级
+        #   import requests ⇒ NameError ×18（6 ETF×3 try + 指数），cn 机 post_close 档
+        #   实测 11-17 03:41 run 43941986679 日志铁证「name 'requests' is not defined」
+        #   ⇒ broad_etf_volume.json 自 11-13 起永不落盘 → 国家队卡 D 胶囊（宽基ETF放量异动）
+        #   连日「未就绪」。改函数内局部 import，与 f_etf_subscription 等（L6226 _rq）同款。
+        import requests as _rq
         EM_URL = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
         ETF6 = [("1.510300", "沪深300ETF华泰柏瑞"), ("1.510050", "上证50ETF华夏"),
                 ("1.510330", "沪深300ETF华夏"), ("1.510310", "沪深300ETF易方达"),
@@ -5945,7 +5951,7 @@ def main(category=None, only=None):
                    "_": str(int(_t.time() * 1000))}
             for _try in range(3):
                 try:
-                    r = requests.get(EM_URL, params=prm, headers=_h, timeout=15)
+                    r = _rq.get(EM_URL, params=prm, headers=_h, timeout=15)
                     r.raise_for_status()
                     ks = ((r.json() or {}).get("data") or {}).get("klines") or []
                     if ks:
