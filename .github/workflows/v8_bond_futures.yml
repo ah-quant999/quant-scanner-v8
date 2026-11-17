@@ -1,0 +1,123 @@
+# 🏦 v8 国债期货利率罗盘 refresh (cn)
+# gen_bond_futures.py → data/BOND_FUTURES.js → 同步 index.html ?v → Pages 自动部署
+# 🔴 中国IP依赖：新浪nf_/东财push2his 境外不可达，锁定 [self-hosted, cn]，勿迁云。
+name: "🏦 v8 国债期货利率罗盘 refresh (cn)"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1-8 * * 1-5'
+    - cron: '30 1-8 * * 1-5'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-bond-futures-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 20
+    steps:
+      - name: "📥 同步源码（GitHub API 直连，仅拉本卡生成器）"
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p v8
+          python - <<'PY'
+          import os, base64, json, urllib.request, time
+          TOK=os.environ["GITHUB_TOKEN"]
+          REPO="ah-quant999/quant-scanner-v8"
+          H={ "Authorization":"Bearer "+TOK, "Accept":"application/vnd.github+json" }
+          path="v8/gen_bond_futures.py"
+          for i in range(6):
+              try:
+                  req=urllib.request.Request(f"https://api.github.com/repos/{REPO}/contents/{path}",headers=H)
+                  obj=json.load(urllib.request.urlopen(req,timeout=90))
+                  data=base64.b64decode(obj["content"])
+                  os.makedirs(os.path.dirname(path) or ".",exist_ok=True)
+                  open(path,"wb").write(data)
+                  print("synced",path,len(data)); break
+              except Exception as e:
+                  print("retry",i,e); time.sleep(min(2**i,15))
+          else:
+              raise SystemExit("sync failed")
+          PY
+
+      - name: "🧮 跑 gen_bond_futures.py"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python v8/gen_bond_futures.py
+          if [ ! -s data/BOND_FUTURES.js ]; then
+            echo "::error::data/BOND_FUTURES.js 空/缺失"; exit 1
+          fi
+          echo "✅ data/BOND_FUTURES.js: $(wc -c < data/BOND_FUTURES.js) bytes"
+
+      - name: "📤 推送 data/BOND_FUTURES.js + 同步 index.html ?v"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, json, base64, urllib.request, urllib.error, hashlib, time
+          TOK=os.environ["GITHUB_TOKEN"]
+          REPO="ah-quant999/quant-scanner-v8"
+          H={ "Authorization":"Bearer "+TOK, "Content-Type":"application/json",
+               "Accept":"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28" }
+          def api(method,url,data=None):
+              body=json.dumps(data).encode() if data is not None else None
+              req=urllib.request.Request(url,data=body,headers=H,method=method)
+              with urllib.request.urlopen(req,timeout=90) as r: return json.load(r)
+
+          raw=open("data/BOND_FUTURES.js","rb").read()
+          if len(raw)==0: raise SystemExit("empty data refuse push")
+          content_sha=hashlib.sha1(raw).hexdigest()[:10]
+          print("BOND_FUTURES.js sha10=",content_sha)
+
+          # 1) 推 data 文件
+          remote="data/BOND_FUTURES.js"; url=f"https://api.github.com/repos/{REPO}/contents/{remote}"
+          try: sha=api("GET",url).get("sha")
+          except urllib.error.HTTPError as e: sha=None if e.code==404 else (_ for _ in ()).throw(e)
+          payload={"message":"v8 BOND_FUTURES: 🏦 v8 国债期货利率罗盘 refresh (cn) {content_sha}",
+                    "content":base64.b64encode(raw).decode(),"branch":"main"}
+          if sha: payload["sha"]=sha
+          for i in range(4):
+              try: api("PUT",url,payload); print("pushed",remote,len(raw)); break
+              except urllib.error.HTTPError as e:
+                  if e.code in (409,422) and i<3:
+                      sha=api("GET",url).get("sha"); payload["sha"]=sha; time.sleep(2); continue
+                  raise
+
+          # 2) 同步 index.html 的 ?v 缓存戳
+          idx=f"https://api.github.com/repos/{REPO}/contents/index.html"
+          for i in range(5):
+              try:
+                  ex=api("GET",idx); idx_sha=ex.get("sha")
+                  html=base64.b64decode(ex["content"]).decode("utf-8"); break
+              except Exception as e:
+                  print("idx get retry",e); time.sleep(3)
+          else:
+              print("index.html 获取失败，跳过 ?v（下轮自愈）"); raise SystemExit(0)
+
+          pat=r'(data/BOND_FUTURES\.js\?v=)([a-f0-9]+)'
+          new_html,n=re.subn(pat,lambda m:m.group(1)+content_sha,html)
+          if n==0: print("⚠️ index.html 未找到 BOND_FUTURES.js?v= 引用")
+          elif new_html==html: print("?v 已是",content_sha)
+          else:
+              pl={"message":"chore(cache): BOND_FUTURES.js?v={content_sha}",
+                   "content":base64.b64encode(new_html.encode("utf-8")).decode(),"branch":"main"}
+              for i in range(4):
+                  if idx_sha: pl["sha"]=idx_sha
+                  try: api("PUT",idx,pl); print("index.html ?v →",content_sha); break
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409,422) and i<3:
+                          ex=api("GET",idx); idx_sha=ex.get("sha"); time.sleep(2); continue
+                      raise
+          PY
+
+      - name: "✅ 完成"
+        run: echo "✅ 🏦 v8 国债期货利率罗盘 refresh (cn) 完成"

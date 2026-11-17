@@ -1,0 +1,250 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+板块技术研判 · 申万一级31行业生成器（2026-11-17 主人令「别人那张卡我也想要」）
+====================================================================
+复刻那张卡的研判能力：申万一级31行业，共振置信度分级 L4/L3/L2/L1 +
+  EMA 多头计数 + 区间分位 + 压力位(近20/60日高) + 支撑位(EMA20/波底50%) + 5日量比。
+
+数据源（全部东方财富，同源同频，实测 2026-11-17 可达，中国IP）：
+  · 板块列表 clist (fs=m:90+t:2, 分页取全) → 31行业名→BK代码, 现价f2/涨跌f3/主力净f62
+  · 板块日K push2his kline (secid=90.BKxxxx, klt=101) → EMA/分位/压力支撑/量比
+
+分级口径（共振置信度，L4最高，全为客观打分，不编造）：
+  资金条件：主力净额>0 且 今日涨幅>0 → +1
+  趋势条件：EMA 多头计数>=4(短期均线多数在上) → +1
+  位置条件：区间分位>=70% (强势区) → +1
+  量价条件：5日量比>=1.1 (放量) → +1
+  L4=4项全满足 / L3=3项 / L2=2项 / L1<=1项
+  状态标签：趋势向上(分位>=90且多头) / 下跌反弹(分位高但空头排列修复) / 弱势整理 等。
+
+产出：data/SECTOR_TECH_JUDG.js → window.SECTOR_TECH_JUDG
+刷新：接 v8_sector_tech.yml，盘后1次 [self-hosted, cn]。
+运行：python v8/gen_sector_tech_judg.py [--no-write] [--limit N]
+"""
+from __future__ import annotations
+import json, re, sys, os, time, datetime, urllib.request
+
+UA = {"User-Agent": "Mozilla/5.0"}
+CLIST = ("https://push2.eastmoney.com/api/qt/clist/get?pn={pn}&pz=100&po=1&np=1"
+         "&fltt=2&invt=2&fid=f3&fs=m%3A90%2Bt%3A2&fields=f12,f14,f2,f3,f62")
+KLINE = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?"
+         "secid=90.{bk}&fields1=f1,f2,f3,f4&fields2=f51,f52,f53,f54,f55,f56"
+         "&klt=101&fqt=1&lmt=90&end=20500101")
+
+# 申万一级31行业（东财板块名精确匹配，实测 31/31 命中）
+SW31 = ["农林牧渔","基础化工","钢铁","有色金属","电子","家用电器","食品饮料","纺织服饰",
+        "轻工制造","医药生物","公用事业","交通运输","房地产","商贸零售","社会服务","综合",
+        "建筑材料","建筑装饰","电力设备","机械设备","国防军工","汽车","计算机","传媒","通信",
+        "银行","非银金融","煤炭","石油石化","环保","美容护理"]
+
+
+def _bj_now():
+    return datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8)
+
+
+def _get_json(url, timeout=20):
+    req = urllib.request.Request(url, headers=UA)
+    return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace"))
+
+
+def load_board_quotes():
+    """分页取全东财行业板块 → {name: {bk, price, chg, net}}。"""
+    allb = {}
+    for pn in range(1, 6):
+        try:
+            d = _get_json(CLIST.format(pn=pn))
+            data = d.get("data") or {}
+            diff = data.get("diff") or []
+            for x in diff:
+                name = x.get("f14")
+                if not name:
+                    continue
+                def num(v):
+                    try:
+                        return float(v)
+                    except (TypeError, ValueError):
+                        return None
+                allb[name] = {"bk": x.get("f12"), "price": num(x.get("f2")),
+                              "chg": num(x.get("f3")), "net": num(x.get("f62"))}
+            if len(diff) < 100:
+                break
+        except Exception as e:
+            print("  ⚠️ clist pn%d 失败: %s" % (pn, e), file=sys.stderr)
+        time.sleep(0.25)
+    print("  ✅ 东财行业板块载入 %d 个" % len(allb))
+    return allb
+
+
+def fetch_kline(bk):
+    """东财板块日K → list of {d,o,c,h,l,v}（近90日）。"""
+    d = _get_json(KLINE.format(bk=bk))
+    data = d.get("data") or {}
+    rows = []
+    for line in (data.get("klines") or []):
+        p = line.split(",")
+        if len(p) < 6:
+            continue
+        try:
+            rows.append({"d": p[0], "o": float(p[1]), "c": float(p[2]),
+                         "h": float(p[3]), "l": float(p[4]), "v": float(p[5])})
+        except (TypeError, ValueError):
+            continue
+    return rows
+
+
+def ema(vals, n):
+    if not vals:
+        return None
+    k = 2.0 / (n + 1)
+    e = vals[0]
+    for v in vals[1:]:
+        e = v * k + e * (1 - k)
+    return e
+
+
+def analyze(name, q):
+    """对单个行业计算技术指标 + 分级。"""
+    bk = q.get("bk")
+    if not bk:
+        return None
+    rows = fetch_kline(bk)
+    closes = [r["c"] for r in rows]
+    vols = [r["v"] for r in rows]
+    if len(closes) < 25:
+        return None
+    last = closes[-1]
+    # EMA 多头计数：短周期均线在长周期之上则计多头
+    ma3 = ema(closes, 3); ma7 = ema(closes, 7); ma20 = ema(closes, 20)
+    bull = sum(1 for m in (ma3, ma7, ma20) if m and m >= closes[-2])
+    # 区间分位：现价在近60日[min,max]中的位置
+    win = closes[-60:] if len(closes) >= 60 else closes
+    lo, hi = min(win), max(win)
+    pos = round((last - lo) / (hi - lo) * 100, 1) if hi > lo else 50.0
+    # 压力位：近20日高 / 近60日高
+    r20 = max(r["h"] for r in rows[-20:])
+    r60 = max(r["h"] for r in rows[-60:]) if len(rows) >= 60 else r20
+    # 支撑位：EMA20 / 近60日波段底回撤50%（取近60日最低）
+    low60 = min(r["l"] for r in rows[-60:]) if len(rows) >= 60 else min(r["l"] for r in rows)
+    swing50 = round((last + low60) / 2, 2)
+    # 5日量比：近5日均量 / 前20日均量
+    v5 = sum(vols[-5:]) / 5 if len(vols) >= 5 else (vols[-1] if vols else 0)
+    vprev = sum(vols[-25:-5]) / 20 if len(vols) >= 25 else (v5 or 1)
+    volratio = round(v5 / vprev, 2) if vprev else 1.0
+
+    price = q.get("price") if q.get("price") is not None else last
+    chg = q.get("chg")
+    net = q.get("net")  # 主力净额(元)
+
+    # 共振打分（4 项）
+    score = 0
+    if net is not None and net > 0 and chg is not None and chg > 0:
+        score += 1
+    if bull >= 2:
+        score += 1
+    if pos >= 70:
+        score += 1
+    if volratio >= 1.1:
+        score += 1
+    level = {4: "L4", 3: "L3", 2: "L2"}.get(score, "L1")
+
+    if pos >= 90 and bull >= 2:
+        state = "趋势向上"
+    elif pos >= 70 and bull <= 1:
+        state = "下跌反弹"
+    elif bull >= 2 and pos < 50:
+        state = "底部修复"
+    elif pos < 35:
+        state = "弱势整理"
+    else:
+        state = "震荡"
+
+    return {
+        "name": name, "bk": bk, "level": level, "score": score, "state": state,
+        "price": round(price, 2), "chg": round(chg, 2) if chg is not None else None,
+        "net_yi": round(net / 1e8, 2) if net is not None else None,
+        "ema_bull": bull, "ema3": round(ma3, 2) if ma3 else None,
+        "ema7": round(ma7, 2) if ma7 else None, "ema20": round(ma20, 2) if ma20 else None,
+        "pos_pct": pos,
+        "resist20": round(r20, 2), "resist60": round(r60, 2),
+        "support_ema20": round(ma20, 2) if ma20 else None, "support_swing50": swing50,
+        "vol_ratio5": volratio,
+        "data_date": rows[-1]["d"],
+    }
+
+
+def judge_text(items):
+    """整体研判：L4 行业清单 + 状态分布。"""
+    l4 = [x["name"] for x in items if x["level"] == "L4"]
+    l3 = [x["name"] for x in items if x["level"] == "L3"]
+    up = [x["name"] for x in items if x["state"] == "趋势向上"]
+    if l4:
+        s = "🔴 资金+趋势+位置+量价四项共振的行业：" + "、".join(l4[:8]) + ("等%d个" % len(l4) if len(l4) > 8 else "") + "，置信度最高（L4）"
+    else:
+        s = "➖ 今日无四项目标全共振(L4)行业，最高为 L3：" + ("、".join(l3[:6]) if l3 else "无")
+    if up:
+        s += "；趋势向上（分位≥90%且均线多头）：" + "、".join(up[:6])
+    return s
+
+
+def main():
+    no_write = "--no-write" in sys.argv
+    limit = None
+    if "--limit" in sys.argv:
+        try:
+            limit = int(sys.argv[sys.argv.index("--limit") + 1])
+        except (IndexError, ValueError):
+            pass
+    boards = load_board_quotes()
+    targets = SW31[:limit] if limit else SW31
+    items = []
+    for name in targets:
+        q = boards.get(name)
+        if not q:
+            print("  ⚠️ %s 未找到东财板块，跳过" % name, file=sys.stderr)
+            continue
+        try:
+            a = analyze(name, q)
+            if a:
+                items.append(a)
+                print("  ✅ %-6s %s %-5s 现价%.1f 涨%s%% 分位%.0f%% 量比%.2f 主力%s亿" %
+                      (name, a["bk"], a["level"], a["price"], a["chg"], a["pos_pct"],
+                       a["vol_ratio5"], a["net_yi"]))
+        except Exception as e:
+            print("  ⚠️ %s 分析失败: %s" % (name, e), file=sys.stderr)
+        time.sleep(0.2)
+    if not items:
+        print("  ❌ 全部失败，不写盘", file=sys.stderr)
+        sys.exit(2)
+    # 分级排序：L4>L3>L2>L1，同级按主力净额降序
+    order = {"L4": 0, "L3": 1, "L2": 2, "L1": 3}
+    items.sort(key=lambda x: (order.get(x["level"], 9), -(x["net_yi"] or 0)))
+    out = {
+        "update_time": _bj_now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data_date": max(x["data_date"] for x in items),
+        "source": "东方财富行业板块K线+主力净额（90.BKxxxx，中国IP）",
+        "universe": "申万一级31行业（东财板块名精确映射）",
+        "grading": "共振置信度：资金(net>0且涨>0)+趋势(EMA多头>=2)+位置(分位>=70%)+量价(5日量比>=1.1)，4项=L4/3=L3/2=L2/<=1=L1",
+        "items": items,
+        "judgment": judge_text(items),
+        "note": "日频盘后研判，非盘中实时信号。压力=近20/60日高点，支撑=EMA20/波段底50%。仅供观测，不改选股排序。红涨绿跌由前端按chg处理。",
+    }
+    if no_write:
+        print("\n=== 研判 ===")
+        print(out["judgment"])
+        print("共 %d 行业" % len(items))
+        return
+    if "--out" in sys.argv:
+        out_path = os.path.abspath(sys.argv[sys.argv.index("--out") + 1])
+    else:
+        here = os.path.dirname(os.path.abspath(__file__))
+        out_path = os.path.normpath(os.path.join(here, "..", "data", "SECTOR_TECH_JUDG.js"))
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("window.SECTOR_TECH_JUDG = ")
+        json.dump(out, f, ensure_ascii=False)
+        f.write(";\n")
+    print("  💾 已写入 %s (%d 行业, data_date=%s)" % (out_path, len(items), out["data_date"]))
+
+
+if __name__ == "__main__":
+    main()

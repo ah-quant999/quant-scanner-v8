@@ -158,6 +158,8 @@ window.__domReadyFns=[];
 <script src="data/MARGIN_DATA.js?v=e3483a9ddb" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=fc4e0e1535" defer></script>
 <script src="data/FUTURES_REALTIME.js?v=2ecc5817d1" defer></script>
+<script src="data/BOND_FUTURES.js?v=de0cadc074" defer></script>
+<script src="data/SECTOR_TECH_JUDG.js?v=4b19386fe0" defer></script>
 <script src="data/IPO_DATA.js?v=5990638af6" defer></script>
     <script src="data/CRISIS_DATA.js?v=6e7089866b" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=8bad62f4a7" defer></script>
@@ -2866,6 +2868,13 @@ window.STRATEGY_WALKFORWARD = {
       <div class="note note-insight">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
     </div>
 
+    <!-- 🏦 国债期货 · 利率预期罗盘（2026-11-17 主人令「TL 要接入，结合给判断」；盘中每30分 cn runner） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🏦</span>国债期货 · 利率预期罗盘 · <span class="fresh" id="bondFutTime">—</span></h3>
+      <div id="bondFutBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note note-insight">📌 国债期货 = 长端利率 / 避险情绪代理（TL=30年期）。价涨=收益率下行=宽松/避险预期升温 → 权益风险偏好趋于谨慎（股债跷跷板）。四品种 TL(30Y)/T(10Y)/TF(5Y)/TS(2Y) 用新浪实时行情；长短端涨跌差看收益率曲线牛陡/熊平。仅宏观环境研判，不直接改选股排序。红涨绿跌。</div>
+    </div>
+
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px"></div>
 
@@ -3182,6 +3191,13 @@ function fmtSigned(v){
   <!-- ============ 盘后数据 ============ -->
   <section id="sec-ph">
     <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag">收盘后生成</span></div>
+
+    <!-- 🔬 板块技术研判（2026-11-17 主人令「别人那张卡我也想要」；申万一级31行业，盘后1次 cn runner） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🔬</span>板块技术研判 · 申万一级31 · <span class="fresh" id="sectorTechTime">—</span></h3>
+      <div id="sectorTechBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note note-insight">📌 共振置信度分级 L4(四项全满足)＞L3(三项)＞L2(两项)＞L1。四项=资金(net＞0且涨＞0)+趋势(EMA多头≥2)+位置(近60日分位≥70%)+量价(5日量比≥1.1)。压力=近20/60日高点，支撑=EMA20/波段底50%。东财一级行业指数点位，日频盘后研判非盘中实时信号；红涨绿跌。仅观测，不改选股排序。</div>
+    </div>
 
     
     <!-- 斐波那契窗口 → 已下沉「运维→已下架·盘后观测」(2026-08-29 主人令)；商品涨价弹性榜 → 2026-09-11 主人令迁回「📡 实时数据」页（主力净额分时卡下方） -->
@@ -8878,6 +8894,8 @@ function switchSec(sec,el){
   if(sec==='ph'){
     setTimeout(function(){
       try{ window.renderFuturesMain(window.FUTURES_REALTIME || window.CFFEX_HOLDINGS || {}); }catch(e){}
+      try{ window.renderBondFutures(window.BOND_FUTURES || {}); }catch(e){}
+      try{ window.renderSectorTech(window.SECTOR_TECH_JUDG || {}); }catch(e){}
       try{ window.renderMacroSummary(window.MACRO_DATA || {}); }catch(e){}
       try{ window.renderRestrictedCalendar(window.RESTRICTED_RELEASE || {}); }catch(e){}
       try{ window.renderForecastCalendar(window.PERFORMANCE_FORECAST || {}); }catch(e){}
@@ -12628,6 +12646,8 @@ function drawUpDownChart(){
           {name:'亚太市场概览', source:'OVERSEAS_MARKETS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'日经/恒生/KOSPI'},
 
           {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'日更(收盘后)', slots:['15:30','02:00'], note:'IF/IC/IM·中金所每日收盘后一次性发布结算'},
+          {name:'国债期货利率罗盘', source:'BOND_FUTURES', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00'], note:'TL/T/TF/TS·新浪实时·股债跷跷板研判'},
+          {name:'板块技术研判', source:'SECTOR_TECH_JUDG', freq:'盘后1次', slots:['15:40'], note:'申万一级31行业·L4/L3分级+量价+压力支撑·东财日K'},
 
           {name:'涨停热力矩阵', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'连板/炸板热度'},
 
@@ -13815,6 +13835,72 @@ function drawUpDownChart(){
   }
   window.renderFuturesMain = renderFuturesMain;
 
+  /* ---- 国债期货 · 利率预期罗盘（2026-11-17 主人令，window.BOND_FUTURES） ---- */
+  var _BOND_LABEL={TL:'30年期',T:'10年期',TF:'5年期',TS:'2年期'};
+  function renderBondFutures(d){
+    const $b=$('bondFutBody'), $t=$('bondFutTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">国债期货数据暂不可用</div>'; return; }
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">';
+    d.items.forEach(it=>{
+      const chg=it.chg;
+      const col=chg>0?'var(--up)':(chg<0?'var(--down)':'var(--sub)');
+      const arrow=chg>0?'▲':(chg<0?'▼':'—');
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">';
+      h+='<span style="font-size:12px;color:var(--sub);">'+it.variety+' <span style="font-size:10px;color:var(--dim);">'+(_BOND_LABEL[it.variety]||it.label||'')+'</span></span>';
+      h+='<span style="font-size:16px;font-weight:800;color:var(--txt);">'+Number(it.last).toFixed(3)+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+(chg>0?'+':'')+Number(chg).toFixed(2)+'%</span>';
+      h+='<span style="font-size:10px;color:var(--dim);">持仓 '+(it.open_interest||0).toLocaleString()+'</span></div>';
+      h+='<div style="font-size:10px;color:var(--dim);margin-top:3px;">昨结 '+Number(it.pre_settle).toFixed(3)+' · 均价 '+(it.avg!=null?Number(it.avg).toFixed(3):'—')+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    const j=d.judgment||{};
+    if(j.level){
+      const jc=(j.level.indexOf('避险')>=0||j.level.indexOf('紧缩')>=0||j.level.indexOf('上行')>=0)?'var(--down)':'var(--sub)';
+      h+='<div style="margin-top:10px;padding:9px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:10px;font-size:12px;line-height:1.8;color:var(--txt);">';
+      h+='<div style="font-weight:700;color:'+jc+';margin-bottom:2px;">📌 利率预期判断：'+j.level+' · 曲线'+j.curve+(j.spread!=null?('（长短端差 '+(j.spread>0?'+':'')+Number(j.spread).toFixed(2)+'pp）'):'')+'</div>';
+      h+='<div>'+(j.equity||'')+'</div>';
+      h+='<div style="font-size:11px;color:var(--dim);margin-top:3px;">'+(j.detail||'')+'</div>';
+      h+='</div>';
+    }
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('盘中','短线',d.update_time);
+  }
+  window.renderBondFutures = renderBondFutures;
+
+  /* ---- 板块技术研判 · 申万一级31（2026-11-17 主人令，window.SECTOR_TECH_JUDG） ---- */
+  var _TECH_LVL={"L4":{c:"var(--up)",t:"L4·四共振"},"L3":{c:"#ffb74d",t:"L3·三共振"},"L2":{c:"var(--sub)",t:"L2·两共振"},"L1":{c:"var(--dim)",t:"L1·弱"}};
+  function renderSectorTech(d){
+    const $b=$('sectorTechBody'), $t=$('sectorTechTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">板块技术研判数据暂不可用</div>'; return; }
+    const lvOrder={L4:0,L3:1,L2:2,L1:3};
+    const items=d.items.slice().sort((a,b)=>(lvOrder[a.level]-lvOrder[b.level])||((b.net_yi||0)-(a.net_yi||0)));
+    let h='<div style="margin-bottom:8px;font-size:12px;color:var(--sub);">'+('研判：'+(d.judgment||''))+'</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">';
+    items.forEach(it=>{
+      const lv=_TECH_LVL[it.level]||_TECH_LVL.L1;
+      const chg=it.chg, col=chg>0?'var(--up)':(chg<0?'var(--down)':'var(--sub)'), arrow=chg>0?'▲':(chg<0?'▼':'—');
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-left:3px solid '+lv.c+';border-radius:8px;padding:9px 10px;">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
+      h+='<span style="font-size:13px;font-weight:700;color:var(--txt);">'+it.name+' <span style="font-size:9px;font-weight:500;color:'+lv.c+';border:1px solid '+lv.c+';border-radius:3px;padding:0 3px;margin-left:2px;">'+lv.t+'</span></span>';
+      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+(chg>0?'+':'')+(chg!=null?Number(chg).toFixed(2)+'%':'--')+'</span></div>';
+      h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;">';
+      h+='<div>现价 <b style="color:var(--txt);">'+Number(it.price).toFixed(1)+'</b> · EMA多头 '+it.ema_bull+'/3 · 区间分位 <b style="color:'+(it.pos_pct>=70?'var(--up)':(it.pos_pct<35?'var(--down)':'var(--sub)'))+';">'+Number(it.pos_pct).toFixed(0)+'%</b></div>';
+      h+='<div>压力 '+Number(it.resist20).toFixed(0)+'(20日)/'+Number(it.resist60).toFixed(0)+'(60日)</div>';
+      h+='<div>支撑 '+(it.support_ema20!=null?Number(it.support_ema20).toFixed(0):'—')+'(EMA20)/'+Number(it.support_swing50).toFixed(0)+'(波段50%)</div>';
+      h+='<div>5日量比 '+Number(it.vol_ratio5).toFixed(2)+' · 主力 <b style="color:'+((it.net_yi||0)>0?'var(--up)':'var(--down)')+';">'+((it.net_yi||0)>0?'+':'')+(it.net_yi!=null?Number(it.net_yi).toFixed(1):'—')+'亿</b> · '+it.state+'</div>';
+      h+='</div></div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('盘后','日频',d.data_date||d.update_time);
+  }
+  window.renderSectorTech = renderSectorTech;
+
   /* ---- 9. 宏观数据速览（盘后数据补位） ---- */
 
 // 2026-08-31：盘后业绩预告/解禁日历 点击展开下表的全局辅助函数
@@ -14180,6 +14266,8 @@ window.showRestrictedItems = showRestrictedItems;
     // 🏔 2026-10-20 主人令：板块年度主力净流入卡已迁「暂未上架」（renderUnlisted._fillSectorYearFlow 派发），此处旧 safe() 调用删除
     safe(window.renderCffexPosition, window.CFFEX_POSITION || {});  // 🆕 2026-10-15 IF会员持仓择时
     safe(window.renderFuturesMain, window.FUTURES_REALTIME || window.CFFEX_HOLDINGS || {});
+    safe(window.renderBondFutures, window.BOND_FUTURES || {});
+    safe(window.renderSectorTech, window.SECTOR_TECH_JUDG || {});
     safe(window.renderMacroSummary, window.MACRO_DATA || {});
     safe(window.renderRestrictedCalendar, window.RESTRICTED_RELEASE || {});
     safe(window.renderForecastCalendar, window.PERFORMANCE_FORECAST || {});

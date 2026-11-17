@@ -138,6 +138,11 @@ CARD_DEFS = [
     #   · weekend_update=False —— 期指周末不交易、专链 cron 仅工作日，周末免检防假红。
     #   · premarket_keep=True —— 盘前沿用上一交易日收盘档不误报（与 STOCK_QUOTE 同型）。
     {"id": "FUTURES_REALTIME", "name": "期指实时", "page": "实时数据", "freq": "盘中每30分", "max_age": 45, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": False, "heal_cat": "futures", "producer": "v8/gen_futures_realtime.py"},
+    # 🆕 2026-11-17 主人令「TL 要接入 / 别人那张卡我也想要」：两张新卡补监控盲区。
+    #   · BOND_FUTURES 走专链 v8_bond_futures.yml（cn，盘中30分），heal_cat=futures 同型
+    #   · SECTOR_TECH_JUDG 走专链 v8_sector_tech.yml（cn，盘后1次），heal_cat=algo_run 日频
+    {"id": "BOND_FUTURES", "name": "国债期货利率罗盘", "page": "实时数据", "freq": "盘中每30分", "max_age": 45, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": False, "heal_cat": "futures", "producer": "v8/gen_bond_futures.py"},
+    {"id": "SECTOR_TECH_JUDG", "name": "板块技术研判", "page": "盘后数据", "freq": "盘后1次", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": True, "heal_cat": "algo_run", "producer": "v8/gen_sector_tech_judg.py"},
     # 盘后数据
     # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
     # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。
