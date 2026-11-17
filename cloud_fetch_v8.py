@@ -3744,7 +3744,12 @@ _ETF_ROUNDS = 3            # 单次快照内最多 3 轮遍历（实测「首趟
 _ETF_BUDGET = 180          # 单次快照时间预算（秒）；实测一轮 ~2s，10 轮 ~30s
 _ETF_TOTAL_BUDGET = 420    # 单轮 run 内累计上限（两个模块共用一次快照，实际只跑一次）
 _ETF_FRESH_S = 1200        # 底表 20 分钟内更新过 ⇒ 整轮跳过
-_ETF_CACHE_MAX_AGE_INTRADAY = 2700   # 盘中允许的跨轮页龄（45 分钟）；收盘后不限
+#   🔴 2026-11-17 盘中页龄 45min→90min（同日 ETF资金条死锁修复）：
+#     45min 窗口下每轮净增 ~5 页、页龄批量过期互相抵消 ⇒ 跨轮拼页**结构性拼不齐**
+#     （实测稳态恒 15/17）。90min 让跨轮累积可达 17 页全量；拼齐期间降级线（≥15 页
+#     partial 如实标注）保产出连续。页间最大时间跨度放宽到 90min ⇒ 合计口径
+#     为「90 分钟滑窗快照」，partial/全量均如实标注，不作全时点精确值使用。
+_ETF_CACHE_MAX_AGE_INTRADAY = 5400   # 盘中允许的跨轮页龄（90 分钟）；收盘后不限
 _ETF_CACHE = RAW_DIR / "etf_snapshot_pages.json"   # 跨轮拼页缓存（随 raw_data 一起入仓）
 _etf_cache = {"date": None, "rows": None}   # 同轮内两个模块共用，避免重复抓
 _etf_spent = {"secs": 0.0}
@@ -4031,10 +4036,17 @@ def _etf_snapshot_partial():
 #   实测每轮总有 1 页拿不到 ⇒ `_etf_snapshot()` 恒 None ⇒ 本卡自 09-24 23:32 起整天不写盘。
 #   但同一时刻 `_etf_snapshot_partial()` 报告「部分快照 17/17 页」——**通路一直是通的**，
 #   是「合计口径必须 17 页全齐」这条硬规矩把它锁死了。
-#   折中（可解释、可审计）：覆盖率 ≥ 16/17 且样本 ≥ _ETF_MIN_ROWS 才放行，
+#   折中（可解释、可审计）：覆盖率 ≥ 15/17 且样本 ≥ _ETF_DAILY_MIN_ROWS_DEGRADE 才放行，
 #   并在产物里标 `partial/covered_pages/total_pages` ⇒ 前端据实标注「部分页口径」，
 #   绝不让它顶着「全市场」三个字误导（宁可降级后如实标偏，也不装作全量）。
-_ETF_DAILY_MIN_PAGES = 16
+#   🔴 2026-11-17 降级线 16→15（主人令「AI速览ETF资金条断更，一劳永逸修复」）：
+#     实测当日稳态卡死 15/17（缺 9/15 两页恒补不进：IP 限速每轮净增 ~5 页 vs 45min 页龄
+#     批量过期互相抵消），1390 只差 _ETF_MIN_ROWS(1400) 10 只、差 16 页线 1 页 ⇒ 双闸
+#     全天拒写 ⇒ ETF资金条冻结昨收一整天（-4.48亿 逐字节不变）。排序按 f62 降序 ⇒
+#     TOP5 流入（第 1 页）/流出（末页）必在已拼页中，缺页只影响合计精度（88% 覆盖），
+#     partial 标注如实披露。全量线 _ETF_MIN_ROWS 不动，17 页全齐仍走全量口径。
+_ETF_DAILY_MIN_PAGES = 15
+_ETF_DAILY_MIN_ROWS_DEGRADE = 1300
 
 
 def _etf_daily_monitor_reuse():
@@ -4101,7 +4113,7 @@ def f_etf_daily_monitor():
     _partial_pages, _total_pages = 0, 0
     if not snap:
         _snap, _got, _need = _etf_snapshot_partial()
-        if _snap and _got >= _ETF_DAILY_MIN_PAGES and len(_snap) >= _ETF_MIN_ROWS:
+        if _snap and _got >= _ETF_DAILY_MIN_PAGES and len(_snap) >= _ETF_DAILY_MIN_ROWS_DEGRADE:
             print(f"  ♻️ ETF_DAILY_MONITOR 降级：复用部分拼页 {_got}/{_need} 页（{len(_snap)} 只）"
                   f"⇒ 合计为**已覆盖部分**，前端将标注 partial")
             snap, _partial_pages, _total_pages = _snap, _got, _need
