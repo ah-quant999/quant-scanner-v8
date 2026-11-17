@@ -554,16 +554,10 @@
     "max_score": 12.2,
     "update_time": "2026-11-10 00:48:05"
   },
-  "2026-11-13": {
-    "count_80plus": 0,
-    "total_scored": 848,
-    "max_score": 13.3,
-    "update_time": "2026-11-13 08:16:56"
-  },
   "2026-11-16": {
     "count_80plus": 0,
-    "total_scored": 892,
-    "max_score": 35.6,
-    "update_time": "2026-11-16 04:02:20"
+    "total_scored": 896,
+    "max_score": 35.4,
+    "update_time": "2026-11-16 06:55:40"
   }
 }
