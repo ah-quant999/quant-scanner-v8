@@ -1,54 +1,54 @@
 window.NATIONAL_TEAM = {
-  "data_date": "2026-11-13",
-  "update_time": "2026-11-16 15:43:09",
-  "source_time": "2026-11-16 15:34:17",
-  "score": 42.3,
-  "verdict": "中性",
-  "verdict_color": "#38bdf8",
-  "ready_count": 3,
+  "data_date": "2026-11-16",
+  "update_time": "2026-11-17 15:44:01",
+  "source_time": "2026-11-17 15:06:52",
+  "score": 55.9,
+  "verdict": "偏活跃",
+  "verdict_color": "#f59e0b",
+  "ready_count": 4,
   "subs": [
     {
       "key": "A",
       "name": "宽基ETF净申购突变",
       "weight": 40,
       "ready": true,
-      "value": -27.5,
+      "value": 43.5,
       "unit": "亿",
-      "detail": "宽基净申购 -27.5 亿（兜底·老源宽基分类 180 只）",
-      "status": "❌净赎回"
+      "detail": "宽基净申购 43.5 亿（3 只宽基ETF·东财五分类）",
+      "status": "✅活跃"
     },
     {
       "key": "B",
       "name": "大金融相对强度",
       "weight": 30,
       "ready": true,
-      "value": -1.02,
+      "value": -0.34,
       "unit": "%",
-      "detail": "大金融 relative_5d 均值 -1.02%（保险/多元金融/银行/证券）",
-      "status": "❌弱势"
+      "detail": "大金融 relative_5d 均值 -0.34%（保险/多元金融/银行/证券）",
+      "status": "🟡中性"
     },
     {
       "key": "C",
       "name": "大金融资金净流入",
       "weight": 15,
       "ready": true,
-      "value": 3.9,
+      "value": -13.5,
       "unit": "亿",
-      "detail": "大金融净流入 3.9 亿（银行 3.9）",
-      "status": "✅流入"
+      "detail": "大金融净流入 -13.5 亿（银行 -13.5）",
+      "status": "❌流出"
     },
     {
       "key": "D",
       "name": "宽基ETF放量异动",
       "weight": 15,
-      "ready": false,
-      "value": null,
+      "ready": true,
+      "value": 0.66,
       "unit": "×",
-      "detail": "broad_etf_volume.json 缺失/过期（post_close 档未落盘）",
-      "status": "—未就绪"
+      "detail": "科创50ETF华夏(588000) 当日成交 81.8 亿 = 20日均 0.66×（大盘跌 -0.37%），覆盖 6/6 只",
+      "status": "❌缩量"
     }
   ],
   "method": "4 子信号加权（缺失项权重重分）；宽基ETF净申购40% + 大金融相对强度30% + 大金融资金净流入15% + 宽基ETF放量异动15%（2026-11-05 主人令新接入：下跌日头部宽基ETF成交额/20日均额，护盘公开指纹）。汇金持仓环比胶囊已于 2026-11-04 移除（季报滞后约2年、权重0%、无增量信息）。",
   "disclaimer": "代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后，如实标注，不构成交易建议。",
-  "oneline": "综合 42.3（中性）：宽基ETF净赎回 -27.5 亿＝未见托盘，大金融弱势，大金融资金净流入 3.9 亿——无托盘且市场走弱，宜收紧防守。"
+  "oneline": "综合 55.9（偏活跃）：宽基ETF净申购 43.5 亿＝国资托盘指纹明确，大金融中性，大金融资金净流出 13.5 亿，下跌日宽基ETF未显著放量 0.66×。"
 };
