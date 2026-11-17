@@ -1292,7 +1292,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WAVE_ELLIOTT.js?v=55112c7bc4" defer></script>
 <script src="data/SZ_FIB.js?v=340a49b108" defer></script>
 <script src="data/SECTOR_RS.js?v=d55a1eb0b8" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=cef2bd155d" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=65674ade9b" defer></script>
 <script src="data/INST_TRADE.js?v=d23922f62a" defer></script>
 <script src="data/NORTH_FUND.js?v=9b65cb646b" defer></script>
 <script src="data/MARKET_ALERTS.js?v=2060336038" defer></script>
@@ -1311,7 +1311,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=de6ab61668" defer></script>
 <script src="data/EXPERIMENT.js?v=df1a9f14d8" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=e7adec88bb" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=cdf4ae0d1b" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=aaffeceb87" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
+<script src="data/FINAL_RECOMMEND_DATA.js?v=e7adec88bb" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=b6a8112af6" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=aaffeceb87" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=3bea57d8fa" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=11026cb988" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=e6e4d675dc" defer></script>
@@ -1346,7 +1346,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RUNNER_STATUS.js?v=bbd84e2b76" defer></script>
 <script src="data/HB_XIAOJIU.js?v=7e1bc8dbc9" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=9b46e3bd94" defer></script>
-<script src="data/HEALTH_CHECK.js?v=e5f40b1c03" defer></script>
+<script src="data/HEALTH_CHECK.js?v=5ed05724e2" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=b56a39a84d" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=ee7d48c375" defer></script>
@@ -2051,7 +2051,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/SENTIMENT_CYCLE.js?v=b25d8930cf" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=7fab533000" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=6ed22479e6" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a5f87e69cb" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=acb5943877" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=0568958b32" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
@@ -15852,7 +15852,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=6ed22479e6');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=a5f87e69cb');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -19557,7 +19557,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=b4b102f56e', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=33687f999f', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=490efb18ae', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=b14d586373', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
