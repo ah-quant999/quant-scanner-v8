@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-19 05:17",
- "generated": "2026-11-19 05:17",
+ "update_time": "2026-11-19 05:30",
+ "generated": "2026-11-19 05:30",
  "meta": {
-  "generated": "2026-11-19 05:17",
+  "generated": "2026-11-19 05:30",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12356,6 +12356,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "002148",
+      "name": "北纬科技",
+      "change_pct": 9.988,
+      "price": 8.92,
+      "category": "突破"
+     },
+     {
       "code": "002403",
       "name": "爱仕达",
       "change_pct": 9.971,
@@ -12374,6 +12381,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST皇庭",
       "change_pct": 8.667,
       "price": 1.63,
+      "category": "突破"
+     },
+     {
+      "code": "300539",
+      "name": "横河精密",
+      "change_pct": 9.243,
+      "price": 21.51,
       "category": "突破"
      },
      {
@@ -12389,20 +12403,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 9.965,
       "price": 12.58,
       "category": "突破"
-     },
-     {
-      "code": "300237",
-      "name": "美晨科技",
-      "change_pct": 5.536,
-      "price": 3.05,
-      "category": "突破"
-     },
-     {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.274,
-      "price": 8.54,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -12411,6 +12411,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST宝馨",
       "change_pct": 4.396,
       "price": 1.9,
+      "category": "加速"
+     },
+     {
+      "code": "002148",
+      "name": "北纬科技",
+      "change_pct": 9.988,
+      "price": 8.92,
       "category": "加速"
      },
      {
@@ -12432,6 +12439,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST皇庭",
       "change_pct": 8.667,
       "price": 1.63,
+      "category": "加速"
+     },
+     {
+      "code": "300539",
+      "name": "横河精密",
+      "change_pct": 9.243,
+      "price": 21.51,
       "category": "加速"
      },
      {
@@ -12451,6 +12465,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "002148",
+      "name": "北纬科技",
+      "change_pct": 9.988,
+      "price": 8.92,
+      "category": "短线选股"
+     },
+     {
       "code": "002403",
       "name": "爱仕达",
       "change_pct": 9.971,
@@ -12472,6 +12493,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300539",
+      "name": "横河精密",
+      "change_pct": 9.243,
+      "price": 21.51,
+      "category": "短线选股"
+     },
+     {
       "code": "688629",
       "name": "华丰科技",
       "change_pct": 14.622,
@@ -12484,20 +12512,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 9.965,
       "price": 12.58,
       "category": "短线选股"
-     },
-     {
-      "code": "300237",
-      "name": "美晨科技",
-      "change_pct": 5.536,
-      "price": 3.05,
-      "category": "短线选股"
-     },
-     {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.274,
-      "price": 8.54,
-      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -12506,20 +12520,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "川润股份",
       "change_pct": 9.965,
       "price": 12.58,
-      "category": "强势股"
-     },
-     {
-      "code": "300237",
-      "name": "美晨科技",
-      "change_pct": 5.536,
-      "price": 3.05,
-      "category": "强势股"
-     },
-     {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.274,
-      "price": 8.54,
       "category": "强势股"
      }
     ]
