@@ -76,7 +76,7 @@ def _net_ret(rows, t, h):
     return exit_ / entry - 1 - COST
 
 
-def compute(codes, top_n=40, window=SIGNAL_WINDOW):
+def compute(codes, top_n=30, window=SIGNAL_WINDOW):
     """codes: list of {code, name}。返回 {update_time, meta, ranked}。"""
     from datetime import datetime
     ranked = []

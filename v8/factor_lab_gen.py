@@ -690,7 +690,7 @@ def main():
             _ycands.append({"code": _r["code"], "name": _r.get("name", "")})
     try:
         import factor_yield as _fy
-        _yr = _fy.compute(_ycands, top_n=40)
+        _yr = _fy.compute(_ycands, top_n=30)
         log("收益率排选", "候选", len(_ycands), "上榜", len(_yr.get("ranked", [])))
     except Exception as _e:
         log("⚠️ 收益率排选计算跳过（不影响因子榜主体）", type(_e).__name__, str(_e)[:120])
