@@ -1,20 +1,20 @@
 {
-  "update_time": "2026-11-18 14:33:45",
+  "update_time": "2026-11-18 15:40:41",
   "data_date": "2026-11-18",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "高潮",
   "color": "#f59e0b",
-  "score": 62.0,
-  "delta_pct": 13.51,
+  "score": 61.0,
+  "delta_pct": 10.81,
   "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
   "metrics": {
-    "total_up": 42,
+    "total_up": 41,
     "max_ladder": 4,
     "high_ladder_count": 1,
     "sectors_count": 10
   },
   "ladder_dist": {
-    "1": 34,
+    "1": 33,
     "2": 7,
     "4": 1
   },
