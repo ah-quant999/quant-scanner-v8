@@ -1,19 +1,19 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-18 23:59:44",
+  "generated": "2026-11-19 00:41:49",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
   "total_unique_stocks": 184,
-  "total_appearances": 570,
+  "total_appearances": 578,
   "kline_available": 184,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
  "periods": {
   "2026-10": {
-   "count": 513,
+   "count": 519,
    "leaders": [
     {
      "code": "002343",
@@ -2502,7 +2502,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh920075",
      "name": "柏星龙",
      "date": "2026-10-09",
-     "count": 7,
+     "count": 8,
      "categories": [
       "加速",
       "短线选股",
@@ -4982,7 +4982,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002272",
      "name": "川润股份",
      "date": "2026-10-14",
-     "count": 5,
+     "count": 6,
      "categories": [
       "强势股",
       "短线选股",
@@ -5702,7 +5702,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz000056",
      "name": "*ST皇庭",
      "date": "2026-10-15",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -6102,7 +6102,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002514",
      "name": "*ST宝馨",
      "date": "2026-10-16",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -6822,7 +6822,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz300237",
      "name": "美晨科技",
      "date": "2026-10-16",
-     "count": 6,
+     "count": 7,
      "categories": [
       "强势股",
       "短线选股",
@@ -7462,7 +7462,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002403",
      "name": "爱仕达",
      "date": "2026-10-19",
-     "count": 5,
+     "count": 6,
      "categories": [
       "加速",
       "短线选股",
@@ -12660,7 +12660,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-11": {
-   "count": 57,
+   "count": 59,
    "leaders": [
     {
      "code": "300741",
@@ -16189,7 +16189,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh688629",
      "name": "华丰科技",
      "date": "2026-11-18",
-     "count": 1,
+     "count": 2,
      "categories": [
       "加速",
       "短线选股",
@@ -16269,7 +16269,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sh600983",
      "name": "惠而浦",
      "date": "2026-11-18",
-     "count": 1,
+     "count": 2,
      "categories": [
       "强势股",
       "短线选股",

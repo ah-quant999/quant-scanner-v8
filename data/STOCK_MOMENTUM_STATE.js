@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-18 23:59",
- "generated": "2026-11-18 23:59",
+ "update_time": "2026-11-19 00:41",
+ "generated": "2026-11-19 00:41",
  "meta": {
-  "generated": "2026-11-18 23:59",
+  "generated": "2026-11-19 00:41",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 29,
+  "total_days": 30,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -12206,6 +12206,188 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-11-18",
+   "categories": {
+    "突破": [
+     {
+      "code": "002514",
+      "name": "*ST宝馨",
+      "change_pct": 4.396,
+      "price": 1.9,
+      "category": "突破"
+     },
+     {
+      "code": "002403",
+      "name": "爱仕达",
+      "change_pct": 9.971,
+      "price": 11.36,
+      "category": "突破"
+     },
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 4.857,
+      "price": 14.25,
+      "category": "突破"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 8.667,
+      "price": 1.63,
+      "category": "突破"
+     },
+     {
+      "code": "688629",
+      "name": "华丰科技",
+      "change_pct": 14.622,
+      "price": 104.1,
+      "category": "突破"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 9.965,
+      "price": 12.58,
+      "category": "突破"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 5.536,
+      "price": 3.05,
+      "category": "突破"
+     },
+     {
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.274,
+      "price": 8.54,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "002514",
+      "name": "*ST宝馨",
+      "change_pct": 4.396,
+      "price": 1.9,
+      "category": "加速"
+     },
+     {
+      "code": "002403",
+      "name": "爱仕达",
+      "change_pct": 9.971,
+      "price": 11.36,
+      "category": "加速"
+     },
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 4.857,
+      "price": 14.25,
+      "category": "加速"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 8.667,
+      "price": 1.63,
+      "category": "加速"
+     },
+     {
+      "code": "688629",
+      "name": "华丰科技",
+      "change_pct": 14.622,
+      "price": 104.1,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "002514",
+      "name": "*ST宝馨",
+      "change_pct": 4.396,
+      "price": 1.9,
+      "category": "短线选股"
+     },
+     {
+      "code": "002403",
+      "name": "爱仕达",
+      "change_pct": 9.971,
+      "price": 11.36,
+      "category": "短线选股"
+     },
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 4.857,
+      "price": 14.25,
+      "category": "短线选股"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 8.667,
+      "price": 1.63,
+      "category": "短线选股"
+     },
+     {
+      "code": "688629",
+      "name": "华丰科技",
+      "change_pct": 14.622,
+      "price": 104.1,
+      "category": "短线选股"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 9.965,
+      "price": 12.58,
+      "category": "短线选股"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 5.536,
+      "price": 3.05,
+      "category": "短线选股"
+     },
+     {
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.274,
+      "price": 8.54,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 9.965,
+      "price": 12.58,
+      "category": "强势股"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 5.536,
+      "price": 3.05,
+      "category": "强势股"
+     },
+     {
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.274,
+      "price": 8.54,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-19",
    "categories": {
     "突破": [
      {
