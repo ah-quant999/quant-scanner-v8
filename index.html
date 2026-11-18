@@ -2415,6 +2415,12 @@ window.STRATEGY_WALKFORWARD = {
       <div class="note note-insight">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
+    <!-- 🆕 2026-11-18 主人令：今日避雷·一页浓缩（解禁+重要公告+投资避雷针 三源聚合，一页式浓缩） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🛡️</span>今日避雷 · 一页浓缩 <span style="font-size:10px;color:var(--dim);font-weight:600">解禁+公告+避雷针 三源聚合</span> · <span class="fresh" id="avoidDigestTime">—</span></h3>
+      <div id="avoidDigestBlock"><div class="ipo-empty">加载中…</div></div>
+    </div>
+
     <!-- 投资避雷针·新闻语料量化（2026-11-05 主人令：自「暂未上架·综合研判」区迁入今日事件页，置于打新速览卡下方；
          渲染仍走 window.__renderInvestAvoid（数据缺失时 600ms×40 自愈重试），switchSec('td') 进入时触发） -->
     <div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #ff5252">
@@ -3196,30 +3202,7 @@ function fmtSigned(v){
 
 
 
-    <!-- 板块资金趋势（v6 风格移植：收盘复盘 + 周期定位）
-         🗑 2026-09-11 主人令：Block1「盘中追热」整块删除——
-              行业/概念净额榜与 AI市场速览重复，已改由「AI市场速览」承载
-              （概念行前 5 + 新建「行业资金」行，见 algorithms/gen_market_brief.py），此处不再重复展示。
-              注意：renderSector() 已同步删除 Block1 渲染与 sfBlock1 依赖，勿再引入。 -->
-    <div class="card" style="margin-bottom:16px">
-    <div class="card" id="sectorFundTrendCard" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>板块资金趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
-
-      <!-- Block 2: 收盘复盘 -->
-      <div class="sf-block sf-block-close">
-        <div class="sf-block-title"><span class="sf-block-icon" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1px solid rgba(251,146,60,.35)">🔥</span><span>收盘复盘</span></div>
-        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 3: 周期定位 -->
-      <div class="sf-block sf-block-trend">
-        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块资金趋势</div>
-        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
-
-    </div>
+    <!-- 🗑 2026-11-18 主人令（方案一）：「板块资金趋势」独立卡删除，资金验证并入「板块技术研判」卡下半区（东财BK同源 5/10/20/60 日主力净流入累计，口径完全对齐）。数据管线（fetch_orphan_sector_fund_flow）保留不动。 -->
 
     <!-- 🚚 日监控·主力净流入（2026-09-11 主人令：自「实时数据」页 ETF 三合一 Block3 迁来，置于市场宽度卡上方）
          容器 id="etfDailyBlock" 与 renderEtfDaily() 保持不变，仅 DOM 位置移动；跨页与「实时数据」页主力净额分时曲线 T+0 联动。 -->
@@ -3229,23 +3212,28 @@ function fmtSigned(v){
       <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
     </div>
 
-    <!-- 🚚 资金热度·净申赎（2026-09-15 主人令：T-1 非实时，自「实时数据」页 ETF 盘中异动·主力净额分时卡 Block2 迁至本页「日监控·主力净流入」卡下方。
-         容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat" 与 renderEtfHeatByCategory() 不变，仅 DOM 位置移动。） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔥</span>资金热度·净申赎（真实份额） <span style="font-size:10px;color:var(--dim);font-weight:600">金额亿元 · 数据日 T-1 · 非估算</span> · <span class="fresh" id="etfHeatTime">—</span></h3>
-      <div id="etfHeatBlock">
-        <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
-      </div>
-      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：资金热度·净申赎·份额类） -->
-    </div>
+    <!-- 🚚 2026-11-18 主人令：「资金热度·净申赎」卡已并入下方「国家队活跃度」卡下半区
+         （国家队 A 路宽基净申购与资金热度卡同源 data/ETF_SUBSCRIPTION_EASTMONEY.js，信号+底层数据合一卡）。
+         容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat/etfHeatTime" 与 renderEtfHeatByCategory() 不变，仅 DOM 归宿移动。 -->
 
-    <!-- 🏛️ 2026-10-27 主人令：国家队活跃度（盘后数据）由「暂未上架」观测卡迁至盘后数据页 -->
+    <!-- 🏛️ 2026-10-27 主人令：国家队活跃度（盘后数据）由「暂未上架」观测卡迁至盘后数据页
+         🔥 2026-11-18 主人令：下半区并入「资金热度·净申赎（真实份额）」（同源合一卡：上半=国家队四路信号，下半=宽基净申购底层明细） -->
     <div class="card" id="nationalTeamCard" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
         <span style="font-size:15px;font-weight:700;color:#c084fc">&#x1F3DB;&#xFE0F; 国家队活跃度</span>
         <span id="nationalTeamFresh" style="display:inline-flex;align-items:center">&#x2014;</span></div>
       <div id="nationalTeamBody"><div class="note">加载中&#x2026;</div></div>
+
+      <div style="border-top:1px dashed var(--border,#2a2f3a);margin:14px 0 12px"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700;color:#f59e0b">&#x1F525; 资金热度·净申赎（真实份额）</span>
+        <span style="font-size:10px;color:var(--dim);font-weight:600">金额亿元 · 数据日 T-1 · 非估算</span>
+        <span class="fresh" id="etfHeatTime">&#x2014;</span></div>
+      <div id="etfHeatBlock">
+        <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
+      </div>
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：资金热度·净申赎·份额类） -->
     </div>
 
     <!-- 🆕 2026-11-08 主人令：股东增减持·结构化监控（全市场法定披露，东财 RPT_SHARE_HOLDER_INCREASE；与重要公告速览互补，非公告标题级） -->
@@ -13887,6 +13875,10 @@ function drawUpDownChart(){
     const groups={L4:[],L3:[],L2:[],L1:[]};
     items.forEach(it=>{ (groups[it.level]||groups.L1).push(it); });
     let h='<div style="margin-bottom:8px;font-size:12px;color:var(--sub);">'+('研判：'+(d.judgment||''))+'</div>';
+    const sc=d.structure_counts||{};
+    if(Object.keys(sc).length){
+      h+='<div style="margin-bottom:8px;font-size:12px;color:var(--sub);">趋势结构：' + '向上 <b style="color:var(--up)">'+(sc['趋势向上']||0)+'</b> · 反弹 '+(sc['下跌反弹']||0) + ' · 修复 '+(sc['底部修复']||0)+' · 整理 '+(sc['弱势整理']||0)+' · 震荡 '+(sc['震荡']||0)+'</div>';
+    }
     ['L4','L3','L2','L1'].forEach(function(k){
       const arr=groups[k], lv=_TECH_LVL[k], isOpen=(k==='L4');
       h+='<details'+(isOpen?' open':'')+' style="margin-bottom:8px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;">';
@@ -13903,18 +13895,68 @@ function drawUpDownChart(){
         h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+(chg>0?'+':'')+(chg!=null?Number(chg).toFixed(2)+'%':'--')+'</span></div>';
         h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;">';
         h+='<div>现价 <b style="color:var(--txt);">'+Number(it.price).toFixed(1)+'</b> · EMA多头 '+it.ema_bull+'/3 · 区间分位 <b style="color:'+(it.pos_pct>=70?'var(--up)':(it.pos_pct<35?'var(--down)':'var(--sub)'))+';">'+Number(it.pos_pct).toFixed(0)+'%</b></div>';
-        h+='<div>压力 '+Number(it.resist20).toFixed(0)+'(20日)/'+Number(it.resist60).toFixed(0)+'(60日)</div>';
-        h+='<div>支撑 '+(it.support_ema20!=null?Number(it.support_ema20).toFixed(0):'—')+'(EMA20)/'+Number(it.support_swing50).toFixed(0)+'(波段50%)</div>';
+        h+='<div>压力 <b style="color:var(--down);">'+(it.fib618!=null?Number(it.fib618).toFixed(0):'—')+'(61.8%)</b>/'+(it.ext1618!=null?Number(it.ext1618).toFixed(0):'—')+'(161.8%延伸)'+' <span style="color:var(--dim);">'+Number(it.resist20).toFixed(0)+'(20日高)</span></div>';
+        h+='<div>支撑 <b style="color:var(--up);">'+(it.fib382!=null?Number(it.fib382).toFixed(0):'—')+'(38.2%)</b>/'+(it.support_ema20!=null?Number(it.support_ema20).toFixed(0):'—')+'(EMA20)'+' <span style="color:var(--dim);">'+Number(it.support_swing50).toFixed(0)+'(波段50%)</span></div>';
         h+='<div>5日量比 '+Number(it.vol_ratio5).toFixed(2)+' · 主力 <b style="color:'+((it.net_yi||0)>0?'var(--up)':'var(--down)')+';">'+((it.net_yi||0)>0?'+':'')+(it.net_yi!=null?Number(it.net_yi).toFixed(1):'—')+'亿</b> · '+it.state+'</div>';
+        if(it.basis) h+='<div style="margin-top:3px;padding-top:3px;border-top:1px dashed var(--border2);font-size:10px;color:var(--dim);line-height:1.5;">'+it.basis+'</div>';
         h+='</div></div>';
       });
       h+='</div></details>';
     });
+    // 💰 2026-11-18 主人令（方案一）：下半区「资金验证」——主力净流入 5/10/20/60 日累计（东财BK同源），合并原「板块资金趋势」卡
+    h+='<div style="margin-top:12px;border-top:1px dashed var(--border2);padding-top:8px;">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px;">💰 资金验证 · 主力净流入累计 <span style="font-size:10px;color:var(--dim);font-weight:600;">东财BK同源 · 亿元 · 按近20日降序</span></div>';
+    h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
+    h+='<tr style="color:var(--dim);"><th style="text-align:left;padding:3px 6px;">行业</th><th style="padding:3px;">5日</th><th style="padding:3px;">10日</th><th style="padding:3px;">20日</th><th style="padding:3px;">60日</th><th style="text-align:left;padding:3px 6px;">验证</th></tr>';
+    const fitems=d.items.slice().sort((a,b)=>((b.fund_20d!=null?b.fund_20d:-1e18)-(a.fund_20d!=null?a.fund_20d:-1e18)));
+    fitems.forEach(it=>{
+      const c=v=>v==null?'—':('<b style="color:'+(v>0?'var(--up)':'var(--down)')+';">'+(v>0?'+':'')+Number(v).toFixed(1)+'</b>');
+      h+='<tr style="border-top:1px solid var(--border2);"><td style="padding:3px 6px;color:var(--txt);font-weight:600;">'+it.name+'</td><td style="padding:3px;text-align:center;">'+c(it.fund_5d)+'</td><td style="padding:3px;text-align:center;">'+c(it.fund_10d)+'</td><td style="padding:3px;text-align:center;">'+c(it.fund_20d)+'</td><td style="padding:3px;text-align:center;">'+c(it.fund_60d)+'</td><td style="padding:3px 6px;color:var(--sub);font-size:10px;">'+(it.fund_verdict||'—')+'</td></tr>';
+    });
+    h+='</table></div></div>';
     $b.innerHTML=h;
     // 🔴 2026-11-18 修复（发现即修）：原传 data_date（纯日期）⇒ 徽章恒显「今日 00:00」，时间失实；改传真实 update_time。
     if($t) $t.innerHTML=_uBadge('盘后','日频',d.update_time||d.data_date);
   }
   window.renderSectorTech = renderSectorTech;
+
+  /* ---- 🆕 2026-11-18 主人令：今日避雷·一页浓缩（解禁+公告+避雷针三源聚合） ---- */
+  function renderAvoidDigest(){
+    const $b=$('avoidDigestBlock');
+    if(!$b) return true;
+    const av=window.INVEST_AVOID||{}, rr=window.RESTRICTED_RELEASE||{}, kn=window.KEY_NOTICES||{};
+    if(!av.risk_overall && !(rr.items||[]).length && !(kn.items||[]).length) return false;
+    const colMap={red:'var(--up)',orange:'#fb923c',yellow:'#ffd024',green:'var(--down)'};
+    let h='';
+    const rl=av.risk_overall||'—';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;font-size:12px;">';
+    h+='<span style="font-weight:700;color:'+(colMap[rl]||'var(--sub)')+';">危机分 '+(av.crisis_score!=null?av.crisis_score:'—') · '+(av.crisis_level||'—')+'</span>';
+    if((av.avoid_sectors||[]).length) h+='<span style="color:var(--sub);">回避板块：<b style="color:var(--up);">'+av.avoid_sectors.slice(0,4).join('、')+'</b></span>';
+    h+='</div>';
+    if(av.summary) h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'+String(av.summary).slice(0,160)+'</div>';
+    const rri=(rr.items||[]).slice().sort((a,b)=>(parseFloat(String(b.amount||'').replace(/[^\d.]/g,''))||0)-(parseFloat(String(a.amount||'').replace(/[^\d.]/g,''))||0)).slice(0,5);
+    if(rri.length){
+      h+='<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 4px;">🔓 近期解禁 TOP5 <span style="font-size:10px;color:var(--dim);font-weight:500;">解禁日历共'+(rr.items||[]).length+'条</span></div>';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;font-size:11px;">';
+      rri.forEach(it=>{ h+='<div style="background:var(--card2);border-radius:6px;padding:4px 8px;">'+'<b style="color:var(--txt);">'+it.name+'</b> <span style="color:var(--dim);">'+String(it.date||'').slice(5)+'</span>'+' <span style="color:var(--up);font-weight:700;">'+(it.amount||'—')+'</span></div>'; });
+      h+='</div>';
+    }
+    const riskCats=['减持','质押','立案','调查','退市','问询','违规','处罚','冻结','司法'];
+    const kni=(kn.items||[]).filter(it=>riskCats.some(c=>String(it.cat||'').indexOf(c)>=0||String(it.title||'').indexOf(c)>=0)).slice(0,8);
+    if(kni.length){
+      h+='<div style="font-size:12px;font-weight:700;color:var(--txt);margin:8px 0 4px;">📢 风险类公告 <span style="font-size:10px;color:var(--dim);font-weight:500;">当日'+((kn.items||[]).length)+'条公告筛出'+kni.length+'条</span></div>';
+      h+='<div style="font-size:11px;line-height:1.7;color:var(--sub);">';
+      kni.forEach(it=>{ h+='<div>· <b style="color:var(--txt);">'+it.name+'</b> <span style="color:#ef5350;">'+String(it.title||'').slice(0,42)+'</span></div>'; });
+      h+='</div>';
+    }
+    $b.innerHTML=h||'<div class="ipo-empty">暂无避雷数据</div>';
+    const $t=$('avoidDigestTime');
+    if($t && window._uBadge) $t.innerHTML=_uBadge('盘前','日频',av.update_time||av.data_date);
+    return true;
+  }
+  window.renderAvoidDigest = renderAvoidDigest;
+  (function(){var n=0;var t=setInterval(function(){n++;var ok=false;try{ok=renderAvoidDigest();}catch(e){}if(ok||n>40)clearInterval(t);},600);})();
+
 
   /* ---- 9. 宏观数据速览（盘后数据补位） ---- */
 
