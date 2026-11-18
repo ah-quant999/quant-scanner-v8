@@ -2415,12 +2415,6 @@ window.STRATEGY_WALKFORWARD = {
       <div class="note note-insight">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
-    <!-- 🆕 2026-11-18 主人令：今日避雷·一页浓缩（解禁+重要公告+投资避雷针 三源聚合，一页式浓缩） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🛡️</span>今日避雷 · 一页浓缩 <span style="font-size:10px;color:var(--dim);font-weight:600">解禁+公告+避雷针 三源聚合</span> · <span class="fresh" id="avoidDigestTime">—</span></h3>
-      <div id="avoidDigestBlock"><div class="ipo-empty">加载中…</div></div>
-    </div>
-
     <!-- 投资避雷针·新闻语料量化（2026-11-05 主人令：自「暂未上架·综合研判」区迁入今日事件页，置于打新速览卡下方；
          渲染仍走 window.__renderInvestAvoid（数据缺失时 600ms×40 自愈重试），switchSec('td') 进入时触发） -->
     <div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #ff5252">
@@ -13931,44 +13925,6 @@ function drawUpDownChart(){
     if($t) $t.innerHTML=_uBadge('盘后','日频',d.update_time||d.data_date);
   }
   window.renderSectorTech = renderSectorTech;
-
-  /* ---- 🆕 2026-11-18 主人令：今日避雷·一页浓缩（解禁+公告+避雷针三源聚合） ---- */
-  function renderAvoidDigest(){
-    const $b=$('avoidDigestBlock');
-    if(!$b) return true;
-    const av=window.INVEST_AVOID||{}, rr=window.RESTRICTED_RELEASE||{}, kn=window.KEY_NOTICES||{};
-    if(!av.risk_overall && !(rr.items||[]).length && !(kn.items||[]).length) return false;
-    const colMap={red:'var(--up)',orange:'#fb923c',yellow:'#ffd024',green:'var(--down)'};
-    let h='';
-    const rl=av.risk_overall||'—';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;font-size:12px;">';
-    h+='<span style="font-weight:700;color:'+(colMap[rl]||'var(--sub)')+';">危机分 '+(av.crisis_score!=null?av.crisis_score:'—')+' · '+(av.crisis_level||'—')+'</span>';
-    if((av.avoid_sectors||[]).length) h+='<span style="color:var(--sub);">回避板块：<b style="color:var(--up);">'+av.avoid_sectors.slice(0,4).join('、')+'</b></span>';
-    h+='</div>';
-    if(av.summary) h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'+String(av.summary).slice(0,160)+'</div>';
-    const rri=(rr.items||[]).slice().sort((a,b)=>(parseFloat(String(b.amount||'').replace(/[^\d.]/g,''))||0)-(parseFloat(String(a.amount||'').replace(/[^\d.]/g,''))||0)).slice(0,5);
-    if(rri.length){
-      h+='<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 4px;">🔓 近期解禁 TOP5 <span style="font-size:10px;color:var(--dim);font-weight:500;">解禁日历共'+(rr.items||[]).length+'条</span></div>';
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;font-size:11px;">';
-      rri.forEach(it=>{ h+='<div style="background:var(--card2);border-radius:6px;padding:4px 8px;">'+'<b style="color:var(--txt);">'+it.name+'</b> <span style="color:var(--dim);">'+String(it.date||'').slice(5)+'</span>'+' <span style="color:var(--up);font-weight:700;">'+(it.amount||'—')+'</span></div>'; });
-      h+='</div>';
-    }
-    const riskCats=['减持','质押','立案','调查','退市','问询','违规','处罚','冻结','司法'];
-    const kni=(kn.items||[]).filter(it=>riskCats.some(c=>String(it.cat||'').indexOf(c)>=0||String(it.title||'').indexOf(c)>=0)).slice(0,8);
-    if(kni.length){
-      h+='<div style="font-size:12px;font-weight:700;color:var(--txt);margin:8px 0 4px;">📢 风险类公告 <span style="font-size:10px;color:var(--dim);font-weight:500;">当日'+((kn.items||[]).length)+'条公告筛出'+kni.length+'条</span></div>';
-      h+='<div style="font-size:11px;line-height:1.7;color:var(--sub);">';
-      kni.forEach(it=>{ h+='<div>· <b style="color:var(--txt);">'+it.name+'</b> <span style="color:#ef5350;">'+String(it.title||'').slice(0,42)+'</span></div>'; });
-      h+='</div>';
-    }
-    $b.innerHTML=h||'<div class="ipo-empty">暂无避雷数据</div>';
-    const $t=$('avoidDigestTime');
-    if($t && window._uBadge) $t.innerHTML=_uBadge('盘前','日频',av.update_time||av.data_date);
-    return true;
-  }
-  window.renderAvoidDigest = renderAvoidDigest;
-  (function(){var n=0;var t=setInterval(function(){n++;var ok=false;try{ok=renderAvoidDigest();}catch(e){}if(ok||n>40)clearInterval(t);},600);})();
-
 
   /* ---- 9. 宏观数据速览（盘后数据补位） ---- */
 
