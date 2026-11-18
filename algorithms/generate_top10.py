@@ -652,11 +652,18 @@ def signal_edge_score(name, present):
 # P2 回测反哺：用 walk-forward by_signal **T+5 收益**直接修正排名
 # （替代原 cockpit T+3 胜率恒50；🔴 2026-09-20 改动15 从 T+10 edge 换 T+5 口径）
 BT_BY_SIGNAL = {}
+BT_GATE_OPEN_SIG = {}
 try:
     _bt2 = load_json(os.path.join(DATA_DIR, "backtest_expectancy.json"), {})
     BT_BY_SIGNAL = _bt2.get("by_signal", {})
+    # 🆕 2026-11-18 整改⑤（Regime 条件化）：开门日(grind/panic)分组合 T+5 edge
+    #   （backtest_expectancy by_regime.gate_open_by_signal）——当前市况开门时，
+    #   用「该组合在开门日的条件期望」修正全池期望。关门日无分组合样本（全池 n5 仅 95）
+    #   → 不条件化（不猜）。
+    BT_GATE_OPEN_SIG = (_bt2.get("by_regime") or {}).get("gate_open_by_signal") or {}
 except Exception:
     BT_BY_SIGNAL = {}
+    BT_GATE_OPEN_SIG = {}
 # 🔴 2026-11-10 整改（主人令·一劳永逸修复）：删除 2026-11-07 的「by_signal 组合层符号钉死」块。
 #   原块把含金钻/缠论的组合收益/edge 强制 abs 变正、纯趋势/机构组合强制变负，直接污染
 #   「用 walk-forward T+5 收益修正排名」（L655）。这与真实数据(金钻/缠论组合负、趋势/机构
@@ -748,14 +755,47 @@ _EXP_RET_EFF_VALS = [_exp_ret_eff(*(int(x) for x in k.split(","))) for k in _EXP
 _EXP_RET_EFF_MIN = min(_EXP_RET_EFF_VALS) if _EXP_RET_EFF_VALS else 0.0
 _EXP_RET_EFF_MAX = max(_EXP_RET_EFF_VALS) if _EXP_RET_EFF_VALS else 0.0
 
-def expected_return_term(chan, jinzuan, jigou, trend):
+# ⑤ Regime 条件化（🆕 2026-11-18）：E[r|组合] → E[r|组合,市况]。
+#   实证（backtest_expectancy.json gate_open_by_signal vs by_signal，开门日样本占比 ~92%）：
+#     1,0,1,0(机构+趋势) 开门日比全池好 +0.72pp；0,0,0,0(裸池) 开门日比全池差 −0.79pp
+#   → 市况状态是真实的条件信息。开门日分组合样本 n5 = 20~436，n≥30 才启用；
+#   关门日无分组合样本（全池 n5 仅 95）→ 不条件化，回退全池 eff（不猜）。
+#   混合 50/50：一半全池期望（稳）+ 一半开门日条件期望（状态敏感），两者均过 n/(n+50) 打折。
+_EXP_RET_REGIME_MIN_N = 30
+_EXP_RET_REGIME_BLEND = 0.5
+
+def _exp_ret_eff_regime(chan, jinzuan, jigou, trend, current_regime=None):
+    """⑤ Regime 条件化有效 raw：开门市况且组合开门日样本充足 →
+    0.5*全池eff + 0.5*开门日eff；否则回退全池 eff。
+    开门侧与全池侧同构混合（0.5*edge5 + 0.5*edge10，持有期口径对齐，防方向被期限构成污染）。"""
+    _full = _exp_ret_eff(chan, jinzuan, jigou, trend)
+    if current_regime not in ("grind", "panic"):
+        return _full
+    _rec = BT_GATE_OPEN_SIG.get(f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}")
+    if not _rec:
+        return _full
+    _n = _num_or_none(_rec.get("n5")) or 0
+    if _n < _EXP_RET_REGIME_MIN_N:
+        return _full
+    _e5 = _num_or_none(_rec.get("edge5"))
+    if _e5 is None:
+        return _full
+    _e10 = _num_or_none(_rec.get("edge10"))
+    _open_raw = (EXP_RET_BLEND_W5 * _e5
+                 + EXP_RET_BLEND_W10 * (_e10 if _e10 is not None else _e5))
+    _w = _n / (_n + _EXP_RET_N_FLOOR) if _n > 0 else 0.0
+    _open_eff = _w * _open_raw + (1.0 - _w) * _EXP_RET_GRAND
+    return _EXP_RET_REGIME_BLEND * _full + (1.0 - _EXP_RET_REGIME_BLEND) * _open_eff
+
+def expected_return_term(chan, jinzuan, jigou, trend, current_regime=None):
     """前瞻收益主项（raw 分，±EXP_RET_TERM_MAX）。
-    🆕 2026-11-18 整改①②③④：IS/OOS 异号清零 / 缺失落 grand mean / 超额剔 β / 小样本贴池心。"""
+    🆕 2026-11-18 整改①②③④：IS/OOS 异号清零 / 缺失落 grand mean / 超额剔 β / 小样本贴池心。
+    🆕 2026-11-18 整改⑤：current_regime 开门(grind/panic)时用开门日条件期望混合修正。"""
     if _exp_ret_seg_conflict(chan, jinzuan, jigou, trend):
         return 0.0
     if _EXP_RET_EFF_MAX == _EXP_RET_EFF_MIN:
         return 0.0
-    _eff = _exp_ret_eff(chan, jinzuan, jigou, trend)
+    _eff = _exp_ret_eff_regime(chan, jinzuan, jigou, trend, current_regime)
     return max(-_EXP_RET_TERM_MAX_DYN, min(_EXP_RET_TERM_MAX_DYN,
         (_eff - _EXP_RET_EFF_MIN) / (_EXP_RET_EFF_MAX - _EXP_RET_EFF_MIN) * 2.0 * _EXP_RET_TERM_MAX_DYN - _EXP_RET_TERM_MAX_DYN))
 
@@ -2371,7 +2411,8 @@ def main():
         sig_tuple = (has_chan, sig_jinzuan, has_jigou, has_trend)
         bt_ex5 = bt_excess5_for(*sig_tuple)          # 保留作展示（T+5 超额），不进 raw_total
         score_backtest = max(-10, min(10, round(bt_ex5)))
-        exp_ret_term = expected_return_term(*sig_tuple)
+        # 🆕 2026-11-18 整改⑤：传入当前市况，开门时用开门日条件期望修正组合前瞻收益
+        exp_ret_term = expected_return_term(*sig_tuple, current_regime=current_regime)
         _raw_noform += exp_ret_term
         raw_total += exp_ret_term
         # 🔴 2026-11-02 主人令·收益率提升核心：RPS 动量主导项（HC 子集内真正分高下）
