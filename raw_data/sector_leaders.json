@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-19 03:02",
-  "republish_time": "2026-11-19 05:33:29",
+  "republish_time": "2026-11-19 06:38:12",
   "data_date": "2026-11-18",
   "rule_ver": 2,
   "top_n": 5,
@@ -156,35 +156,35 @@
           "name": "龙江交通",
           "price": 5.08,
           "chg": 7.17,
-          "main_net": null
+          "main_net": 302777240.0
         },
         {
           "code": "600350",
           "name": "山东高速",
           "price": 11.69,
           "chg": 3.09,
-          "main_net": null
+          "main_net": 25864098.0
         },
         {
           "code": "600012",
           "name": "皖通高速",
           "price": 18.25,
           "chg": 2.82,
-          "main_net": null
+          "main_net": 16441031.0
         },
         {
           "code": "001965",
           "name": "招商公路",
           "price": 10.93,
           "chg": 1.2,
-          "main_net": null
+          "main_net": -5965447.0
         },
         {
           "code": "200429",
           "name": "粤高速Ｂ",
           "price": 9.6,
           "chg": 1.16,
-          "main_net": null
+          "main_net": -458438.0
         }
       ],
       "match": "alias:exact"
@@ -199,35 +199,35 @@
           "name": "京基智农",
           "price": 13.3,
           "chg": 3.26,
-          "main_net": null
+          "main_net": -1581791.0
         },
         {
           "code": "600965",
           "name": "*ST福成",
           "price": 2.02,
           "chg": 0.5,
-          "main_net": null
+          "main_net": -40519.0
         },
         {
           "code": "300498",
           "name": "温氏股份",
           "price": 17.58,
           "chg": 0.23,
-          "main_net": null
+          "main_net": -24870135.0
         },
         {
           "code": "002157",
           "name": "正邦科技",
           "price": 2.91,
           "chg": 0.0,
-          "main_net": null
+          "main_net": 2158967.0
         },
         {
           "code": "002299",
           "name": "圣农发展",
           "price": 16.85,
           "chg": -0.24,
-          "main_net": null
+          "main_net": 1394851.0
         }
       ],
       "match": "exact"
@@ -235,42 +235,42 @@
     {
       "name": "小家电",
       "bk": "BK1244",
-      "cons_count": 21,
+      "cons_count": 24,
       "leaders": [
         {
           "code": "002403",
           "name": "爱仕达",
           "price": 11.36,
           "chg": 9.97,
-          "main_net": null
+          "main_net": 53141263.0
+        },
+        {
+          "code": "920926",
+          "name": "鸿智科技",
+          "price": 9.93,
+          "chg": 7.35,
+          "main_net": 10020047.0
         },
         {
           "code": "002005",
           "name": "德豪润达",
           "price": 2.23,
           "chg": 5.69,
-          "main_net": null
+          "main_net": 25985124.0
         },
         {
           "code": "002959",
           "name": "小熊电器",
           "price": 41.52,
           "chg": 4.06,
-          "main_net": null
+          "main_net": -76186021.0
         },
         {
-          "code": "003023",
-          "name": "彩虹集团",
-          "price": 20.88,
-          "chg": 1.61,
-          "main_net": null
-        },
-        {
-          "code": "301332",
-          "name": "德尔玛",
-          "price": 7.56,
-          "chg": 1.48,
-          "main_net": null
+          "code": "920081",
+          "name": "欧伦电气",
+          "price": 38.75,
+          "chg": 2.24,
+          "main_net": 919409.0
         }
       ],
       "match": "exact"
@@ -278,42 +278,42 @@
     {
       "name": "小金属",
       "bk": "BK1027",
-      "cons_count": 25,
+      "cons_count": 27,
       "leaders": [
         {
           "code": "002428",
           "name": "云南锗业",
           "price": 70.5,
           "chg": 3.42,
-          "main_net": null
+          "main_net": 328938368.0
         },
         {
           "code": "000962",
           "name": "东方钽业",
           "price": 33.06,
           "chg": 0.33,
-          "main_net": null
+          "main_net": 6848720.0
         },
         {
           "code": "000657",
           "name": "中钨高新",
           "price": 35.51,
           "chg": 0.31,
-          "main_net": null
+          "main_net": 26545976.0
         },
         {
           "code": "600549",
           "name": "厦门钨业",
           "price": 32.68,
           "chg": -0.27,
-          "main_net": null
+          "main_net": -24598545.0
         },
         {
           "code": "688750",
           "name": "金天钛业",
           "price": 12.96,
           "chg": -0.46,
-          "main_net": null
+          "main_net": 495327.0
         }
       ],
       "match": "exact"
@@ -625,5 +625,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "cache",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-19 05:33:29 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-19 06:38:12 跟随 FINAL 重算(一劳永逸)"
 }
