@@ -785,10 +785,20 @@ def _assess_validity(top10, max_score, missing):
     _ts = [s.get("total_score", 0) or 0 for s in (top10 or [])[:5]]
     _spread = (_ts[0] - _ts[-1]) if len(_ts) >= 5 else None
     _r = []
-    if max_score < 25:
-        _r.append(f"分辩度不足（max_score={max_score:.1f}，健康阈值≥25）")
-    if _spread is not None and _spread < 3:
-        _r.append(f"头部无区分（Top5 分差={_spread:.1f}，健康阈值≥3）")
+    # 🔴 2026-11-18 阈值再校准（主人令「测算未来收益最好的股」范式切换）：
+    #   原 ≥25/≥3 按旧因子和(full≈43)时代校准。10-25 五维清账 + 动量家族 OOS 全 FAIL
+    #   （mom12_1/resid_mom/vamom ir_oos≈-1.3~1.4，铁律 W2 禁入）后，前瞻综合分的
+    #   证据定级可达上限 ≈ exp_ret(±15)+fusion(±5)+base(≤1) ≈ 21 raw → 夜间 gate 0.81
+    #   下 max≈13。阈值 25 会让健康榜永久挂「降级」假预警 → 按新范式量纲再校准。
+    #   旧塌缩事故(11-05 max=12 但 spread<1)由 spread 判据兜住。
+    if max_score < 10:
+        _r.append(f"分辩度不足（max_score={max_score:.1f}，健康阈值≥10）")
+    #   头部判据改「Top5 非全同分」：组合级前瞻主导下头部同组合小分差并列属正常
+    #   （信号组合每日随行情轮动，11-05「同一对票连天霸屏」已结构性消除）；
+    #   真塌缩签名 = Top5 全同分（噪声霸屏），distinct<2 才报。
+    _distinct5 = len(set(round(t, 2) for t in _ts)) if _ts else 0
+    if _ts and _distinct5 < 2:
+        _r.append(f"头部无区分（Top5 全同分，疑似噪声霸屏）")
     if len(missing or []) >= 3:
         _r.append("缺失因子维度≥3（" + "、".join((missing or [])[:5]) + "）")
     return {
@@ -2322,14 +2332,16 @@ def main():
 
         # ── 归一化到 0~100 ──
         # 分母见模块顶部 NORM_DIVISOR 注释：250 已使 ≥80 分不可达，现校准为 130
-        # 🔴 2026-11-14 主人令·改主金股池为「收益率+胜率」排名（一劳永逸）：
-        #   主键 total_score 改为个股历史「收益率+胜率」实绩（STOCK_WINRATE.winrate_score，
-        #   已对小样本做收缩 conf(n)=max(0.15,min(1,n/12)) 防极端均值霸榜）→ 真正按
-        #   「收益率最高+胜率最高」降序；信号融合分 raw_total 仅作「无性能记录票」的兜底排序。
-        #   如此 FINAL_RECOMMEND(final_score:=total_score) 与跨产物一致性链闸均自动保持口径一致，无需改校验。
-        _perf_raw = _wr_score_raw if _wr_score_raw is not None else raw_total
-        total = round(min(100, max(0, _perf_raw / NORM_DIVISOR * 100)), 1)
-        _fusion_score = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
+        # 🔴 2026-11-18 主人令「我不是要历史收益好，我是要测算推荐未来收益最好的股」·范式切换（覆盖 11-14 实绩榜）：
+        #   废除「_perf_raw=winrate_score 历史实绩覆盖」特例，全票统一走前瞻综合分 raw_total：
+        #     预期前瞻收益 exp_ret_term(±15, backtest_expectancy walk-forward T+5/T+10)
+        #     + RPS 动量(≤±55, OOS 证据门控自动定级，今日 B 级=0 禁入)
+        #     + 信号 edge(base) + 资金/板块/机构 + form 横截面中性化
+        #     + winrate 仅 ×0.2 置信微调 + winrate_fusion ±5 微调 + demote −10 风险闸。
+        #   历史实绩 winrate_score 降为纯展示字段（win5/avg5 照常透出），不再参与主排序。
+        #   FINAL_RECOMMEND(final_score:=total_score) 与跨产物一致性链闸口径自动一致。
+        total = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
+        _fusion_score = total
 
         # ── Regime 驱动的行业风格微调（2026-08-29 元模型升级）──
         #   根据 market_regime 推荐/规避板块，给个股 ±8% 的分数乘数。
@@ -2474,14 +2486,8 @@ def main():
     if scored:
         _neut = rank_neutralize([s["_form_raw"] for s in scored], FORM_NEUT_SCALE)
         for s, fn in zip(scored, _neut):
-            # 🔴 2026-11-14 一劳永逸修复（选股逻辑落地根因）：
-            #   收益率+胜率实绩票(_wr_score_raw 非空)的 total_score 已在循环内按
-            #   _perf_raw(=winrate_score 优先、无记录回退融合分)正确归一化并叠加 regime 微调；
-            #   此处横截面中性化重建原仅为纯融合分口径设计（_raw_noform + fn），若强行覆盖
-            #   会把正确的「收益率最高+胜率最高」排名值改回旧纯因子融合分（如 688059 由 32.9 改回 13.3），
-            #   使「收益率优先选股」名存实亡。→ 实绩票直接保留循环内 total_score，不进中性化覆盖分支。
-            if s.get("_wr_score_raw") is not None:
-                continue
+            # 🔴 2026-11-18 范式切换：废除 11-14「实绩票跳过中性化」特例，全票统一重建
+            #   （前瞻综合分 + form 横截面中性化，同一归一口径；历史实绩不再参与主排序）。
             raw_eff = (s["_raw_noform"] + fn) * s["_gate"]
             s["total_score"] = round(min(100, max(0, raw_eff / NORM_DIVISOR * 100)) * s.get("regime_adjust", 1.0), 1)
             s["breakdown"]["form"] = round(fn, 2)   # 展示与排序口径一致（有效 form）
@@ -2493,7 +2499,8 @@ def main():
     #   诊断(by_signal 1,1,0,0) 实证全市场唯一正 edge 组合：T+10 +4.64% / 胜率 61.9%（n=171）；
     #   jinzuan / jigou / trend 单维或负组合均负期望，旧逻辑却把它们顶进 TOP10 前排。
     # 🔴 2026-11-04 主人令「不强制双共振」：V8_HIGH_CONVICTION 默认改关（"0"）。
-    #   终选输出 = 金股池按个股历史收益率+胜率(winrate_score)降序的 top20（收益率优先·2026-11-14 改主排序），不再强制「chan & jinzuan」共振。
+    #   终选输出 = 金股池按「预期前瞻收益」综合分（exp_ret walk-forward + 证据门控动量 + winrate 置信微调）降序 top20
+    #     （2026-11-18 主人令「测算未来收益最好的股」范式；历史实绩降为展示字段），不再强制「chan & jinzuan」共振。
     #   设 V8_HIGH_CONVICTION=1 可回退高信念双共振模式（金钻+缠论，全量输出）。
     # 🔴 2026-10-30 根因修复：HC 重赋值前捕获真实金股池规模（非双共振子集），
     #   避免 total_scored 被误报为 54（双共振子集）而掩盖真实 800 池 → 主人误判「池子掉到45/冻住」。
@@ -2519,7 +2526,7 @@ def main():
     _hc = os.environ.get("V8_HIGH_CONVICTION", "0").strip() == "1"
     _hc_cap = int(os.environ.get("V8_HC_CAP", "0"))
     _hc_limit = _hc_cap if _hc_cap > 0 else None  # None=全量
-    _SELECTION_MODE = "top_by_performance"
+    _SELECTION_MODE = "top_by_expected_return"
     if _hc:
         _reso = [s for s in scored
                  if (s.get("breakdown", {}).get("signals", {}) or {}).get("jinzuan")
