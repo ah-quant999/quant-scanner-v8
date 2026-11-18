@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-11-18 08:46:58",
-  "run_start": "2026-11-18 07:25:07",
-  "ok": 18,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    }
-  ],
+  "update_time": "2026-11-18 17:24:25",
+  "run_start": "2026-11-18 16:44:09",
+  "ok": 14,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
