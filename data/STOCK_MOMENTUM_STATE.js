@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-18 20:46",
- "generated": "2026-11-18 20:46",
+ "update_time": "2026-11-18 21:16",
+ "generated": "2026-11-18 21:16",
  "meta": {
-  "generated": "2026-11-18 20:46",
+  "generated": "2026-11-18 21:16",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -12237,6 +12237,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688629",
+      "name": "华丰科技",
+      "change_pct": 14.622,
+      "price": 104.1,
+      "category": "突破"
+     },
+     {
       "code": "002272",
       "name": "川润股份",
       "change_pct": 9.965,
@@ -12251,17 +12258,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "600410",
-      "name": "华胜天成",
-      "change_pct": 10.007,
-      "price": 16.82,
-      "category": "突破"
-     },
-     {
-      "code": "002771",
-      "name": "真视通",
-      "change_pct": 10.017,
-      "price": 13.07,
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.274,
+      "price": 8.54,
       "category": "突破"
      }
     ],
@@ -12292,6 +12292,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST皇庭",
       "change_pct": 8.667,
       "price": 1.63,
+      "category": "加速"
+     },
+     {
+      "code": "688629",
+      "name": "华丰科技",
+      "change_pct": 14.622,
+      "price": 104.1,
       "category": "加速"
      }
     ],
@@ -12325,6 +12332,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688629",
+      "name": "华丰科技",
+      "change_pct": 14.622,
+      "price": 104.1,
+      "category": "短线选股"
+     },
+     {
       "code": "002272",
       "name": "川润股份",
       "change_pct": 9.965,
@@ -12339,17 +12353,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "600410",
-      "name": "华胜天成",
-      "change_pct": 10.007,
-      "price": 16.82,
-      "category": "短线选股"
-     },
-     {
-      "code": "002771",
-      "name": "真视通",
-      "change_pct": 10.017,
-      "price": 13.07,
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.274,
+      "price": 8.54,
       "category": "短线选股"
      }
     ],
@@ -12369,17 +12376,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "600410",
-      "name": "华胜天成",
-      "change_pct": 10.007,
-      "price": 16.82,
-      "category": "强势股"
-     },
-     {
-      "code": "002771",
-      "name": "真视通",
-      "change_pct": 10.017,
-      "price": 13.07,
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.274,
+      "price": 8.54,
       "category": "强势股"
      }
     ]
