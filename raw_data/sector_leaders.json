@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-19 00:57",
-  "republish_time": "2026-11-19 04:20:20",
+  "update_time": "2026-11-19 03:02",
+  "republish_time": "2026-11-19 05:33:29",
   "data_date": "2026-11-18",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "上海银行",
           "price": 8.86,
           "chg": 1.14,
-          "main_net": -59319176.0
+          "main_net": null
         },
         {
           "code": "601998",
           "name": "中信银行",
           "price": 9.57,
           "chg": 0.84,
-          "main_net": 21910491.0
+          "main_net": null
         },
         {
           "code": "600015",
           "name": "华夏银行",
           "price": 6.8,
           "chg": 0.74,
-          "main_net": 4003015.0
+          "main_net": null
         },
         {
           "code": "601825",
           "name": "沪农商行",
           "price": 9.77,
           "chg": 0.72,
-          "main_net": 10481792.0
+          "main_net": null
         },
         {
           "code": "601009",
           "name": "南京银行",
           "price": 13.27,
           "chg": 0.53,
-          "main_net": -49310404.0
+          "main_net": null
         }
       ],
       "match": "exact"
@@ -67,35 +67,35 @@
           "name": "中国人保",
           "price": 7.39,
           "chg": 1.65,
-          "main_net": -1428709.0
+          "main_net": null
         },
         {
           "code": "601628",
           "name": "中国人寿",
           "price": 35.4,
           "chg": 0.94,
-          "main_net": 9975127.0
+          "main_net": null
         },
         {
           "code": "601601",
           "name": "中国太保",
           "price": 32.54,
           "chg": -0.31,
-          "main_net": 50459513.0
+          "main_net": null
         },
         {
           "code": "601336",
           "name": "新华保险",
           "price": 51.67,
           "chg": -0.4,
-          "main_net": 8112263.0
+          "main_net": null
         },
         {
           "code": "601318",
           "name": "中国平安",
           "price": 54.4,
           "chg": -0.46,
-          "main_net": -208694496.0
+          "main_net": null
         }
       ],
       "match": "norm"
@@ -156,35 +156,35 @@
           "name": "龙江交通",
           "price": 5.08,
           "chg": 7.17,
-          "main_net": 302777240.0
+          "main_net": null
         },
         {
           "code": "600350",
           "name": "山东高速",
           "price": 11.69,
           "chg": 3.09,
-          "main_net": 25864098.0
+          "main_net": null
         },
         {
           "code": "600012",
           "name": "皖通高速",
           "price": 18.25,
           "chg": 2.82,
-          "main_net": 16441031.0
+          "main_net": null
         },
         {
           "code": "001965",
           "name": "招商公路",
           "price": 10.93,
           "chg": 1.2,
-          "main_net": -5965447.0
+          "main_net": null
         },
         {
           "code": "200429",
           "name": "粤高速Ｂ",
           "price": 9.6,
           "chg": 1.16,
-          "main_net": -458438.0
+          "main_net": null
         }
       ],
       "match": "alias:exact"
@@ -199,35 +199,35 @@
           "name": "京基智农",
           "price": 13.3,
           "chg": 3.26,
-          "main_net": -1581791.0
+          "main_net": null
         },
         {
           "code": "600965",
           "name": "*ST福成",
           "price": 2.02,
           "chg": 0.5,
-          "main_net": -40519.0
+          "main_net": null
         },
         {
           "code": "300498",
           "name": "温氏股份",
           "price": 17.58,
           "chg": 0.23,
-          "main_net": -24870135.0
+          "main_net": null
         },
         {
           "code": "002157",
           "name": "正邦科技",
           "price": 2.91,
           "chg": 0.0,
-          "main_net": 2158967.0
+          "main_net": null
         },
         {
           "code": "002299",
           "name": "圣农发展",
           "price": 16.85,
           "chg": -0.24,
-          "main_net": 1394851.0
+          "main_net": null
         }
       ],
       "match": "exact"
@@ -624,6 +624,6 @@
   "leaders_fail_count": 0,
   "neo_fallback_count": 0,
   "retained_count": 0,
-  "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-19 04:20:20 跟随 FINAL 重算(一劳永逸)"
+  "em_boards_source": "cache",
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-19 05:33:29 跟随 FINAL 重算(一劳永逸)"
 }
