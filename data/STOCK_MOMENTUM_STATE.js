@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-18 17:10",
- "generated": "2026-11-18 17:10",
+ "update_time": "2026-11-18 17:29",
+ "generated": "2026-11-18 17:29",
  "meta": {
-  "generated": "2026-11-18 17:10",
+  "generated": "2026-11-18 17:29",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -12211,43 +12211,50 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002514",
       "name": "*ST宝馨",
-      "change_pct": 3.3,
-      "price": 1.88,
+      "change_pct": 4.396,
+      "price": 1.9,
       "category": "突破"
      },
      {
       "code": "002403",
       "name": "爱仕达",
-      "change_pct": 9.97,
+      "change_pct": 9.971,
       "price": 11.36,
       "category": "突破"
      },
      {
       "code": "920075",
       "name": "柏星龙",
-      "change_pct": 4.19,
-      "price": 14.16,
+      "change_pct": 4.857,
+      "price": 14.25,
       "category": "突破"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 7.33,
-      "price": 1.61,
+      "change_pct": 8.667,
+      "price": 1.63,
       "category": "突破"
      },
      {
       "code": "002272",
       "name": "川润股份",
-      "change_pct": 9.97,
+      "change_pct": 9.965,
       "price": 12.58,
       "category": "突破"
      },
      {
       "code": "300237",
       "name": "美晨科技",
-      "change_pct": 5.19,
-      "price": 3.04,
+      "change_pct": 5.536,
+      "price": 3.05,
+      "category": "突破"
+     },
+     {
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.007,
+      "price": 16.82,
       "category": "突破"
      }
     ],
@@ -12255,29 +12262,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002514",
       "name": "*ST宝馨",
-      "change_pct": 3.3,
-      "price": 1.88,
+      "change_pct": 4.396,
+      "price": 1.9,
       "category": "加速"
      },
      {
       "code": "002403",
       "name": "爱仕达",
-      "change_pct": 9.97,
+      "change_pct": 9.971,
       "price": 11.36,
       "category": "加速"
      },
      {
       "code": "920075",
       "name": "柏星龙",
-      "change_pct": 4.19,
-      "price": 14.16,
+      "change_pct": 4.857,
+      "price": 14.25,
       "category": "加速"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 7.33,
-      "price": 1.61,
+      "change_pct": 8.667,
+      "price": 1.63,
       "category": "加速"
      }
     ],
@@ -12285,43 +12292,50 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002514",
       "name": "*ST宝馨",
-      "change_pct": 3.3,
-      "price": 1.88,
+      "change_pct": 4.396,
+      "price": 1.9,
       "category": "短线选股"
      },
      {
       "code": "002403",
       "name": "爱仕达",
-      "change_pct": 9.97,
+      "change_pct": 9.971,
       "price": 11.36,
       "category": "短线选股"
      },
      {
       "code": "920075",
       "name": "柏星龙",
-      "change_pct": 4.19,
-      "price": 14.16,
+      "change_pct": 4.857,
+      "price": 14.25,
       "category": "短线选股"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 7.33,
-      "price": 1.61,
+      "change_pct": 8.667,
+      "price": 1.63,
       "category": "短线选股"
      },
      {
       "code": "002272",
       "name": "川润股份",
-      "change_pct": 9.97,
+      "change_pct": 9.965,
       "price": 12.58,
       "category": "短线选股"
      },
      {
       "code": "300237",
       "name": "美晨科技",
-      "change_pct": 5.19,
-      "price": 3.04,
+      "change_pct": 5.536,
+      "price": 3.05,
+      "category": "短线选股"
+     },
+     {
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.007,
+      "price": 16.82,
       "category": "短线选股"
      }
     ],
@@ -12329,15 +12343,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002272",
       "name": "川润股份",
-      "change_pct": 9.97,
+      "change_pct": 9.965,
       "price": 12.58,
       "category": "强势股"
      },
      {
       "code": "300237",
       "name": "美晨科技",
-      "change_pct": 5.19,
-      "price": 3.04,
+      "change_pct": 5.536,
+      "price": 3.05,
+      "category": "强势股"
+     },
+     {
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.007,
+      "price": 16.82,
       "category": "强势股"
      }
     ]
