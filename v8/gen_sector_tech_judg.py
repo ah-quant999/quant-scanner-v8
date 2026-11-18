@@ -285,12 +285,21 @@ def structure_counts(items):
 
 def main():
     no_write = "--no-write" in sys.argv
+    force = "--force" in sys.argv  # 盘中补跑强制写盘（一般不用）
     limit = None
     if "--limit" in sys.argv:
         try:
             limit = int(sys.argv[sys.argv.index("--limit") + 1])
         except (IndexError, ValueError):
             pass
+    # 🔴 2026-11-18 修复：本卡=日频盘后研判（workflow 交易日16:00）。盘中手动 dispatch 曾把
+    #    运行时刻10:31写进 update_time，令盘后卡显示盘中时间。此处闸门：交易日15:00前
+    #    只预览不写盘（--no-write 语义），杜绝盘中污染；--force 仅供人为补跑。
+    _nb = _bj_now()
+    if not no_write and not force and _nb.weekday() < 5 and _nb.hour < 15:
+        print("⏸ 盘中 %02d:%02d（北京）不写盘：日频盘后卡仅收盘后产出；预览用 --no-write" %
+              (_nb.hour, _nb.minute), file=sys.stderr)
+        no_write = True
     boards = load_board_quotes()
     targets = SW31[:limit] if limit else SW31
     items = []
@@ -315,9 +324,12 @@ def main():
     # 分级排序：L4>L3>L2>L1，同级按主力净额降序
     order = {"L4": 0, "L3": 1, "L2": 2, "L1": 3}
     items.sort(key=lambda x: (order.get(x["level"], 9), -(x["net_yi"] or 0)))
+    _data_date = max(x["data_date"] for x in items)
     out = {
-        "update_time": _bj_now().strftime("%Y-%m-%d %H:%M:%S"),
-        "data_date": max(x["data_date"] for x in items),
+        # 🔴 2026-11-18：盘后卡 update_time = 数据日收盘定稿时刻（非脚本运行时刻），
+        #    徽章恒显盘后口径（今日/昨日 15:00），盘中误触发亦不污染。
+        "update_time": _data_date + " 15:00:00",
+        "data_date": _data_date,
         "source": "东方财富行业板块K线+主力净额（90.BKxxxx，中国IP）",
         "universe": "申万一级31行业（东财板块名精确映射）",
         "grading": "共振置信度：资金(net>0且涨>0)+趋势(EMA多头>=2)+位置(分位>=70%)+量价(5日量比>=1.1)，4项=L4/3=L3/2=L2/<=1=L1",
