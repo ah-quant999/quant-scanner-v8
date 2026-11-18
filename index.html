@@ -160,7 +160,7 @@ window.__domReadyFns=[];
 <script src="data/FUTURES_REALTIME.js?v=3dac99842e" defer></script>
 <script src="data/BOND_FUTURES.js?v=0bb3106b37" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=a49233aa6d" defer></script>
-<script src="data/IPO_DATA.js?v=3fbc84f61a" defer></script>
+<script src="data/IPO_DATA.js?v=c515bab12a" defer></script>
     <script src="data/CRISIS_DATA.js?v=0c398c9b9f" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=2c27d97afc" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=26b1a49ffa" defer></script>
@@ -198,7 +198,7 @@ window.__domReadyFns=[];
         <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=21b580a36c" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=ace7824e3d" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=39b41ed759" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=2b6819723f" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=aeb1006b47" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 CN runner2号机的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
@@ -1343,7 +1343,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=19df87e5aa" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=f41f937580" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=eaaeca33a0" defer></script>
+<script src="data/RUNNER_STATUS.js?v=626a9b1beb" defer></script>
 <script src="data/HB_XIAOJIU.js?v=989c048c1b" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=503dd28101" defer></script>
 <script src="data/HEALTH_CHECK.js?v=14b93d66c5" defer></script>
@@ -10727,11 +10727,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=3fbc84f61a"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=c515bab12a"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=3fbc84f61a';
+        return 'data/IPO_DATA.js?v=c515bab12a';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -19633,7 +19633,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=27812b9f0d', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=bb0b132d2f', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=11b9de4700', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=399dee42e1', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
