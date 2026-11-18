@@ -11556,10 +11556,16 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     let shtml='<span style="color:var(--dim)">ETF 净申赎 · '+(isEm?'金额口径':'真实份额口径')+(src.data_date?(' · '+_dd):'')+'：</span>';
     shtml+='<span><span style="color:var(--txt);font-weight:700">合计</span> <span style="color:'+totc+';font-weight:700">'+fmtYi(tot)+metUnit+'</span> '+(isEm?'':'<span style="color:var(--sub);font-size:11px">（约 '+fmtYi(tota)+'元）</span>')+'· '+(src.total_etf||0)+'只</span>';
     if(el0) el0.innerHTML=shtml;
-    let h='';
-    catNames.forEach(cn=>{
+    // 2026-11-18 主人令：五种分类按「板块聚焦/增持榜/减持榜」同款 tab 标签形式切换展示，默认直显股票型（老视图默认宽基）。
+    //   一次只渲染一个分类卡片；标签点击切换；红涨绿跌、合计汇总与数据口径均不变。
+    const tabColors = isEm
+      ? {'股票型':'#22d3ee','债券型':'#a78bfa','货币型':'#94a3b8','商品型':'#fbbf24','跨境型':'#f472b6'}
+      : {'宽基':'#22d3ee','行业':'#a78bfa','主题':'#fbbf24','跨境':'#f472b6','商品':'#ef5350'};
+    const defaultView = isEm ? '股票型' : '宽基';
+    if(!window.__etfHeatView || catNames.indexOf(window.__etfHeatView)<0) window.__etfHeatView = defaultView;
+    function etfCatCardHTML(cn){
       const c=src.categories[cn];
-      if(!c){h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-weight:700;margin-bottom:6px;color:'+colorMap[cn]+'">'+cn+' · 暂无数据</div><div style="color:var(--dim);font-size:11.5px">该分类本期无份额申赎数据</div></div>';return;}
+      if(!c) return '<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-weight:700;margin-bottom:6px;color:'+(colorMap[cn]||'var(--cyan)')+'">'+cn+' · 暂无数据</div><div style="color:var(--dim);font-size:11.5px">该分类本期无份额申赎数据</div></div>';
       const list=[];
       const seen=new Set();
       [].concat(c.top_sub||[],c.top_redeem||[]).forEach(function(x){
@@ -11580,12 +11586,28 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
         rows+='<div class="flow-row" style="padding:2px 0"><span class="flow-name" style="width:110px;font-size:11px;line-height:1.25;display:flex;flex-direction:column;justify-content:center" title="'+x.name+' '+x.code+'"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.name+'</span><span style="font-size:9.5px;color:var(--dim);white-space:nowrap">（'+x.code+'）</span></span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:130px;font-size:10.5px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+fmtYi(v)+metUnit+'</span> <span style="color:var(--sub);font-size:9px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
       });
       const yi=isEm?(c.net_amount_yi||0):(c.net_share_yi||0), c2=yi>=0?'var(--up)':'var(--down)';
-      h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 10px">';
-      h+='<div style="font-weight:700;margin-bottom:4px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center;font-size:11.5px"><span>'+cn+' · '+c.count+'只</span><span style="font-size:10px;color:'+c2+';font-weight:700">'+fmtYi(yi)+metUnit+'</span></div>';
-      h+=rows;
-      h+='</div>';
-    });
-    if(el1) el1.innerHTML=h;
+      let card='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 10px">';
+      card+='<div style="font-weight:700;margin-bottom:4px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center;font-size:11.5px"><span>'+cn+' · '+c.count+'只</span><span style="font-size:10px;color:'+c2+';font-weight:700">'+fmtYi(yi)+metUnit+'</span></div>';
+      card+=rows;
+      card+='</div>';
+      return card;
+    }
+    window.__etfHeatPaint = function(){
+      let out='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">';
+      catNames.forEach(function(cn){
+        const act=(window.__etfHeatView===cn), col=tabColors[cn]||'var(--cyan)';
+        out+='<span onclick="window.__etfHeatShow(\''+cn+'\')" style="cursor:pointer;font-size:12px;background:'+(act?col:'transparent')+';color:'+(act?'#e6edf7':col)+';border:1px solid '+col+';border-radius:6px;padding:2px 8px;'+(act?'font-weight:700;':'opacity:.9;')+'">'+cn+'</span>';
+      });
+      out+='</div>';
+      out+=etfCatCardHTML(window.__etfHeatView);
+      if(el1){ el1.style.display='block'; el1.innerHTML=out; }
+    };
+    window.__etfHeatShow = function(cn){
+      if(catNames.indexOf(cn)<0) return;
+      window.__etfHeatView=cn;
+      try{ window.__etfHeatPaint(); }catch(e){ console.warn('[etfHeatShow]',e); }
+    };
+    window.__etfHeatPaint();
     // 2026-09-15 主人令：资金热度·净申赎 T-1 非实时 → 时段「盘后」（徽章 etfHeatTime 随卡在「盘后数据」页）
     if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘后','短线',src.update_time);
   }
