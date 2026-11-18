@@ -31,6 +31,10 @@ CLIST = ("https://push2.eastmoney.com/api/qt/clist/get?pn={pn}&pz=100&po=1&np=1"
 KLINE = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?"
          "secid=90.{bk}&fields1=f1,f2,f3,f4&fields2=f51,f52,f53,f54,f55,f56"
          "&klt=101&fqt=1&lmt=90&end=20500101")
+# 板块资金流日K（主力净流入逐日，实测 2026-11-18 可达）：f51=日期 f52=主力净流入(元)
+FFLOW = ("https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?"
+         "secid=90.{bk}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56"
+         "&klt=101&lmt=70&end=20500101")
 
 # 申万一级31行业（东财板块名精确匹配，实测 31/31 命中）
 SW31 = ["农林牧渔","基础化工","钢铁","有色金属","电子","家用电器","食品饮料","纺织服饰",
@@ -44,8 +48,16 @@ def _bj_now():
 
 
 def _get_json(url, timeout=20):
-    req = urllib.request.Request(url, headers=UA)
-    return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace"))
+    """带 3 次重试退避的 JSON 抓取（防偶发网络抖动导致缺行）。"""
+    last = None
+    for i in range(3):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace"))
+        except Exception as e:
+            last = e
+            time.sleep(1.0 + i)
+    raise last
 
 
 def load_board_quotes():
@@ -93,6 +105,40 @@ def fetch_kline(bk):
     return rows
 
 
+def fetch_fflow(bk):
+    """东财板块资金流日K → 逐日主力净流入(元) list，倒序取最近在末尾。"""
+    try:
+        d = _get_json(FFLOW.format(bk=bk))
+        data = d.get("data") or {}
+        out = []
+        for line in (data.get("klines") or []):
+            p = line.split(",")
+            if len(p) < 2:
+                continue
+            try:
+                out.append({"d": p[0], "main": float(p[1])})
+            except (TypeError, ValueError):
+                continue
+        return out
+    except Exception as e:
+        print("  ⚠️ fflow %s 失败: %s" % (bk, e), file=sys.stderr)
+        return []
+
+
+def fib_levels(rows):
+    """斐波那契（60日窗口 hi/lo）：38.2% / 61.8% 回撤位 + 161.8% 延伸位。"""
+    win = rows[-60:] if len(rows) >= 60 else rows
+    hi = max(r["h"] for r in win)
+    lo = min(r["l"] for r in win)
+    rng = hi - lo
+    return {
+        "fib382": round(lo + rng * 0.382, 2),
+        "fib618": round(lo + rng * 0.618, 2),
+        "ext1618": round(lo + rng * 1.618, 2),
+        "hi": round(hi, 2), "lo": round(lo, 2),
+    }
+
+
 def ema(vals, n):
     if not vals:
         return None
@@ -137,8 +183,9 @@ def analyze(name, q):
     net = q.get("net")  # 主力净额(元)
 
     # 共振打分（4 项）
+    score_ok1 = bool(net is not None and net > 0 and chg is not None and chg > 0)
     score = 0
-    if net is not None and net > 0 and chg is not None and chg > 0:
+    if score_ok1:
         score += 1
     if bull >= 2:
         score += 1
@@ -159,6 +206,42 @@ def analyze(name, q):
     else:
         state = "震荡"
 
+    # 斐波那契（60日窗口）
+    fib = fib_levels(rows)
+
+    # 资金验证：主力净流入 5/10/20/60 日累计（东财 BK fflow，与技术面同源同 secid）
+    ff = fetch_fflow(bk)
+    mains = [x["main"] for x in ff]
+    def cum(n):
+        seg = mains[-n:] if len(mains) >= n else mains
+        return round(sum(seg) / 1e8, 2) if seg else None
+    net5, net10, net20, net60 = cum(5), cum(10), cum(20), cum(60)
+    # 资金验证结论（全窗口客观判定）
+    pos_n = sum(1 for v in (net5, net10, net20, net60) if v is not None and v > 0)
+    if pos_n == 4:
+        fund_verdict = "全周期净流入（5/10/20/60日皆为正）"
+    elif pos_n == 3:
+        fund_verdict = "资金较强（四窗口三项为正）"
+    elif net20 is not None and net20 > 0 and net60 is not None and net60 < 0:
+        fund_verdict = "资金改善（近20日转正、60日仍负）"
+    elif pos_n == 0:
+        fund_verdict = "全周期净流出"
+    else:
+        fund_verdict = "资金偏弱（%d/4 窗口为正）" % pos_n
+
+    # 依据句式（展开项）：四项判定 + 斐波那契压力支撑
+    def tick(ok, txt):
+        return ("✅" if ok else "❌") + txt
+    basis = (
+        "依据：" + tick(score_ok1, "资金(净%s亿且涨%s%%)" % (("%.2f" % (net/1e8)) if net is not None else "—", chg)) +
+        " " + tick(bull >= 2, "趋势(EMA多头%d/3)" % bull) +
+        " " + tick(pos >= 70, "位置(分位%.0f%%)" % pos) +
+        " " + tick(volratio >= 1.1, "量价(量比%.2f)" % volratio) +
+        "；压力=61.8%%位%.2f/延伸161.8%%位%.2f，支撑=38.2%%位%.2f/EMA20 %s" %
+        (fib["fib618"], fib["ext1618"], fib["fib382"],
+         ("%.2f" % ma20) if ma20 else "—")
+    )
+
     return {
         "name": name, "bk": bk, "level": level, "score": score, "state": state,
         "price": round(price, 2), "chg": round(chg, 2) if chg is not None else None,
@@ -169,12 +252,16 @@ def analyze(name, q):
         "resist20": round(r20, 2), "resist60": round(r60, 2),
         "support_ema20": round(ma20, 2) if ma20 else None, "support_swing50": swing50,
         "vol_ratio5": volratio,
+        "fib382": fib["fib382"], "fib618": fib["fib618"], "ext1618": fib["ext1618"],
+        "fund_5d": net5, "fund_10d": net10, "fund_20d": net20, "fund_60d": net60,
+        "fund_verdict": fund_verdict,
+        "basis": basis,
         "data_date": rows[-1]["d"],
     }
 
 
 def judge_text(items):
-    """整体研判：L4 行业清单 + 状态分布。"""
+    """整体研判：L4 行业清单 + 状态分布 + 趋势结构计数。"""
     l4 = [x["name"] for x in items if x["level"] == "L4"]
     l3 = [x["name"] for x in items if x["level"] == "L3"]
     up = [x["name"] for x in items if x["state"] == "趋势向上"]
@@ -185,6 +272,15 @@ def judge_text(items):
     if up:
         s += "；趋势向上（分位≥90%且均线多头）：" + "、".join(up[:6])
     return s
+
+
+def structure_counts(items):
+    """趋势结构计数（图1式汇总行）：向上/反弹/修复/整理/震荡。"""
+    c = {"趋势向上": 0, "下跌反弹": 0, "底部修复": 0, "弱势整理": 0, "震荡": 0}
+    for x in items:
+        if x["state"] in c:
+            c[x["state"]] += 1
+    return c
 
 
 def main():
@@ -225,9 +321,10 @@ def main():
         "source": "东方财富行业板块K线+主力净额（90.BKxxxx，中国IP）",
         "universe": "申万一级31行业（东财板块名精确映射）",
         "grading": "共振置信度：资金(net>0且涨>0)+趋势(EMA多头>=2)+位置(分位>=70%)+量价(5日量比>=1.1)，4项=L4/3=L3/2=L2/<=1=L1",
+        "structure_counts": structure_counts(items),
         "items": items,
         "judgment": judge_text(items),
-        "note": "日频盘后研判，非盘中实时信号。压力=近20/60日高点，支撑=EMA20/波段底50%。仅供观测，不改选股排序。红涨绿跌由前端按chg处理。",
+        "note": "日频盘后研判，非盘中实时信号。压力=斐波那契61.8%位/161.8%延伸位与近20/60日高，支撑=38.2%位/EMA20/波段底50%。资金验证=东财BK主力净流入5/10/20/60日累计（同源同secid）。仅供观测，不改选股排序。红涨绿跌由前端按chg处理。",
     }
     if no_write:
         print("\n=== 研判 ===")
