@@ -13585,8 +13585,21 @@ function drawUpDownChart(){
     }
     h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px">较上一观察日 '+_tr+'</div>';
     // 行动解读（档位判定 → 仓位建议，口径与逻辑详解页一致）
-    h+='<div style="font-size:12px;line-height:1.7;color:var(--txt);border:1px dashed rgba(255,208,36,0.48);border-radius:8px;padding:8px 10px;margin-bottom:10px">';
-    h+='<b style="color:'+_z.col+'">解读：</b>'+total+' 家 → '+_z.label+'。'+_z.tip+'。</div>';
+    // 🔴 2026-11-18 主人令：解读改为「结论先行 + 三句话」，补近期区间位置与边际变化（原版只报档位+建议，太干巴）
+    var _bt=(data.history||[]).map(function(x){return Number(x.total);}).filter(function(v){return isFinite(v);});
+    var _bmin=_bt.length?Math.min.apply(null,_bt):null, _bmax=_bt.length?Math.max.apply(null,_bt):null;
+    var _bd = (_bt.length>=2)?(total-_bt[_bt.length-2]):0; // 不依赖块内 const _prev，直接从历史序列重算上一日差值
+    var _headB = total+' 家，'+_z.label+'档；'+(isFinite(_bmin)&&isFinite(_bmax)&&_bmax>_bmin?('近'+_bt.length+'观察日在 '+_bmin+'–'+_bmax+' 窄幅横盘，宽度没明显扩张'):_z.label);
+    var _rdB = '<div style="background:var(--card);border-radius:6px;padding:7px 9px;margin-bottom:8px">'
+      +'<div style="font-size:10px;color:var(--sub);margin-bottom:2px">一句话结论</div>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--txt)">'+_headB+'</div></div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:5px">读这张卡，记住三句话</div>'
+      +'<div style="font-size:11.5px;line-height:1.7;color:var(--txt);margin-bottom:5px"><b style="color:'+_z.col+'">现在在哪一档：</b>'+_z.label+'（切点 30/100/200/300+）——'+_z.tip+'。</div>'
+      +'<div style="font-size:11.5px;line-height:1.7;color:var(--txt);margin-bottom:5px"><b style="color:'+_z.col+'">边际有没有变：</b>较上一观察日 '+(_bd>0?'+':'')+_bd+' 家'+(isFinite(_bmin)&&isFinite(_bmax)?('，近'+_bt.length+'观察日始终在 '+_bmin+'–'+_bmax+' 之间'+(Math.abs(_bd)<=3?'横着，既没扩散加速也没退潮走弱':'')):'')+'。</div>'
+      +'<div style="font-size:11.5px;line-height:1.7;color:var(--txt);margin-bottom:7px"><b style="color:'+_z.col+'">怎么用：</b>正常做多区、跟随主线板块；家数上不到 200（亢奋普涨线）前广度有限，别指望普涨。</div>'
+      +'<div style="font-size:10.5px;line-height:1.6;color:var(--sub);border-top:1px dashed var(--border2);padding-top:6px">东方财富历史新高家数 · 状态尺，非买卖信号。</div>';
+    h+='<div style="font-size:12px;line-height:1.7;color:var(--txt);border:1px dashed rgba(255,208,36,0.48);border-radius:8px;padding:9px 10px;margin-bottom:10px">';
+    h+='<b style="color:'+_z.col+'">解读：</b>'+_rdB+'</div>';
     if(top.length){
       h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px">领涨新高股 TOP8</div>';
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px">';
@@ -13660,10 +13673,15 @@ function drawUpDownChart(){
       const _dir=_dd>0.002?'右移（净空占比走高 → 机构加空/减多、避险升温）'
                 :_dd<-0.002?'左移（净空占比走低 → 机构减空/加多、风险偏好回暖）'
                 :'基本横盘（中性震荡）';
-      _drift='<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6">🌡 温度条近 '+_tNlr.length+' 日<span style="color:var(--txt)">'+_dir+'</span>'
-        +(_dd>0.002?' → 逆向框架（z≥+1 偏多）下 <b style="color:var(--up)">偏多信号正在酝酿</b>'
-         :_dd<-0.002?' → 逆向框架下偏空/减仓压力缓和'
-         :'')+'（累计 Δ净空占比 '+(_dd>=0?'+':'')+(_dd*100).toFixed(2)+'pct）</div>';
+      // 🔴 2026-11-18 主人令：修正方向笔误——净空走低=空头撤退=趋向多头拥挤=靠近 z≤−1 偏空/减仓线，
+      //    故压力是「累积/升温」而非「缓和」；与右移分支「偏多信号正在酝酿」措辞对称。
+      _drift='<div style="background:var(--card);border-radius:6px;padding:7px 9px;margin-top:8px;line-height:1.6">'
+        +'<div style="font-size:10px;color:var(--sub);margin-bottom:3px">近一个月往哪走</div>'
+        +'<div style="font-size:11.5px;color:var(--txt)">净空占比近 '+_tNlr.length+' 日'+_dir+'（累计 Δ '+(_dd>=0?'+':'')+(_dd*100).toFixed(2)+'pct）</div>'
+        +'<div style="font-size:11.5px;color:var(--txt);margin-top:3px">按逆向框架：'
+        +(_dd>0.002?'空头越挤、越靠近 z≥+1，<b style="color:var(--up)">偏多信号正在酝酿</b>'
+         :_dd<-0.002?'空头越撤、越靠近 z≤−1，<b style="color:var(--down)">偏空/减仓压力在累积（升温）</b>，非缓和'
+         :'方向不明显，维持观察')+'。</div></div>';
     }
     h+='<div style="font-size:11.5px;color:var(--txt);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-top:4px;margin-bottom:10px;line-height:1.7"><b style="color:'+st.col+'">解读：</b>'+_rd+(_drift||'')+'</div>';
     // 近10日净空占比迷你走势（文字条形，宽度按 nlr 相对极值）
