@@ -166,9 +166,13 @@ def main():
             continue
         rec["horizons"] = h_stats
         s5, s10 = h_stats.get("5"), h_stats.get("10")
-        # 🔴 2026-10-23 晚主人令·终态：收益率(均益 avg)为第一驱动，胜率仅作微小质量修正。
-        #   主人原话"我只要收益率最高的股票能选出来就行"——故均益权重抬到 5.0/3.0，
-        #   胜率腿从 0.5 压到 0.3/0.2（≈20:1），使"历史信号后平均涨得最多"的票真正排前。
+        # 🔴 2026-11-18 主人令「收益率为主，胜率不能独大，评分要改」·终态：
+        #   实测拆解发现旧权重 (5.0,0.3)/(3.0,0.2) 下 T+10 均益占头部票 66%（江丰电子 30.8/46.3）——
+        #   远端慢变量（多周前历史收益）压过近端 T+5 持有体验，榜单固化"总是这几只"。
+        #   现三向再平衡：① T+5（全站默认持有期，与 excess5 校准口径一致）均益 5.0→6.0 升为唯一主项；
+        #   ② T+10 均益 3.0→2.0 慢变量减权（近端实绩优先，排名随新信号窗口轮动）；
+        #   ③ 胜率腿 0.3/0.2→0.15/0.1 再减半（胜率部分占比 ≤8%，永不可能独大，仅作质量微调）。
+        #   真数据仿真：安集科技(T+5均益7.54%) 升 #1、TOP20 8 只轮换、新头部均益占比 92.7%。
         # 🔴 2026-11-01 根因修复（九宝令）：小样本过拟合折扣。
         # 原 winrate_score 由 avg_shrunk×5.0 主导，而 avg_shrunk=avg×n/(n+10) 对 n=1~4 收缩过弱，
         # 致 1~4 个极端暴涨窗口（均益 +40~55%）被吹成 +50~96 分霸榜，真实稳健票（n≥11、均益仅 +7%）
@@ -179,9 +183,9 @@ def main():
             return max(0.15, min(1.0, (n or 0) / 12.0))
         score = 0.0
         if s5:
-            score += (s5["avg_shrunk"] * 5.0 + (s5["win_shrunk"] - 50.0) * 0.3) * _wr_conf(s5["n"])
+            score += (s5["avg_shrunk"] * 6.0 + (s5["win_shrunk"] - 50.0) * 0.15) * _wr_conf(s5["n"])
         if s10:
-            score += (s10["avg_shrunk"] * 3.0 + (s10["win_shrunk"] - 50.0) * 0.2) * _wr_conf(s10["n"])
+            score += (s10["avg_shrunk"] * 2.0 + (s10["win_shrunk"] - 50.0) * 0.1) * _wr_conf(s10["n"])
         rec["winrate_score"] = round(score, 2)
         stocks.append(rec)
 
@@ -195,7 +199,7 @@ def main():
             "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
             "cost_pct_roundtrip": COST_PCT,
             "shrinkage_k": SHRINK_K,
-            "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w] × conf(n_h)；h∈{5:(5.0,0.3),10:(3.0,0.2)}；conf(n)=max(0.15,min(1,n/12)) 小样本可信度折扣（2026-11-01 根因修复：防 1~4 样本极端均值霸榜）",
+            "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w] × conf(n_h)；h∈{5:(6.0,0.15),10:(2.0,0.1)}；conf(n)=max(0.15,min(1,n/12)) 小样本可信度折扣（2026-11-01 防小样本霸榜）；2026-11-18 主人令收益率再平衡：T+5均益唯一主项、T+10慢变量减权、胜率腿减半(占比≤8%)",
             "n_signals": len(occ),
             "n_stocks": len(stocks),
             "signal_date_range": [min(o["signal_date"] for o in occ), max(o["signal_date"] for o in occ)] if occ else [],
