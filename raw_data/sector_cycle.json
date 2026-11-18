@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-18 05:18:26",
+  "update_time": "2026-11-18 09:56:49",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,15 +17,15 @@
     {
       "sector": "AI算力",
       "start": "10/08",
-      "end": "11/13",
+      "end": "11/18",
       "start_idx": 0,
-      "end_idx": 26,
-      "days": 27,
-      "hot_days": 24,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 25,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 203,
-      "ongoing": false
+      "total": 210,
+      "ongoing": true
     },
     {
       "sector": "其他",
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1747,
+      "total": 1725,
       "ongoing": true
     },
     {
@@ -50,21 +50,21 @@
       "hot_days": 26,
       "peak": 36,
       "peak_date": "10/08",
-      "total": 259,
+      "total": 257,
       "ongoing": true
     },
     {
       "sector": "新能源车",
       "start": "10/08",
-      "end": "11/16",
+      "end": "11/18",
       "start_idx": 0,
-      "end_idx": 27,
-      "days": 28,
-      "hot_days": 24,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 25,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 285,
-      "ongoing": false
+      "total": 290,
+      "ongoing": true
     },
     {
       "sector": "机器人",
@@ -89,7 +89,7 @@
       "hot_days": 30,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 273,
+      "total": 270,
       "ongoing": true
     },
     {
@@ -115,7 +115,7 @@
       "hot_days": 29,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 200,
+      "total": 196,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 16,
       "peak": 18,
       "peak_date": "11/17",
-      "total": 104,
+      "total": 103,
       "ongoing": true
     },
     {
