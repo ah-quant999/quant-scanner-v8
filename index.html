@@ -1341,6 +1341,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=e9d99f49b5" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=ecfe644af6" defer></script>
 <script src="data/CFFEX_POSITION.js?v=19df87e5aa" defer></script>
+<!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（沪深300估值 vs 中债10Y） -->
+<script src="data/EQBOND_ATTRACTION.js?v=109a87c84a" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=f41f937580" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=b4d511678c" defer></script>
@@ -3283,6 +3285,14 @@ function fmtSigned(v){
       <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
     </div>
+
+    <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（同 IF 持仓/市场宽度卡风格） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
+      <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
+      <div class="note">口径：ERP = 1 / PE_TTM − 10Y国债；股息利差 = 沪深300股息率TTM − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数月线（n=130）。<b>温度计只做状态观测，不是机械买卖信号。</b></div>
+    </div>
+
 
     <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
          ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
@@ -12690,6 +12700,8 @@ function drawUpDownChart(){
 
           {name:'市场宽度·新高家数', source:'W52_HIGH', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'52周新高广度'},
 
+          {name:'股债性价比·温度计', source:'EQBOND_ATTRACTION', freq:'每日盘后', slots:['1','8',':','0','0'], note:'ERP/股息利差/比价分位（状态观测）'},
+
           {name:'宏观数据速览', source:'MACRO_DATA', freq:'盘前+盘后', slots:['0','8',':','2','5','|','1','7',':','2','0'], note:'LPR/M2/CPI/PMI'},
 
           {name:'解禁日历', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['0','8',':','2','5'], note:'未来 N 天解禁'},
@@ -13684,6 +13696,97 @@ function drawUpDownChart(){
   }
   window.renderCffexPosition = renderCffexPosition;
 
+  /* ---- 6c. 股债性价比温度计（2026-11-18 主人令：同 IF持仓/市场宽度卡风格） ---- */
+  function renderEqbondAttraction(d){
+    const $b=$('eqbondBody'), $t=$('eqbondTime');
+    if(!$b) return;
+    d = d || window.EQBOND_ATTRACTION || {};
+    if(!d.data_date || typeof d.erp_pct!=='number'){
+      $b.innerHTML='<div class="ipo-empty">股债性价比数据暂不可用</div>';
+      if($t) $t.textContent='—';
+      return;
+    }
+    // 分位温度：越高＝权益相对债券越便宜（红/up），越低＝越贵（绿/down），遵守全站红涨绿跌
+    const _zone=function(p){
+      return p>=80 ? {label:'极便宜',col:'var(--up)'}
+           : p>=50 ? {label:'偏便宜',col:'var(--gold)'}
+           : p>=20 ? {label:'中性',col:'var(--sub)'}
+           : {label:'偏贵',col:'var(--down)'};
+    };
+    const _bar=function(title,val,pct){
+      const z=_zone(pct), px=Math.max(2,Math.min(98,pct));
+      let s='<div style="margin-bottom:10px">';
+      s+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:5px;flex-wrap:wrap">';
+      s+='<span style="font-size:11.5px;color:var(--sub)">'+title+' <b style="color:var(--txt);font-size:14px">'+val+'</b>'
+        +' · 分位 <b style="color:'+z.col+';font-size:13px">'+pct.toFixed(1)+'%</b></span>';
+      s+='<span style="font-size:11.5px;font-weight:700;color:'+z.col+'">'+z.label+'</span></div>';
+      s+='<div style="position:relative;height:18px;display:flex;border-radius:6px">';
+      s+='<div style="width:20%;background:var(--down);opacity:.6;border-radius:6px 0 0 6px"></div>';
+      s+='<div style="width:30%;background:var(--sub);opacity:.6"></div>';
+      s+='<div style="width:30%;background:var(--gold);opacity:.6"></div>';
+      s+='<div style="flex:1;background:var(--up);opacity:.6;border-radius:0 6px 6px 0"></div>';
+      s+='<div style="position:absolute;left:calc('+px+'% - 4px);top:1px;width:4px;height:16px;border-radius:2px;background:var(--txt);box-shadow:0 0 4px rgba(0,0,0,.7)"></div>';
+      s+='<div style="position:absolute;left:calc('+px+'% - 6px);top:-9px;font-size:9px;color:var(--txt);text-shadow:0 1px 3px #000">'+pct.toFixed(0)+'%</div>';
+      s+='</div>';
+      s+='<div style="display:flex;font-size:9px;color:var(--dim);margin-top:2px">';
+      s+='<span style="width:20%;text-align:left">0 偏贵</span><span style="width:30%;text-align:center">20</span>'
+        +'<span style="width:30%;text-align:center">50</span><span style="flex:1;text-align:right">80 · 100 极便宜</span></div>';
+      s+='</div>';
+      return s;
+    };
+    let h='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px">';
+    h+='<div style="font-size:11.5px;color:var(--sub);margin-bottom:9px">'+d.data_date
+      +' · 沪深300 vs 中债10Y · 样本 '+Number(d.sample_size||0)+' 交易日</div>';
+    h+=_bar('ERP（1/PE − 10Y）', Number(d.erp).toFixed(2)+'%', d.erp_pct);
+    h+=_bar('股息率TTM − 10Y', Number(d.spread).toFixed(2)+'pct', d.spread_pct);
+    const _chip=function(name,val,pct){
+      const z=_zone(pct);
+      return '<div style="background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:5px 8px">'
+        +'<div style="font-size:10px;color:var(--dim)">'+name+'</div>'
+        +'<div style="font-size:12px;color:var(--txt);font-weight:700">'+val
+        +' <span style="font-size:10px;color:'+z.col+'">'+pct.toFixed(0)+'%</span></div></div>';
+    };
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px;margin:4px 0 10px">';
+    h+=_chip('PE_TTM', Number(d.pe_ttm).toFixed(2), d.pe_pct);
+    h+=_chip('PB_LF', Number(d.pb_lf).toFixed(3), d.pb_pct);
+    h+=_chip('股息率TTM', Number(d.dy_ttm).toFixed(2)+'%', d.dy_pct);
+    h+=_chip('中债10Y', Number(d.y10).toFixed(3)+'%', d.y10_pct);
+    h+=_chip('股债比价', Number(d.ratio).toFixed(2), d.ratio_pct);
+    h+='</div>';
+    const _ez=_zone(d.erp_pct), _sz=_zone(d.spread_pct);
+    let _rd='ERP '+d.erp_pct.toFixed(0)+'% 分位（'+_ez.label+'）、股息利差 '+d.spread_pct.toFixed(0)
+      +'% 分位（'+_sz.label+'）→ ';
+    _rd += (d.erp_pct>=50 && d.spread_pct>=50)
+      ? '两项温度均偏权益有利，性价比处于偏暖区间。'
+      : (d.erp_pct<30 && d.spread_pct<30)
+        ? '两项温度均偏权益不利，需防估值与利率双杀。'
+        : '两项温度读数不一致，以 ERP 为主、股息利差为辅交叉验证。';
+    _rd += ' 10Y 国债处于 '+Number(d.y10_pct).toFixed(0)+'% 极低分位，会放大股息利差与股债比价的权益吸引力读数；'
+      + '股债比价 '+Number(d.ratio_pct).toFixed(0)+'% 分位、PE '+Number(d.pe_pct).toFixed(0)
+      +'% 分位需一起看。这是<b>状态温度计，不是买入/止跌信号</b>。';
+    h+='<div style="font-size:11.5px;line-height:1.7;color:var(--txt);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-bottom:10px">'
+      +'<b style="color:var(--gold)">解读：</b>'+_rd+'</div>';
+    const tail=(d.history_tail||[]).slice(-10);
+    if(tail.length>=2){
+      const vals=tail.map(function(x){return Number(x.erp)||0;});
+      const mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals), rg=Math.max(mx-mn,1e-6);
+      h+='<div style="margin-top:6px;font-size:10px;color:var(--dim)">近 '+tail.length+' 日 ERP 走势（%）</div>';
+      tail.forEach(function(x){
+        const w=18+((Number(x.erp)||0)-mn)/rg*82;
+        h+='<div style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--dim);line-height:1.55">'
+         +'<span style="width:64px">'+String(x.date||'').slice(5)+'</span>'
+         +'<span style="flex:1;height:7px;border-radius:3px;background:var(--card);position:relative;overflow:hidden">'
+         +'<span style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;border-radius:3px;background:var(--sub);opacity:.8"></span></span>'
+         +'<span style="width:44px;text-align:right">'+Number(x.erp).toFixed(2)+'</span></div>';
+      });
+    }
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t && typeof setBadge==='function'){ try{ setBadge('eqbondTime','盘后','观测', d.update_time||'', null, '盘后'); }catch(e){} }
+    else if($t){ $t.textContent=(d.update_time||'').slice(5,16)||'—'; }
+  }
+  window.renderEqbondAttraction = renderEqbondAttraction;
+
   /* ---- 12. 指数快览（实时数据补位） ---- */
   function renderIndexQuotes(d){
     const $b=$('indexQuotesBody'), $t=$('indexQuotesTime');
@@ -14290,6 +14393,7 @@ window.showRestrictedItems = showRestrictedItems;
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
     // 🏔 2026-10-20 主人令：板块年度主力净流入卡已迁「暂未上架」（renderUnlisted._fillSectorYearFlow 派发），此处旧 safe() 调用删除
     safe(window.renderCffexPosition, window.CFFEX_POSITION || {});  // 🆕 2026-10-15 IF会员持仓择时
+    safe(window.renderEqbondAttraction, window.EQBOND_ATTRACTION || {});  // 🆕 2026-11-18 股债性价比温度计
     safe(window.renderFuturesMain, window.FUTURES_REALTIME || window.CFFEX_HOLDINGS || {});
     safe(window.renderBondFutures, window.BOND_FUTURES || {});
     safe(window.renderSectorTech, window.SECTOR_TECH_JUDG || {});
