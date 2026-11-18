@@ -1,6 +1,6 @@
 {
-  "DATA": "/home/runner/work/quant-scanner-v8/quant-scanner-v8/algorithms/../out",
-  "V8_OUT_DIR": "",
+  "DATA": "out",
+  "V8_OUT_DIR": "out",
   "guanlan_watchlist": {
     "exists": true,
     "stocks": 3
@@ -17,6 +17,6 @@
     "科创板成交前100": 100,
     "港股成交前50": 79,
     "外资研投": 183,
-    "因子优选": 146
+    "因子优选": 147
   }
 }
