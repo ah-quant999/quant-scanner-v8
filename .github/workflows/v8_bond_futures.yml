@@ -20,6 +20,13 @@ jobs:
   refresh:
     runs-on: [self-hosted, cn]
     timeout-minutes: 20
+    # 2026-11-18 14:35 根治：cn runner 是 Windows 机，缺 shell: bash 时 GitHub Actions
+    #    用系统默认命令解释器跑 run 步骤 -> bash 语法 ParserError 全崩（01:46 run#1 实录）。
+    #    触改本结构同时强制 GitHub 重新注册 cron（11-16 期指 workflow 同款先例：
+    #    schedule 零触发 = 注册丢失）。
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: "📥 同步源码（GitHub API 直连，仅拉本卡生成器）"
         continue-on-error: true
