@@ -24,6 +24,8 @@ jobs:
     #    用系统默认命令解释器跑 run 步骤 -> bash 语法 ParserError 全崩（01:46 run#1 实录）。
     #    触改本结构同时强制 GitHub 重新注册 cron（11-16 期指 workflow 同款先例：
     #    schedule 零触发 = 注册丢失）。
+    env:
+      PYTHONUTF8: "1"
     defaults:
       run:
         shell: bash
