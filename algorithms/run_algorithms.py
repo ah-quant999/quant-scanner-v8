@@ -105,6 +105,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "scripts/gen_factor_progress.py": 900,          # 读 factor_audit.json，纯本地
     "scripts/fetch_valuation_percentile.py": 1200,  # akshare stock_index_pe_lg（理杏仁），单接口
     "scripts/fetch_index_value_framework.py": 900,  # 读本地 INDEX_HISTORY.js + numpy 计算
+    "stock_forward_alpha.py": 5400,  # 🆕 2026-11-19：个股级前瞻 Alpha（kline_cache 全池 walk-forward，与 factor_walkforward 同量级），显式登记避免走默认 1800s 在 B批关键路径被杀
     # 🆕 2026-09-11：全算法回测汇总——纯本地读 data/*.js + raw_data/algo_track.json，零网络
     "gen_market_bench.py": 900,   # 🆕 2026-09-17：3120 只×250 根纯本地计算（交接单口径 timeout 900s）
     "gen_backtest_all_algos.py": 900,
@@ -210,6 +211,7 @@ ORDER = [
     "backtest_expectancy.py",          # → raw_data/backtest_expectancy.json（四信号 edge；generate_top10 与 D批 final_recommend 双消费者，都必须在其后）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "gen_stock_winrate.py",            # 🔴 2026-10-23 主人令·嵌入因子榜：读 raw_data/history 真实信号流 + kline_cache 复算个股历史胜率/期望 → data/STOCK_WINRATE.js（generate_top10 嵌入因子用）；须在 generate_top10 之前（与 STAGES["B"] 成对）
+    "stock_forward_alpha.py",          # 🆕 2026-11-19 主人令·个股级前瞻预测因子：读 kline_cache → raw_data/stock_forward_alpha.json（IS 定权/OOS 不重拟合；PASS 且当日新鲜才被 generate_top10 alpha_gate 启用，FAIL/陈旧权重 0）。真正「同信号组合内按个股未来收益分高下」。须在 generate_top10 之前（与 STAGES["B"] 成对）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-10-28 E批缓存新鲜度（与 STAGES["E"] 成对）：kline_cache 是云端 V8_NO_NET 下
     #   backtest_tdx/factor_lab/factor_walkforward 的唯一 K 线水源，
@@ -411,7 +413,7 @@ STAGES = {
         "refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（与 ORDER 成对）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
         "backtest_expectancy.py",          # 🔴 2026-10-23 主人令（P0-b）：再前移至 generate_top10 之前（与 ORDER 成对），选股吃当日最新 edge
-        "build_candidate_pool.py", "gen_stock_winrate.py", "generate_top10.py",  # 🔴 2026-10-23 主人令·嵌入因子榜：gen_stock_winrate 须在 generate_top10 之前（与 ORDER 成对）
+        "build_candidate_pool.py", "gen_stock_winrate.py", "stock_forward_alpha.py", "generate_top10.py",  # 🔴 2026-10-23 主人令·嵌入因子榜：gen_stock_winrate 须在 generate_top10 之前（与 ORDER 成对）；🆕 2026-11-19 stock_forward_alpha 亦须在其前（当日 PASS 证据先产，generate_top10 才吃到）
         # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
         # "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",

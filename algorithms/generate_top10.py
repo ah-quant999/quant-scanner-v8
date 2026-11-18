@@ -231,6 +231,45 @@ _TERM_OOS_KEYS = {
 # 动态权重容器（main 启动时由 factor_oos_gate() 填充；评分循环读此而非写死常量）
 EXP_RET_TERM_MAX = 15.0  # 前移：消除 import 期 NameError（原定义晚于下方 _DYN 初始化，致 11-02 起每夜崩溃）
 _RPS_TERM_MAX_DYN = RPS_TERM_MAX
+# 🔴 2026-11-18 主人令·新建个股级前瞻预测因子（algorithms/stock_forward_alpha.py）
+#   真正「测算未来收益率最高的个股」：个股级 Alpha 分位，同信号组合内分高下。
+#   PASS 才启用（铁律 W2：无 OOS 证据/FAIL 默认权重 0，绝不未验证就给分）。
+ALPHA_TERM_MAX = 15.0
+_ALPHA_TERM_MAX_DYN = 0.0   # 由 _alpha_gate() 填；默认 0=未验证禁入
+_ALPHA_SCORES = {}          # code -> 0~1 预测分位（当日）
+_ALPHA_META = {}
+_STOCK_ALPHA_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "..", "raw_data", "stock_forward_alpha.json")
+def _alpha_gate():
+    """读 stock_forward_alpha.json；仅 verdict=PASS 且有个股分覆盖才启用，否则权重 0。"""
+    global _ALPHA_TERM_MAX_DYN, _ALPHA_SCORES, _ALPHA_META
+    _ALPHA_TERM_MAX_DYN = 0.0
+    _ALPHA_SCORES, _ALPHA_META = {}, {}
+    try:
+        with open(_STOCK_ALPHA_JSON, encoding="utf-8") as _f:
+            _d = json.load(_f)
+        _v = _d.get("verdict")
+        _sc = _d.get("latest_scores") or {}
+        # 🛡 宁缺毋滥（2026-11-19 主人令）：仅当日新鲜（≤20h，容 UTC/CST 时区差）证据才采信，
+        #   昨日陈旧 alpha 即使 PASS 也禁入 —— 防止旧分位污染今日排序。
+        _age_ok = False
+        try:
+            from datetime import datetime as _dt2, timezone as _tz2, timedelta as _td2
+            _ts2 = _dt2.strptime(str(_d.get("update_time"))[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=_tz2.utc)
+            _age_ok = (_dt2.now(_tz2.utc) - _ts2) <= _td2(hours=20)
+        except Exception:
+            _age_ok = False
+        if _v == "PASS" and not _age_ok:
+            _v = "陈旧(>20h·禁入)"
+        if _v == "PASS" and isinstance(_sc, dict) and len(_sc) >= 20:
+            _ALPHA_TERM_MAX_DYN = ALPHA_TERM_MAX
+            _ALPHA_SCORES = {str(k).replace(".", ""): float(v) for k, v in _sc.items()}
+        _ALPHA_META = {"verdict": _v, "ir_oos": _d.get("ir_oos"),
+                       "years": "%s/%s" % (_d.get("years_beat_gt55"), _d.get("years_total")),
+                       "n_scores": len(_sc), "update_time": _d.get("update_time")}
+    except Exception:
+        _ALPHA_META = {"verdict": "无证据(默认关闭)"}
+    return _ALPHA_META
 _EXP_RET_TERM_MAX_DYN = EXP_RET_TERM_MAX
 _OOS_GATE_REPORT = {}
 
@@ -1962,6 +2001,10 @@ def main():
     _env_rps = os.environ.get("V8_RPS", "1").strip() != "0"
     _rps_map = _rps_prepass(_p5_codes) if _env_rps else {}
     print(f"  🚀 RPS 动量因子：{'启用' if _env_rps else '关闭(V8_RPS=0)'} · 覆盖 {len(_rps_map)}/{len(_p5_codes)} 只")
+    # 🔴 2026-11-18 个股级前瞻 Alpha 闸门（PASS 才启用，FAIL/无证据权重 0）
+    _am = _alpha_gate()
+    print(f"  🎯 个股级前瞻Alpha：verdict={_am.get('verdict')} 权重=±{_ALPHA_TERM_MAX_DYN:.1f} "
+          f"IR_OOS={_am.get('ir_oos')} 个股分覆盖={_am.get('n_scores')}")
     # 🔴 2026-11-02 因子样本外验证 gate（铁律 W2 自动执行）：启动即校验各科学因子 OOS 证据并动态定权重
     _gate_rep = factor_oos_gate()
     print(f"  🔬 因子样本外验证 gate（铁律 W2）：{'开' if FACTOR_OOS_GATE_ON else '关(V8_OOS_GATE=0)'}")
@@ -2422,6 +2465,11 @@ def main():
         rps_term = (_rps_pct - 0.5) * 2.0 * _RPS_TERM_MAX_DYN
         _raw_noform += rps_term
         raw_total += rps_term
+        # 🔴 2026-11-18 个股级前瞻 Alpha（同信号组合内真正分高下）；FAIL 时 _ALPHA_TERM_MAX_DYN=0 → 零影响
+        _alpha_pct = _ALPHA_SCORES.get(raw_code, 0.5)
+        alpha_term = (_alpha_pct - 0.5) * 2.0 * _ALPHA_TERM_MAX_DYN
+        _raw_noform += alpha_term
+        raw_total += alpha_term
         # T+5 胜率（用于前端展示；改动15 从 win10 改 win5 —— T+10 胜率同样被 β 撑高：
         #   by_signal "1,1,0,0" win10=72.5% 但 win5 仅 48.1%，展示 T+10 会误导主人）
         _wr_rec = BT_BY_SIGNAL.get(f"{int(has_chan)},{int(sig_jinzuan)},{int(has_jigou)},{int(has_trend)}")
@@ -2508,6 +2556,8 @@ def main():
                 "backtest": score_backtest,
                 "winrate": round(wr_term, 1),
                 "rps": round(rps_term, 1),
+                "alpha": round(alpha_term, 1),
+                "alpha_oos": _ALPHA_META.get("verdict"),
                 "oos_grade": _OOS_GATE_REPORT.get("rps", ("?", 0, ""))[0],
                 "oos_rps_weight": round(_RPS_TERM_MAX_DYN, 1),
                 "breakout": 5 if breakout_5d else 0,
