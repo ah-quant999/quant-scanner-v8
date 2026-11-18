@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-18 16:58",
-  "republish_time": "2026-11-18 21:20:13",
+  "update_time": "2026-11-18 19:38",
+  "republish_time": "2026-11-19 00:31:19",
   "data_date": "2026-11-17",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "上海银行",
           "price": 8.86,
           "chg": 1.14,
-          "main_net": -59319176.0
+          "main_net": null
         },
         {
           "code": "601998",
           "name": "中信银行",
           "price": 9.57,
           "chg": 0.84,
-          "main_net": 21910491.0
+          "main_net": null
         },
         {
           "code": "600015",
           "name": "华夏银行",
           "price": 6.8,
           "chg": 0.74,
-          "main_net": 4003015.0
+          "main_net": null
         },
         {
           "code": "601825",
           "name": "沪农商行",
           "price": 9.77,
           "chg": 0.72,
-          "main_net": 10481792.0
+          "main_net": null
         },
         {
           "code": "601009",
           "name": "南京银行",
           "price": 13.27,
           "chg": 0.53,
-          "main_net": -49310404.0
+          "main_net": null
         }
       ],
       "match": "exact"
@@ -316,6 +316,49 @@
       "match": "alias:exact"
     },
     {
+      "name": "汽车整车",
+      "bk": null,
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "000980",
+          "name": "众泰汽车",
+          "price": 1.67,
+          "chg": 9.87,
+          "main_net": null
+        },
+        {
+          "code": "000951",
+          "name": "中国重汽",
+          "price": 20.16,
+          "chg": 1.82,
+          "main_net": null
+        },
+        {
+          "code": "000572",
+          "name": "海马汽车",
+          "price": 3.03,
+          "chg": 1.68,
+          "main_net": null
+        },
+        {
+          "code": "600375",
+          "name": "汉马科技",
+          "price": 3.1,
+          "chg": 1.64,
+          "main_net": null
+        },
+        {
+          "code": "600104",
+          "name": "上汽集团",
+          "price": 10.32,
+          "chg": 1.57,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
+    {
       "name": "港口航运",
       "bk": null,
       "cons_count": 20,
@@ -396,49 +439,6 @@
           "name": "山西汾酒",
           "price": 130.46,
           "chg": -1.14,
-          "main_net": null
-        }
-      ],
-      "match": "norm"
-    },
-    {
-      "name": "证券",
-      "bk": "BK0473",
-      "cons_count": 48,
-      "leaders": [
-        {
-          "code": "000776",
-          "name": "广发证券",
-          "price": 18.77,
-          "chg": 1.3,
-          "main_net": null
-        },
-        {
-          "code": "600095",
-          "name": "湘财股份",
-          "price": 6.99,
-          "chg": 0.72,
-          "main_net": null
-        },
-        {
-          "code": "600864",
-          "name": "哈投股份",
-          "price": 4.87,
-          "chg": 0.21,
-          "main_net": null
-        },
-        {
-          "code": "000783",
-          "name": "长江证券",
-          "price": 6.76,
-          "chg": 0.15,
-          "main_net": null
-        },
-        {
-          "code": "300059",
-          "name": "东方财富",
-          "price": 18.38,
-          "chg": 0.05,
           "main_net": null
         }
       ],
@@ -578,6 +578,6 @@
   "leaders_fail_count": 0,
   "neo_fallback_count": 0,
   "retained_count": 0,
-  "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-18 20:57:13 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-18 21:20:13 跟随 FINAL 重算(一劳永逸)"
+  "em_boards_source": "cache",
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-19 00:31:19 跟随 FINAL 重算(一劳永逸)"
 }

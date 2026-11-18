@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-18 21:13:50",
-  "update_time": "2026-11-18 21:13:50",
+  "generated": "2026-11-19 00:31:19",
+  "update_time": "2026-11-19 00:31:19",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -1856,8 +1856,8 @@
     },
     "2026-11-18": {
       "date": "2026-11-18",
-      "update_time": "2026-11-18 20:54:34",
-      "file": "final_recommend_20261118.json",
+      "update_time": "2026-11-19 00:27:34",
+      "file": "final_recommend_20261119.json",
       "degraded": false,
       "top3": [
         {
