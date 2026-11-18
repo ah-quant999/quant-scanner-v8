@@ -1,7 +1,7 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-17",
-  "update_time": "2026-11-18 21:43:41",
-  "source_time": "2026-11-18 21:43:30",
+  "update_time": "2026-11-18 21:51:43",
+  "source_time": "2026-11-18 21:51:35",
   "score": 53.3,
   "verdict": "中性",
   "verdict_color": "#38bdf8",
@@ -22,9 +22,9 @@ window.NATIONAL_TEAM = {
       "name": "大金融相对强度",
       "weight": 30,
       "ready": true,
-      "value": -0.62,
+      "value": -0.61,
       "unit": "%",
-      "detail": "大金融 relative_5d 均值 -0.62%（保险/多元金融/银行/证券）",
+      "detail": "大金融 relative_5d 均值 -0.61%（保险/多元金融/银行/证券）",
       "status": "🟡中性"
     },
     {
