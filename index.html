@@ -10901,50 +10901,73 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       const groups = {};
       rows.forEach(function(r){ (groups[r.st] = groups[r.st] || []).push(r); });
       const order = ['真入','新进','反弹','轮动','真出'];
-      const others = order.filter(function(st){ return st !== '真入' && (groups[st] || []).length; });
-      const slug = {'新进':'new','反弹':'rebound','轮动':'rotate','真出':'out'};
-      if (!window.__sfStatusView) window.__sfStatusView = '';
-      if (window.__sfStatusView !== '真入' && others.indexOf(window.__sfStatusView) < 0) window.__sfStatusView = '';
+      // 2026-11-18 主人令（三次）：真入直显保持；其余状态用「板块资金趋势」卡同款三行胶囊折叠。
+      //   修复「真出消失」：此前 count=0 的状态被过滤隐藏 ⇒ 本次四种状态胶囊一律显示（含数量为0，标注「暂无」）。
+      //   点击胶囊才在下方一行5列展开明细，再点收起，胶囊间互斥；胶囊第三行文案随面板显隐同步。
+      const stateMeta = {
+        '新进': { color:'#41c9ff', emoji:'🆕' },
+        '反弹': { color:'#fb923c', emoji:'🔁' },
+        '轮动': { color:'#ffd024', emoji:'🔄' },
+        '真出': { color:'#26d9c2', emoji:'📤' }
+      };
+      const pillStates = order.filter(function(st){ return st !== '真入'; });
 
       let h2 = '';
-      h2 += '<div style="font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:8px">📝 板块状态一览 <span style="font-size:10px;color:var(--dim);font-weight:400">（真入直显 · 其他点击展开 · 每行 5 列）</span></div>';
+      h2 += '<div style="font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:8px">📝 板块状态一览 <span style="font-size:10px;color:var(--dim);font-weight:400">（真入直显 · 其余胶囊点击展开 · 每行 5 列）</span></div>';
+
+      // 真入区：直接展示
       h2 += '<div style="font-size:11px;color:var(--dim);margin-bottom:5px">🎯 真入 ' + ((groups['真入'] || []).length) + ' 个</div>';
       h2 += '<div class="sf-status-grid">';
       if ((groups['真入'] || []).length) groups['真入'].forEach(function(r){ h2 += sfCardHTML(r); });
       else h2 += '<div style="grid-column:1/-1;color:var(--dim);font-size:12px;padding:8px">暂无真入板块</div>';
       h2 += '</div>';
 
-      if (others.length) {
-        h2 += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">';
-        others.forEach(function(st){
-          const col = statusMeta[st].color;
-          const act = (window.__sfStatusView === st);
-          h2 += '<span id="sfTab_' + slug[st] + '" onclick="window.__sfToggleStatus(\'' + st + '\')" style="cursor:pointer;font-size:12px;background:' + (act ? col : 'transparent') + ';color:' + (act ? '#e6edf7' : col) + ';border:1px solid ' + col + ';border-radius:6px;padding:2px 8px;' + (act ? 'font-weight:700;' : 'opacity:.9;') + '">' + st + ' ' + groups[st].length + '</span>';
-        });
+      // 胶囊区（image#2 同款：左色条、上排名称、中排大数字、下排 点击查看/暂无）
+      h2 += '<div style="display:flex;gap:8px;margin:12px 0 6px">';
+      pillStates.forEach(function(st){
+        const m = stateMeta[st], cnt = (groups[st] || []).length;
+        const idle = cnt ? '点击查看' : '暂无';
+        h2 += '<div class="sf-pill" data-st="' + st + '" onclick="window.__sfPillToggle(\'' + st + '\')" style="flex:1;padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid ' + m.color + ';text-align:center;cursor:pointer;transition:background .15s">';
+        h2 += '<div style="font-size:12px;color:var(--dim);margin-bottom:2px">' + m.emoji + ' ' + st + '</div>';
+        h2 += '<div style="font-size:18px;font-weight:700;color:' + m.color + '">' + cnt + '</div>';
+        h2 += '<div class="sf-pill-status" data-idle="' + idle + '" style="font-size:10px;color:var(--sub);margin-top:2px">' + idle + '</div>';
         h2 += '</div>';
-        others.forEach(function(st){
-          h2 += '<div id="sfGroup_' + slug[st] + '" style="display:' + (window.__sfStatusView === st ? 'block' : 'none') + '">';
-          h2 += '<div style="font-size:11px;color:var(--dim);margin-bottom:5px">' + st + ' ' + groups[st].length + ' 个（点击上方标签切换 / 再点收起）</div>';
-          h2 += '<div class="sf-status-grid">';
-          groups[st].forEach(function(r){ h2 += sfCardHTML(r); });
-          h2 += '</div></div>';
-        });
-      }
+      });
+      h2 += '</div>';
 
-      window.__sfToggleStatus = function(st){
-        window.__sfStatusView = (window.__sfStatusView === st) ? '' : st;
-        Object.keys(slug).forEach(function(k){
-          const box = document.getElementById('sfGroup_' + slug[k]);
-          if (box) box.style.display = (window.__sfStatusView === k) ? 'block' : 'none';
-          const tab = document.getElementById('sfTab_' + slug[k]);
-          if (tab) {
-            const col = statusMeta[k].color, act = (window.__sfStatusView === k);
-            tab.style.background = act ? col : 'transparent';
-            tab.style.color = act ? '#e6edf7' : col;
-            tab.style.borderColor = col;
-            tab.style.fontWeight = act ? '700' : '400';
-            tab.style.opacity = act ? '1' : '.9';
-          }
+      // 明细面板：默认全部折叠，点击胶囊才展开（一行5列），互斥
+      h2 += '<div id="sfStateDetailBox">';
+      pillStates.forEach(function(st){
+        const m = stateMeta[st], list = groups[st] || [], cnt = list.length;
+        h2 += '<div class="sf-state-detail" data-st="' + st + '" style="display:none;margin-bottom:12px;padding:10px;border-radius:6px;background:var(--bg1);border:1px solid var(--border)">';
+        h2 += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+        h2 += '<div style="font-size:12px;font-weight:700;color:' + m.color + '">' + m.emoji + ' ' + st + ' · ' + cnt + ' 个板块</div>';
+        h2 += '<span onclick="window.__sfPillToggle(\'' + st + '\')" style="cursor:pointer;font-size:12px;color:var(--dim)">收起 ▴</span>';
+        h2 += '</div>';
+        if (cnt) {
+          h2 += '<div class="sf-status-grid">';
+          list.forEach(function(r){ h2 += sfCardHTML(r); });
+          h2 += '</div>';
+        } else {
+          h2 += '<div style="color:var(--dim);font-size:12px;padding:8px">暂无 ' + st + ' 板块</div>';
+        }
+        h2 += '</div>';
+      });
+      h2 += '</div>';
+
+      window.__sfPillToggle = function(st){
+        const box = document.getElementById('sfStateDetailBox');
+        if (!box) return;
+        box.querySelectorAll('.sf-state-detail').forEach(function(panel){
+          panel.style.display = (panel.getAttribute('data-st') === st && panel.style.display !== 'block') ? 'block' : 'none';
+        });
+        document.querySelectorAll('.sf-pill').forEach(function(pl){
+          const key = pl.getAttribute('data-st');
+          const stEl = pl.querySelector('.sf-pill-status');
+          if (!stEl) return;
+          const idle = stEl.getAttribute('data-idle') || '点击查看';
+          const panel = box.querySelector('.sf-state-detail[data-st="' + key + '"]');
+          stEl.textContent = (panel && panel.style.display === 'block') ? '已展开' : idle;
         });
       };
 
