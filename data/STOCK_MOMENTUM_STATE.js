@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-19 00:41",
- "generated": "2026-11-19 00:41",
+ "update_time": "2026-11-19 00:42",
+ "generated": "2026-11-19 00:42",
  "meta": {
-  "generated": "2026-11-19 00:41",
+  "generated": "2026-11-19 00:42",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12209,177 +12209,219 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "002514",
-      "name": "*ST宝馨",
-      "change_pct": 4.396,
-      "price": 1.9,
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
       "category": "突破"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.971,
-      "price": 11.36,
+      "code": "688169",
+      "name": "石头科技",
+      "change_pct": 5.005,
+      "price": 140.35,
       "category": "突破"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 4.857,
-      "price": 14.25,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 6.884,
+      "price": 17.08,
       "category": "突破"
      },
      {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 8.667,
-      "price": 1.63,
+      "code": "688036",
+      "name": "传音控股",
+      "change_pct": 4.367,
+      "price": 66.44,
       "category": "突破"
      },
      {
-      "code": "688629",
-      "name": "华丰科技",
-      "change_pct": 14.622,
-      "price": 104.1,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.0,
+      "price": 4.4,
       "category": "突破"
      },
      {
-      "code": "002272",
-      "name": "川润股份",
-      "change_pct": 9.965,
-      "price": 12.58,
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.0,
+      "price": 15.29,
       "category": "突破"
      },
      {
-      "code": "300237",
-      "name": "美晨科技",
-      "change_pct": 5.536,
-      "price": 3.05,
+      "code": "000533",
+      "name": "顺钠股份",
+      "change_pct": 9.98,
+      "price": 10.8,
       "category": "突破"
      },
      {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.274,
-      "price": 8.54,
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.0,
+      "price": 11.88,
+      "category": "突破"
+     },
+     {
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 4.48,
+      "price": 41.98,
+      "category": "突破"
+     },
+     {
+      "code": "688010",
+      "name": "福光股份",
+      "change_pct": 6.681,
+      "price": 24.43,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "002514",
-      "name": "*ST宝馨",
-      "change_pct": 4.396,
-      "price": 1.9,
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
       "category": "加速"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.971,
-      "price": 11.36,
+      "code": "688169",
+      "name": "石头科技",
+      "change_pct": 5.005,
+      "price": 140.35,
       "category": "加速"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 4.857,
-      "price": 14.25,
-      "category": "加速"
-     },
-     {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 8.667,
-      "price": 1.63,
-      "category": "加速"
-     },
-     {
-      "code": "688629",
-      "name": "华丰科技",
-      "change_pct": 14.622,
-      "price": 104.1,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 6.884,
+      "price": 17.08,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "002514",
-      "name": "*ST宝馨",
-      "change_pct": 4.396,
-      "price": 1.9,
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 10.017,
+      "price": 31.52,
       "category": "短线选股"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.971,
-      "price": 11.36,
+      "code": "688169",
+      "name": "石头科技",
+      "change_pct": 5.005,
+      "price": 140.35,
       "category": "短线选股"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 4.857,
-      "price": 14.25,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 6.884,
+      "price": 17.08,
       "category": "短线选股"
      },
      {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 8.667,
-      "price": 1.63,
+      "code": "688036",
+      "name": "传音控股",
+      "change_pct": 4.367,
+      "price": 66.44,
       "category": "短线选股"
      },
      {
-      "code": "688629",
-      "name": "华丰科技",
-      "change_pct": 14.622,
-      "price": 104.1,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.0,
+      "price": 4.4,
       "category": "短线选股"
      },
      {
-      "code": "002272",
-      "name": "川润股份",
-      "change_pct": 9.965,
-      "price": 12.58,
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.0,
+      "price": 15.29,
       "category": "短线选股"
      },
      {
-      "code": "300237",
-      "name": "美晨科技",
-      "change_pct": 5.536,
-      "price": 3.05,
+      "code": "000533",
+      "name": "顺钠股份",
+      "change_pct": 9.98,
+      "price": 10.8,
       "category": "短线选股"
      },
      {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.274,
-      "price": 8.54,
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.0,
+      "price": 11.88,
+      "category": "短线选股"
+     },
+     {
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 4.48,
+      "price": 41.98,
+      "category": "短线选股"
+     },
+     {
+      "code": "688010",
+      "name": "福光股份",
+      "change_pct": 6.681,
+      "price": 24.43,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "002272",
-      "name": "川润股份",
-      "change_pct": 9.965,
-      "price": 12.58,
+      "code": "688036",
+      "name": "传音控股",
+      "change_pct": 4.367,
+      "price": 66.44,
       "category": "强势股"
      },
      {
-      "code": "300237",
-      "name": "美晨科技",
-      "change_pct": 5.536,
-      "price": 3.05,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.0,
+      "price": 4.4,
       "category": "强势股"
      },
      {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.274,
-      "price": 8.54,
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 10.0,
+      "price": 15.29,
+      "category": "强势股"
+     },
+     {
+      "code": "000533",
+      "name": "顺钠股份",
+      "change_pct": 9.98,
+      "price": 10.8,
+      "category": "强势股"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.0,
+      "price": 11.88,
+      "category": "强势股"
+     },
+     {
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 4.48,
+      "price": 41.98,
+      "category": "强势股"
+     },
+     {
+      "code": "688010",
+      "name": "福光股份",
+      "change_pct": 6.681,
+      "price": 24.43,
       "category": "强势股"
      }
     ]
