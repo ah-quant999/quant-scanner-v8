@@ -3298,13 +3298,6 @@ function fmtSigned(v){
          ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
          现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
 
-    <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🌍</span>宏观数据速览 · <span class="fresh" id="macroSummaryTime">—</span></h3>
-      <div id="macroSummaryBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-      <div class="note">LPR / M2 / CPI / PMI / 中美利差 / 汇率 / 商品，集中速览。</div>
-    </div>
-
     <!-- 解禁日历（2026-08-30：盘后数据页 · 未来 N 天解禁汇总） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🔓</span>解禁日历 · <span class="fresh" id="restrictedCalendarTime">—</span></h3>
@@ -8910,7 +8903,6 @@ function switchSec(sec,el){
       try{ window.renderFuturesMain(window.FUTURES_REALTIME || window.CFFEX_HOLDINGS || {}); }catch(e){}
       try{ window.renderBondFutures(window.BOND_FUTURES || {}); }catch(e){}
       try{ window.renderSectorTech(window.SECTOR_TECH_JUDG || {}); }catch(e){}
-      try{ window.renderMacroSummary(window.MACRO_DATA || {}); }catch(e){}
       try{ window.renderRestrictedCalendar(window.RESTRICTED_RELEASE || {}); }catch(e){}
       try{ window.renderForecastCalendar(window.PERFORMANCE_FORECAST || {}); }catch(e){}
       try{ window.__renderNationalTeam(); }catch(e){}
@@ -17262,6 +17254,15 @@ window.__renderComprehensiveSynthesis = function(){
        原「🌅 盘前（开盘前观测）」分组内仅此一卡 ⇒ 分组横幅随之删除，避免出现空分组。 */
     // 🚚 2026-08-30 置顶说明已作废：斐波那契卡已迁出，本页盘前分组清空。
 
+    /* 🚚 2026-11-18 主人令：宏观数据速览 自「🕐 盘后数据」迁至「🔒 已下架」顶部（本卡置于本页第一卡）。
+       容器 id="macroSummaryBody" / 时间戳 id="macroSummaryTime" 不变；渲染走 renderMacroSummary，
+       在下方 el.innerHTML=h 之后即时调用，数据 MACRO_DATA。 */
+h+='<div class="card" style="margin-bottom:16px">';
+h+='  <h3><span class="ic">🌍</span>宏观数据速览 · <span class="fresh" id="macroSummaryTime">—</span></h3>';
+h+='  <div id="macroSummaryBody" style="font-size:13px;color:var(--txt)">加载中…</div>';
+h+='  <div class="note">LPR / M2 / CPI / PMI / 中美利差 / 汇率 / 商品，集中速览。</div>';
+h+='</div>';
+
     /* 🚚 2026-11-18 主人令：商品涨价弹性榜 自「📡 实时数据」迁回「🔒 已下架」顶部（本卡即本页第一卡）。
        容器 id="ceBody" / 时间戳 id="prCEFresh" 不变；渲染仍走 _fillCommodityElasticity
        （下方 innerHTML 后即时调用一次 + 既有 1s 永久自愈轮询双保险），数据 COMMODITY_ELASTICITY（盘后·短线）。 */
@@ -17337,6 +17338,8 @@ h+='<div style="padding:8px 14px;font-size:13px;font-weight:700;color:#c084fc;bo
 
     el.innerHTML=h;
     drawV8MarginChart();
+    // 🚚 2026-11-18：宏观数据速览迁来后即时渲染（容器本函数刚建好，必须 innerHTML 之后调用）
+    try{ if(window.renderMacroSummary) window.renderMacroSummary(window.MACRO_DATA||{}); }catch(e){console.warn('已下架·宏观数据速览渲染失败',e);}
     // 🚚 2026-11-18：商品涨价弹性榜卡壳刚建好，即时填充一次（1s 自愈轮询继续兜底）
     try{ if(window._fillCommodityElasticity) window._fillCommodityElasticity(); }catch(e){}
     // 2026-09-07 主人令：宽基ETF卡恢复柱状图形态（数据仍东财五分类，不回退旧口径图表函数——旧口径 fetch 链保持下线）。
