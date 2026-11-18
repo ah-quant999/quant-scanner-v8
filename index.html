@@ -3202,7 +3202,32 @@ function fmtSigned(v){
 
 
 
-    <!-- 🗑 2026-11-18 主人令（方案一）：「板块资金趋势」独立卡删除，资金验证并入「板块技术研判」卡下半区（东财BK同源 5/10/20/60 日主力净流入累计，口径完全对齐）。数据管线（fetch_orphan_sector_fund_flow）保留不动。 -->
+    <!-- 板块资金趋势（v6 风格移植：收盘复盘 + 周期定位）
+         🗑 2026-09-11 主人令：Block1「盘中追热」整块删除——
+              行业/概念净额榜与 AI市场速览重复，已改由「AI市场速览」承载
+              （概念行前 5 + 新建「行业资金」行，见 algorithms/gen_market_brief.py），此处不再重复展示。
+              注意：renderSector() 已同步删除 Block1 渲染与 sfBlock1 依赖，勿再引入。 -->
+    <div class="card" style="margin-bottom:16px">
+    <div class="card" id="sectorFundTrendCard" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>板块资金趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
+
+      <!-- Block 2: 收盘复盘 -->
+      <div class="sf-block sf-block-close">
+        <div class="sf-block-title"><span class="sf-block-icon" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1px solid rgba(251,146,60,.35)">🔥</span><span>收盘复盘</span></div>
+        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <!-- Block 3: 周期定位 -->
+      <div class="sf-block sf-block-trend">
+        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块资金趋势</div>
+        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
+
+    </div>
+
+
 
     <!-- 🚚 日监控·主力净流入（2026-09-11 主人令：自「实时数据」页 ETF 三合一 Block3 迁来，置于市场宽度卡上方）
          容器 id="etfDailyBlock" 与 renderEtfDaily() 保持不变，仅 DOM 位置移动；跨页与「实时数据」页主力净额分时曲线 T+0 联动。 -->
