@@ -675,30 +675,89 @@ EXP_RET_BLEND_W5 = 0.5
 EXP_RET_BLEND_W10 = 0.5
 
 def _exp_ret_raw(chan, jinzuan, jigou, trend):
-    """个股四信号组合 → 前瞻收益混合 raw(%)：0.5*ret5 + 0.5*ret10（by_signal）。缺失→0。"""
+    """个股四信号组合 → 前瞻收益混合 raw(%)：0.5*收益5 + 0.5*收益10。
+    🆕 2026-11-18 整改③：优先读 exc_shrunk5/10（组合收益 − 同档全池均值，剔 β 真超额，
+    与 by_factor excess5 同构；旧 JSON 无该字段时回退 ret5/ret10 绝对口径）。
+    组合缺失 → None（上层落 grand mean 中性，不再伪 0）。"""
     _rec = BT_BY_SIGNAL.get(f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}")
     if not _rec:
-        return 0.0
+        return None
+    _e5 = _num_or_none(_rec.get("exc_shrunk5"))
+    _e10 = _num_or_none(_rec.get("exc_shrunk10"))
+    if _e5 is not None or _e10 is not None:
+        return (EXP_RET_BLEND_W5 * (_e5 if _e5 is not None else 0.0)
+                + EXP_RET_BLEND_W10 * (_e10 if _e10 is not None else 0.0))
     _r5 = _num_or_none(_rec.get("ret5")) or 0.0
     _r10 = _num_or_none(_rec.get("ret10")) or 0.0
     return EXP_RET_BLEND_W5 * _r5 + EXP_RET_BLEND_W10 * _r10
 
-# 跨「有数据」的 16 组合中心化：最佳(收益最高)→+MAX，最差→-MAX，使前瞻收益成为主排序项且保留区分度。
+# ── 🆕 2026-11-18 审计整改四连（主人令「马上改好上线，今晚用新算法」）──────────
+#   ① IS/OOS 同号门：backtest_expectancy 同步升级后 by_signal 产出 n5_is/ret5_is、
+#      n5_oos/ret5_oos；两段 n 均 ≥10 且 T+5 分段符号异 ⇒ 样本内外证据矛盾 → 本组合
+#      exp_ret 清零（同 2026-10-23 P0-b「IS/OOS 异号弃用」先例，主项与证据项视同仁，
+#      消除主项未经 OOS 的最大方法论漏洞）。旧 JSON 无分段字段 → 不门控（软上线，
+#      当晚 B 批 backtest_expectancy 重跑后自动生效）。
+#   ② 收缩目标改 grand mean：缺失组合不再落 0（偏空窗口 0 = 最悲观端点，缺数据被当
+#      最差惩罚），改落全组合均值（中性 = 池子平均）。
+#   ③ 组合级改超额：见 _exp_ret_raw。
+#   ④ n<50 置信打折：w = n/(n+50)，eff = w*raw + (1−w)*grand —— 小样本组合向池心收缩，
+#      不再占 ±MAX 端点（源侧 SHRINK_K=10 太弱，n=50 仍 83% 裸权重，此处补强）。
+_EXP_RET_N_FLOOR = 50.0    # ④ 打折半衰样本数
+_EXP_RET_SEG_MIN_N = 10    # ① 分段门最低样本（每段）
+
+def _exp_ret_n(chan, jinzuan, jigou, trend):
+    """组合样本量（T+5 优先，回退 T+10）。缺失 → 0。"""
+    _rec = BT_BY_SIGNAL.get(f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}")
+    if not _rec:
+        return 0
+    return int(_num_or_none(_rec.get("n5")) or _num_or_none(_rec.get("n10")) or 0)
+
+def _exp_ret_seg_conflict(chan, jinzuan, jigou, trend):
+    """① IS/OOS 分段证据矛盾（T+5 口径）：两段 n 均 ≥ 阈值且符号异 → True。
+    分段字段缺失（旧 JSON）或任一段样本不足 → False（不误杀）。"""
+    _rec = BT_BY_SIGNAL.get(f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}")
+    if not _rec:
+        return False
+    _ni = _num_or_none(_rec.get("n5_is")) or 0
+    _no = _num_or_none(_rec.get("n5_oos")) or 0
+    if _ni < _EXP_RET_SEG_MIN_N or _no < _EXP_RET_SEG_MIN_N:
+        return False
+    _ri = _num_or_none(_rec.get("ret5_is"))
+    _ro = _num_or_none(_rec.get("ret5_oos"))
+    if _ri is None or _ro is None or _ri == 0 or _ro == 0:
+        return False
+    return (_ri > 0) != (_ro > 0)
+
+# 跨「有数据」组合的中心化：最佳(有效收益最高)→+MAX，最差→-MAX，使前瞻收益成为主排序项且保留区分度。
 _EXP_RET_PRESENT = [f"{c},{j},{g},{t}" for c in (0, 1) for j in (0, 1) for g in (0, 1) for t in (0, 1)
                     if f"{c},{j},{g},{t}" in BT_BY_SIGNAL]
-_EXP_RET_VALS = [_exp_ret_raw(*(int(x) for x in k.split(","))) for k in _EXP_RET_PRESENT]
-_EXP_RET_MIN = min(_EXP_RET_VALS) if _EXP_RET_VALS else 0.0
-_EXP_RET_MAX = max(_EXP_RET_VALS) if _EXP_RET_VALS else 0.0
+# ② grand mean = 全组合均值（收缩/中性锚点）
+_EXP_RET_GRAND = (sum(_exp_ret_raw(*(int(x) for x in k.split(","))) for k in _EXP_RET_PRESENT)
+                  / len(_EXP_RET_PRESENT)) if _EXP_RET_PRESENT else 0.0
+
+def _exp_ret_eff(chan, jinzuan, jigou, trend):
+    """④ 置信打折后的有效 raw：w*raw + (1−w)*grand；缺失组合 → grand（中性 = 池子平均）。"""
+    _raw = _exp_ret_raw(chan, jinzuan, jigou, trend)
+    if _raw is None:
+        return _EXP_RET_GRAND
+    _n = _exp_ret_n(chan, jinzuan, jigou, trend)
+    _w = _n / (_n + _EXP_RET_N_FLOOR) if _n > 0 else 0.0
+    return _w * _raw + (1.0 - _w) * _EXP_RET_GRAND
+
+_EXP_RET_EFF_VALS = [_exp_ret_eff(*(int(x) for x in k.split(","))) for k in _EXP_RET_PRESENT]
+_EXP_RET_EFF_MIN = min(_EXP_RET_EFF_VALS) if _EXP_RET_EFF_VALS else 0.0
+_EXP_RET_EFF_MAX = max(_EXP_RET_EFF_VALS) if _EXP_RET_EFF_VALS else 0.0
 
 def expected_return_term(chan, jinzuan, jigou, trend):
-    """前瞻收益主项（raw 分，±EXP_RET_TERM_MAX，中心化到全组合）。组合无数据→0（中性，不惩罚）。"""
-    if f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}" not in BT_BY_SIGNAL:
+    """前瞻收益主项（raw 分，±EXP_RET_TERM_MAX）。
+    🆕 2026-11-18 整改①②③④：IS/OOS 异号清零 / 缺失落 grand mean / 超额剔 β / 小样本贴池心。"""
+    if _exp_ret_seg_conflict(chan, jinzuan, jigou, trend):
         return 0.0
-    if _EXP_RET_MAX == _EXP_RET_MIN:
+    if _EXP_RET_EFF_MAX == _EXP_RET_EFF_MIN:
         return 0.0
-    _raw = _exp_ret_raw(chan, jinzuan, jigou, trend)
+    _eff = _exp_ret_eff(chan, jinzuan, jigou, trend)
     return max(-_EXP_RET_TERM_MAX_DYN, min(_EXP_RET_TERM_MAX_DYN,
-        (_raw - _EXP_RET_MIN) / (_EXP_RET_MAX - _EXP_RET_MIN) * 2.0 * _EXP_RET_TERM_MAX_DYN - _EXP_RET_TERM_MAX_DYN))
+        (_eff - _EXP_RET_EFF_MIN) / (_EXP_RET_EFF_MAX - _EXP_RET_EFF_MIN) * 2.0 * _EXP_RET_TERM_MAX_DYN - _EXP_RET_TERM_MAX_DYN))
 
 def bt_excess5_for(chan, jinzuan, jigou, trend):
     """给定四信号布尔 (chan, jinzuan, jigou, trend) → walk-forward **T+5 收益**(%)；

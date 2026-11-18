@@ -470,6 +470,10 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
     _is_dates = is_dates or set()
     _oos_dates = oos_dates or set()
     by_signal = defaultdict(lambda: {h: [] for h in HORIZONS})
+    # 🆕 2026-11-18 审计整改①（主人令「马上改好上线」）：by_signal IS/OOS 分段原始池
+    #   （与 by_factor_is/oos 同构）—— generate_top10 主项 exp_ret 的「同号才给分」门消费。
+    by_signal_is = defaultdict(lambda: {h: [] for h in HORIZONS})
+    by_signal_oos = defaultdict(lambda: {h: [] for h in HORIZONS})
     factor_defs = {
         "fund": lambda s: (s.get("score_fund") or 0) > 0,
         "sector": lambda s: (s.get("score_sector") or 0) > 0,
@@ -571,9 +575,13 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
                     continue
                 coverage["occ_total"] += 1
                 by_signal[tup][h].append(ret)
-                # IS/OOS 分段（2026-09-20 改动③）
+                # IS/OOS 分段（2026-09-20 改动③；🆕 2026-11-18 整改① 扩展到 by_signal）
                 _seg = (by_factor_is if date in _is_dates else
                         (by_factor_oos if date in _oos_dates else None))
+                _seg_sig = (by_signal_is if date in _is_dates else
+                            (by_signal_oos if date in _oos_dates else None))
+                if _seg_sig is not None:
+                    _seg_sig[tup][h].append(ret)
                 for f, on in fflags.items():
                     if f not in by_factor:
                         continue
@@ -595,7 +603,14 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
                         if on:
                             by_factor_gate[f][gk][h].append(ret)
 
-    # 汇总 by_signal（原样）
+    # 汇总 by_signal
+    # 🆕 2026-11-18 审计整改（主人令「马上改好上线，今晚用新算法」）：
+    #   ① IS/OOS 分段字段：n{h}_is / ret{h}_is / n{h}_oos / ret{h}_oos（分段裸均值）。
+    #   ② ③ 超额口径：exc{h} = 组合均值 − 同档全池均值（β 代理，与 by_factor build_excess
+    #      同构）；exc_shrunk{h} = 超额 × n/(n+SHRINK_K)（置信收缩后的超额）。
+    #      旧字段 ret{h}/edge{h} 原样保留（final_recommend / 展示层兼容，零波及）。
+    _sig_pooled = {h: mean([r for _hd in by_signal.values() for r in _hd[h]])
+                   for h in HORIZONS}
     sig_out = {}
     for tup, hd in by_signal.items():
         rec = {"key": ",".join("1" if x else "0" for x in tup)}
@@ -606,6 +621,14 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
             rec[f"win{h}"] = round(shrink_win(win_rate(rs), n), 2)
             rec[f"ret{h}"] = round(shrink(mean(rs), n), 3)
             rec[f"edge{h}"] = round(shrink(mean(rs), n), 3)
+            _m = mean(rs)
+            rec[f"exc{h}"] = (round(_m - _sig_pooled[h], 3) if n else None)
+            rec[f"exc_shrunk{h}"] = (round((_m - _sig_pooled[h]) * (n / (n + SHRINK_K)), 3)
+                                     if n else None)
+            for _tag, _seg_pool in (("is", by_signal_is), ("oos", by_signal_oos)):
+                _srs = _seg_pool.get(tup, {}).get(h, [])
+                rec[f"n{h}_{_tag}"] = len(_srs)
+                rec[f"ret{h}_{_tag}"] = (round(mean(_srs), 3) if _srs else None)
         sig_out[rec["key"]] = rec
 
     # 汇总 by_factor（原样）
