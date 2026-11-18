@@ -13753,18 +13753,31 @@ function drawUpDownChart(){
     h+=_chip('中债10Y', Number(d.y10).toFixed(3)+'%', d.y10_pct);
     h+=_chip('股债比价', Number(d.ratio).toFixed(2), d.ratio_pct);
     h+='</div>';
+    // 🔴 2026-11-18 主人令：解读改为「结论先行 + 四层大白话」，解决原版一段话堆四指标、读完不知贵不贵的问题
     const _ez=_zone(d.erp_pct), _sz=_zone(d.spread_pct);
-    let _rd='ERP '+d.erp_pct.toFixed(0)+'% 分位（'+_ez.label+'）、股息利差 '+d.spread_pct.toFixed(0)
-      +'% 分位（'+_sz.label+'）→ ';
-    _rd += (d.erp_pct>=50 && d.spread_pct>=50)
-      ? '两项温度均偏权益有利，性价比处于偏暖区间。'
-      : (d.erp_pct<30 && d.spread_pct<30)
-        ? '两项温度均偏权益不利，需防估值与利率双杀。'
-        : '两项温度读数不一致，以 ERP 为主、股息利差为辅交叉验证。';
-    _rd += ' 10Y 国债处于 '+Number(d.y10_pct).toFixed(0)+'% 极低分位，会放大股息利差与股债比价的权益吸引力读数；'
-      + '股债比价 '+Number(d.ratio_pct).toFixed(0)+'% 分位、PE '+Number(d.pe_pct).toFixed(0)
-      +'% 分位需一起看。这是<b>状态温度计，不是买入/止跌信号</b>。';
-    h+='<div style="font-size:11.5px;line-height:1.7;color:var(--txt);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-bottom:10px">'
+    const _erpPct=Number(d.erp_pct)||0, _sprPct=Number(d.spread_pct)||0, _y10Pct=Number(d.y10_pct)||0;
+    // 第1层：一句话结论（以 ERP 为主——股息利差被低利率放大会失真）
+    const _head = _erpPct>=80 ? '股票相对债券很便宜，处于历史极便宜区'
+      : _erpPct>=50 ? '股票相对债券偏便宜'
+      : _erpPct>=20 ? '股票相对债券不便宜也不贵，处于中性均衡区'
+      : '股票相对债券偏贵，需谨慎';
+    let _rd='<div style="background:rgba(251,191,36,.10);border-radius:6px;padding:7px 9px;margin-bottom:9px">'
+      + '<div style="font-size:10px;color:var(--gold);margin-bottom:2px">一句话结论</div>'
+      + '<div style="font-size:13px;font-weight:700;color:var(--txt)">'+_head+'</div></div>';
+    // 第2层：两把尺子说人话
+    _rd+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:5px">两把尺子，说人话</div>'
+      + '<div style="font-size:11.5px;line-height:1.7;color:var(--txt);margin-bottom:5px">'
+      + '<b style="color:'+_ez.col+'">ERP '+_erpPct.toFixed(0)+'% 分位（'+_ez.label+'）</b>：把股票当「会分红的债」看，多拿的风险补偿 '+Number(d.erp).toFixed(2)+'%，历史中游——不划算也不吃亏。</div>'
+      + '<div style="font-size:11.5px;line-height:1.7;color:var(--txt);margin-bottom:8px">'
+      + '<b style="color:'+_sz.col+'">股息利差 '+_sprPct.toFixed(0)+'% 分位（'+_sz.label+'）</b>：只看现金分红，比国债多 '+Number(d.spread).toFixed(2)+'%，历史高位——看着极便宜。</div>';
+    // 第3层：把「打架」讲透（国债低利率放大股息利差）
+    _rd+='<div style="background:var(--card);border-radius:6px;padding:7px 9px;margin-bottom:7px">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:3px">为什么两把尺子打架？</div>'
+      + '<div style="font-size:11.5px;line-height:1.7;color:var(--txt)">10Y 国债只有 '+Number(d.y10).toFixed(2)+'%（历史最低 '+_y10Pct.toFixed(0)+'% 区间），分母太小，把「股息−国债」的差距撑大了。所以股息利的「极便宜」有水分，<b style="color:var(--txt)">以 ERP 为准更靠谱</b>。</div></div>';
+    // 第4层：旁证 + 怎么用（旁证用中性表述，避免与 chip 口径标签打架）
+    _rd+='<div style="font-size:11px;line-height:1.7;color:var(--sub);margin-bottom:5px">旁证方向不一：PE '+Number(d.pe_pct).toFixed(0)+'%、PB '+Number(d.pb_pct).toFixed(0)+'%、股债比价 '+Number(d.ratio_pct).toFixed(0)+'% 分位，没有一边倒的便宜。</div>'
+      + '<div style="font-size:11px;line-height:1.7;color:var(--sub);border-top:1px dashed var(--border2);padding-top:6px"><b style="color:var(--gold)">怎么用：</b>这是估值状态尺，<b style="color:var(--txt)">不是买卖信号</b>。均衡市按纪律操作，别因「股息极便宜」就追高。</div>';
+    h+='<div style="font-size:11.5px;line-height:1.7;color:var(--txt);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:9px 10px;margin-bottom:10px">'
       +'<b style="color:var(--gold)">解读：</b>'+_rd+'</div>';
     const tail=(d.history_tail||[]).slice(-10);
     if(tail.length>=2){
