@@ -1,12 +1,13 @@
 {
-  "update_time": "2026-11-19 15:12:01",
+  "update_time": "2026-11-19 15:31:30",
   "status": "ok",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": false,
+    "worker": true,
     "details": [
-      "runner.listener"
+      "runner.listener",
+      "runner.worker"
     ]
   },
   "service": {
@@ -24,7 +25,7 @@
     "ok": true,
     "consecutive_failures": 0,
     "checkout_failures": 0,
-    "latest_run_id": 44476195898,
+    "latest_run_id": 44478172838,
     "latest_failed": false,
     "latest_status": "pending",
     "stuck_min": 0,
