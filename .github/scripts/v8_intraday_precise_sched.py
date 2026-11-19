@@ -31,6 +31,19 @@ TARGETS = {
     "v8_futures_realtime.yml": {
         "slots": [f"{h:02d}:{m}" for h in range(9, 16) for m in ("02", "17", "32", "47")] + ["16:02"],
         "fresh_window": ("09:05", "15:45"), "fresh_thresh": 25},
+    # 2026-11-19 14:35 小九：v8_bond_futures 又一条 schedule 日间失灵漏网链（最近 run 停在
+    #   11-18 16:55, 今天全天零投递 -> 罗盘卡显示昨日数据）。收编进调度器逐档 dispatch。
+    "v8_bond_futures.yml": {
+        "slots": [f"{h:02d}:{m}" for h in range(9, 17) for m in ("02", "32")],
+        "fresh_window": ("09:02", "16:35"), "fresh_thresh": 35},
+    # 2026-11-19 14:40 小九：全仓扫描再揪出两条今天零投递漏网链，一并收编：
+    #   liveness_guard(盘中存活监控守卫) / cred_expiry_watch(凭证巡检每日 09:10 单档)。
+    "v8_intraday_liveness_guard.yml": {
+        "slots": [f"{h:02d}:{m}" for h in range(9, 16) for m in ("02", "32")] + ["15:32"],
+        "fresh_window": ("09:02", "15:35"), "fresh_thresh": 35},
+    "v8_cred_expiry_watch.yml": {
+        "slots": ["09:10"],
+        "fresh_window": ("09:05", "09:40"), "fresh_thresh": 40},
 }
 ENDS = {"morning": "14:45", "afternoon": "16:38"}
 RELAY_EVERY_MIN = 20   # 🛡 11-19 实测有外部黑手在实例跑 ~28min 时取消 run（#1 实证）——
