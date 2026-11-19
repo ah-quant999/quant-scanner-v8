@@ -20,6 +20,7 @@
 {"kind": "cycle", "at": "2026-10-30 10:54:20", "snapshot_new": 0, "clobbered": [], "healed": [], "unpublished": -1}
 {"kind": "cycle", "at": "2026-10-30 17:36:16", "snapshot_new": 0, "clobbered": [], "healed": [], "unpublished": -1}
 {"kind": "clobber_detected", "severity": "high", "lost": ["docs/ops/handover/2026-08-08_1821_URGENT_阿狸咪_添加ZSXQ_TOKEN_Secret.md", "docs/ops/handover/HANDOVER_阿狸咪的工程师给小九_2026-09-17_1900_guard新鲜度WARN假黄灯治本_补传token与use_cloud.md"], "healed": ["docs/ops/handover/2026-08-08_1821_URGENT_阿狸咪_添加ZSXQ_TOKEN_Secret.md", "docs/ops/handover/HANDOVER_阿狸咪的工程师给小九_2026-09-17_1900_guard新鲜度WARN假黄灯治本_补传token与use_cloud.md"], "ok": true, "at": "2026-10-31 14:14:52"}
+{"kind": "heal", "severity": "high", "paths": ["docs/ops/handover/2026-08-08_1821_URGENT_阿狸咪_添加ZSXQ_TOKEN_Secret.md", "docs/ops/handover/HANDOVER_阿狸咪的工程师给小九_2026-09-17_1900_guard新鲜度WARN假黄灯治本_补传token与use_cloud.md"], "commit": "89921abb8a471e5d137e934a83bf57e63a3360cb", "note": "cycle 检出静默覆盖", "at": "2026-10-31 14:14:52"}
 {"kind": "cycle", "at": "2026-10-31 14:14:53", "snapshot_new": 0, "clobbered": ["docs/ops/handover/2026-08-08_1821_URGENT_阿狸咪_添加ZSXQ_TOKEN_Secret.md", "docs/ops/handover/HANDOVER_阿狸咪的工程师给小九_2026-09-17_1900_guard新鲜度WARN假黄灯治本_补传token与use_cloud.md"], "healed": ["docs/ops/handover/2026-08-08_1821_URGENT_阿狸咪_添加ZSXQ_TOKEN_Secret.md", "docs/ops/handover/HANDOVER_阿狸咪的工程师给小九_2026-09-17_1900_guard新鲜度WARN假黄灯治本_补传token与use_cloud.md"], "unpublished": -1}
 {"kind": "cycle", "at": "2026-10-31 20:44:16", "snapshot_new": 0, "clobbered": [], "healed": [], "unpublished": -1}
 {"kind": "cycle", "at": "2026-11-01 04:39:34", "snapshot_new": 0, "clobbered": [], "healed": [], "unpublished": -1}
@@ -141,4 +142,35 @@
 {"kind": "cycle", "at": "2026-11-19 20:26:29", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
 {"kind": "cycle", "at": "2026-11-19 20:37:14", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
 {"kind": "cycle", "at": "2026-11-19 20:47:57", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 20:58:50", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 21:09:34", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 21:20:21", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
 {"kind": "cycle", "at": "2026-11-19 21:25:21", "snapshot_new": 0, "clobbered": [], "healed": [], "unpublished": -1}
+{"kind": "cycle", "at": "2026-11-19 21:32:16", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 21:44:18", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 21:56:24", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 22:07:40", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 22:18:48", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 22:29:55", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 22:41:04", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 22:53:06", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 23:05:21", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 23:17:41", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 23:32:05", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 23:43:05", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-19 23:54:09", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 00:05:16", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 00:16:13", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 00:26:59", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 00:38:26", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 00:48:51", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 00:59:21", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 01:09:31", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 01:19:41", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 01:29:50", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 01:39:55", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 01:50:00", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 02:00:06", "snapshot_new": 4, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 02:10:11", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 02:20:16", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
+{"kind": "cycle", "at": "2026-11-20 02:30:22", "snapshot_new": 3, "clobbered": [], "healed": [], "unpublished": 0}
