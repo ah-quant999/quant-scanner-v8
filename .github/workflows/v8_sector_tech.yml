@@ -26,6 +26,10 @@ jobs:
     defaults:
       run:
         shell: bash
+    # 🔴 2026-11-19 二修：cn runner 为中文 Windows，Python stdout 默认 GBK，
+    #   生成器 print('✅...') 触发 UnicodeEncodeError 崩在第一步。钉死 UTF-8 输出编码。
+    env:
+      PYTHONIOENCODING: utf-8
     steps:
       - name: "📥 同步源码（GitHub API 直连，仅拉本卡生成器）"
         continue-on-error: true
