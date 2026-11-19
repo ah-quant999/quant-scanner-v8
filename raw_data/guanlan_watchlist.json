@@ -1,22 +1,11 @@
 {
   "version": "2.0",
-  "updated": "2026-11-19 17:20:28",
+  "updated": "2026-11-19 16:35:50",
   "sources": [
     "guanlan"
   ],
-  "total": 21,
+  "total": 13,
   "stocks": [
-    {
-      "name": "德业股份",
-      "code": "605117",
-      "full_code": "sh605117",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "摩根大通",
-      "rating": "推荐",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
     {
       "name": "宁德时代",
       "code": "300750",
@@ -51,50 +40,6 @@
       "added_date": "2026-11-19"
     },
     {
-      "name": "寒武纪",
-      "code": "688256",
-      "full_code": "sh688256",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "瑞银",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "中微公司",
-      "code": "688012",
-      "full_code": "sh688012",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "摩根大通",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "华峰测控",
-      "code": "688200",
-      "full_code": "sh688200",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "摩根大通",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "伟测科技",
-      "code": "688372",
-      "full_code": "sh688372",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "摩根大通",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
       "name": "北方华创",
       "code": "002371",
       "full_code": "sz002371",
@@ -113,17 +58,6 @@
       "market": "深市",
       "institution": "高盛",
       "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "老百姓",
-      "code": "603883",
-      "full_code": "sh603883",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "摩根大通",
-      "rating": "未评级",
       "source": "外资研投",
       "added_date": "2026-11-19"
     },
@@ -188,28 +122,6 @@
       "full_code": "300487.SZ",
       "exchange": "SZ",
       "market": "深市",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "华荣股份",
-      "code": "603855",
-      "full_code": "sh603855",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "联德股份",
-      "code": "605060",
-      "full_code": "sh605060",
-      "exchange": "SH",
-      "market": "沪市",
       "institution": "瑞银",
       "rating": "未评级",
       "source": "外资研投",
