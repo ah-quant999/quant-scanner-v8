@@ -19,6 +19,13 @@ jobs:
   refresh:
     runs-on: [self-hosted, cn]
     timeout-minutes: 20
+    # 🔴 2026-11-19 一劳永逸根治：本 job 三个 step 用 bash heredoc (python - <<'PY')，
+    #   但 cn self-hosted runner 默认 shell 非 bash ⇒ heredoc 被误解析成 ParserError，
+    #   该 workflow 自 11-18 创建起唯一一次 run 即因此失败，卡永远停在 11-18 15:00。
+    #   显式钉死 shell: bash（仓内其它 self-hosted cn workflow 已广泛验证 bash 可用）。
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: "📥 同步源码（GitHub API 直连，仅拉本卡生成器）"
         continue-on-error: true
