@@ -132,7 +132,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=637488a5ea" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=6cc80f79aa" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=8f4365e9b0" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4b8de76d66" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=7e8759c5db" defer></script>
     <script src="data/CRED_LEDGER.js?v=cd3dc3521c" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
@@ -157,7 +157,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=8635db3a01" defer></script>
 <script src="data/MARGIN_DATA.js?v=2757864f14" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=78fe296be7" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=12a35ee3b2" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=18653d7db9" defer></script>
 <script src="data/BOND_FUTURES.js?v=c124bb0c88" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=f89217283e" defer></script>
 <script src="data/IPO_DATA.js?v=2a81a9c000" defer></script>
@@ -167,7 +167,7 @@ window.__domReadyFns=[];
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
-<script src="data/US_HK_MAP.js?v=df0b2f8f40" defer></script>
+<script src="data/US_HK_MAP.js?v=b44b282fb6" defer></script>
 <!-- 🚨 2026-09-23 主人令：大基金 增减持监控（暂未上架 > 观测类）。
      数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
@@ -1300,7 +1300,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=b7e65c5574" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=5e22b893b0" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=c3f7ab0a91" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=d14db90ea8" defer></script>
 <script src="data/VOLATILITY.js?v=858cb796e9" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=dae195fa2f" defer></script>
@@ -19799,7 +19799,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=02f757ae2c', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=1bfb363d26', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=aca479c5f9', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=8dd38c6818', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
