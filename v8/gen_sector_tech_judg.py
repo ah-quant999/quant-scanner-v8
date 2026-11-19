@@ -97,8 +97,9 @@ def _get_json(url, timeout=20):
 
 
 def load_board_quotes():
-    """分页取全东财行业板块 → {name: {bk, price, chg, net}}；clist 全败走静态 BK 兜底。"""
-    allb = {}
+    """静态 SW31→BK 固定 31 行业；clist 仅作报价增强，缺项用 push2his 真实日K/资金流反推。"""
+    allb = {name: {"bk": bk} for name, bk in SW31_BK.items()}
+    clist_hit = 0
     for pn in range(1, 6):
         try:
             d = _get_json(CLIST.format(pn=pn))
@@ -106,41 +107,44 @@ def load_board_quotes():
             diff = data.get("diff") or []
             for x in diff:
                 name = x.get("f14")
-                if not name:
+                if name not in SW31_BK:
                     continue
                 def num(v):
                     try:
                         return float(v)
                     except (TypeError, ValueError):
                         return None
-                allb[name] = {"bk": x.get("f12"), "price": num(x.get("f2")),
-                              "chg": num(x.get("f3")), "net": num(x.get("f62"))}
+                allb[name].update({"price": num(x.get("f2")), "chg": num(x.get("f3")),
+                                   "net": num(x.get("f62"))})
+                clist_hit += 1
             if len(diff) < 100:
                 break
         except Exception as e:
             print("  ⚠️ clist pn%d 失败: %s" % (pn, e), file=sys.stderr)
         time.sleep(0.25)
 
-    if not allb:
-        print("  ⚠️ clist 全部失败，启用 SW31→BK 静态映射 + push2his 日K真实反推（不再整卡停摆）",
-              file=sys.stderr)
-        for name, bk in SW31_BK.items():
-            try:
-                rows = fetch_kline(bk)
-                if len(rows) < 2:
-                    continue
-                ff = fetch_fflow(bk)
-                price = rows[-1]["c"]
-                prev = rows[-2]["c"]
-                chg = round((price / prev - 1) * 100, 2) if prev else None
-                net = ff[-1]["main"] if ff else None
-                allb[name] = {"bk": bk, "price": price, "chg": chg, "net": net,
-                              "fallback": "push2his"}
-            except Exception as e:
-                print("  ⚠️ 静态BK兜底 %s/%s 失败: %s" % (name, bk, e), file=sys.stderr)
-            time.sleep(0.15)
+    derived = 0
+    for name, q in allb.items():
+        if q.get("price") is not None and q.get("chg") is not None and q.get("net") is not None:
+            continue
+        try:
+            rows = fetch_kline(q["bk"])
+            if len(rows) < 2:
+                continue
+            ff = fetch_fflow(q["bk"])
+            price = rows[-1]["c"]
+            prev = rows[-2]["c"]
+            q["price"] = price
+            q["chg"] = round((price / prev - 1) * 100, 2) if prev else None
+            q["net"] = ff[-1]["main"] if ff else None
+            q["fallback"] = "push2his"
+            derived += 1
+        except Exception as e:
+            print("  ⚠️ 静态BK反推 %s/%s 失败: %s" % (name, q["bk"], e), file=sys.stderr)
+        time.sleep(0.15)
 
-    print("  ✅ 东财行业板块载入 %d 个" % len(allb))
+    print("  ✅ 东财行业板块载入 %d 个（clist命中%d / push2his真实反推%d）" %
+          (len(allb), clist_hit, derived))
     return allb
 
 

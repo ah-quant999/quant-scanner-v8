@@ -129,7 +129,11 @@ def main():
     try:
         pe = to_map(ak.stock_index_pe_lg(symbol="沪深300"), ("日期", "date"), ("滚动市盈率", "pe_ttm"))
         pb = to_map(ak.stock_index_pb_lg(symbol="沪深300"), ("日期", "date"), ("市净率", "pb"))
-        cs = ak.index_value_csindex(symbol="000300")
+        # akshare 某些安装态未把 index_value_csindex 挂到顶层；直接按模块导入兜底
+        cs_fn = getattr(ak, "index_value_csindex", None)
+        if cs_fn is None:
+            from akshare.index.index_stock_zh_csindex import index_value_csindex as cs_fn
+        cs = cs_fn(symbol="000300")
         dy1 = to_map(cs, ("日期", "date"), ("股息率1", "dv1", "dividend1"))
         dy2 = to_map(cs, ("日期", "date"), ("股息率2", "dv2", "dividend2"))
         y10 = to_map(ak.bond_zh_us_rate(), ("日期", "date"), ("中国国债收益率10年", "中国10年", "china_10y"))
