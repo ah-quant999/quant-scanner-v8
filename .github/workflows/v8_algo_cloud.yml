@@ -1931,9 +1931,7 @@ jobs:
           # 2026-11-15 pin：1.20.43+ 移除 stock_hk_spot/stock_zh_index_daily 致 A 批 4 脚本 AttributeError（==避免 shell 对 < 的重定向歧义）
           OPTIONAL="akshare==1.20.42 baostock"
           ok=0
-          for IDX in "https://pypi.org/simple" \
-                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
-                     "https://mirrors.aliyun.com/pypi/simple"; do
+          for IDX in "https://pypi.org/simple" "https://pypi.tuna.tsinghua.edu.cn/simple" "https://mirrors.aliyun.com/pypi/simple"; do
             for TRY in 1 2; do
               echo "=== pip install required [index=$IDX try=$TRY] ==="
               if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $REQUIRED; then
@@ -1953,9 +1951,7 @@ jobs:
             exit 1
           fi
           # 取数依赖：尽力安装，失败仅告警不阻断（重建 FINAL 不需要）
-          for IDX in "https://pypi.org/simple" \
-                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
-                     "https://mirrors.aliyun.com/pypi/simple"; do
+          for IDX in "https://pypi.org/simple" "https://pypi.tuna.tsinghua.edu.cn/simple" "https://mirrors.aliyun.com/pypi/simple"; do
             if python -m pip install -q --retries 2 --timeout 90 -i "$IDX" $OPTIONAL 2>/dev/null; then
               echo "optional deps (akshare/baostock) OK via $IDX"
               break
@@ -1963,9 +1959,7 @@ jobs:
             echo "!! optional deps 安装失败于 $IDX（非致命，继续）"
           done
           # mootdx 可选依赖（SKIP_MOOTDX=1 不使用），尽力安装不阻断
-          pip install -q --retries 2 --timeout 40 mootdx \
-            || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx \
-            || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
+          pip install -q --retries 2 --timeout 40 mootdx || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
           python -c "import pandas, numpy, requests; print('core deps ready')"
           echo "akshare/baostock 为可选依赖：仅 A 批取数用，缺失不影响 B/D/E 算法链重建最终推荐"
 
