@@ -587,6 +587,12 @@ jobs:
           cp raw_data/stock_names.json out/stock_names.json 2>/dev/null || true
           cp raw_data/gold_pool.json out/gold_pool.json 2>/dev/null || true
           python algorithms/guanlan_extractor.py
+          # 🆕 2026-11-19 主人令「发现就马上解决」：提取成功的素材沉淀进 raw_data/ 并随「推送 raw_data/」步上 main
+          #   （此前 out/guanlan_* 属「输入类」不落仓，随临时 runner 丢弃 → token 坏的机器永远吃陈料）。
+          #   仅非空才覆盖：401 硬失败时临时 out/ 无产物，自然跳过，不会洗掉仓内 last-good。
+          for _gf in out/guanlan_reports.json out/guanlan_watchlist.json; do
+            if [ -s "$_gf" ]; then cp -f "$_gf" raw_data/; fi
+          done
           python algorithms/build_candidate_pool.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
