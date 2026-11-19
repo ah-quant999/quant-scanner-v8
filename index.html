@@ -8307,10 +8307,17 @@ window.__renderIndexObserve = function(){
   var idxNow = '';
   if(V && V.indices && V.indices.length){
     var loN = 0, hiN = 0, openN = 0;
+    /* 2026-11-19 一劳永逸：口径必须与生成器 overall_strategy 同源——
+       生成器按 bucket_5y 计数（低估/偏低=低，高估/偏高=高），前端原用严格
+       p<0.30 / p>0.70 导致「高估区间·防御60%」却显示「0低估/1高估」自相矛盾。
+       改为直接采信数据自带 bucket_5y，缺失时才回退到分位数阈值。 */
     V.indices.forEach(function(x){
-      if(x.percentile_5y != null){
-        if(x.percentile_5y < 0.30) loN++;
-        else if(x.percentile_5y > 0.70) hiN++;
+      var b5 = x.bucket_5y;
+      if(b5 === '低估' || b5 === '偏低') loN++;
+      else if(b5 === '高估' || b5 === '偏高') hiN++;
+      else if(!b5 && x.percentile_5y != null){
+        if(x.percentile_5y < 0.50) loN++;
+        else hiN++;
       }
       var gx = fmap[x.name] || {};
       if(gx.gate === '多头开放') openN++;
@@ -18123,9 +18130,12 @@ hm += '</div>'; // /ulPaneBacktest
   window.__renderCycleBreadth = function(){
     var dst = document.getElementById('cycleBreadthInner');
     if(!dst){
-      if((window.__cbRetry||0) < 20){ window.__cbRetry=(window.__cbRetry||0)+1; setTimeout(window.__renderCycleBreadth, 400); }
+      /* 2026-11-19 一劳永逸：DOM 就绪重试 与 数据就绪重试 用独立计数器，
+         杜绝原 __cbRetry 共用导致「DOM 重试耗尽 → 数据重试被跳过」或反之的相互污染。 */
+      if((window.__cbDomRetry||0) < 20){ window.__cbDomRetry=(window.__cbDomRetry||0)+1; setTimeout(window.__renderCycleBreadth, 400); }
       return;
     }
+    window.__cbDomRetry = 0;
     var C_RED='#ff5252', C_GRN='#26d9c2', C_AMB='#f59e0b', C_DIM='var(--dim)', C_TXT='var(--txt)', C_SUB='var(--sub)';
     var _cbRow = function(name, val, col){
       return '<div style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.22);border-left:3px solid '+col+';border-radius:7px;padding:9px 11px">'
@@ -18144,11 +18154,14 @@ hm += '</div>'; // /ulPaneBacktest
         if(_aph>0) apDD=(Number(ap.avg_price)/_aph-1)*100; } }catch(e){}
       // ── 周期位置（统一口径：全站唯一牛熊真相源 __v8CycleState，2026-10-29 主人令「对齐市场统一说法·禁自创操作建议」）──
       var bst='bull', edhecDD=null, cbBst='数据未就绪';
-      var _cs=null;
-      if(D && D.sh && D.sh.length){
-        _cs = window.__v8CycleState(D.sh, apDD);
-        bst=_cs.bst; edhecDD=_cs.edhecDD; cbBst=_cs.combinedShort;
-      } else if((window.__cbRetry||0) < 15){ window.__cbRetry=(window.__cbRetry||0)+1; setTimeout(window.__renderCycleBreadth, 700); return; }
+      /* 2026-11-19 一劳永逸修复（Cannot read properties of null reading 'verdict'）：
+         数据源 MARKET_THERMO.js 偶发 503/缺 D.sh → 原实现重试耗尽后 _cs 仍为 null，
+         下面直接读 _cs.verdict / _cs.indexLabel 抛错整卡崩。__v8CycleState 本身有完整
+         空态兜底（out 默认对象），此处无条件调用一次即可，null 永不外泄。 */
+      var _cs = window.__v8CycleState((D && D.sh && D.sh.length) ? D.sh : null, apDD);
+      bst=_cs.bst; edhecDD=_cs.edhecDD; cbBst=_cs.combinedShort;
+      if(!(D && D.sh && D.sh.length) && (window.__cbDataRetry||0) < 15){ window.__cbDataRetry=(window.__cbDataRetry||0)+1; setTimeout(window.__renderCycleBreadth, 700); return; }
+      window.__cbDataRetry = 0;
       // ── 广度观测 ──
       var TD = window.TOP10_DAILY || null;
       var hc = (TD && typeof TD.hc_count==='number') ? TD.hc_count : null;
