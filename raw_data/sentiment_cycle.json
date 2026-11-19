@@ -1,20 +1,20 @@
 {
-  "update_time": "2026-11-19 13:07:52",
+  "update_time": "2026-11-19 19:06:21",
   "data_date": "2026-11-19",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
-  "score": 35.0,
-  "delta_pct": -51.22,
+  "score": 38.0,
+  "delta_pct": -43.9,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 20,
+    "total_up": 23,
     "max_ladder": 3,
     "high_ladder_count": 3,
     "sectors_count": 10
   },
   "ladder_dist": {
-    "1": 15,
+    "1": 18,
     "2": 2,
     "3": 3
   },
@@ -26,16 +26,16 @@
       "chg": 10.02
     },
     {
-      "code": "603324",
-      "name": "盛剑科技",
-      "lbc": 3,
-      "chg": 10.0
-    },
-    {
       "code": "603030",
       "name": "全筑股份",
       "lbc": 3,
       "chg": 9.86
+    },
+    {
+      "code": "603324",
+      "name": "盛剑科技",
+      "lbc": 3,
+      "chg": 10.0
     }
   ],
   "prev_total": 41,
