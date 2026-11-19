@@ -1,16 +1,24 @@
 {
-  "update_time": "2026-11-19 19:28:57",
-  "run_start": "2026-11-19 16:40:19",
-  "ok": 45,
-  "fail": 2,
+  "update_time": "2026-11-19 22:55:23",
+  "run_start": "2026-11-19 19:59:59",
+  "ok": 43,
+  "fail": 4,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
     },
     {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | 接收数据异常，请稍后再试。"
+    },
+    {
       "script": "scripts/fetch_multiyear_kline.py",
       "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []

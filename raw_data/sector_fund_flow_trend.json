@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-19 18:47",
+  "update_time": "2026-11-19 22:09",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -556,13 +556,13 @@
     {
       "name": "白酒概念",
       "net": 3.99,
-      "net_5d": -30.35,
-      "net_20d": -122.51,
+      "net_5d": -40.48,
+      "net_20d": -52.95,
       "type": "概念",
-      "net_10d": -72.75,
+      "net_10d": -101.13,
       "net_10d_days": 10,
-      "net_60d": -591.34,
-      "net_60d_days": 44,
+      "net_60d": -696.26,
+      "net_60d_days": 45,
       "source": "本地累加",
       "consecutive_days": 9,
       "trend": "in",
@@ -1119,13 +1119,13 @@
     {
       "name": "白酒概念",
       "net": 3.99,
-      "net_5d": -30.35,
-      "net_20d": -122.51,
+      "net_5d": -40.48,
+      "net_20d": -52.95,
       "type": "概念",
-      "net_10d": -72.75,
+      "net_10d": -101.13,
       "net_10d_days": 10,
-      "net_60d": -591.34,
-      "net_60d_days": 44,
+      "net_60d": -696.26,
+      "net_60d_days": 45,
       "source": "本地累加",
       "consecutive_days": 9,
       "trend": "in",
@@ -1499,6 +1499,21 @@
       "trend": "in"
     },
     {
+      "name": "AI智能体",
+      "net": -25.7,
+      "net_5d": -74.65,
+      "net_20d": 154.18,
+      "net_60d": 522.32,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 58.35,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
       "name": "味蕾经济",
       "net": 0.18,
       "net_5d": 1.54,
@@ -1599,24 +1614,24 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60
-    },
-    {
-      "name": "生活用纸",
-      "net": 2.61,
-      "net_5d": 12.07,
-      "net_20d": 40.19,
-      "net_60d": 89.98,
-      "type": "行业",
-      "consecutive_days": 56,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 27.18,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 56
     }
   ],
   "trend_20d": [
+    {
+      "name": "AI智能体",
+      "net": -25.7,
+      "net_5d": -74.65,
+      "net_20d": 154.18,
+      "net_60d": 522.32,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 58.35,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
     {
       "name": "银行",
       "net": -26.33,
@@ -1658,6 +1673,21 @@
       "trend": "out",
       "net_5d_days": 5,
       "net_10d": -56.29,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
+      "name": "人形机器人",
+      "net": -26.09,
+      "net_5d": -71.09,
+      "net_20d": 104.15,
+      "net_60d": 180.61,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": -77.03,
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60
@@ -1765,39 +1795,24 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60
-    },
-    {
-      "name": "动力电池回收",
-      "net": 1.31,
-      "net_5d": -37.51,
-      "net_20d": 32.06,
-      "net_60d": 96.27,
-      "type": "行业",
-      "consecutive_days": 2,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 21.91,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 58
-    },
-    {
-      "name": "美容护理",
-      "net": 1.31,
-      "net_5d": 8.25,
-      "net_20d": 27.37,
-      "net_60d": 62.78,
-      "type": "行业",
-      "consecutive_days": 18,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 20.92,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
     }
   ],
   "trend_60d": [
+    {
+      "name": "AI智能体",
+      "net": -25.7,
+      "net_5d": -74.65,
+      "net_20d": 154.18,
+      "net_60d": 522.32,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 58.35,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
     {
       "name": "银行",
       "net": -26.33,
@@ -1866,6 +1881,21 @@
       "trend": "out",
       "net_5d_days": 5,
       "net_10d": 40.15,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
+      "name": "人形机器人",
+      "net": -26.09,
+      "net_5d": -71.09,
+      "net_20d": 104.15,
+      "net_60d": 180.61,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": -77.03,
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 60
@@ -1944,36 +1974,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 56
-    },
-    {
-      "name": "消费电子概念",
-      "net": -20.29,
-      "net_5d": -37.82,
-      "net_20d": -59.22,
-      "net_60d": 88.03,
-      "type": "概念",
-      "consecutive_days": 4,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": -242.27,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
-    },
-    {
-      "name": "集成电路制造",
-      "net": 11.18,
-      "net_5d": 37.83,
-      "net_20d": 33.91,
-      "net_60d": 81.84,
-      "type": "行业",
-      "consecutive_days": 4,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 39.97,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
     }
   ]
 }

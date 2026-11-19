@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-19 19:41:28",
-  "update_time": "2026-11-19 19:41:28",
+  "generated": "2026-11-19 22:53:46",
+  "update_time": "2026-11-19 22:53:46",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -1900,9 +1900,9 @@
     },
     "2026-11-19": {
       "date": "2026-11-19",
-      "update_time": "2026-11-19 19:23:02",
+      "update_time": "2026-11-19 22:50:38",
       "file": "final_recommend_20261119.json",
-      "degraded": false,
+      "degraded": true,
       "top3": [
         {
           "rank": 1,
@@ -1910,7 +1910,7 @@
           "name": "三孚股份",
           "close": 27.78,
           "close_date": "2026-11-19",
-          "final_score": 6.1,
+          "final_score": 5.9,
           "resonance": 1,
           "sources": [
             "因子榜"
@@ -1922,7 +1922,7 @@
           "name": "银河微电",
           "close": 30.47,
           "close_date": "2026-11-19",
-          "final_score": 5.7,
+          "final_score": 5.5,
           "resonance": 1,
           "sources": [
             "因子榜"
@@ -1934,7 +1934,7 @@
           "name": "莲花控股",
           "close": 9.01,
           "close_date": "2026-11-19",
-          "final_score": 5.0,
+          "final_score": 4.7,
           "resonance": 1,
           "sources": [
             "因子榜"

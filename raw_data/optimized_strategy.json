@@ -7,33 +7,33 @@
     "gold_pool_size": 1070,
     "survivor_bias_warning": true,
     "entry_caliber_ver": 3,
-    "signal_window": "2023-07-28~2026-11-17"
+    "signal_window": "2021-12-15~2026-11-17"
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 17485,
+    "total_signals": 17941,
     "periods": {
       "T+5": {
         "win_rate_pct": 47.6,
-        "avg_return_pct": -0.21
+        "avg_return_pct": -0.2
       },
       "T+10": {
-        "win_rate_pct": 46.8,
-        "avg_return_pct": -0.19
+        "win_rate_pct": 47.1,
+        "avg_return_pct": -0.15
       }
     },
     "data_ok": true
   },
   "baseline_ge3": {
     "T+5": {
-      "win_rate_pct": 46.6,
-      "avg_return_pct": -0.47
+      "win_rate_pct": 46.5,
+      "avg_return_pct": -0.46
     },
     "T+10": {
-      "win_rate_pct": 47.3,
-      "avg_return_pct": -0.43
+      "win_rate_pct": 47.5,
+      "avg_return_pct": -0.4
     },
-    "total_signals": 34700
+    "total_signals": 36999
   },
   "config": {
     "enabled": true,
