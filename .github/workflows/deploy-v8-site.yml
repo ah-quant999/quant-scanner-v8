@@ -65,6 +65,7 @@ on:
       # 🔴 2026-11-19 两张昨日卡根治：数据链用 GITHUB_TOKEN push，必须列入 workflow_run 才自动上线。
       - "🔬 v8 板块技术研判 refresh (cn)"
       - "⚖️ v8 股债性价比 refresh (cloud)"
+      - "🏛️ v8 国家队活跃度+板块年度主力净流入 生成器 (云端)"
 
 
     types: [completed]
