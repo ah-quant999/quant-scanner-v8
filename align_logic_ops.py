@@ -74,6 +74,13 @@ MUST_HAVE_CRON = {
     #   白天零投递），14 条日间 cron 全部拆除，触发权移交 v8_intraday_precise_sched（下），
     #   本链只留 workflow_dispatch → 归 ALLOW_NO_CRON。
     "v8_intraday_precise_sched": "盘中精准调度器(低峰5entry启动+内部时钟逐档dispatch·唯一主线)",
+
+    # 2026-11-20 阿狸咪的工程师补登记（[4/8] 自 11-19 20:47 连拦未收敛 · 交接 item eqbond-intraday-docregress-block-1119）：
+    #   股债性价比云端真数据链（小九 20:47 上线；cron 交易日 19:20 CST = 11:20 UTC；workflow_run 挂主抓取链兜底）。
+    #   22:44 thermo 修复以陈旧本地基底重写 index.html，一次性抹掉该链文档行 + 11-18/11-19 傍晚多项主人令改动
+    #   （亮灯口径重构 / ETF_FLOW_OBS 观测卡 / 股债卡四修 UI / precise_sched 双登记行 / 多项一劳永逸修复）；
+    #   本批同 commit 以 22:43 最后完好版为基底选择性还原（三保：缓存戳 / thermo 沪深合计动态实算 / candpool horizon 映射）。
+    "v8_eqbond_attraction": "⚖️ 股债性价比温度计(云端真数据链·交易日19:20)",
     # 2026-10-09 阿狸咪的工程师：selfhosted 兜底链升格为常规档（装 cron）——
     #   W52_HIGH/AVG_PRICE_880003 等 cn-IP 硬约束源在境外托管主力链上结构性不可达
     #   （10-08 实证 W52 冻结 22h），本链装盘前 08:25 / 盘后 17:20 两档常规兜底。
