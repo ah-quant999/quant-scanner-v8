@@ -1,11 +1,33 @@
 {
   "version": "2.0",
-  "updated": "2026-11-19 16:35:50",
+  "updated": "2026-11-20 03:27:25",
   "sources": [
     "guanlan"
   ],
-  "total": 13,
+  "total": 10,
   "stocks": [
+    {
+      "name": "太阳能",
+      "code": "000591",
+      "full_code": "sz000591",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "高盛",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-19"
+    },
+    {
+      "name": "德业股份",
+      "code": "605117",
+      "full_code": "sh605117",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "推荐",
+      "source": "外资研投",
+      "added_date": "2026-11-19"
+    },
     {
       "name": "宁德时代",
       "code": "300750",
@@ -40,6 +62,50 @@
       "added_date": "2026-11-19"
     },
     {
+      "name": "寒武纪",
+      "code": "688256",
+      "full_code": "sh688256",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-19"
+    },
+    {
+      "name": "中微公司",
+      "code": "688012",
+      "full_code": "sh688012",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-19"
+    },
+    {
+      "name": "华峰测控",
+      "code": "688200",
+      "full_code": "sh688200",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-19"
+    },
+    {
+      "name": "伟测科技",
+      "code": "688372",
+      "full_code": "sh688372",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-19"
+    },
+    {
       "name": "北方华创",
       "code": "002371",
       "full_code": "sz002371",
@@ -47,105 +113,6 @@
       "market": "深市",
       "institution": "摩根大通",
       "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "智飞生物",
-      "code": "300122",
-      "full_code": "300122.SZ",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "高盛",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "创科实业",
-      "code": "0669",
-      "full_code": "0669.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "泉峰控股",
-      "code": "2285",
-      "full_code": "2285.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "巨星科技",
-      "code": "002444",
-      "full_code": "002444.SH",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "花旗",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "史丹利",
-      "code": "002588",
-      "full_code": "sz002588",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "花旗",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "天工国际",
-      "code": "0826",
-      "full_code": "0826.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "蓝晓科技",
-      "code": "300487",
-      "full_code": "300487.SZ",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "安踏体育",
-      "code": "2020",
-      "full_code": "2020.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "花旗",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-19"
-    },
-    {
-      "name": "滔搏",
-      "code": "6110",
-      "full_code": "6110.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "花旗",
-      "rating": "买入",
       "source": "外资研投",
       "added_date": "2026-11-19"
     }
