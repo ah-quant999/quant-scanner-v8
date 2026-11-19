@@ -57,10 +57,7 @@ jobs:
           PROBE_TOKEN: ${{ secrets.V8_GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set -eo pipefail
-          CODE=$(curl -sS -o runners.json -w "%{http_code}" \
-            -H "Authorization: token $PROBE_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/runners")
+          CODE=$(curl -sS -o runners.json -w "%{http_code}" -H "Authorization: token $PROBE_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/actions/runners")
           if [ "$CODE" != "200" ]; then
             echo "::warning::runner 列表 API HTTP=$CODE（凭据缺 administration 权限？）→ 本次判定 unknown，不告警"
             head -c 300 runners.json || true
@@ -80,34 +77,15 @@ jobs:
         run: |
           set -eo pipefail
           BJ_NOW=$(TZ='Asia/Shanghai' date '+%m-%d %H:%M')
-          EXISTING=$(curl -sS -H "Authorization: token $GH_TOKEN" \
-            "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=1" \
-            | jq -r 'if length>0 then .[0].number else "" end')
+          EXISTING=$(curl -sS -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=1" | jq -r 'if length>0 then .[0].number else "" end')
           if [ -n "$EXISTING" ]; then
             echo "  issue #$EXISTING 已开，跳过"
             exit 0
           fi
           echo "::warning::lemoncat-cn runner 离线（state=${{ steps.probe.outputs.state }}），开 GitHub Issue 告警"
-          BODY=$(printf '%s\n' \
-            "@ah-quant999 ⚠️ **lemoncat-cn runner 离线**" \
-            "" \
-            "- 检测时间: $BJ_NOW 北京" \
-            "- 探测结果: ${{ steps.probe.outputs.state }}" \
-            "" \
-            "**后果**: 中国节点全部 cron 漏跑 → 实时数据停更" \
-            "**可能原因**: 机器停电 / 网络断 / runner 服务未启动 / 安全软件拦截" \
-            "" \
-            "**自愈路径**:" \
-            "- 数据陈旧 → 邮件报警 + 盘后守护自愈" \
-            "- 恢复后本工作流会自动关闭此 issue" \
-            "" \
-            "---" \
-            "*本 issue 由 runner_health_alert.yml 自动创建*")
-          jq -n --arg t "🚨 lemoncat-cn runner 离线 ($BJ_NOW)" --arg b "$BODY" \
-            '{title:$t, body:$b, labels:["runner-offline"], assignees:["ah-quant999"]}' > payload.json
-          curl -sS -X POST -H "Authorization: token $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/issues" -d @payload.json > /dev/null
+          BODY=$(printf '%s\n' "@ah-quant999 ⚠️ **lemoncat-cn runner 离线**" "" "- 检测时间: $BJ_NOW 北京" "- 探测结果: ${{ steps.probe.outputs.state }}" "" "**后果**: 中国节点全部 cron 漏跑 → 实时数据停更" "**可能原因**: 机器停电 / 网络断 / runner 服务未启动 / 安全软件拦截" "" "**自愈路径**:" "- 数据陈旧 → 邮件报警 + 盘后守护自愈" "- 恢复后本工作流会自动关闭此 issue" "" "---" "*本 issue 由 runner_health_alert.yml 自动创建*")
+          jq -n --arg t "🚨 lemoncat-cn runner 离线 ($BJ_NOW)" --arg b "$BODY" '{title:$t, body:$b, labels:["runner-offline"], assignees:["ah-quant999"]}' > payload.json
+          curl -sS -X POST -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/issues" -d @payload.json > /dev/null
           echo "  created issue"
 
       - name: "✅ 恢复在线：关闭告警 Issue"
@@ -115,9 +93,7 @@ jobs:
         run: |
           set -eo pipefail
           BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
-          ISSUES=$(curl -sS -H "Authorization: token $GH_TOKEN" \
-            "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=10" \
-            | jq -r '.[].number')
+          ISSUES=$(curl -sS -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=10" | jq -r '.[].number')
           if [ -z "$ISSUES" ]; then
             echo "  无 open 告警 issue，runner 健康"
             exit 0
@@ -125,10 +101,8 @@ jobs:
           for n in $ISSUES; do
             echo "  closing issue #$n"
             jq -n --arg b "✅ lemoncat-cn runner 已恢复在线（$BJ_NOW 北京）" '{body:$b}' > cmt.json
-            curl -sS -X POST -H "Authorization: token $GH_TOKEN" \
-              "https://api.github.com/repos/$REPO/issues/$n/comments" -d @cmt.json > /dev/null
-            curl -sS -X PATCH -H "Authorization: token $GH_TOKEN" \
-              "https://api.github.com/repos/$REPO/issues/$n" -d '{"state":"closed"}' > /dev/null
+            curl -sS -X POST -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/issues/$n/comments" -d @cmt.json > /dev/null
+            curl -sS -X PATCH -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/issues/$n" -d '{"state":"closed"}' > /dev/null
           done
 
       - name: "📝 写状态文件 data/RUNNER_STATUS_HEALTH.js"
@@ -139,20 +113,12 @@ jobs:
           if [ -z "$STATE" ]; then STATE="unknown"; fi
           BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
           UTC_NOW=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-          SHA=$(curl -sS -H "Authorization: token $GH_TOKEN" \
-            "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
-            | jq -r '.sha // ""')
+          SHA=$(curl -sS -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" | jq -r '.sha // ""')
           mkdir -p data
-          printf 'window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"%s","checked_at_utc":"%s","checked_at_bj":"%s","update_time":"%s","source":"runner_health_alert.yml"};\n' \
-            "$STATE" "$UTC_NOW" "$BJ_NOW" "$BJ_NOW" > data/RUNNER_STATUS_HEALTH.js
+          printf 'window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"%s","checked_at_utc":"%s","checked_at_bj":"%s","update_time":"%s","source":"runner_health_alert.yml"};\n' "$STATE" "$UTC_NOW" "$BJ_NOW" "$BJ_NOW" > data/RUNNER_STATUS_HEALTH.js
           B64=$(base64 -w0 data/RUNNER_STATUS_HEALTH.js)
-          jq -n --arg m "runner health: $STATE @ $BJ_NOW" --arg c "$B64" --arg s "$SHA" \
-            'if $s=="" then {message:$m, content:$c} else {message:$m, content:$c, sha:$s} end' > put.json
-          HTTP_CODE=$(curl -sS -o resp.json -w "%{http_code}" -X PUT \
-            -H "Authorization: token $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
-            -d @put.json)
+          jq -n --arg m "runner health: $STATE @ $BJ_NOW" --arg c "$B64" --arg s "$SHA" 'if $s=="" then {message:$m, content:$c} else {message:$m, content:$c, sha:$s} end' > put.json
+          HTTP_CODE=$(curl -sS -o resp.json -w "%{http_code}" -X PUT -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" -d @put.json)
           if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
             echo "  ✅ 状态文件已更新 state=$STATE"
           else
