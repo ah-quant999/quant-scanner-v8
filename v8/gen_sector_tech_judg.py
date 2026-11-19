@@ -6,8 +6,9 @@
 复刻那张卡的研判能力：申万一级31行业，共振置信度分级 L4/L3/L2/L1 +
   EMA 多头计数 + 区间分位 + 压力位(近20/60日高) + 支撑位(EMA20/波底50%) + 5日量比。
 
-数据源（全部东方财富，同源同频，实测 2026-11-17 可达，中国IP）：
+数据源（全部东方财富，同源同频；2026-11-19 改为云端 runner）：
   · 板块列表 clist (fs=m:90+t:2, 分页取全) → 31行业名→BK代码, 现价f2/涨跌f3/主力净f62
+  · clist 整体不可达时 → 静态 SW31→BK 映射 + push2his 日K/资金流日K反推现价/涨跌/净额，绝不用旧值糊弄
   · 板块日K push2his kline (secid=90.BKxxxx, klt=101) → EMA/分位/压力支撑/量比
 
 分级口径（共振置信度，L4最高，全为客观打分，不编造）：
@@ -19,7 +20,7 @@
   状态标签：趋势向上(分位>=90且多头) / 下跌反弹(分位高但空头排列修复) / 弱势整理 等。
 
 产出：data/SECTOR_TECH_JUDG.js → window.SECTOR_TECH_JUDG
-刷新：接 v8_sector_tech.yml，盘后1次 [self-hosted, cn]。
+刷新：接 v8_sector_tech.yml，盘后1次 [ubuntu-latest 云端；clist 不可达自动走静态 BK 兜底]。
 运行：python v8/gen_sector_tech_judg.py [--no-write] [--limit N]
 """
 from __future__ import annotations
@@ -41,6 +42,23 @@ SW31 = ["农林牧渔","基础化工","钢铁","有色金属","电子","家用�
         "轻工制造","医药生物","公用事业","交通运输","房地产","商贸零售","社会服务","综合",
         "建筑材料","建筑装饰","电力设备","机械设备","国防军工","汽车","计算机","传媒","通信",
         "银行","非银金融","煤炭","石油石化","环保","美容护理"]
+
+# 🔴 2026-11-19 根治 clist 不可达：31 行业 BK 代码来自 raw_data/sector_bk_codes.json，
+#   与旧版 data/SECTOR_TECH_JUDG.js 逐项核对一致。clist 全败时直接据此拉近 90 日 K/资金流，
+#   现价=最新收盘、涨跌=最近两根日K、主力净额=资金流日K最新一天，全部是当日真实数据。
+SW31_BK = {
+    "通信": "BK1215", "交通运输": "BK1210", "公用事业": "BK0427", "煤炭": "BK0437",
+    "家用电器": "BK0456", "轻工制造": "BK1212", "传媒": "BK0486", "电子": "BK1201",
+    "计算机": "BK1207", "美容护理": "BK1035", "钢铁": "BK0479", "社会服务": "BK1214",
+    "石油石化": "BK0464", "综合": "BK1217", "机械设备": "BK1205", "建筑装饰": "BK1209",
+    "环保": "BK0728", "纺织服饰": "BK0436", "房地产": "BK1202", "食品饮料": "BK0438",
+    "建筑材料": "BK1208", "非银金融": "BK1203", "商贸零售": "BK1213", "农林牧渔": "BK0433",
+    "汽车": "BK1211", "国防军工": "BK1204", "银行": "BK1283", "基础化工": "BK1206",
+    "电力设备": "BK1200", "医药生物": "BK1216", "有色金属": "BK0478",
+}
+
+_KLINE_CACHE = {}
+_FFLOW_CACHE = {}
 
 
 def _bj_now():
@@ -79,7 +97,7 @@ def _get_json(url, timeout=20):
 
 
 def load_board_quotes():
-    """分页取全东财行业板块 → {name: {bk, price, chg, net}}。"""
+    """分页取全东财行业板块 → {name: {bk, price, chg, net}}；clist 全败走静态 BK 兜底。"""
     allb = {}
     for pn in range(1, 6):
         try:
@@ -102,12 +120,34 @@ def load_board_quotes():
         except Exception as e:
             print("  ⚠️ clist pn%d 失败: %s" % (pn, e), file=sys.stderr)
         time.sleep(0.25)
+
+    if not allb:
+        print("  ⚠️ clist 全部失败，启用 SW31→BK 静态映射 + push2his 日K真实反推（不再整卡停摆）",
+              file=sys.stderr)
+        for name, bk in SW31_BK.items():
+            try:
+                rows = fetch_kline(bk)
+                if len(rows) < 2:
+                    continue
+                ff = fetch_fflow(bk)
+                price = rows[-1]["c"]
+                prev = rows[-2]["c"]
+                chg = round((price / prev - 1) * 100, 2) if prev else None
+                net = ff[-1]["main"] if ff else None
+                allb[name] = {"bk": bk, "price": price, "chg": chg, "net": net,
+                              "fallback": "push2his"}
+            except Exception as e:
+                print("  ⚠️ 静态BK兜底 %s/%s 失败: %s" % (name, bk, e), file=sys.stderr)
+            time.sleep(0.15)
+
     print("  ✅ 东财行业板块载入 %d 个" % len(allb))
     return allb
 
 
 def fetch_kline(bk):
-    """东财板块日K → list of {d,o,c,h,l,v}（近90日）。"""
+    """东财板块日K → list of {d,o,c,h,l,v}（近90日），进程内缓存避免兜底重复抓。"""
+    if bk in _KLINE_CACHE:
+        return _KLINE_CACHE[bk]
     d = _get_json(KLINE.format(bk=bk))
     data = d.get("data") or {}
     rows = []
@@ -120,11 +160,14 @@ def fetch_kline(bk):
                          "h": float(p[3]), "l": float(p[4]), "v": float(p[5])})
         except (TypeError, ValueError):
             continue
+    _KLINE_CACHE[bk] = rows
     return rows
 
 
 def fetch_fflow(bk):
-    """东财板块资金流日K → 逐日主力净流入(元) list，倒序取最近在末尾。"""
+    """东财板块资金流日K → 逐日主力净流入(元) list，倒序取最近在末尾，进程内缓存。"""
+    if bk in _FFLOW_CACHE:
+        return _FFLOW_CACHE[bk]
     try:
         d = _get_json(FFLOW.format(bk=bk))
         data = d.get("data") or {}
@@ -137,9 +180,11 @@ def fetch_fflow(bk):
                 out.append({"d": p[0], "main": float(p[1])})
             except (TypeError, ValueError):
                 continue
+        _FFLOW_CACHE[bk] = out
         return out
     except Exception as e:
         print("  ⚠️ fflow %s 失败: %s" % (bk, e), file=sys.stderr)
+        _FFLOW_CACHE[bk] = []
         return []
 
 
@@ -348,7 +393,7 @@ def main():
         #    徽章恒显盘后口径（今日/昨日 15:00），盘中误触发亦不污染。
         "update_time": _data_date + " 15:00:00",
         "data_date": _data_date,
-        "source": "东方财富行业板块K线+主力净额（90.BKxxxx，中国IP）",
+        "source": "东方财富行业板块日K+资金流日K（90.BKxxxx，云端；clist不可达时静态BK兜底）",
         "universe": "申万一级31行业（东财板块名精确映射）",
         "grading": "共振置信度：资金(net>0且涨>0)+趋势(EMA多头>=2)+位置(分位>=70%)+量价(5日量比>=1.1)，4项=L4/3=L3/2=L2/<=1=L1",
         "structure_counts": structure_counts(items),

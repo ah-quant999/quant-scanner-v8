@@ -1,6 +1,7 @@
-# 🔬 v8 板块技术研判 refresh (cn)
+# 🔬 v8 板块技术研判 refresh (云端兜底版，沿用 workflow 名以保部署链)
 # gen_sector_tech_judg.py → data/SECTOR_TECH_JUDG.js → 同步 index.html ?v → Pages 自动部署
-# 🔴 中国IP依赖：新浪nf_/东财push2his 境外不可达，锁定 [self-hosted, cn]，勿迁云。
+# 🔴 2026-11-19 根治：cn runner 到东财 clist 域名簇整体 "Remote end closed connection"，
+#   31 行业全空→不写盘。改 ubuntu-latest；生成器内再加 SW31→BK 静态映射 + push2his 兜底。
 name: "🔬 v8 板块技术研判 refresh (cn)"
 
 on:
@@ -17,19 +18,15 @@ concurrency:
 
 jobs:
   refresh:
-    runs-on: [self-hosted, cn]
-    timeout-minutes: 20
-    # 🔴 2026-11-19 一劳永逸根治：本 job 三个 step 用 bash heredoc (python - <<'PY')，
-    #   但 cn self-hosted runner 默认 shell 非 bash ⇒ heredoc 被误解析成 ParserError，
-    #   该 workflow 自 11-18 创建起唯一一次 run 即因此失败，卡永远停在 11-18 15:00。
-    #   显式钉死 shell: bash（仓内其它 self-hosted cn workflow 已广泛验证 bash 可用）。
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # shell / 编码显式钉死，避免 cn 中文 Windows 的 heredoc ParserError + GBK UnicodeEncodeError 重演。
     defaults:
       run:
         shell: bash
-    # 🔴 2026-11-19 二修：cn runner 为中文 Windows，Python stdout 默认 GBK，
-    #   生成器 print('✅...') 触发 UnicodeEncodeError 崩在第一步。钉死 UTF-8 输出编码。
     env:
       PYTHONIOENCODING: utf-8
+      TZ: Asia/Shanghai
     steps:
       - name: "📥 同步源码（GitHub API 直连，仅拉本卡生成器）"
         continue-on-error: true

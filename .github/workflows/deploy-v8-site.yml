@@ -62,6 +62,9 @@ on:
       # 🔴 2026-11-19 根治「盘后避雷针数据推 main 却不上线」：
       #   consolidate 用 GITHUB_TOKEN push，反递归不触发 push 类部署；列入 workflow_run 上游→数据一落地必唤起 Pages 重发。
       - "🛡️ 投资避雷针 consolidate (cloud)"
+      # 🔴 2026-11-19 两张昨日卡根治：数据链用 GITHUB_TOKEN push，必须列入 workflow_run 才自动上线。
+      - "🔬 v8 板块技术研判 refresh (cn)"
+      - "⚖️ v8 股债性价比 refresh (cloud)"
 
 
     types: [completed]
