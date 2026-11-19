@@ -34,7 +34,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p v8
+          mkdir -p v8 data
           python - <<'PY'
           import os, base64, json, urllib.request, time
           TOK=os.environ["GITHUB_TOKEN"]
