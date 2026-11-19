@@ -3983,7 +3983,7 @@ items:
   - id: intraday-precise-sched-align-block-1119
     owner: 小九(lemoncat-cn)
     priority: P1
-    status: todo
+    status: done
     created: 2026-11-19
     title: 盘中精准调度器上线未双登记 ⇒ align_logic_ops[4/8] 阻断 build_deploy（部署停摆）
     note: >-
@@ -4015,3 +4015,6 @@ items:
       align_logic_ops EXIT 0；Pages index.html Last-Modified 前进至修复后；
       站上 data/*.js 与 raw_data 提交时间对齐。
     updated: "2026-11-19 12:15"
+    verified_at: "2026-11-19 13:52"
+    evidence: >-
+      小九侧已按 jinzuan-1109 先例双登记并实证放开：commit d5b9646373（13:11 CST）同批改 align_logic_ops.py（MUST_HAVE_CRON 收 v8_intraday_precise_sched + ALLOW_NO_CRON 收 v8_cn_fetch_intraday_lemoncat）与 index.html 文档源（sec-op 运维页 L8588-8589 + 逻辑详解页 L8700-8710）。 部署实证：run 15536/15537/15538（12:31/12:35/12:49 CST）failure → run 15539（head d5b9646373， 13:11 CST）起至 run 15545 连续 success，build job 真绿。
