@@ -373,15 +373,7 @@ jobs:
 
           REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
 
-          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cloud.json -w "%{http_code}" -X POST \
-
-            -H "Authorization: token $GH_TOKEN" \
-
-            -H "Accept: application/vnd.github+json" \
-
-            "$REPO/actions/workflows/v8_cn_fetch_cloud.yml/dispatches" \
-
-            -d '{"ref":"main","inputs":{"category":"intraday"}}')
+          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cloud.json -w "%{http_code}" -X POST -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "$REPO/actions/workflows/v8_cn_fetch_cloud.yml/dispatches" -d '{"ref":"main","inputs":{"category":"intraday"}}')
 
           if [ "$HTTP_CODE" = "204" ]; then
 
@@ -425,11 +417,7 @@ jobs:
 
             sleep 30
 
-            STATUS=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-
-              "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=3" \
-
-              | python -c "
+            STATUS=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=3" | python -c "
 
             import sys, json, datetime
 
@@ -527,13 +515,7 @@ jobs:
 
           REPO="ah-quant999/quant-scanner-v8"
 
-          RESP=$(curl -sS -o /tmp/check.json -w "%{http_code}" \
-
-            -H "Authorization: token $GH_TOKEN" \
-
-            -H "Accept: application/vnd.github+json" \
-
-            "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5")
+          RESP=$(curl -sS -o /tmp/check.json -w "%{http_code}" -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5")
 
           if [ "$RESP" != "200" ]; then
 
@@ -711,15 +693,7 @@ jobs:
 
           REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
 
-          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cn.json -w "%{http_code}" -X POST \
-
-            -H "Authorization: token $GH_TOKEN" \
-
-            -H "Accept: application/vnd.github+json" \
-
-            "$REPO/actions/workflows/v8_cn_fetch_cloud_selfhosted.yml/dispatches" \
-
-            -d '{"ref":"main","inputs":{"category":"intraday"}}')
+          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cn.json -w "%{http_code}" -X POST -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "$REPO/actions/workflows/v8_cn_fetch_cloud_selfhosted.yml/dispatches" -d '{"ref":"main","inputs":{"category":"intraday"}}')
 
           if [ "$HTTP_CODE" = "204" ]; then
 
