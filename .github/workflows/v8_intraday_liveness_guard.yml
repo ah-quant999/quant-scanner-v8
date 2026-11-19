@@ -45,10 +45,12 @@ jobs:
             exit 0
           fi
           # 数近90分 success run（jq，避免 python 缩进打架）
-          CNT_SLOT=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+          # 🛡 2026-11-19 小九：curl 瞬断会被 set -eo pipefail 直接判死（14:45/14:51 两连败实证，
+          #   当时两链实际都活着 lemoncat 13:36 success 距 75min<90）—— 加 --retry 3 容错瞬时网络错。
+          CNT_SLOT=$(curl -sS --retry 3 --retry-delay 3 --retry-all-errors -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/workflows/354533319/runs?per_page=30&status=success" \
             | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("Z";"+00:00") | fromdateiso8601))/60 <= 90)] | length')
-          CNT_CLOUD=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+          CNT_CLOUD=$(curl -sS --retry 3 --retry-delay 3 --retry-all-errors -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/workflows/327687211/runs?per_page=30&status=success" \
             | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("Z";"+00:00") | fromdateiso8601))/60 <= 90)] | length')
           echo "intraday_slot 近90分 success=$CNT_SLOT ; cn_fetch_cloud 近90分 success=$CNT_CLOUD"
