@@ -1612,17 +1612,22 @@ def _fetch_us_overnight():
     return _fetch_us_overnight_yahoo()
 
 
-# 新浪国际指数备源代码 → 与 _fetch_overseas_indices 的东财 code 一一对应
-_SINA_OVERSEAS = (("int_hangseng", "HSI"), ("int_nikkei", "N225"),
-                  ("int_kospi", "KS11"), ("int_taiwan", "TWII"))
+# 新浪国际指数备源代码 → 与 _fetch_overseas_indices 的东财 code 一一对应。
+# 🔴 2026-11-19 一劳永逸根治：int_kospi/int_taiwan 已停供（返回空串），
+#   经实测改用新浪全球指数 znb_KOSPI(首尔综合) / znb_TWJQ(台湾加权)，均为当日实时有效点位。
+#   每个 em_code 可按优先级配多个候选，取第一个非空有效值。
+_SINA_OVERSEAS = (("HSI", ("int_hangseng",)), ("N225", ("int_nikkei",)),
+                  ("KS11", ("znb_KOSPI", "int_kospi")),
+                  ("TWII", ("znb_TWJQ", "int_taiwan")))
 
 
 def _fetch_overseas_sina():
     """新浪国际指数备源（东财 push2delay 全灭时兜底）。
     返回 {东财code: {"f12": code, "f2": 点位, "f3": 涨跌幅%}}，与东财 diff 行同构。
-    接口：https://hq.sinajs.cn/list=int_hangseng,int_nikkei,int_kospi,int_taiwan
+    接口：https://hq.sinajs.cn/list=<所有候选代码>
     返回形如 `var hq_str_int_hangseng="恒生指数,24560.33,-81.23,-0.33,...";`
-    （字段序：名称, 现价, 涨跌额, 涨跌幅%…）。需 Referer，编码 gb2312。"""
+    或 `var hq_str_znb_KOSPI="首尔综合指数,5114.20,46.76,0.92,...";`
+    （字段序：名称, 现价, 涨跌额, 涨跌幅%…；znb_ 与 int_ 前 4 字段同构）。需 Referer，编码 gb2312。"""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -1631,21 +1636,24 @@ def _fetch_overseas_sina():
     }
     out = {}
     try:
-        codes = ",".join(c for c, _ in _SINA_OVERSEAS)
-        r = _requests.get(f"https://hq.sinajs.cn/list={codes}", headers=headers, timeout=15)
+        all_codes = sorted({c for _, cands in _SINA_OVERSEAS for c in cands})
+        r = _requests.get(f"https://hq.sinajs.cn/list={','.join(all_codes)}", headers=headers, timeout=15)
         r.encoding = "gb2312"
-        for c, em_code in _SINA_OVERSEAS:
-            m = re.search(r'hq_str_%s="([^"]*)"' % c, r.text or "")
-            if not m:
-                continue
-            f = (m.group(1) or "").split(",")
-            if len(f) < 4:
-                continue
-            try:
-                price, pct = float(f[1]), float(f[3])
-            except Exception:
-                continue
-            out[em_code] = {"f12": em_code, "f2": price, "f3": pct}
+        for em_code, cands in _SINA_OVERSEAS:
+            for c in cands:
+                m = re.search(r'hq_str_%s="([^"]*)"' % c, r.text or "")
+                if not m:
+                    continue
+                f = (m.group(1) or "").split(",")
+                if len(f) < 4:
+                    continue
+                try:
+                    price, pct = float(f[1]), float(f[3])
+                except Exception:
+                    continue
+                if price > 0:
+                    out[em_code] = {"f12": em_code, "f2": price, "f3": pct}
+                    break
     except Exception as e:
         print(f"    ⚠️ 海外指数新浪备源失败: {e}")
     return out
@@ -1725,7 +1733,7 @@ def _fetch_overseas_indices():
     if len(by_code) < len(sec_map):
         sina_all = _fetch_overseas_sina()
         _added = 0
-        for _c, _em in _SINA_OVERSEAS:
+        for _em, _cands in _SINA_OVERSEAS:
             if _em not in by_code and _em in sina_all:
                 by_code[_em] = sina_all[_em]
                 _added += 1
