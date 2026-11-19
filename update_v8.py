@@ -25,6 +25,7 @@ def now_cst():
 # 原始文件名 → window 变量名
 DATA_SOURCES = {
     "etf_net_subscription.json":   "ETF_NET_SUBSCRIPTION",  # 2026-09-11 主人 P1：真实 ETF 份额申赎（上交所日环比）
+    "etf_flow_obs.json":          "ETF_FLOW_OBS",  # 2026-11-19 主人令：股票型ETF申赎净流入·观测卡（Kimi/Wind 主源+上交所备源）
     "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
     "sector_phase_history.json":   "SECTOR_PHASE_HISTORY",  # 2026-08-17 主人令：盘后每日阶段快照（自动累积+前端"今日 vs 上次"对比）
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
@@ -300,6 +301,9 @@ CATEGORY_MAP = {
     #   非估算）。份额为日频披露 → 抓取侧只挂 premarket/post_close，注入侧同档对齐，
     #   盘中不重建（盘中数据与盘前同值），前端如实标注「上交所口径 · 数据日 T-1」。
     "ETF_NET_SUBSCRIPTION": "premarket,post_close",
+    # 📊 2026-11-19：ETF 申赎净流入观测（Kimi/Wind 主源+上交所备源）。Kimi 每交易日收盘后更新、
+    #   备源上交所份额数据随 post_close 主抓产出 → 只挂 post_close，盘中不重建。
+    "ETF_FLOW_OBS": "post_close",
     "ETF_DAILY_MONITOR": "intraday,post_close",
     # 🛡 2026-09-04 一劳永逸（两处映射不一致根治）：cloud_fetch_v8.py 早在 2026-09-03 就把这两个
     #   改成 "intraday,post_close"（盘中 cron 偶发丢档→收盘定格值无着落），但 update_v8.py 侧漏同步，

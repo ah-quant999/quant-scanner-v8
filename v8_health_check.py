@@ -374,6 +374,9 @@ CARD_DEFS = [
     #   补登记 + heal_cat='local_gen'，巡检发现 stale 直接本地跑生成器并推送真实数据。
     {"id": "NATIONAL_TEAM", "name": "国家队活跃度", "page": "暂未上架", "freq": "工作日20:50(纯本地生成)", "max_age": 1440, "heal_cat": "local_gen", "key_fields": ["score", "subs"], "raw_file": "national_team.json", "producer": "v8/gen_national_team.py"},
     {"id": "SECTOR_YEAR_FLOW", "name": "板块年度主力净流入", "page": "暂未上架", "freq": "工作日20:50(纯本地生成)", "max_age": 1440, "heal_cat": "local_gen", "key_fields": ["sectors"], "raw_file": "sector_year_flow.json", "producer": "v8/gen_sector_year_flow.py"},
+    # 📊 2026-11-19 主人令：股票型ETF申赎净流入·观测卡（Kimi/Wind 主源+上交所备源，断源自切）。
+    #   随 v8_cn_fetch_cloud post_close 主抓后由 fetcher 产出 raw → update_v8 生成；周末顺延给 2880 容错。
+    {"id": "ETF_FLOW_OBS", "name": "股票型ETF申赎净流入·观测", "page": "暂未上架", "freq": "每交易日盘后(随v8_cn_fetch_cloud post_close)", "max_age": 2880, "heal_cat": "cloud_fetch", "key_fields": ["active_source", "update_time"], "raw_file": "etf_flow_obs.json", "producer": "v8/fetch_etf_flow_obs.py"},
     # 🛡 2026-10-27 一劳永逸（CN runner1号机·all-generic-redline 家族）：以下 4 个「前端活跃卡消费、
     #   却未登记 CARD_DEFS」的产物，此前掉进 check_all_data_files 通用 1620 红线被误判 fail。
     #   逐条补齐登记，按真实节拍给 max_age=1440（盘后产物 24h 红线），保留真故障监控（生产者真漏刷仍 fail 触发自愈）。

@@ -1354,6 +1354,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_POOL_TRACKER.js?v=bb0b7b1df5" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=7cc7e0977d" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=40d7c94282" defer></script>
+    <script src="data/ETF_FLOW_OBS.js?v=0000000000" defer></script><!-- 📊 2026-11-19 主人令：股票型ETF申赎净流入·观测卡（Kimi/Wind 主源 + 上交所备源，断源自切） -->
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <!-- 🗑 2026-11-08 主人令：盘前预案卡整卡下线，对应数据注入一并移除 -->
     <script src="data/FACTOR_LAB_BACKTEST.js?v=20f87b8ea1" defer></script>
@@ -12884,6 +12885,7 @@ function drawUpDownChart(){
           {name:'市场利率环境', source:'MARKET_REGIME', freq:'收盘后1次', slots:['19:15'], note:'宏观利率环境'},
           {name:'板块年度主力净流入', source:'SECTOR_YEAR_FLOW', freq:'工作日20:50(纯本地生成)', slots:['20:50'], note:'板块年度资金流'},
           {name:'国家队活跃度', source:'NATIONAL_TEAM', freq:'工作日20:50', slots:['20:50'], note:'托盘代理信号'},
+          {name:'股票型ETF申赎净流入·观测', source:'ETF_FLOW_OBS', freq:'每交易日盘后(随v8_cn_fetch_cloud post_close)', slots:['17:20'], note:'观测类·Wind主源+上交所备源'},
 
 
 
@@ -13462,7 +13464,7 @@ function drawUpDownChart(){
     '个股查询': ['DO_T_SPACE'],  /* 🆕 2026-11-08 主人令一劳永逸：做T空间（DO_T_SPACE）此前漏登健康巡检板 → 与 CARD_DEFS/看板对齐 */
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'IMA_STRONG_STOCK'],  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除；🗑 2026-10-24 主人令：连板梯队子页（前哨卡+回测实证卡）整体删除（负期望·不进选股）；🗑 2026-11-08 主人令一劳永逸：H_AUTO_BUY/H_AUTO_BUY_TRACK 已下线条目移除（模块下线、data 已删，留之=每天假红） */
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION', 'SECTOR_YEAR_FLOW', 'NATIONAL_TEAM'],  /* 📋 2026-10-21：+盘前预案（观测类首卡）；🏛️ 2026-10-21：+国家队活跃度（第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（生产者/渲染/派发/workflow/数据 同批清理，见 git 历史）；🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略；🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」；🆕 2026-11-08：+NATIONAL_TEAM（国家队活跃度·与 CARD_DEFS/看板对齐） */
+    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION', 'SECTOR_YEAR_FLOW', 'NATIONAL_TEAM', 'ETF_FLOW_OBS'],  /* 📋 2026-10-21：+盘前预案（观测类首卡）；🏛️ 2026-10-21：+国家队活跃度（第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（生产者/渲染/派发/workflow/数据 同批清理，见 git 历史）；🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略；🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」；🆕 2026-11-08：+NATIONAL_TEAM（国家队活跃度·与 CARD_DEFS/看板对齐） */
     '运维': ['INST_TRADE', 'DO_NOT_DELETE', 'PORTFOLIO_DATA'],
     '全量数据': ['NT_DATA', 'all_AUDIT_TRAIL', 'all_CANDIDATE_BACKTEST', 'all_CANDIDATE_QUOTES', 'all_CAPITAL_FLOW_DATA', 'all_CITIC_PE_BACKTEST', 'all_CONCEPT_ETF_MAP', 'all_EXPERIMENT', 'all_FACTOR_AUDIT', 'all_FACTOR_LAB_BACKTEST', 'all_FACTOR_PROGRESS', 'all_FACTOR_WALKFORWARD', 'all_FINAL_RECOMMEND_DATA', 'all_FRESHNESS_STATUS', 'all_FUNDAMENTAL_QUALITY', 'all_GOLD_POOL_BACKTEST', 'all_HB_ALIMI', 'all_HB_XIAOJIU', 'all_HEALTH_CHECK', 'all_INDEX_HISTORY', 'all_LHB_HISTORY', 'all_LIMIT_UP_BROKEN', 'all_MACRO_BRIEF', 'all_MARKET_THERMO', 'all_NORTH_FUND', 'all_OPTIMIZED_STRATEGY', 'all_PORTFOLIO', 'all_RISK_GAUGE', 'all_RUNNER_STATUS', 'all_RUNNER_STATUS_HEALTH', 'all_SECTOR_CYCLE_ARCHIVE', 'all_SECTOR_FUND_FLOW_INTRADAY', 'all_SECTOR_FUND_FLOW_TREND', 'all_SECTOR_PHASE_HISTORY', 'all_SECTOR_RS', 'all_SENTIMENT_CYCLE', 'all_SH_SZ_HISTORY', 'all_STOCK_LIST', 'all_SUSPENSION_ALERT', 'all_SZ_FIB', 'all_US_HK_MAP', 'all_V8_POOL_TRACKER', 'all_VALUATION_PERCENTILE', 'all_WEEKEND_META_REPORT', 'all_WEEKEND_RUN'],  /* 🔴 2026-10-11：all_CRDS_BACKTEST/all_TRIPLE_TRACK 随两策略下架移除；🗑 2026-10-28：all_BACKTEST_COMPREHENSIVE/all_BACKTEST_TDX 随回测卡退役移除 */
     '管线': ['raw_etf_pulse.json', 'raw_capital_flow_data.json', 'raw_index_quotes.json', 'raw_crisis_data.json', 'raw_concept_ranking.json', 'raw_volume', 'site_sync', 'runner_local', 'runner_github', 'runner'],
@@ -15964,6 +15966,83 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }catch(e){ console.warn('板块年度主力净流入渲染失败', e); }
     };
 
+    // ═══ 📊 2026-11-19 主人令：股票型ETF申赎净流入 · 观测卡（暂未上架>观测类）═══
+    //   数据 window.ETF_FLOW_OBS（data/ETF_FLOW_OBS.js ← v8/fetch_etf_flow_obs.py，post_close 随 v8_cn_fetch_cloud）。
+    //   主源 Kimi/Wind 全市场股票型ETF日度净流入合计；Kimi 站随时会断（反爬墙）→ 断源/过期自动切备源
+    //   上交所股票型ETF份额日环比（自建累积序列，口径略差，卡面橙标标注）。无数据 ⇒ 整卡 display:none。
+    //   红涨绿跌（正值红/负值绿），近120日单日柱状 + 累计/近5/近20日汇总胶囊。
+    window._fillEtfFlowObs = function(){
+      try{
+        var card = document.getElementById('etfFlowObsCard');
+        var body = document.getElementById('etfFlowObsBody');
+        if(!card || !body) return;
+        var D = window.ETF_FLOW_OBS;
+        var A = null, isKimi = false;
+        if(D && D.active_source === 'kimi' && D.kimi && D.kimi.stats) { A = D.kimi; isKimi = true; }
+        else if(D && D.active_source === 'backup' && D.backup && D.backup.stats) { A = D.backup; }
+        if(!A){
+          if(!window.__efoRetryTimer){
+            window.__efoRetryN = 0;
+            window.__efoRetryTimer = setInterval(function(){
+              var _d = window.ETF_FLOW_OBS;
+              var _a = _d && ((_d.active_source === 'kimi' && _d.kimi && _d.kimi.stats) || (_d.active_source === 'backup' && _d.backup && _d.backup.stats));
+              if(_a){ clearInterval(window.__efoRetryTimer); window.__efoRetryTimer = null; window.__efoRetryN = 0; try{ window._fillEtfFlowObs(); }catch(e){} }
+              else if(window.__efoRetryN > 30){ clearInterval(window.__efoRetryTimer); window.__efoRetryTimer = null; window.__efoRetryN = 0; }
+            }, 600);
+          }
+          return;
+        }
+        if(window.__efoRetryTimer){ clearInterval(window.__efoRetryTimer); window.__efoRetryTimer = null; window.__efoRetryN = 0; }
+        var S = A.stats;
+        function _col(v){ return v > 0 ? '#ef5350' : (v < 0 ? '#26a69a' : 'var(--dim)'); }
+        function _sign(v){ return v > 0 ? '+' : ''; }
+        var srcTag = isKimi
+          ? '<span style="font-size:10.5px;color:#26d9c2;border:1px solid rgba(38,217,194,0.5);border-radius:4px;padding:0 5px;line-height:1.5">主源 Kimi &#183; Wind</span>' + (D.kimi && D.kimi.live === false ? '<span style="font-size:10.5px;color:#9ca3af;border:1px solid rgba(156,163,175,0.5);border-radius:4px;padding:0 5px;line-height:1.5">last-good 快照</span>' : '')
+          : '<span style="font-size:10.5px;color:#f97316;border:1px solid rgba(249,115,22,0.5);border-radius:4px;padding:0 5px;line-height:1.5">备源 上交所（Kimi 断源自动切换）</span>';
+        var totalLabel = isKimi ? '累计净流入（2024以来）' : ('累计（自建起点 ' + ((A.daily && A.daily[0] && A.daily[0][0]) || '—') + '）');
+        var h = '';
+        /* 汇总胶囊 4 列 */
+        h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">';
+        var chips = [
+          [totalLabel, _sign(S.total) + S.total, S.total],
+          ['最新交易日单日（' + (S.last_date || '—') + '）', _sign(S.last_val) + S.last_val, S.last_val],
+          ['近5个交易日合计', _sign(S.sum5) + S.sum5, S.sum5],
+          ['近20个交易日合计', _sign(S.sum20) + S.sum20, S.sum20]
+        ];
+        for(var i=0;i<chips.length;i++){
+          h += '<div style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.22);border-radius:10px;padding:8px 10px">'
+             + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px">' + chips[i][0] + '</div>'
+             + '<div style="font-size:20px;font-weight:800;color:' + _col(chips[i][2]) + ';line-height:1.1">' + chips[i][1] + '<span style="font-size:11px;font-weight:400;color:var(--dim)"> 亿元</span></div></div>';
+        }
+        h += '</div>';
+        /* 近120日单日柱状（红涨绿跌，基线居中） */
+        var daily = (A.daily || []).slice(-120);
+        if(daily.length){
+          var mx = 1; for(var j=0;j<daily.length;j++) mx = Math.max(mx, Math.abs(Number(daily[j][1]) || 0));
+          var H = 64, bars = '';
+          for(var j=0;j<daily.length;j++){
+            var v = Number(daily[j][1]) || 0;
+            var bh = Math.max(2, Math.round(Math.abs(v) / mx * (H/2 - 4)));
+            var up = v >= 0;
+            bars += '<div title="' + daily[j][0] + '  ' + _sign(v) + v + ' 亿元" style="flex:1;min-width:2px;display:flex;flex-direction:' + (up ? 'column' : 'column-reverse') + ';justify-content:flex-start;align-items:stretch">'
+                 + '<div style="height:' + bh + 'px;background:' + (up ? '#ef5350' : '#26a69a') + ';border-radius:1px;margin:0 0.5px"></div></div>';
+          }
+          h += '<div style="font-size:11px;color:var(--dim);margin:2px 0 4px">单日净流入 &#183; 近' + daily.length + '个交易日（' + daily[0][0] + ' ～ ' + daily[daily.length-1][0] + '）</div>';
+          h += '<div style="display:flex;align-items:center;gap:4px">'
+             + '<div style="display:flex;height:' + H + 'px;align-items:center">' + bars + '</div></div>';
+          h += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:3px"><span>' + daily[0][0] + '</span><span>0 轴居中 &#183; 红=净流入 绿=净流出</span><span>' + daily[daily.length-1][0] + '</span></div>';
+        }
+        /* 口径说明 */
+        h += '<div style="font-size:11.5px;color:var(--sub);line-height:1.7;margin:10px 0 0;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">'
+           + '<div><b style="color:#ffd024">&#x1F4CC; 口径：</b>' + (isKimi ? 'Wind 全市场股票型ETF（不含债券/货币/商品/跨境）日度资金净流入合计；主站另有上交所份额申赎口径见「盘后数据 > 资金热度·净申赎」。' : '上交所官方基金份额日环比 × 单位净值（股票型子集，不含深市）——与 Wind 流量口径<b style="color:#f97316">有系统性差异</b>，仅供断源期间承接观测。') + '</div>'
+           + '<div style="margin-top:3px"><b style="color:#ffd024">&#x26A0; 数据源：</b>主源为第三方 Kimi 页（随时可能下线/被反爬墙拦截），断源或数据过期时<b style="color:#ffd024">自动切换</b>自建上交所备源并橙标提示；备源序列每日盘后自动沉淀、断源越久越完整。仅观测，不构成投资建议。</div></div>';
+        body.innerHTML = h;
+        if(window.setBadge) setBadge('etfFlowObsFresh','auto','', D.update_time, '');
+        else { var _fr = document.getElementById('etfFlowObsFresh'); if(_fr) _fr.textContent = '已更新 ' + (window._fmtAshareRel?window._fmtAshareRel(D.update_time):(D.update_time||'').slice(5,16)); }
+        card.style.display = 'block';
+      }catch(e){ console.warn('[fillEtfFlowObs]', e); }
+    };
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -15983,7 +16062,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
+      var names = ['__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       /* 🔬 2026-11-18 主人令：+renderSectorTech（板块技术研判卡迁入本骨架，主升/启动卡上方；派发名单同步补入，幂等重渲无害） */
       var probe = document.getElementById('themeValueBody');
@@ -16240,6 +16319,16 @@ h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;
    + '<span class="fresh" id="usHkFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim)">观测类 &#183; 隔夜口径（美东收盘，非实时）</span></div>'
    + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
+
+// ═══ 📊 2026-11-19 主人令：股票型ETF申赎净流入 · 观测卡（观测类卡尾）═══
+//   主源 Kimi/Wind（随时会断）+ 备源上交所自建累积（断源自切橙标）。无数据 ⇒ 整卡 display:none（不产空壳卡）。
+h += '<div class="card" id="etfFlowObsCard" style="display:none;margin-bottom:16px;border-left:4px solid #41c9ff">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
+   + '<span style="font-size:15px;font-weight:700;color:#41c9ff">&#x1F4CA; 股票型ETF申赎净流入 &#183; 观测</span>'
+   + '<span class="fresh" id="etfFlowObsFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim)">观测类 &#183; Wind 口径 &#183; 主备双源</span></div>'
+   + '<div id="etfFlowObsBody"><div class="note">加载中&#x2026;</div></div></div>';
+
 
 // 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
 //   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。

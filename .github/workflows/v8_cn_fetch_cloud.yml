@@ -464,6 +464,26 @@ jobs:
           echo "本次类别: $cat"
           python cloud_fetch_v8.py --category "$cat"
 
+      # 📊 2026-11-19 主人令：股票型ETF申赎净流入·观测（暂未上架>观测类）——Kimi/Wind 主源 + 上交所备源。
+      #   依赖上一步 cloud_fetch_v8 已产出 raw_data/etf_net_subscription.json（post_close 档必含）。
+      #   Kimi 站有反爬墙随时会断 → fetcher 内部带 last-good 回落 + 备源自建累积序列（raw_data/
+      #   etf_flow_backup_history.json / etf_flow_kimi_lastgood.json 随「推送 raw_data/」步上 main 沉淀），
+      #   断源/过期自动 active_source=backup 顶上。产出 raw_data/etf_flow_obs.json → update_v8 生成
+      #   data/ETF_FLOW_OBS.js（window.ETF_FLOW_OBS）。本步软失败不阻断 job，但须显式告警。
+      - name: "📊 ETF申赎净流入观测（Kimi主源+上交所备源 · post_close + 周末全量）"
+        id: soft_2
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python v8/fetch_etf_flow_obs.py
+
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_2(exit=$_v8_rc)::📊 ETF申赎净流入观测 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       # 2026-09-01 主人令：#7 分红刷新上云（小九机降级为监督/应急兜底）。
       # 直接跑 refresh_dividend_cninfo（cninfo 源），写回 raw_data/stock_quote.json 并重建
       # data/STOCK_QUOTE.js；随后本 workflow 的「📤 推送 raw_data/」与「📤 推送重建 data/*.js」
@@ -1015,6 +1035,7 @@ jobs:
         shell: bash
         env:
           V8_SF_soft_1: ${{ steps.soft_1.outcome }}
+          V8_SF_soft_2: ${{ steps.soft_2.outcome }}  # 📊 2026-11-19 复用原 id：ETF申赎净流入观测（Kimi主源+上交所备源）
           V8_SF_soft_3: ${{ steps.soft_3.outcome }}
           V8_SF_soft_4: ${{ steps.soft_4.outcome }}
           V8_SF_soft_5: ${{ steps.soft_5.outcome }}
