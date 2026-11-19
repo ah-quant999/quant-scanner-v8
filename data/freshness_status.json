@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-11-19 16:05:15",
+  "check_time": "2026-11-19 17:50:31",
   "last_trade_close": "2026-11-19 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -44,6 +44,7 @@
     "ETF_PULSE": "intraday,post_close",
     "ETF_INTRADAY_HEAT": "intraday,post_close",
     "ETF_NET_SUBSCRIPTION": "premarket,post_close",
+    "ETF_FLOW_OBS": "post_close",
     "ETF_DAILY_MONITOR": "intraday,post_close",
     "SECTOR_FUND_FLOW": "intraday,post_close",
     "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",
