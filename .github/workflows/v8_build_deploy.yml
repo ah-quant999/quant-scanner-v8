@@ -218,19 +218,13 @@ jobs:
         run: |
           set -uo pipefail
           ME="${{ github.run_id }}"
-          Q=$(curl -sS -m 20 -H "Authorization: Bearer $GITHUB_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/runs/$ME" \
-              | python -c "import sys,json;d=json.load(sys.stdin);print(d.get('run_started_at') or d.get('created_at') or '')" 2>/dev/null || true)
+          Q=$(curl -sS -m 20 -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$ME" | python -c "import sys,json;d=json.load(sys.stdin);print(d.get('run_started_at') or d.get('created_at') or '')" 2>/dev/null || true)
           if [ -z "$Q" ]; then
             echo "⚠️ 取本 run 时刻失败 → fail-open，继续构建"
             exit 0
           fi
           echo "本 run 起始时刻: $Q"
-          NEWER=$(curl -sS -m 25 -H "Authorization: Bearer $GITHUB_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_build_deploy.yml/runs?event=push&per_page=30" \
-              | ME_ID="${{ github.run_id }}" Q_AT="$Q" python -c "
+          NEWER=$(curl -sS -m 25 -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_build_deploy.yml/runs?event=push&per_page=30" | ME_ID="${{ github.run_id }}" Q_AT="$Q" python -c "
           import os,sys,json
           try:
               d=json.load(sys.stdin)
@@ -529,9 +523,7 @@ jobs:
           PYEOF
             # 🛡 安全：先把任何落入 data/ 的密钥/令牌文件从索引移除，避免一并由 git add 提交到
             #   公开仓库（git add 不会自动 unstage 已跟踪的敏感文件；此前 -f 曾把 .mahoro_cookies.txt 等强制入库）。
-            git rm --cached --ignore-unmatch \
-              data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
-              data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+            git rm --cached --ignore-unmatch data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
             # 🛡 2026-10-11 一劳永逸（阿狸咪的工程师）·防「直推文件被 build 回退」：
             #   WAVE_ELLIOTT / DAJIJIN_REDUCTION / MAHORO_INSIGHTS 由独立自动化直推远端 main，
             #   不经本 build；本 job 的 checkout 是启动时快照，git add data/ 全量暂存会把
@@ -553,12 +545,7 @@ jobs:
               git checkout origin/main -- $_PUSHED 2>/dev/null || true
               echo "🛡 已回捞本 build 期间被新推的 data 文件（防回退）：$_PUSHED"
             fi
-            git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
-              raw_data/sh_sz_history.json \
-              raw_data/sector_fund_flow_history.json \
-              raw_data/h_auto_buy_history.json \
-              raw_data/lhb_history.json \
-              raw_data/stock_profile.json
+            git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py raw_data/sh_sz_history.json raw_data/sector_fund_flow_history.json raw_data/h_auto_buy_history.json raw_data/lhb_history.json raw_data/stock_profile.json
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
               exit 0
@@ -612,9 +599,7 @@ jobs:
               #     远端 mid-run 直推的同类文件由算法链分钟级重推自愈；index.html 正文
               #     由外层 reset --hard + 全量重建路径保护。
               git reset FETCH_HEAD
-              git rm --cached --ignore-unmatch \
-                data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
-                data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+              git rm --cached --ignore-unmatch data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
                             # 🛡 2026-10-11 一劳永逸（阿狸咪的工程师）·防「直推文件被 build 回退」：
             #   WAVE_ELLIOTT / DAJIJIN_REDUCTION / MAHORO_INSIGHTS 由独立自动化直推远端 main，
             #   不经本 build；本 job 的 checkout 是启动时快照，git add data/ 全量暂存会把
@@ -656,12 +641,7 @@ jobs:
               #   失败不致命（15 分钟档 reconcile 兜底对齐）。
               git checkout FETCH_HEAD -- index.html logic.html
               timeout 180 python update_v8.py --only-cache-busters || echo "⚠️ retry 环 ?v 刷新失败，留给 reconcile 兜底"
-              git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
-                raw_data/sh_sz_history.json \
-                raw_data/sector_fund_flow_history.json \
-                raw_data/h_auto_buy_history.json \
-                raw_data/lhb_history.json \
-                raw_data/stock_profile.json
+              git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py raw_data/sh_sz_history.json raw_data/sector_fund_flow_history.json raw_data/h_auto_buy_history.json raw_data/lhb_history.json raw_data/stock_profile.json
               if git diff --cached --quiet; then
                 echo "✅ 与远端 main 已无差异（他人已部署等价内容），视作部署成功"; _deployed=1; break
               fi
