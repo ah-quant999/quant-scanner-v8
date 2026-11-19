@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-20 06:13",
- "generated": "2026-11-20 06:13",
+ "update_time": "2026-11-20 06:17",
+ "generated": "2026-11-20 06:17",
  "meta": {
-  "generated": "2026-11-20 06:13",
+  "generated": "2026-11-20 06:17",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12529,6 +12529,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.212,
       "price": 122.25,
       "category": "突破"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -12603,6 +12610,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 6.212,
       "price": 122.25,
       "category": "短线选股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -12618,6 +12632,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "中芯国际",
       "change_pct": 6.212,
       "price": 122.25,
+      "category": "强势股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
       "category": "强势股"
      }
     ]
