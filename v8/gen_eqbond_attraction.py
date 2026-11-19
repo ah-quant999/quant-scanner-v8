@@ -97,6 +97,28 @@ def value_at_or_before(m, day):
     return m[max(keys)] if keys else None
 
 
+def fetch_csindex_dy():
+    """直接读中证指数官方 indicator.xls；绕过 akshare 版本导出差异。"""
+    import io
+    import pandas as pd
+    import requests
+    url = ("https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/"
+           "000300indicator.xls")
+    r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=45)
+    r.raise_for_status()
+    try:
+        df = pd.read_excel(io.BytesIO(r.content))
+    except Exception:
+        df = pd.read_html(io.BytesIO(r.content))[0]
+    cols = ["日期", "指数代码", "指数中文全称", "指数中文简称", "指数英文全称", "指数英文简称",
+            "市盈率1", "市盈率2", "股息率1", "股息率2"]
+    if len(df.columns) >= len(cols):
+        df.columns = cols[:len(df.columns)] + list(df.columns[len(cols):])
+    else:
+        df.columns = cols[:len(df.columns)]
+    return df
+
+
 def fetch_index_close(symbol, canonical):
     """stock_zh_index_daily 与 index_zh_a_hist 双路取指数收盘，任一成功即可。"""
     import akshare as ak
@@ -129,11 +151,7 @@ def main():
     try:
         pe = to_map(ak.stock_index_pe_lg(symbol="沪深300"), ("日期", "date"), ("滚动市盈率", "pe_ttm"))
         pb = to_map(ak.stock_index_pb_lg(symbol="沪深300"), ("日期", "date"), ("市净率", "pb"))
-        # akshare 某些安装态未把 index_value_csindex 挂到顶层；直接按模块导入兜底
-        cs_fn = getattr(ak, "index_value_csindex", None)
-        if cs_fn is None:
-            from akshare.index.index_stock_zh_csindex import index_value_csindex as cs_fn
-        cs = cs_fn(symbol="000300")
+        cs = fetch_csindex_dy()
         dy1 = to_map(cs, ("日期", "date"), ("股息率1", "dv1", "dividend1"))
         dy2 = to_map(cs, ("日期", "date"), ("股息率2", "dv2", "dividend2"))
         y10 = to_map(ak.bond_zh_us_rate(), ("日期", "date"), ("中国国债收益率10年", "中国10年", "china_10y"))

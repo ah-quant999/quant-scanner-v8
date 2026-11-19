@@ -96,6 +96,24 @@ def _get_json(url, timeout=20):
     raise last
 
 
+def _get_json_data(url, data_key, timeout=20):
+    """东财多 host 轮换，且要求 data.<data_key> 非空；避免首台 host 返回 200+空 data 被误判成功。"""
+    last = None
+    import re as _re
+    path = _re.sub(r"^https://[^/]+", "", url)
+    for host in _EM_HOSTS:
+        try:
+            req = urllib.request.Request(host + path, headers=UA)
+            d = json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace"))
+            data = d.get("data") or {}
+            if data.get(data_key):
+                return data
+            last = RuntimeError("empty %s from %s" % (data_key, host))
+        except Exception as e:
+            last = e
+    raise last
+
+
 def load_board_quotes():
     """静态 SW31→BK 固定 31 行业；clist 仅作报价增强，缺项用 push2his 真实日K/资金流反推。"""
     allb = {name: {"bk": bk} for name, bk in SW31_BK.items()}
@@ -152,8 +170,7 @@ def fetch_kline(bk):
     """东财板块日K → list of {d,o,c,h,l,v}（近90日），进程内缓存避免兜底重复抓。"""
     if bk in _KLINE_CACHE:
         return _KLINE_CACHE[bk]
-    d = _get_json(KLINE.format(bk=bk))
-    data = d.get("data") or {}
+    data = _get_json_data(KLINE.format(bk=bk), "klines")
     rows = []
     for line in (data.get("klines") or []):
         p = line.split(",")
@@ -173,8 +190,7 @@ def fetch_fflow(bk):
     if bk in _FFLOW_CACHE:
         return _FFLOW_CACHE[bk]
     try:
-        d = _get_json(FFLOW.format(bk=bk))
-        data = d.get("data") or {}
+        data = _get_json_data(FFLOW.format(bk=bk), "klines")
         out = []
         for line in (data.get("klines") or []):
             p = line.split(",")
