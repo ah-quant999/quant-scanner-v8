@@ -3980,3 +3980,38 @@ items:
       curl 线上 raw_data/etf_daily_monitor.json total_etf≈1660 total_net 当日值；
       明早 05:35 后查 v8_us_hk_map runs 准点 success + US_HK_MAP.js data_date=11-17。
     updated: "2026-11-17 15:01"
+  - id: intraday-precise-sched-align-block-1119
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: todo
+    created: 2026-11-19
+    title: 盘中精准调度器上线未双登记 ⇒ align_logic_ops[4/8] 阻断 build_deploy（部署停摆）
+    note: >-
+      登记方：阿狸咪的工程师（11-19 午间巡检，主人外出期自主处置）。
+      现象：build_deploy 11:37/11:44 CST 两连败（run 44452743675 head ea5a06e0d5 /
+      44453568159 head 3964e35760），gate job success、build job 均死于
+      「🛡️ Pre-deploy audit」步 [4/8] align_logic_ops（其余 14 项全绿含 [13/13] ledger 锚），
+      两条未对齐项：① 逻辑详解页/运维页：盘中准点档调度器(14 档·唯一主线)
+      （v8_cn_fetch_intraday_lemoncat）期望有 cron 但实际 workflow 无 cron 调度；
+      ② workflow v8_intraday_precise_sched 有 cron 调度，但既未登记 MUST/ALLOW 名单、
+      也未文档化。
+      根因：小九今日 11:03-11:53 CST 上线「盘中精准调度器」重构三连（d3db89c46d 11:03
+      新增 v8_intraday_precise_sched.yml「GitHub schedule 日间失灵根治」＋ f2311f2189 11:14
+      调度器加固＋ c113ff8181 11:28 lemoncat 删除空 schedule 键），未做守卫要求的双登记
+      （① scripts/align_logic_ops.py 的 MUST/ALLOW 名单；② 文档源 index.html sec-op
+      运维页 + 逻辑详解页）——与 11-09 jinzuan-track-cron-audit-block-1109 同族同签名。
+      影响面：build_deploy 数据写回 main 停摆自 11:37 CST 起；11:56-12:07 的数据提交
+      （futures_realtime/STOCK_QUOTE/守卫账本/cn fetch 0f591db354）均未发布到 Pages；
+      主站仍为 11:27 轮 7817ae21d1 部署（11:45 发布，页面完好 200/1,422,923B），
+      暂未断供但盘中实时卡持续滞后，交易日 12:45-15:00 前宜恢复。
+      处置边界：登记时属小九日间窗口（7:45-17:45）且小九高频迭代中
+      （11:53-12:07 连续 6+ commit），阿狸咪不代改 index.html/文档源/调度器意图面，防踩踏；
+      修复须按 jinzuan-1109 先例做双登记，并自查 docs 期望与 lemoncat 去 cron 的意图一致性
+      （09-09 主人令口径：盘中 schedule cron 已删除改由本机调度器派发，文档侧若仍写
+      「期望有 cron」属文档滞后，两边取其一收口即可）。
+    note_to: 小九(lemoncat-cn)
+    verify_how: >-
+      修复后最新 build_deploy 轮 build job 全绿（成功发布非 skipped）；
+      align_logic_ops EXIT 0；Pages index.html Last-Modified 前进至修复后；
+      站上 data/*.js 与 raw_data 提交时间对齐。
+    updated: "2026-11-19 12:15"
