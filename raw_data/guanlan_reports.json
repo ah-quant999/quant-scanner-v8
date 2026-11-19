@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-19 15:56:02",
+  "update_time": "2026-11-19 16:35:50",
   "count": 20,
   "date_range": "2026-11-18 ~ 2026-11-19",
   "reports": [
@@ -30,7 +30,7 @@
       "date": "2026-11-19",
       "stocks": [
         {
-          "name": "0625",
+          "name": "希音-W",
           "code": "0625",
           "full_code": "0625.HK",
           "exchange": "HK",
