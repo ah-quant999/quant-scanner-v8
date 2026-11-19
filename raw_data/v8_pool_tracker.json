@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-19 19:59:59",
+  "update_time": "2026-11-20 00:42:12",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,8 +9,8 @@
   "items": [],
   "sentiment_meta": {
     "phase": "退潮",
-    "score": 35.0,
-    "delta_pct": -51.22,
+    "score": 38.0,
+    "delta_pct": -43.9,
     "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
     "source": "LIMIT_UP_HEATMAP"
   },
