@@ -1,105 +1,214 @@
 name: Deploy v8 Site (self-hosted)
 
+
+
 # 🔴 2026-11-04 递归防护根治：数据管线 v8_build_deploy.yml 在把数据 commit 回 main 后，
+
 #   会显式 `gh workflow run deploy-v8-site.yml` 唤起本工作流。原因：GitHub 规定
+
 #   GITHUB_TOKEN(Actions 令牌) 的 push 不触发下游 push 类 workflow，导致数据更新后
+
 #   Pages 停在旧部署（如 WAVE_ELLIOTT.js 缺 update_time → 前端徽章显示"已加载"）。
+
 #   用 workflow_dispatch 绕过该限制，确保数据一落地即上线。
 
+
+
 on:
+
   push:
+
     branches: [main]
+
   workflow_dispatch:
+
 # 🔴 2026-11-06 一劳永逸（主人令「主站还是 13 点的数据」根因修复·续）：
+
 #   【2026-11-06 实证病灶】上条（11-05）只加了 schedule 保底 + 手动 dispatch 兜底，
+
 #     但 GitHub schedule 大面积哑火（本仓 09-18 已记录同款「schedule 大面积哑火」）——
+
 #     11-06 全天 deploy-v8-site 的 schedule 一次都没触发（recent runs 全是 push/dispatch，
+
 #     无一条 schedule）；同时 build_deploy 的「触发 Pages」步在交易时段被设计性跳过
+
 #     （避免抢 CI），而数据刷新是 bot 用 GITHUB_TOKEN 推 main（反递归不触发下游 workflow）。
+
 #     ⇒ 盘中每次刷新都把新数据推上 main，却**永远不发布到 Pages** → 主站冻结在 13:27 旧版。
+
 #   【修法】部署与「推送者 / 定时」彻底解耦：改用 workflow_run 触发器——任一条把数据推上
+
 #     main 的刷新链（STOCK_QUOTE / cn抓取云端 / cn抓取应急 / 盘中算法追踪）一跑完（completed），
+
 #     本工作流即被 GitHub 原生机制唤起，无需依赖已哑火的 schedule、也不受 GITHUB_TOKEN 反递归限制。
+
 #     workflow_run 上游无论由 schedule 还是手动 dispatch 触发都照样唤起，从根上保证
+
 #     「数据一进 main，Pages 必重发」。schedule / push / dispatch 触发保留作冗余兜底。
+
   workflow_run:
+
     workflows:
+
       - "📈 v8 STOCK_QUOTE 轻量 refresh"
+
       - "📈 v8 期指实时 refresh (cn)"
+
       - "🇨🇳 v8 中国数据抓取(云端)"
+
       - "🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)"
+
       - "☁️ v8 盘中算法追踪(轻量)"
+      # 🔴 2026-11-19 根治「盘后避雷针数据推 main 却不上线」：
+      #   consolidate 用 GITHUB_TOKEN push，反递归不触发 push 类部署；列入 workflow_run 上游→数据一落地必唤起 Pages 重发。
+      - "🛡️ 投资避雷针 consolidate (cloud)"
+
+
     types: [completed]
+
 # 🔴 2026-11-05 一劳永逸（主人令「主站数据还是12点多的，自动刷新也没了」根因修复）：
+
 # 🔴 2026-11-05 一劳永逸（主人令「主站数据还是12点多的，自动刷新也没了」根因修复）：
+
 #   【病灶】Pages 部署此前只靠 push 事件触发。云端抓取链推 main 的 commit 是
+
 #     github-actions[bot]（GITHUB_TOKEN）—— GitHub 反递归设计规定 GITHUB_TOKEN 产生的
+
 #     push **不触发任何 workflow**（11-04 WAVE_ELLIOTT 卡版同病灶，当时只加手动 dispatch
+
 #     兜底未根治）⇒ 11-05 实测：数据 12:48 起持续进 main（13:29/13:42/13:48 三笔 cn fetch
+
 #     皆成功），Pages 冻结在 13:21 旧版本 ⇒ 主站数据卡 12:4x、HEALTH_CHECK 不变 ⇒
+
 #     前端「数据变化即刷」探测永不命中，主人看到「自动刷新也没了」。
+
 #   【修法】部署与推送者解耦：定时保底把 main 当前内容原子发布上线。
+
 #     盘中每 15 分钟（数据档 20 分钟节奏 ⇒ 任一批次 ≤15 分钟必上线）+ 盘外每小时兜底。
+
 #     部署为原子替换（actions/deploy-pages），无新数据时重复发布无害。push 触发保留。
+
   schedule:
+
     - cron: '*/15 1-8 * * 1-5'    # CN 交易日 09:00-16:59 每 15 分钟
+
     - cron: '23 0,9-23 * * *'     # 盘外时段每小时一次（CN 08:23 / 17:23-次日07:23）
 
+
+
 # 经 GitHub 托管 ubuntu-latest 运行器构建静态站点并发币到 GitHub Pages。
+
 # 目的：
+
 #   ① 绕开 GitHub 原生 "branch: main" 构建服务器（其持久化工作克隆含已删除的
+
 #      docs/ops 超长名文件，git checkout 永远失败 -> Pages 长期 build errored）；
+
 #   ② 2026-11-02 事故根治：原 runs-on:[self-hosted,Windows] 依赖一台常驻自托管机，
+
 #      该机离线即导致 Pages 卡在旧版本、所有 main 推送只排队不部署
+
 #      （实测线上 19:13 CST 后冻结逾 1 小时，龙虎榜真实数据无法上线）。
+
 #      ubuntu-latest 为临时干净运行器，既避开中毒克隆、又始终可用，
+
 #      部署不再有单点故障（自托管机离线也不影响上线）。
+
 # 本工作流 checkout 当前 main，仅打包站点所需文件为制品，由 actions/deploy-pages 经 API 发布。
+
 permissions:
+
   contents: read
+
   pages: write
+
   id-token: write
 
+
+
 concurrency:
+
   group: pages-deploy
+
   cancel-in-progress: false
 
+
+
 jobs:
+
   deploy:
+
     runs-on: ubuntu-latest
+
     environment:
+
       name: github-pages
+
       url: ${{ steps.deploy.outputs.page_url }}
+
     steps:
+
       - name: Checkout (clean, fetch-depth 1)
+
         uses: actions/checkout@v4
+
         with:
+
           fetch-depth: 1
 
+
+
       - name: Build site artifact
+
         shell: bash
+
         run: |
+
           mkdir -p _site
+
           cp index.html _site/
+
           cp *.css _site/ 2>/dev/null || true
+
           cp *.js _site/ 2>/dev/null || true
+
           cp *.html _site/ 2>/dev/null || true
+
           mkdir -p _site/assets
+
           cp -r assets/* _site/assets/ 2>/dev/null || true
+
           mkdir -p _site/data
+
           cp -r data/* _site/data/ 2>/dev/null || true
+
           echo "artifact files: $(find _site -type f | wc -l)"
 
+
+
       - name: Upload Pages artifact
+
         uses: actions/upload-pages-artifact@v3
+
         with:
+
           path: '_site'
 
+
+
       - name: Deploy to GitHub Pages
+
         id: deploy
+
         uses: actions/deploy-pages@v4
+
         with:
+
           # 🔴 2026-11-05 根治「Getting Pages deployment status failed」403：
+
           #   GITHUB_TOKEN 属 installation 级限流（1500/h 全仓工作流共享），盘中高峰被耗尽后
+
           #   状态轮询 403 ⇒ 部署实际已发布却被判 failure。改用 V8_GH_TOKEN（用户级 5000/h 独立配额）。
+
           token: ${{ secrets.V8_GH_TOKEN }}
+

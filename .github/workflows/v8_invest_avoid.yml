@@ -14,6 +14,16 @@ on:
     #   根因级修法：补收盘定稿档（北京 15:35，收盘后微调），收盘价/停牌/ST/公告当日口径齐了再 consolidate；
     #   前端徽章同步改 auto（按真实 update_time 自动归类盘前/盘中/盘后，不再硬编码）。
     - cron: '35 7 * * 1-5'  # 北京 15:35 交易日盘后定稿（UTC 07:35）
+  # 🔴 2026-11-19 一劳永造根治（主人令「盘后没和其他今日事件一起更新」）：
+  #   GitHub schedule 本仓实证大面积漂移/哒火（07:55 档漂到 12:59、15:35 盘后档当日未触发）： cron 不能作盘后必跑唯一保证。
+  #   改用 workflow_run：上游 cn 数据抓取任一链 completed 即触发 consolidate（六源刷新完紧跟重算），盘后 cn_fetch 完成→本卡盘后自动定稿。
+  #   原 schedule 保留作冗余兜底；workflow_dispatch 保留供人工补跑。
+  workflow_run:
+    workflows:
+      - "🇨🇳 v8 中国数据抓取(云端)"
+      - "🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)"
+      - "🇨🇳 v8 中国数据抓取(云端·hosted兜底)"
+    types: [completed]
   workflow_dispatch:
 
 permissions:
