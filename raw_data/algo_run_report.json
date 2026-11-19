@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-11-19 06:30:15",
-  "run_start": "2026-11-19 05:39:59",
-  "ok": 11,
-  "fail": 1,
+  "update_time": "2026-11-19 08:45:48",
+  "run_start": "2026-11-19 06:43:11",
+  "ok": 17,
+  "fail": 2,
   "failed_scripts": [
     {
-      "script": "scripts/fetch_multiyear_kline.py",
+      "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
+    },
+    {
+      "script": "refresh_stock_metadata.py",
+      "reason": "超时 >30min"
     }
   ],
   "skipped_by_time_gate": []
