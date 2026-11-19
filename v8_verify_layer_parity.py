@@ -25,6 +25,20 @@ sys.path.insert(0, str(ROOT))
 
 from update_v8 import DATA_SOURCES
 
+# 🛡🛡 2026-11-19 小九（第4枚定时炸弹·跨层双边同陈旧根治）：
+#   原闸门只查 raw vs data 日期是否「相等」，若二者被同一陈旧基线一起冻结（如云端每日
+#   生成器环境性失败停更、update_v8 又用 source 时间戳重建 data ⇒ 双边同旧），闸门判
+#   「一致」放行 ⇒ 陈旧数据静默上线。15:04 那次只是 data 被独立直写刷成今日、raw 停
+#   11-11 才侥幸触发「真错位」被拦；若 data 也停旧，就完全绕过。
+#   修法：对每个【有日期字段】的 raw，用交易日历算语义日期距今日几个交易日，超过
+#   STALE_RAW_TDAYS 即判 FAIL。交易日口径天然免疫周末/长假误伤，不误伤隔夜盘后产物。
+#   实测全仓 75 个有日期 raw 今天 D+0×72 / D+1×3，无合法 D+2 以上低频文件 ⇒ 阈值安全。
+try:
+    import v8_date as _v8_date
+except Exception:
+    _v8_date = None
+STALE_RAW_TDAYS = 3  # 交易日距离 >3 判陈旧（D+1 正常隔夜=2 放行；停 11-11 事故=7 拦截）
+
 RAW_DIR = ROOT / "raw_data"
 DATA_DIR = ROOT / "data"
 
@@ -149,6 +163,7 @@ def main() -> int:
     pending_mismatches = []  # raw 比 data 新（待 post_close 构建重建）→ 按时段判定
     unable = []
     stale_data = []
+    stale_raw = []           # 🛡 2026-11-19：raw 语义日期绝对陈旧（交易日口径）→ 恒失败
     missing_raw = []
     missing_data = []
     checked = 0
@@ -173,6 +188,25 @@ def main() -> int:
 
         raw_dp = _date_part(raw_date)
         data_dp = _date_part(data_date)
+
+        # 🛡🛡 2026-11-19：raw 绝对陈旧拦截（交易日历口径）——堵住「双边同陈旧」绕过。
+        #   与下方 raw/data 对齐校验独立：即使 data 日期恰好等于 raw 旧日期（闸门原判「一致」），
+        #   只要 raw 语义日期距今 >STALE_RAW_TDAYS 个交易日，即判陈旧并阻断。
+        if raw_dp and _v8_date is not None:
+            _rdt = _parse_date(raw_dp)
+            if _rdt is not None:
+                try:
+                    _tdays = _v8_date.trading_days_between(raw_dp, today.isoformat())
+                    # 数据日期在未来（如跨时区写入差异）不算陈旧
+                    if _rdt <= today and _tdays > STALE_RAW_TDAYS:
+                        stale_raw.append({
+                            "var": var_name,
+                            "raw": str(raw_path),
+                            "raw_date": raw_date,
+                            "tdays": _tdays,
+                        })
+                except Exception:
+                    pass
 
         # raw 无日期字段 → 无法直接校验；但检查 data 层是否已陈旧（静默上线）
         if raw_dp is None:
@@ -203,7 +237,7 @@ def main() -> int:
             else:
                 mismatches.append(_rec)
 
-    print(f"🔍 跨层一致性校验完成：检查 {checked} 对，缺失 raw {len(missing_raw)} 个，缺失 data {len(missing_data)} 个，无法校验 {len(unable)} 个，真错位 {len(mismatches)} 个，待重建 {len(pending_mismatches)} 个，data 层陈旧 {len(stale_data)} 个")
+    print(f"🔍 跨层一致性校验完成：检查 {checked} 对，缺失 raw {len(missing_raw)} 个，缺失 data {len(missing_data)} 个，无法校验 {len(unable)} 个，真错位 {len(mismatches)} 个，待重建 {len(pending_mismatches)} 个，data 层陈旧 {len(stale_data)} 个，raw 层绝对陈旧 {len(stale_raw)} 个")
     print(f"   时段判定：当前 CST {_now.strftime('%Y-%m-%d %H:%M')}，"
           f"{'已过' if after_rebuild else '未过'}盘后重建窗口结束点 "
           f"({POSTCLOSE_REBUILD_DONE[0]:02d}:{POSTCLOSE_REBUILD_DONE[1]:02d})")
@@ -224,6 +258,10 @@ def main() -> int:
         print(f"  ❌ data 层超过 {STALE_DAYS} 天未更新（raw 无日期字段，属陈旧静默上线）：")
         for s in stale_data:
             print(f"    - {s['var']}: data={s['data_date']} 已陈旧 {s['stale_days']} 天")
+    if stale_raw:
+        print(f"  ❌ raw 层语义日期绝对陈旧（距今日 >{STALE_RAW_TDAYS} 个交易日，双边同旧也会拦截）：")
+        for s in stale_raw:
+            print(f"    - {s['var']}: raw={s['raw_date']} 已陈旧 {s['tdays']} 个交易日")
     if mismatches:
         print("  ❌ 真错位（data 比 raw 新 / 任一侧无日期）——任何时段都不放行：")
         for m in mismatches:
@@ -233,17 +271,20 @@ def main() -> int:
         for m in pending_mismatches:
             print(f"    - {m['var']}: raw={m['raw_date']} vs data={m['data_date']}")
 
-    # 🛡 失败条件（2026-09-11 起）：
+    # 🛡 失败条件（2026-09-11 起，2026-11-19 增 raw 绝对陈旧）：
     #   · 真错位（mismatches）              → 恒失败
     #   · data 层陈旧静默上线（stale_data）  → 恒失败（>STALE_DAYS 天，与时段无关）
+    #   · 🆕 raw 层绝对陈旧（stale_raw）      → 恒失败（>STALE_RAW_TDAYS 交易日，堵双边同旧绕过）
     #   · 待重建（pending_mismatches）       → 仅当已过盘后重建窗口才失败；盘前/盘中只告警放行
-    _hard = bool(mismatches) or bool(stale_data) or (bool(pending_mismatches) and after_rebuild)
+    _hard = bool(mismatches) or bool(stale_data) or bool(stale_raw) or (bool(pending_mismatches) and after_rebuild)
     if _hard:
         _why = []
         if mismatches:
             _why.append(f"真错位 {len(mismatches)} 项")
         if stale_data:
             _why.append(f"陈旧静默上线 {len(stale_data)} 项")
+        if stale_raw:
+            _why.append(f"raw 层绝对陈旧 {len(stale_raw)} 项")
         if pending_mismatches and after_rebuild:
             _why.append(f"盘后重建窗口已过仍有 {len(pending_mismatches)} 项未重建")
         print(f"\n🛑 {'；'.join(_why)}，阻断部署/推送。")
