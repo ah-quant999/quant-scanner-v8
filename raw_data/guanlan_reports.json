@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-19 18:32:49",
+  "update_time": "2026-11-19 19:38:20",
   "count": 20,
   "date_range": "2026-11-18 ~ 2026-11-19",
   "reports": [
@@ -9,13 +9,6 @@
       "title": "储能电池（ESS Battery）：一季度表现偏弱，终端需求仍具韧性",
       "date": "2026-11-19",
       "stocks": [
-        {
-          "name": "德业股份",
-          "code": "605117",
-          "full_code": "sh605117",
-          "exchange": "SH",
-          "market": "沪市"
-        },
         {
           "name": "宁德时代",
           "code": "300750",
@@ -74,13 +67,6 @@
           "full_code": "06082.HK",
           "exchange": "HK",
           "market": "港股"
-        },
-        {
-          "name": "寒武纪",
-          "code": "688256",
-          "full_code": "sh688256",
-          "exchange": "SH",
-          "market": "沪市"
         }
       ],
       "topic_id": 55521455582544214,
@@ -119,27 +105,6 @@
       "title": "中国科技考察团要点：本土化是关键增长驱动力；看好半导体设备（SPE）及本土人工智能（AI）行业",
       "date": "2026-11-19",
       "stocks": [
-        {
-          "name": "中微公司",
-          "code": "688012",
-          "full_code": "sh688012",
-          "exchange": "SH",
-          "market": "沪市"
-        },
-        {
-          "name": "华峰测控",
-          "code": "688200",
-          "full_code": "sh688200",
-          "exchange": "SH",
-          "market": "沪市"
-        },
-        {
-          "name": "伟测科技",
-          "code": "688372",
-          "full_code": "sh688372",
-          "exchange": "SH",
-          "market": "沪市"
-        },
         {
           "name": "北方华创",
           "code": "002371",
@@ -203,15 +168,7 @@
       "rating": "未评级",
       "title": "摩根大通",
       "date": "2026-11-19",
-      "stocks": [
-        {
-          "name": "老百姓",
-          "code": "603883",
-          "full_code": "sh603883",
-          "exchange": "SH",
-          "market": "沪市"
-        }
-      ],
+      "stocks": [],
       "topic_id": 22258422244512141,
       "author": "西湖西子西窗烛",
       "source": "外资研投",
@@ -292,20 +249,6 @@
           "full_code": "300487.SZ",
           "exchange": "SZ",
           "market": "深市"
-        },
-        {
-          "name": "华荣股份",
-          "code": "603855",
-          "full_code": "sh603855",
-          "exchange": "SH",
-          "market": "沪市"
-        },
-        {
-          "name": "联德股份",
-          "code": "605060",
-          "full_code": "sh605060",
-          "exchange": "SH",
-          "market": "沪市"
         }
       ],
       "topic_id": 22258422242448841,
