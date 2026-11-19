@@ -47,16 +47,34 @@ def _bj_now():
     return datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8)
 
 
+# 🔴 2026-11-19 一劳永逸：东财 push2 单 host 在 cn runner 上被限流（实测
+#   "Remote end closed connection without response" 连败 5 页 → clist 板表全空 → 31 行业全"未找到"→ 不写盘）。
+#   对齐 cloud_fetch_v8.py 的 _EM_HOSTS 范式：push2delay + push2 + 12 数字镜像共 14 host 轮换，
+#   把瞬时限流挡在函数内，任一 host 可达即成功。
+_EM_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com") + tuple(
+    "https://%d.push2.eastmoney.com" % _i for _i in range(1, 13))
+
+
 def _get_json(url, timeout=20):
-    """带 3 次重试退避的 JSON 抓取（防偶发网络抖动导致缺行）。"""
+    """带东财多 host 轮换 + 3 次重试退避的 JSON 抓取。
+    对东财 URL 逐个替换 host；非东财 URL 走原逻辑。任一 host 成功即返回。"""
     last = None
-    for i in range(3):
+    is_em = "eastmoney.com" in url
+    if is_em:
+        import re as _re
+        path = _re.sub(r"^https://[^/]+", "", url)
+        hosts = _EM_HOSTS
+    else:
+        path = None
+        hosts = (url,)
+    for host in hosts:
+        target = host + path if is_em else host
         try:
-            req = urllib.request.Request(url, headers=UA)
+            req = urllib.request.Request(target, headers=UA)
             return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace"))
         except Exception as e:
             last = e
-            time.sleep(1.0 + i)
+            continue
     raise last
 
 
