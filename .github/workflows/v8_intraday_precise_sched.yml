@@ -1,0 +1,44 @@
+name: "v8 盘中精准调度器 (intraday precise scheduler)"
+
+on:
+  schedule:
+    # 🔴 2026-11-19 根治：GitHub schedule 日间系统性失灵（11-16~11-19 实测：盘中档全部
+    #   积压到 16:00 后/午夜补投 → 守卫判窗外空转，09:30 首档连续多日缺席）。
+    #   低峰分钟注册 5 个 entry（实例互相 dedupe，任一落地即接管全天），实例内部用
+    #   本机时钟精准逐档 dispatch（dispatch 事件不经 schedule 队列，秒级投递）。
+    #   替代 lemoncat 原 14 条日间 cron（已拆除，触发权移交本调度器）。
+    - cron: '20 0 * * 1-5'   # 08:20 CST 晨档1
+    - cron: '35 0 * * 1-5'   # 08:35 CST 晨档2
+    - cron: '50 0 * * 1-5'   # 08:50 CST 晨档3
+    - cron: '45 6 * * 1-5'   # 14:45 CST 午后档1（接棒上午实例，覆盖 15:02-16:32 档）
+    - cron: '55 6 * * 1-5'   # 14:55 CST 午后档2（冗余）
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'morning / afternoon / auto'
+        default: 'auto'
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: v8-intraday-precise-sched
+  cancel-in-progress: false   # 🔴 绝不允许取消在跑实例（上午实例被取消=全天失守）
+
+jobs:
+  precise_sched:
+    # 纯调度器：零数据、零写盘、零 push，只需 dispatch 权限 → GitHub 托管 ubuntu-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 358
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      PHASE: ${{ github.event.inputs.phase || 'auto' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "⏱ 精准逐档 dispatch（内部时钟对时，替代失灵的 GitHub schedule）"
+        run: |
+          python3 .github/scripts/v8_intraday_precise_sched.py
