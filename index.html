@@ -1312,7 +1312,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/OPTIMIZED_STRATEGY.js?v=1950d1f55c" defer></script>
 <script src="data/EXPERIMENT.js?v=71ce9c2dcf" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=f57872e0f6" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=f08b0c693a" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=5a7cefc466" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=055643d06e" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=e2ddb96162" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=844d50455f" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=40d7c94282" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
@@ -1324,7 +1324,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=b7072b624e" defer></script>
+    <script src="data/FACTOR_LAB.js?v=dbf144e1b8" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=d1ca9d5a4d" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=499cbc8025" defer></script>
@@ -19798,7 +19798,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=02f757ae2c', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=a4819261b8', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=3f6e144a6e', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=2b1a47ae8e', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
