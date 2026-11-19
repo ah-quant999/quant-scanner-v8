@@ -62,7 +62,13 @@ permissions:
 #     - cancel-in-progress: true → 上一档若卡住，新档接管，避免 14 档逐档堆积。
 concurrency:
   group: v8-cn-fetch-slot
-  cancel-in-progress: true
+  # 🔴 2026-11-19 15:10 根治（主人令「都收盘了主站还是13:40数据」· 小九）：
+  #   上面 11-04 的 cancel-in-progress:true 设计基于「调度器 dispatch 前必查云端在途」，
+  #   但精准调度器的新鲜度兜底（>25min 无 success 即补派）打破了这个假设：
+  #   兜底查到最新 run=cancelled 不算覆盖 → 补派 → 顶掉在跑档 → 在跑档变 cancelled
+  #   → 兜底再补派 → 无限互杀循环（实测 14:29-14:47 五连杀，云端生成器 14 点后零成功
+  #   = 主站卡 13:40 根因）。改 false：档间排队不互杀，配合调度器 dedupe 足够安全。
+  cancel-in-progress: false
 
 jobs:
   intraday_slot:
