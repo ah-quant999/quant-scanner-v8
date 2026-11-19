@@ -8,8 +8,9 @@
 
 本脚本全部用真实公开数据重算，不沿用旧值、不伪造分布：
   · 沪深300 PE_TTM / PB：akshare stock_index_pe_lg / stock_index_pb_lg（理杏仁，日频长历史）
-  · 沪深300 股息率：akshare index_value_csindex("000300")（中证指数官方 indicator.xls）
-  · 中国 10Y 国债收益率：akshare bond_zh_us_rate()（与 MACRO_DATA 同源）
+  · 股息率：akshare stock_a_gxl_lg("上证A股")（乐咕乐股日频；中证官方 000300 xls 实测仅 20 行且停 10-23，
+    为保日更改用 A 股股息率作明确标注的代理口径，前端/数据 source 均写明，绝不冒充沪深300严格一致）
+  · 中国 10Y 国债收益率：akshare bond_zh_us_yield_em()（与 MACRO_DATA 同源）
   · 股债比价：沪深300收盘 / 中债国债指数(000012)收盘，长期历史分位
 
 产出：data/EQBOND_ATTRACTION.js → window.EQBOND_ATTRACTION
@@ -97,28 +98,6 @@ def value_at_or_before(m, day):
     return m[max(keys)] if keys else None
 
 
-def fetch_csindex_dy():
-    """直接读中证指数官方 indicator.xls；绕过 akshare 版本导出差异。"""
-    import io
-    import pandas as pd
-    import requests
-    url = ("https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/"
-           "000300indicator.xls")
-    r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=45)
-    r.raise_for_status()
-    try:
-        df = pd.read_excel(io.BytesIO(r.content))
-    except Exception:
-        df = pd.read_html(io.BytesIO(r.content))[0]
-    cols = ["日期", "指数代码", "指数中文全称", "指数中文简称", "指数英文全称", "指数英文简称",
-            "市盈率1", "市盈率2", "股息率1", "股息率2"]
-    if len(df.columns) >= len(cols):
-        df.columns = cols[:len(df.columns)] + list(df.columns[len(cols):])
-    else:
-        df.columns = cols[:len(df.columns)]
-    return df
-
-
 def fetch_index_close(symbol, canonical):
     """stock_zh_index_daily 与 index_zh_a_hist 双路取指数收盘，任一成功即可。"""
     import akshare as ak
@@ -151,10 +130,13 @@ def main():
     try:
         pe = to_map(ak.stock_index_pe_lg(symbol="沪深300"), ("日期", "date"), ("滚动市盈率", "pe_ttm"))
         pb = to_map(ak.stock_index_pb_lg(symbol="沪深300"), ("日期", "date"), ("市净率", "pb"))
-        cs = fetch_csindex_dy()
-        dy1 = to_map(cs, ("日期", "date"), ("股息率1", "dv1", "dividend1"))
-        dy2 = to_map(cs, ("日期", "date"), ("股息率2", "dv2", "dividend2"))
-        y10 = to_map(ak.bond_zh_us_rate(), ("日期", "date"), ("中国国债收益率10年", "中国10年", "china_10y"))
+        # 中证官方 000300indicator.xls 实测仅 20 行且停在 2026-10-23，不可当日刷新；
+        # 改用乐咕乐股 A 股股息率（日频、当日可达）作明确标注的代理口径，绝不把旧 xls 冒充今日。
+        dy = ak.stock_a_gxl_lg(symbol="上证A股")
+        dy1 = to_map(dy, ("日期", "date"), ("股息率", "dv", "dividend"))
+        dy2 = dict(dy1)
+        y10 = to_map(ak.bond_zh_us_yield_em(), ("日期", "date"),
+                     ("中国国债收益率10年", "中国国债收益率10Y", "china_10y"))
         px = fetch_index_close("sh000300", "沪深300")
         bd = fetch_index_close("sh000012", "中债国债指数")
     except Exception as e:
@@ -216,7 +198,7 @@ def main():
     out = {
         "data_date": as_of,
         "update_time": now,
-        "source": "理杏仁沪深300 PE/PB（akshare）/ 中证指数官方000300股息率 / akshare中债10Y / 沪深300与中债国债指数比价",
+        "source": "理杏仁沪深300 PE/PB（akshare）/ A股股息率(乐咕乐股·代理口径，非沪深300严格一致) / akshare中债10Y / 沪深300与中债国债指数比价",
         "sample_size": max(len(erp_dates), len(spr_dates)),
         "pe_ttm": round(pe_ttm, 4),
         "pe_pct": pe_pct,
@@ -225,6 +207,7 @@ def main():
         "dy_ttm": round(dy_ttm, 4),
         "dy_pct": dy_pct,
         "dy_static": round(dy_static, 4) if dy_static else None,
+        "dy_source": "上证A股股息率（乐咕乐股，代理口径，非沪深300严格一致）",
         "y10": round(y10_v, 4),
         "y10_pct": y10_pct,
         "erp": erp,

@@ -3335,7 +3335,7 @@ function fmtSigned(v){
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
       <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：ERP = 1 / PE_TTM − 10Y国债；股息利差 = 沪深300股息率TTM − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数月线（n=130）。<b>温度计只做状态观测，不是机械买卖信号。</b></div>
+      <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
     </div>
 
 
@@ -13930,7 +13930,7 @@ function drawUpDownChart(){
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px;margin:4px 0 10px">';
     h+=_chip('PE_TTM', Number(d.pe_ttm).toFixed(2), d.pe_pct);
     h+=_chip('PB_LF', Number(d.pb_lf).toFixed(3), d.pb_pct);
-    h+=_chip('股息率TTM', Number(d.dy_ttm).toFixed(2)+'%', d.dy_pct);
+    h+=_chip('A股股息率*', Number(d.dy_ttm).toFixed(2)+'%', d.dy_pct);
     h+=_chip('中债10Y', Number(d.y10).toFixed(3)+'%', d.y10_pct);
     h+=_chip('股债比价', Number(d.ratio).toFixed(2), d.ratio_pct);
     h+='</div>';
