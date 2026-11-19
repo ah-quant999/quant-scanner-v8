@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-19 08:57",
- "generated": "2026-11-19 08:57",
+ "update_time": "2026-11-19 15:57",
+ "generated": "2026-11-19 15:57",
  "meta": {
-  "generated": "2026-11-19 08:57",
+  "generated": "2026-11-19 15:57",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12349,177 +12349,135 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.808,
+      "price": 14.72,
+      "category": "突破"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
-      "change_pct": 4.396,
-      "price": 1.9,
+      "change_pct": 7.895,
+      "price": 2.05,
       "category": "突破"
      },
      {
-      "code": "002148",
-      "name": "北纬科技",
-      "change_pct": 9.988,
-      "price": 8.92,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 7.854,
+      "price": 17.99,
       "category": "突破"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.971,
-      "price": 11.36,
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
       "category": "突破"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 4.857,
-      "price": 14.25,
+      "code": "603885",
+      "name": "吉祥航空",
+      "change_pct": 3.045,
+      "price": 10.83,
       "category": "突破"
      },
      {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 8.667,
-      "price": 1.63,
-      "category": "突破"
-     },
-     {
-      "code": "300539",
-      "name": "横河精密",
-      "change_pct": 9.243,
-      "price": 21.51,
-      "category": "突破"
-     },
-     {
-      "code": "688629",
-      "name": "华丰科技",
-      "change_pct": 14.622,
-      "price": 104.1,
-      "category": "突破"
-     },
-     {
-      "code": "002272",
-      "name": "川润股份",
-      "change_pct": 9.965,
-      "price": 12.58,
+      "code": "002367",
+      "name": "康力电梯",
+      "change_pct": 3.766,
+      "price": 4.96,
       "category": "突破"
      }
     ],
     "加速": [
      {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.808,
+      "price": 14.72,
+      "category": "加速"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
-      "change_pct": 4.396,
-      "price": 1.9,
+      "change_pct": 7.895,
+      "price": 2.05,
       "category": "加速"
      },
      {
-      "code": "002148",
-      "name": "北纬科技",
-      "change_pct": 9.988,
-      "price": 8.92,
-      "category": "加速"
-     },
-     {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.971,
-      "price": 11.36,
-      "category": "加速"
-     },
-     {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 4.857,
-      "price": 14.25,
-      "category": "加速"
-     },
-     {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 8.667,
-      "price": 1.63,
-      "category": "加速"
-     },
-     {
-      "code": "300539",
-      "name": "横河精密",
-      "change_pct": 9.243,
-      "price": 21.51,
-      "category": "加速"
-     },
-     {
-      "code": "688629",
-      "name": "华丰科技",
-      "change_pct": 14.622,
-      "price": 104.1,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 7.854,
+      "price": 17.99,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.808,
+      "price": 14.72,
+      "category": "短线选股"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
-      "change_pct": 4.396,
-      "price": 1.9,
+      "change_pct": 7.895,
+      "price": 2.05,
       "category": "短线选股"
      },
      {
-      "code": "002148",
-      "name": "北纬科技",
-      "change_pct": 9.988,
-      "price": 8.92,
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 7.854,
+      "price": 17.99,
       "category": "短线选股"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.971,
-      "price": 11.36,
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
       "category": "短线选股"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 4.857,
-      "price": 14.25,
+      "code": "603885",
+      "name": "吉祥航空",
+      "change_pct": 3.045,
+      "price": 10.83,
       "category": "短线选股"
      },
      {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 8.667,
-      "price": 1.63,
-      "category": "短线选股"
-     },
-     {
-      "code": "300539",
-      "name": "横河精密",
-      "change_pct": 9.243,
-      "price": 21.51,
-      "category": "短线选股"
-     },
-     {
-      "code": "688629",
-      "name": "华丰科技",
-      "change_pct": 14.622,
-      "price": 104.1,
-      "category": "短线选股"
-     },
-     {
-      "code": "002272",
-      "name": "川润股份",
-      "change_pct": 9.965,
-      "price": 12.58,
+      "code": "002367",
+      "name": "康力电梯",
+      "change_pct": 3.766,
+      "price": 4.96,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "002272",
-      "name": "川润股份",
-      "change_pct": 9.965,
-      "price": 12.58,
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
+      "category": "强势股"
+     },
+     {
+      "code": "603885",
+      "name": "吉祥航空",
+      "change_pct": 3.045,
+      "price": 10.83,
+      "category": "强势股"
+     },
+     {
+      "code": "002367",
+      "name": "康力电梯",
+      "change_pct": 3.766,
+      "price": 4.96,
       "category": "强势股"
      }
     ]
