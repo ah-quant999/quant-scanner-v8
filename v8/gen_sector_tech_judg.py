@@ -71,6 +71,10 @@ def _bj_now():
 #   把瞬时限流挡在函数内，任一 host 可达即成功。
 _EM_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com") + tuple(
     "https://%d.push2.eastmoney.com" % _i for _i in range(1, 13))
+# 日K/资金流属于 push2his 域名族；原 host 轮换把 push2his 换成 push2 导致 data.klines 恒空。
+_DATA_HOSTS = ("https://push2his.eastmoney.com", "https://push2delay.eastmoney.com",
+               "https://push2.eastmoney.com") + tuple(
+    "https://%d.push2his.eastmoney.com" % _i for _i in range(1, 9))
 
 
 def _get_json(url, timeout=20):
@@ -96,12 +100,12 @@ def _get_json(url, timeout=20):
     raise last
 
 
-def _get_json_data(url, data_key, timeout=20):
-    """东财多 host 轮换，且要求 data.<data_key> 非空；避免首台 host 返回 200+空 data 被误判成功。"""
+def _get_json_data(url, data_key, timeout=8):
+    """push2his 域名族轮换，且要求 data.<data_key> 非空；避免 push2 200+空 data 伪成功/长时间挂起。"""
     last = None
     import re as _re
     path = _re.sub(r"^https://[^/]+", "", url)
-    for host in _EM_HOSTS:
+    for host in _DATA_HOSTS:
         try:
             req = urllib.request.Request(host + path, headers=UA)
             d = json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace"))
