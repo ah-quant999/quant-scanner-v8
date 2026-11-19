@@ -20,8 +20,10 @@ stock_forward_alpha.py — 个股级「未来收益预测分」因子（2026-11-
      判据一字不改（主人 2026-09-09 硬门槛，注释明载「不可放宽」）。
   5. 产物 raw_data/stock_forward_alpha.json：
      · overall / per_hold：与 factor_walkforward 同构的 OOS 证据 + verdict
-     · latest_scores：当日（最后一个调仓点）每只票的 Alpha 预测分（0~1 截面分位），
+     · latest_scores：最新交易日截面每只票的 Alpha 预测分（0~1 截面分位），
        供 generate_top10.py 的 alpha_term 排序使用。
+       🛡 2026-11-19 主人令「发现就马上解决」：原实现误取最后一个回测调仓点（截面滞后
+       约 hold+2 个交易日）；权重是 IS 固定值，套最新截面合法、不构成前视。
      · 闸门：generate_top10 仅当 verdict=PASS 才启用 alpha_term；FAIL 则权重 0（零影响）。
 
 运行（cn runner，明晚真实数据）：
@@ -170,17 +172,39 @@ def build_synthetic_prep(dates, pos, bars, base_prep, hold):
         tbl = alpha_at[c]
         prep_syn[c] = {"f": {"forward_alpha": (lambda i, t=tbl: t.get(i))}}
 
-    # 4) 当日（最后调仓点）个股预测分 → 0~1 截面分位（供排序）
+    # 4) 最新交易日截面个股预测分 → 0~1 截面分位（供排序）
+    #    🛡 2026-11-19 主人令「发现就马上解决」：原取最后一个回测调仓点 t_points[-1]
+    #    （受 t+1+hold<len(dates) 约束，截面滞后约 hold+2 个交易日，rev5/rev20 十二天前
+    #    的排序≠今日排序）。w_k 是 IS 段固定权重，套最新截面只用当日信息，合法无前视。
     latest_scores = {}
-    last_t = t_points[-1]
-    vals = []
-    for c, tbl in alpha_at.items():
-        i = pos[c][last_t]
-        if i in tbl:
-            vals.append((c, tbl[i]))
-    if vals:
-        z = _rank01(vals)
-        latest_scores = {c: round((v + 1.0) / 2.0, 4) for c, v in z.items()}
+    t_last = len(dates) - 1                      # 全局轴最新交易日
+    feat_vals = {}                               # k -> [(code, raw_value)]
+    for c in base_prep:
+        i = pos[c][t_last]
+        if i < fw.MIN_BARS:                      # 最新日停牌/历史不足，与回测口径一致
+            continue
+        for k in active:
+            fn = base_prep[c]["f"].get(k)
+            if fn is None:
+                continue
+            v = fn(i)
+            if v is None:
+                continue
+            feat_vals.setdefault(k, []).append((c, v))
+    zs = {k: _rank01(vals) for k, vals in feat_vals.items() if len(vals) >= 15}
+    zs = {k: z for k, z in zs.items() if z}
+    if zs:
+        codes_last = set()
+        for z in zs.values():
+            codes_last.update(z)
+        alpha_raw = {}
+        for c in codes_last:
+            parts = [w * zs[k][c] for k, w in active.items() if k in zs and c in zs[k]]
+            if parts:
+                alpha_raw[c] = sum(parts) / sum(abs(w) for w in active.values())
+        if alpha_raw:
+            z = _rank01(list(alpha_raw.items()))
+            latest_scores = {c: round((v + 1.0) / 2.0, 4) for c, v in z.items()}
 
     cover = sum(1 for c, tbl in alpha_at.items() if tbl)
     return prep_syn, {k: round(v, 6) for k, v in weights.items()}, cover, latest_scores
@@ -240,11 +264,14 @@ def main():
         _log("  ⚠️ 无有效持有期结果，不写产物")
         return
 
-    # 主判据 hold=10 的 verdict 决定闸门；缺失则用已合格档里 IR_OOS 最高者
+    # 主判据 hold=10 的 verdict 决定闸门；缺失则按 HOLDS 固定次序取第一个 PASS。
+    # 🛡 2026-11-19 主人令「修」：原回退在 PASS 档里挑 IR_OOS 最高者 = 多持有期多重检验，
+    #   改为确定性次序（fw.HOLDS=[5,10,20]），不挑最优；全 FAIL 时维持取最后一个档。
     primary = per_hold.get(HOLD_PRIMARY)
     if primary is None:
-        ok = [(h, s) for h, s in per_hold.items() if s.get("verdict") == "PASS"]
-        primary = max(ok, key=lambda x: (x[1].get("ir_oos") or -99))[1] if ok else list(per_hold.values())[-1]
+        ok = [(h, s) for h in fw.HOLDS
+              if h in per_hold and per_hold[h].get("verdict") == "PASS"]
+        primary = ok[0][1] if ok else list(per_hold.values())[-1]
 
     out = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -252,9 +279,11 @@ def main():
         "purpose": "个股级未来收益预测分（同信号组合内分高下），generate_top10 alpha_term 消费",
         "methodology": (
             "Alpha = Σ w_k·rank_z(feature_k)；w_k = IS 段(前60%调仓点)逐点截面 Spearman IC 均值(含符号)，"
-            "OOS 段绝不重拟合；特征=rev5/rev20/vol60/h52/amt60/vol_conf/dviol60（纯OHLCV，避开W2禁入动量家族）。"
+            "OOS 段绝不重拟合；latest_scores 取最新交易日截面(2026-11-19 主人令修正，原误用最后回测调仓点滞后约hold+2日)。"
+            "特征=rev5/rev20/vol60/h52/amt60/vol_conf/dviol60（纯OHLCV，避开W2禁入动量家族）。"
             "验证完全复用 factor_walkforward 引擎：次日开盘进场、往返成本0.20%、五分层、"
-            "全池等权基准、IS/OOS 60/40；判据 IR_OOS>0.3 且连续5年内≥4年Top层跑赢基准>55%（硬门槛不放宽）。"),
+            "全池等权基准、IS/OOS 60/40；判据 IR_OOS>0.3 且连续5年内≥4年Top层跑赢基准>55%（硬门槛不放宽）；"
+            "verdict 回退按 HOLDS 固定次序取首个 PASS（不挑最优）。"),
         "features": FEATURES,
         "hold_primary": HOLD_PRIMARY,
         "gate_hold": HOLD_PRIMARY,
