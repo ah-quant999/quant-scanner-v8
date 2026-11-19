@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-19 18:49",
- "generated": "2026-11-19 18:49",
+ "update_time": "2026-11-19 19:45",
+ "generated": "2026-11-19 19:45",
  "meta": {
-  "generated": "2026-11-19 18:49",
+  "generated": "2026-11-19 19:45",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12356,6 +12356,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301391",
+      "name": "卡莱特",
+      "change_pct": 19.974,
+      "price": 55.98,
+      "category": "突破"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
       "change_pct": 7.895,
@@ -12370,24 +12377,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.502,
-      "price": 26.6,
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.45,
+      "price": 8.92,
       "category": "突破"
      },
      {
-      "code": "603885",
-      "name": "吉祥航空",
-      "change_pct": 3.045,
-      "price": 10.83,
-      "category": "突破"
-     },
-     {
-      "code": "002367",
-      "name": "康力电梯",
-      "change_pct": 3.766,
-      "price": 4.96,
+      "code": "688981",
+      "name": "中芯国际",
+      "change_pct": 6.212,
+      "price": 122.25,
       "category": "突破"
      }
     ],
@@ -12397,6 +12397,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "龙版传媒",
       "change_pct": 3.808,
       "price": 14.72,
+      "category": "加速"
+     },
+     {
+      "code": "301391",
+      "name": "卡莱特",
+      "change_pct": 19.974,
+      "price": 55.98,
       "category": "加速"
      },
      {
@@ -12423,6 +12430,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301391",
+      "name": "卡莱特",
+      "change_pct": 19.974,
+      "price": 55.98,
+      "category": "短线选股"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
       "change_pct": 7.895,
@@ -12437,47 +12451,33 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.502,
-      "price": 26.6,
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.45,
+      "price": 8.92,
       "category": "短线选股"
      },
      {
-      "code": "603885",
-      "name": "吉祥航空",
-      "change_pct": 3.045,
-      "price": 10.83,
-      "category": "短线选股"
-     },
-     {
-      "code": "002367",
-      "name": "康力电梯",
-      "change_pct": 3.766,
-      "price": 4.96,
+      "code": "688981",
+      "name": "中芯国际",
+      "change_pct": 6.212,
+      "price": 122.25,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.502,
-      "price": 26.6,
+      "code": "600983",
+      "name": "惠而浦",
+      "change_pct": 4.45,
+      "price": 8.92,
       "category": "强势股"
      },
      {
-      "code": "603885",
-      "name": "吉祥航空",
-      "change_pct": 3.045,
-      "price": 10.83,
-      "category": "强势股"
-     },
-     {
-      "code": "002367",
-      "name": "康力电梯",
-      "change_pct": 3.766,
-      "price": 4.96,
+      "code": "688981",
+      "name": "中芯国际",
+      "change_pct": 6.212,
+      "price": 122.25,
       "category": "强势股"
      }
     ]
