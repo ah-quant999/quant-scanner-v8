@@ -68,3 +68,10 @@ jobs:
           #   原 27.8KB run 块内嵌表达式定界符+320行脚本，被 GitHub 表达式扫描器整块误吞 ⇒ 每次推送
           #   全仓连坐 Invalid workflow file（11-09 实证 5 连坐，含双机纯数据推送）。
           python3 .github/scripts/v8_watchdog_probe.py
+      # 🔴 2026-11-19 主人令「一劳永逸」：morning_plan cron（北京07:50）漏触发根治——
+      #   交易日 07:45-09:35 CST 每 15 分随看门狗顺带检查，MORNING_PLAN data_date≠今日
+      #   即补发 v8_morning_plan（幂等：已生成则退出；探针只读+派发，不写数据）。
+      - name: 盘前计划兜底派发（MORNING_PLAN 陈旧即补发）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/v8_morning_plan_fallback.py
