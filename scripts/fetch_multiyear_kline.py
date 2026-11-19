@@ -118,43 +118,76 @@ def main():
                         codes.add(c)
         except Exception:
             pass
+    # 🛡 2026-11-20 根治（Alpha 空转根因链）：旧串行版 958 只 × (0.4s sleep + 境外IP延迟 + 失败冷却6s)
+    #   每次都 >40min 硬超时被杀 → 金股池深缓存(≥800根)从未建成 → kline_cache 全局日期轴仅 ~251 天
+    #   < factor_walkforward MIN_BARS=515 → stock_forward_alpha 调仓点恒为 0 →「无有效持有期结果」
+    #   → Alpha 因子结构性空转（2026-11-19 云端批次日志实证）。
+    #   【修法】线程池并行（实测境内网络 0.2s/只，12 workers ≈ 3~5min 全量完成）+ wall-clock 预算
+    #   保护（默认 25min < 监督器 40min 硬超时，超预算保留已完成进度，幂等下轮续跑）。
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--workers", type=int, default=int(os.environ.get("MULTIYEAR_WORKERS", "12")))
+    ap.add_argument("--budget", type=int, default=int(os.environ.get("MULTIYEAR_BUDGET_S", "1500")),
+                    help="wall-clock 预算秒数，超预算保留进度退出（幂等可续跑）")
+    ap.add_argument("--force", action="store_true", help="忽略跳过条件全量重抓")
+    args = ap.parse_args()
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     jobs = [("000001", "sh000001")]  # 上证指数基准最前
     for c in sorted(codes):
         jobs.append((c, "sh" + c if c.startswith("6") else "sz" + c))
-    ok = fail = skip = 0
-    n = len(jobs)
-    for idx, (code, sym) in enumerate(jobs, 1):
+    # 幂等增量：深度 ≥761 且末根日期在 4 天内才跳过（覆盖周末+短假期；长假后自动全量补抓）
+    _fresh = (datetime.date.today() - datetime.timedelta(days=4)).isoformat()
+    todo, skip = [], 0
+    for code, sym in jobs:
         outp = os.path.join(OUT, code + ".json")
-        if os.path.exists(outp):
+        if not args.force and os.path.exists(outp):
             try:
-                # 🛡 2026-10-28 新鲜度门槛：深度 ≥761 且末根日期在 4 天内才跳过（幂等增量）。
-                #   只看深度会让缓存永远缺最新交易日（回测吃陈旧数据）；4 天窗口覆盖周末+短假期，
-                #   长假后首个交易日自动全量补抓（~19min，2400s 预算内）。
                 _rows = json.load(open(outp, encoding="utf-8"))
                 _last = _rows[-1].get("date", "") if isinstance(_rows, list) and _rows else ""
-                _fresh = (datetime.date.today() - datetime.timedelta(days=4)).isoformat()
                 if len(_rows) >= 761 and _last >= _fresh:
                     skip += 1
                     continue
             except Exception:
                 pass
-        # 🛡 2026-10-28 根治：个股目标 800 根（非 640）。
-        #   原 640 仍低于 factor_lab_backtest 的硬门槛 MIN_BARS=761（NEED_MIN=261+2×250），
-        #   云端 V8_NO_NET 下 factor_lab 仍会写「累积中」而非真回测。800 留足余量（761+39），
-        #   与 FETCH_DAYS=800 同口径；上证指数基准保持 1200。
+        todo.append((code, sym))
+    n = len(todo)
+    print("plan: total=%d skip=%d todo=%d workers=%d budget=%ds" % (len(jobs), skip, n, args.workers, args.budget), flush=True)
+    t0 = time.time()
+    ok = fail = 0
+    failed_codes = []
+
+    def _one(job):
+        code, sym = job
         bars_n = 1200 if sym == "sh000001" else 800
         k = fetch_kline(sym, bars_n)
         rows = to_rows(k)
         if len(rows) >= 60:
-            json.dump(rows, open(outp, "w", encoding="utf-8"))
-            ok += 1
-            time.sleep(0.4)  # 慢速防 429
-        else:
-            fail += 1
-            time.sleep(6.0)  # 🛡 2026-10-28 限流冷却：突发窗口被打爆后 0.4s 间隔会连环失败，拉长间隔自愈
-        if idx % 100 == 0 or idx == n:
-            print("progress %d/%d ok=%d fail=%d skip=%d" % (idx, n, ok, fail, skip), flush=True)
-    print("DONE ok=%d fail=%d skip=%d" % (ok, fail, skip), flush=True)
+            json.dump(rows, open(os.path.join(OUT, code + ".json"), "w", encoding="utf-8"))
+            return code, True, len(rows)
+        return code, False, 0
+
+    done_cnt = 0
+    with ThreadPoolExecutor(max_workers=args.workers) as ex:
+        futs = {ex.submit(_one, j): j for j in todo}
+        for fu in as_completed(futs):
+            # wall-clock 预算保护：超预算不再等新任务提交结果，保留已完成进度（幂等可续跑）
+            if time.time() - t0 > args.budget:
+                print("BUDGET_EXCEEDED %.0fs done=%d ok=%d fail=%d —— 保留进度退出，下轮幂等续跑" % (time.time() - t0, done_cnt, ok, fail), flush=True)
+                for f2 in futs:
+                    f2.cancel()
+                break
+            code, good, nr = fu.result()
+            done_cnt += 1
+            if good:
+                ok += 1
+            else:
+                fail += 1
+                failed_codes.append(code)
+            if done_cnt % 100 == 0 or done_cnt == n:
+                print("progress %d/%d ok=%d fail=%d skip=%d %.0fs" % (done_cnt, n, ok, fail, skip, time.time() - t0), flush=True)
+    print("DONE ok=%d fail=%d skip=%d 用时%.0fs" % (ok, fail, skip, time.time() - t0), flush=True)
+    if failed_codes:
+        print("FAILED_CODES(%d): %s" % (len(failed_codes), ",".join(failed_codes[:50])), flush=True)
 
 
 if __name__ == "__main__":

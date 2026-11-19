@@ -208,15 +208,16 @@ ORDER = [
     #   与 BT_BY_SIGNAL 永远吃 T-1 edge（代码自认，见原 09-22 注释）；前移后选股必吃当日
     #   （含今日收盘已到期 T+5 结果的）最新 edge。它只读 raw_data/history/top10_daily_*.json
     #   归档 + kline_cache，不依赖 generate_top10 当日产物（当日账本明日自然入档，无损失）。
+    # 🛡 2026-11-20 根因修复#4（时序倒挂）：fetch_multiyear 原排在 stock_forward_alpha/
+    #   gen_stock_winrate/backtest_expectancy 之后 → B 批全部 kline_cache 消费者吃昨日浅缓存
+    #   （2026-11-19 云端批次实证：Alpha 调仓点恒空「无有效持有期结果」）。
+    #   前移到 B 批全部 K 线消费者之前；并行版 22s~3min 完成（幂等，≥761根且≤4天新鲜秒级跳过）。
+    "scripts/fetch_multiyear_kline.py",
     "backtest_expectancy.py",          # → raw_data/backtest_expectancy.json（四信号 edge；generate_top10 与 D批 final_recommend 双消费者，都必须在其后）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "gen_stock_winrate.py",            # 🔴 2026-10-23 主人令·嵌入因子榜：读 raw_data/history 真实信号流 + kline_cache 复算个股历史胜率/期望 → data/STOCK_WINRATE.js（generate_top10 嵌入因子用）；须在 generate_top10 之前（与 STAGES["B"] 成对）
-    "stock_forward_alpha.py",          # 🆕 2026-11-19 主人令·个股级前瞻预测因子：读 kline_cache → raw_data/stock_forward_alpha.json（IS 定权/OOS 不重拟合；PASS 且当日新鲜才被 generate_top10 alpha_gate 启用，FAIL/陈旧权重 0）。真正「同信号组合内按个股未来收益分高下」。须在 generate_top10 之前（与 STAGES["B"] 成对）
+    "stock_forward_alpha.py",          # 🆕 2026-11-19 主人令·个股级前瞻预测因子：读 kline_cache → raw_data/stock_forward_alpha.json（IS 定权/OOS 不重拟合；PASS 且当日新鲜才被 generate_top10 alpha_gate 启用，FAIL/陈旧权重 0）。真正「同信号组合内按个股未来收益分高下」。须在 generate_top10 之前（与 STAGES["B"] 成对）。2026-11-20 三重根因修复后链路首次打通（深缓存过滤+全局轴裁剪+并行补缓存）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
-    # 🛡 2026-10-28 E批缓存新鲜度（与 STAGES["E"] 成对）：kline_cache 是云端 V8_NO_NET 下
-    #   backtest_tdx/factor_lab/factor_walkforward 的唯一 K 线水源，
-    #   必须在回测前刷新到 800 根且 ≤4 天新鲜，否则回测永远吃陈旧缓存。
-    "scripts/fetch_multiyear_kline.py",
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
     "backtest_tdx.py",                 # 读 gold_pool 输入
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）

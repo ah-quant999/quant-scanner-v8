@@ -51,6 +51,30 @@ def _http_json(url, timeout=20):
     return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8"))
 
 
+# 🛡 2026-11-20 根治：主域 ifzq.gtimg.cn 对 month K 恒 501（腾讯下线 month 通道，day 仍正常）
+#   → 观测台 build_D 月K 抓取中断、EXT.margin 全市场口径未生效。三域兜底（与 fetch_multiyear
+#   同款）：主域 → web.ifzq → proxy.finance.qq.com（实测 month 340 根 2026-11-19 正常）。
+_GTIMG_HOSTS = (
+    "https://ifzq.gtimg.cn/appstock/app/fqkline/get",
+    "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+    "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get",
+)
+
+
+def _gtimg_kline_json(param, timeout=20):
+    import urllib.request
+    last = None
+    for h in _GTIMG_HOSTS:
+        try:
+            req = urllib.request.Request(
+                h + "?param=" + param,
+                headers={"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"})
+            return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8"))
+        except Exception as e:
+            last = e
+    raise last
+
+
 # ────────────────────────── D：27年月度骨架 ──────────────────────────
 def build_D():
     import pandas as pd
@@ -84,7 +108,7 @@ def build_D():
     ma200 = eq_m.rolling(12).mean()
 
     # 上证月K（gtimg，340个月覆盖 1996~）
-    j = _http_json("https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,month,,,340,qfq")
+    j = _gtimg_kline_json("sh000001,month,,,340,qfq")
     node = j["data"]["sh000001"]
     k = node.get("qfqmonth") or node.get("month")
     sh_by_month = {}
@@ -163,10 +187,14 @@ def _prev_ext():
 def ext_margin(prev):
     try:
         d = json.load(io.open(os.path.join(BASE, "raw_data", "margin_data.json"), encoding="utf-8"))
-        sh = d["sh"]
-        cur, old = sh[-1], sh[0]
+        # 🛡 2026-11-20 主人令切全市场口径：沪深合计(total_market)优先，与 2015 全市场峰值
+        #   (≈2.27万亿)同口径可比；旧数据无 total_market 时回退沪市单边并如实标注。
+        _is_full = bool(d.get("total_market"))
+        rows = d.get("total_market") or d["sh"]
+        cur, old = rows[-1], rows[0]
         chg = round((cur["rz_balance"] / old["rz_balance"] - 1) * 100, 1)
-        return {"bal": cur["rz_balance"], "date": cur["date_raw"], "chg": chg}
+        return {"bal": cur["rz_balance"], "date": cur["date_raw"], "chg": chg,
+                "mkt": "沪深合计" if _is_full else "沪市单边"}
     except Exception:
         return prev.get("margin") or {}
 
@@ -190,7 +218,7 @@ def ext_bond_erp(prev):
 
 def ext_turnover(prev):
     try:
-        j = _http_json("https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,,,260,qfq")
+        j = _gtimg_kline_json("sh000001,day,,,260,qfq")
         node = j["data"]["sh000001"]
         k = node.get("qfqday") or node.get("day")
         vols = [float(r[5]) for r in k]

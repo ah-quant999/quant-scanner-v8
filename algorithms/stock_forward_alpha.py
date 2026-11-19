@@ -228,10 +228,34 @@ def main():
         codes = codes[:args.limit]
     _log("  universe: %d 只" % len(codes))
     klines = fw.get_klines(codes, args.workers, not args.no_fetch)
+    # 🛡 2026-11-20 根因修复#2（IS 权重全 0 → summarize 空）：
+    #   全局日期轴由全部缓存票并集构成，1200 根上证指数(000001.json)会把轴拉到 1200 天；
+    #   调仓点 t 从 MIN_BARS=515 起步时，金股池 800 根票自身行号仅 ~115(<515 预热线)
+    #   → 前大半调仓点全无效 → IS 段 IC 样本 <MIN_IC_POINTS=8 → 权重全 0 → 产物恒空。
+    #   【修法】只保留 ≥761 根深缓存票（金股池口径，fetch_multiyear_kline 同源），
+    #   全局轴即收窄到深缓存并集(~800天)，t=515 处自身行号≈515 预热恰好满足；
+    #   000001.json 当前实为上证指数(1200根，文件名空间与平安银行冲突的历史遗留)，一并排除。
+    _deep = {c: rows for c, rows in klines.items() if len(rows) >= 761 and c != "000001"}
+    _log("  深缓存票(≥761根): %d / 读入 %d" % (len(_deep), len(klines)))
+    klines = _deep
     if len(klines) < 200:
         _log("  ⚠️ 有效 K 线 <200，放弃（不在本机伪造）")
         return
     dates, pos, bars = fw.build_panel(klines)
+    # 🛡 2026-11-20 根因修复#3（IS 权重仍全 0）：全局轴由最早票(2017 长历史老票)拉到 2244 天，
+    #   金股池 800 根票 2023-04 才有数据 → 全局 t=515 只对应 2019 年 → 无票预热完成
+    #   → IS 段截面恒空 → 权重全 0。MIN_BARS 的正确语义是「调仓点处每票自身行号≥515」，
+    #   为此全局轴必须从深缓存票共同覆盖区间起算（消除前导空白），否则调仓点语义错位。
+    _th = int(0.8 * len(pos))
+    _first = 0
+    for _t in range(len(dates)):
+        if sum(1 for _p in pos.values() if _p[_t] >= 0) >= _th:
+            _first = _t
+            break
+    if _first > 0:
+        dates = dates[_first:]
+        pos = {c: p[_first:] for c, p in pos.items()}
+        _log("  全局轴裁剪: 去前导 %d 天 → %d 天 (自 %s 起，覆盖≥80%%)" % (_first, len(dates), dates[0]))
 
     # 基础特征 prep（复用引擎）
     base_prep = {}
