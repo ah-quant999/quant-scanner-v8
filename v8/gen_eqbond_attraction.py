@@ -51,6 +51,12 @@ def dstr(v):
 
 def pick_col(df, *candidates):
     cols = [str(c).lower() for c in df.columns]
+    # 精确匹配优先：akshare 的「等权滚动市盈率」会把「滚动市盈率」模糊命中，导致 PE 从 12.69 错读成 28.73
+    for cand in candidates:
+        key = cand.lower()
+        for i, c in enumerate(cols):
+            if c == key:
+                return df.columns[i]
     for cand in candidates:
         key = cand.lower()
         for i, c in enumerate(cols):
