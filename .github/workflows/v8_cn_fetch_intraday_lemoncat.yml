@@ -82,6 +82,10 @@ concurrency:
 
 jobs:
   intraday_slot:
+    # 🛡 2026-11-19 push 僵尸免疫：GitHub 对改触发器的 workflow 有已知怪癖——push 后
+    #    可能以 event=push 拉起本链且零 job 直接 failure（实测 #989/#990，连未改本文件
+    #    的账本 push 也中招）。push 触发一律空转跳过，不产生失败噪音、不污染调度器 dedupe。
+    if: github.event_name != 'push'
     # 🔴 2026-09-10 一劳永逸修复（盘中混乱根因①）：原 runs-on: [self-hosted, cn] 本以为能
     #    "固定CN runner1号机单位机"，但 [self-hosted, cn] 是【标签集合】而非专属标签——任何注册了
     #    self-hosted + cn 的 runner 都会被接单。实测 09-10 全天 14 档有 11 档落在 alimi-cn

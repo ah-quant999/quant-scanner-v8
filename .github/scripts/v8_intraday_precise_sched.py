@@ -58,15 +58,18 @@ def dispatch(wf):
         return False
 
 
-def last_start(wf):
+def last_run(wf):
+    """最近一条 run -> (BJ时刻, status, conclusion) 或 None（失败 run 不算覆盖）"""
     try:
         st, data = req(API + wf + "/runs?per_page=1")
         runs = data.get("workflow_runs") or []
         if not runs:
             return None
-        s = runs[0]["run_started_at"].replace("Z", "")
-        return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S").replace(
+        r = runs[0]
+        s = r["run_started_at"].replace("Z", "")
+        dt = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S").replace(
             tzinfo=datetime.timezone.utc).astimezone(BJ)
+        return dt, r["status"], r["conclusion"]
     except Exception:
         return None
 
@@ -120,10 +123,17 @@ def main():
                     fired.add(key)
                     continue
                 if wf not in cache:
-                    cache[wf] = last_start(wf)
-                ls = cache[wf]
-                if ls and (t - ls).total_seconds() < DEDUPE_SEC:
-                    fired.add(key)               # 5 分钟内刚跑过 = 已覆盖
+                    cache[wf] = last_run(wf)
+                info = cache[wf]
+                # 🛡 11-19 加固：只有 在跑/排队/成功 的近期 run 才算「已覆盖」；
+                #   失败 run（如 push 僵尸）不算，照常 dispatch 补档。
+                covered = False
+                if info:
+                    ls, status, concl = info
+                    fresh = (t - ls).total_seconds() < DEDUPE_SEC
+                    covered = fresh and (status in ("in_progress", "queued") or concl == "success")
+                if covered:
+                    fired.add(key)
                     continue
                 if dispatch(wf):
                     fired.add(key)
@@ -136,10 +146,10 @@ def main():
                     a, b = cfg["fresh_window"]
                     if not (a <= tm <= b):
                         continue
-                    ls = cache.get(wf) or last_start(wf)
+                    ls = cache.get(wf) or last_run(wf)
                     if ls is None:
                         continue
-                    age = (t - ls).total_seconds() / 60
+                    age = (t - ls[0]).total_seconds() / 60
                     if cfg["fresh_thresh"] < age < 90:
                         if dispatch(wf):
                             print(f"[{tm}] fresh-rescue {wf} age={age:.0f}min", flush=True)
