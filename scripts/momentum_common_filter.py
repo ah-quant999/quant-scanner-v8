@@ -157,6 +157,16 @@ def main():
     sys.path.pop(0)
     sq_date_part = today_data_date()
     live_track_generated = f"{sq_date_part} {latest_snap_hms}" if latest_snap_hms else now
+    # 🛡 2026-11-19 三修（主人令「修」）：交易日盘前/凌晨跑批时 today_data_date()=今日交易日，
+    #   但 snapshot_time 仍是上一交易日收盘快照（如昨晚 21:41）→ 拼出「未来今日 21:41」。
+    #   08-30 二修只堵了周末/假期，没堵这个场景。兜底：拼出的时间若晚于当前真实时刻，
+    #   回退用 now（每只票的 live_snapshot 仍保留真实快照时刻，信息不丢）。
+    try:
+        if live_track_generated and datetime.strptime(
+                live_track_generated, "%Y-%m-%d %H:%M:%S") > datetime.now():
+            live_track_generated = now
+    except Exception:
+        live_track_generated = now
     out_generated = live_track_generated or now
     out = {
         "generated": out_generated,
