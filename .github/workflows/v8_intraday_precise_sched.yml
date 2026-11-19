@@ -15,8 +15,12 @@ on:
   workflow_dispatch:
     inputs:
       phase:
-        description: 'morning / afternoon / auto'
+        description: 'morning / afternoon / relay / auto'
         default: 'auto'
+        type: string
+      end_bj:
+        description: 'relay 班次的当日结束时刻(HH:MM, CST)'
+        default: ''
         type: string
 
 permissions:
@@ -36,6 +40,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO: ${{ github.repository }}
       PHASE: ${{ github.event.inputs.phase || 'auto' }}
+      END_BJ: ${{ github.event.inputs.end_bj || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -33,6 +33,9 @@ TARGETS = {
         "fresh_window": ("09:05", "15:45"), "fresh_thresh": 25},
 }
 ENDS = {"morning": "14:45", "afternoon": "16:38"}
+RELAY_EVERY_MIN = 20   # 🛡 11-19 实测有外部黑手在实例跑 ~28min 时取消 run（#1 实证）——
+                       #    改「接力跑短实例」：每实例最多 20min，退出前 dispatch 下一班接力，
+                       #    链条对任意单点取消免疫。
 SLOT_TOL_MIN = 7      # 迟到超过此值放弃该档（深夜补投实例自灭）
 DEDUPE_SEC = 300      # 目标链 5 分钟内已有 run → 视为已覆盖
 FRESH_EVERY_SEC = 300 # 新鲜度兜底检查间隔
@@ -79,12 +82,23 @@ def hm(t):
 
 
 def main():
-    if PHASE == "auto":
+    end_bj_in = os.environ.get("END_BJ", "").strip()
+    if PHASE == "relay":
+        phase = "relay"
+        end = end_bj_in or "14:45"
+    elif PHASE == "auto":
         phase = "morning" if datetime.datetime.now(datetime.timezone.utc).hour <= 5 else "afternoon"
+        end = ENDS[phase]
     else:
         phase = PHASE
-    end = ENDS[phase]
-    print(f"phase={phase} end={end} BJ_now={hm(datetime.datetime.now(BJ))}", flush=True)
+        end = ENDS[phase]
+    start = datetime.datetime.now(BJ)
+    end_dt = datetime.datetime.strptime(f"{start.date()} {end}", "%Y-%m-%d %H:%M").replace(tzinfo=BJ)
+    deadline = start + datetime.timedelta(minutes=RELAY_EVERY_MIN)
+    if datetime.datetime.now(BJ) >= end_dt:
+        print("end 已过，空转退出", flush=True)
+        return
+    print(f"phase={phase} end={end} 硬截止={deadline.strftime('%H:%M')} BJ_now={hm(datetime.datetime.now(BJ))}", flush=True)
 
     # ① 实例 dedupe：已有别的实例排队/在跑 → 最多等 25 分钟，仍活则让位退出
     for _ in range(50):
@@ -104,11 +118,10 @@ def main():
         return
 
     fired = set()
-    start = datetime.datetime.now(BJ)
     last_fresh = 0.0
     while True:
         t = datetime.datetime.now(BJ)
-        if hm(t) >= end or t.date() != start.date():
+        if t >= end_dt or t >= deadline or t.date() != start.date():
             break
         tm = hm(t)
         cache = {}
@@ -154,6 +167,15 @@ def main():
                         if dispatch(wf):
                             print(f"[{tm}] fresh-rescue {wf} age={age:.0f}min", flush=True)
         time.sleep(20)
+    # 🛡 接力：非自然到期（被取消/超硬截止前退出）→ 退出前派下一班，链条永不断
+    now = datetime.datetime.now(BJ)
+    if now < end_dt - datetime.timedelta(minutes=5):
+        try:
+            st, _ = req(API + SELF_WF + "/dispatches", "POST",
+                        {"ref": "main", "inputs": {"phase": "relay", "end_bj": end}})
+            print(f"[{hm(now)}] relay -> 下一班(end={end}) dispatch={st}", flush=True)
+        except Exception as e:
+            print(f"[{hm(now)}] relay dispatch ERR {e}", flush=True)
     print(f"done end={hm(datetime.datetime.now(BJ))}", flush=True)
 
 
