@@ -769,6 +769,36 @@ def process_group(key, config, token):
     return reports, watch_stocks, len(topics)
 
 
+def _relay_from_rawdata():
+    """🔴 2026-11-19 素材接力（主人令「发现就马上解决」+ 一劳永逸断粮保险）：
+    本机 token 失效(401)时，若云端班已把成功提取的素材沉淀进 raw_data/ 并随 git pull 到本地，
+    则把 last-good 云端素材接力到 out/ —— 稿件生成与候选池继续吃新鲜料，不再全站啃 11-09 陈料。
+    仅接力 72h 内的素材（防陈旧污染）；硬失败信号保留（仍 exit 42 提醒换 token）。"""
+    import shutil
+    import time
+    raw_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "raw_data")
+    relayed = []
+    targets = [cfg["out_reports"] for cfg in GROUPS.values()] + [WATCHLIST_OUT]
+    for dst in targets:
+        try:
+            src = os.path.join(raw_dir, os.path.basename(dst))
+            if not os.path.isfile(src):
+                continue
+            age_h = (time.time() - os.path.getmtime(src)) / 3600.0
+            if age_h > 72:
+                continue
+            if os.path.isfile(dst) and os.path.getmtime(dst) >= os.path.getmtime(src):
+                continue  # 本机 out/ 已更新，不回填
+            os.makedirs(os.path.dirname(dst) or ".", exist_ok=True)
+            shutil.copy2(src, dst)
+            relayed.append(f"{os.path.basename(src)}(云端 {age_h:.1f}h 前)")
+        except Exception as e:
+            print(f"  [RELAY-ERR] {dst}: {e}")
+    if relayed:
+        print("  🔁 素材接力(本机401→云端last-good): " + ", ".join(relayed))
+    return bool(relayed)
+
+
 def main():
     print("=== 知识星球研报提取 (guanlan_extractor) ===")
     print("   模式: API优先 | 星球: 外资研投\n")
@@ -802,6 +832,7 @@ def main():
     #   且 **不覆盖旧产物**：保住 last-good 的 reports/watchlist，
     #   maharo 出稿与前端至少还能用旧料，池子重建时外资研投腿保持旧值（不再被空数据洗成化石假成功）。
     if total_topics == 0:
+        _relay_from_rawdata()  # 2026-11-19 素材接力：401 时用云端沉淀的 last-good 填 out/，下游不断粮
         code = 42 if AUTH_FAILED else 43
         reason = ("HTTP 401 凭据失效（token 过期/被注销，需主人换新）" if AUTH_FAILED
                   else "API 持续返回空（限流未恢复或接口变化）")
