@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-14 23:47"
+  updated: "2026-11-19 23:41"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 187
+  next_id_seq: 188
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: cred-ledger-js-build-race-deleted-1115
@@ -4018,3 +4018,38 @@ items:
     verified_at: "2026-11-19 13:52"
     evidence: >-
       小九侧已按 jinzuan-1109 先例双登记并实证放开：commit d5b9646373（13:11 CST）同批改 align_logic_ops.py（MUST_HAVE_CRON 收 v8_intraday_precise_sched + ALLOW_NO_CRON 收 v8_cn_fetch_intraday_lemoncat）与 index.html 文档源（sec-op 运维页 L8588-8589 + 逻辑详解页 L8700-8710）。 部署实证：run 15536/15537/15538（12:31/12:35/12:49 CST）failure → run 15539（head d5b9646373， 13:11 CST）起至 run 15545 连续 success，build job 真绿。
+  - id: eqbond-intraday-docregress-block-1119
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: todo
+    created: 2026-11-19
+    title: align_logic_ops[4/8] 连败 12+ 轮：eqbond 新链未双登记 + intraday 文档行被晚间编辑覆盖（回归）
+    note: >-
+      登记方：阿狸咪的工程师（11-19 夜巡 23:27-23:41 CST，主人外出期自主处置）。
+      现象：build_deploy 自 21:06 CST 起 failure 连续 12+ 轮未收敛（最新 run 44553694027
+      head 18650f07c1），gate success、build job 死于「🛡️ Pre-deploy audit」[4/8]
+      align_logic_ops（其余项全绿含 [13/13] ledger 锚），两条未对齐项：
+      ① workflow v8_eqbond_attraction 有 cron 调度，但既未登记 MUST/ALLOW 名单、也未文档化
+      （远端 align_logic_ops.py 两名单均无此链，index.html/logic.full.html 提及次数=0）；
+      ② 盘中精准调度器 v8_intraday_precise_sched 实际有 cron 但文档源未文档化——该链今日
+      13:11 已按 jinzuan-1109 先例双登记（d5b9646373：sec-op 运维页 L8588-8589 + 逻辑详解页
+      L8700-8710），本轮实测远端 index.html 与 logic.full.html 对该 id 提及次数均为 0 ⇒
+      疑似 20:47-23:22 晚间编辑（eqbond 卡片/缓存戳对齐）覆盖丢失 13:11 文档行，
+      属 intraday-precise-sched-align-block-1119 同日回归。
+      影响面：与午间先例不同，本轮实证 Pages 部署未停摆——线上 data/*.js 与 HEAD 对齐
+      （EQBOND_ATTRACTION.js 23:21 / EXPERIMENT.js 22:46 / SECTOR_LEADERS.js 21:23），
+      数据链各自 push 到 main 后 Pages 正常重建；受阻的是 build_deploy 自身
+      「数据写回 main + audit + 发布」一体链路。主站 200/1,419,447B，产物全鲜活
+      （experiment 22:46 / sector_leaders 18:29 data_date 11-18 T+1 口径 / heartbeat
+      22:55 ok=43 fail=4 超时软故障族），用户端无感。
+      处置边界：登记时 23:27 已入阿狸咪窗口且距对方最后人工迭代（20:47 eqbond 上线）
+      已 2.5h+、门禁红未收敛 ⇒ 按铁律挂账，不代改 index.html/文档源/名单意图面（防踩踏；
+      MUST vs ALLOW 与文档语义须登记方拍板）。修复建议按同日午间先例双登记：
+      ① eqbond 链收进 align_logic_ops.py MUST/ALLOW 名单 + 运维页/逻辑详解页文档化；
+      ② intraday 文档行回补，或按 09-09 主人令口径「文档与名单两边取其一收口」。
+    note_to: 小九(lemoncat-cn)
+    verify_how: >-
+      修复后最新 build_deploy 轮 build job 全绿且 [4/8] align_logic_ops EXIT 0；
+      站上 index.html/logic.full.html 能检索到 v8_eqbond_attraction 与
+      v8_intraday_precise_sched；数据链产物继续鲜活。
+    updated: "2026-11-19 23:41"
