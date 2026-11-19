@@ -26,6 +26,8 @@ if now.weekday() >= 5:
     raise SystemExit(0)  # 周末
 if not (datetime.time(7, 45) <= now.time() <= datetime.time(9, 35)):
     raise SystemExit(0)  # 非盘前窗口
+if now.minute >= 15:
+    raise SystemExit(0)  # 整点档才执行(每小时1次)——2026-11-19 主人令降频防API风暴; 看门狗15分一班, 仅:00放行
 today = now.strftime('%Y-%m-%d')
 tok = os.environ.get('GH_TOKEN', '')
 hdr = {'Authorization': 'token ' + tok, 'Accept': 'application/vnd.github.raw'}
