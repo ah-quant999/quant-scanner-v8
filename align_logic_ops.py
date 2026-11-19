@@ -70,7 +70,10 @@ MUST_HAVE_CRON = {
     "v8_intraday_snapshot": "板块资金日内快照(盘中每10分钟)",
     # 2026-09-10 阿狸咪归类纠正：准点档调度器**事实持有 14 条 cron**（9:40–15:00 每 20 分），
     #   旧版把它归入 ALLOW_NO_CRON 属分类错误（当时 cron 一度被注释，现早已恢复）。
-    "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(14 档·唯一主线)",
+    # 🔴 2026-11-19 小九再归类：GitHub schedule 日间系统性失灵（11-16~11-19 实测盘中 cron
+    #   白天零投递），14 条日间 cron 全部拆除，触发权移交 v8_intraday_precise_sched（下），
+    #   本链只留 workflow_dispatch → 归 ALLOW_NO_CRON。
+    "v8_intraday_precise_sched": "盘中精准调度器(低峰5entry启动+内部时钟逐档dispatch·唯一主线)",
     # 2026-10-09 阿狸咪的工程师：selfhosted 兜底链升格为常规档（装 cron）——
     #   W52_HIGH/AVG_PRICE_880003 等 cn-IP 硬约束源在境外托管主力链上结构性不可达
     #   （10-08 实证 W52 冻结 22h），本链装盘前 08:25 / 盘后 17:20 两档常规兜底。
@@ -183,6 +186,9 @@ ALLOW_NO_CRON = {
     # 🗑 2026-11-15 金钻跟踪卡整支退役后停每日 cron，仅留 workflow_dispatch 手动复用；
     #   文件保留供回滚，故归 ALLOW_NO_CRON（文件在、无 cron，方向3自净校验通过）。
     "v8_jinzuan_track": "💎 金钻跟踪monitor(已退役·停cron·仅dispatch)",
+    # 2026-11-19 小九：盘中数据链 lemoncat 拆除全部 14 条日间 cron（GitHub schedule 日间失灵
+    #   根治），触发权移交 v8_intraday_precise_sched，本链仅 workflow_dispatch + 手动兜底。
+    "v8_cn_fetch_intraday_lemoncat": "盘中数据链(触发权移交精准调度器·仅dispatch)",
 }
 
 

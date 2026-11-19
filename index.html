@@ -8585,7 +8585,8 @@ window.__renderIndexObserve = function(){
       <h3><span class="ic">⚙️</span>自动化任务 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
       <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead><tbody>
         <tr><td>v8_cn_fetch_cloud</td><td>工作日 cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取主链 · push raw_data → 自动触发 build_deploy</td></tr>
-        <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>工作日 14 档(9:40-15:00)</td><td><span class="status-dot s-ok"></span>云端 ubuntu-latest</td><td>盘中准点档调度器（接力赛模型）：每档 dispatch 云端 → sleep 10min → 查状态 → 失败则CN runner1号机 cn IP 兜底；同 group v8-cn-fetch-cloud 互斥排队。<b>2026-09-10 改</b>：runs-on 由 [self-hosted, cn] 收归 ubuntu-latest（原标签非专属，实测 14 档 11 档被CN runner2号机机抢跑）；并新增三重守卫（非交易日拦截 / 时间窗 09:32-15:05 / 云端在途则跳过本档，绝不制造第二个 pending）</td></tr>
+        <tr><td>v8_intraday_precise_sched</td><td>低峰 5 entry(08:20/35/50,14:45/55)启动</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>盘中精准调度器（2026-11-19 上线·唯一主线）：GitHub schedule 日间系统性失灵（11-16~11-19 实测盘中 cron 白天零投递），改低峰 5 entry 互相 dedupe 启动 + 实例内部本机时钟精准逐档 dispatch 三链（lemoncat 14 档/实时报价/国债期货），档位容差 7min + 新鲜度兜底 &gt;25min 补派；20 分钟接力短实例对外部取消免疫。守卫窗 09:32-15:10 不动。</td></tr>
+        <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>仅 workflow_dispatch（无 cron）</td><td><span class="status-dot s-ok"></span>云端 ubuntu-latest</td><td>盘中数据主链：<b>2026-11-19 拆除全部 14 条日间 cron</b>（schedule 日间失灵），触发权移交 v8_intraday_precise_sched；守卫窗 09:32-15:10 / 云端在途互斥 / 非交易日拦截均不变；保留 dispatch 供手动与兜底。</td></tr>
         <tr><td>v8_intraday_snapshot</td><td>盘中每 10 分(9:00-15:50)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>板块资金日内快照（独立高频·根治上午空白）：写 SECTOR_FUND_FLOW_INTRADAY，ubuntu-latest 云端，独立 group v8-intraday-snapshot；2026-09-10 补登记（此前漏登记致 Pre-deploy audit 阻断部署）</td></tr>        <!-- ✅ 2026-08-29 一劳永逸：下列 3 个自愈器已于 commit 1fe4f8c71 删除（.github/workflows/ 下已不存在），
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
         <tr><td>v8_cn_fetch_watchdog</td><td>盘中每 15 分(8:07-15:52)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td><b>唯一状态型兜底</b>：陈旧 &gt;45min 才动手派发；其余一概不新增派发者（2026-09-10 派发源收敛铁律）</td></tr>
@@ -8661,7 +8662,7 @@ window.__renderIndexObserve = function(){
            v8_cn_fetch_cloud | v8_cn_fetch_cloud_hosted | v8_cn_fetch_watchdog | v8_algo_cloud | v8_algo_intraday_lite |
            v8_lhb_fetch | v8_ima_strong_stock | v8_stock_quote_refresh | v8_risk_gauge | v8_health_patrol |
            v8_cache_buster_reconcile | v8_daily_audit | v8_backup | v8_cleanup | cloud_weekly_cleanup |
-           runner_health_alert | v8_t1_guard | v8_weekend_light | v8_intraday_snapshot | v8_cn_fetch_intraday_lemoncat |
+           runner_health_alert | v8_t1_guard | v8_weekend_light | v8_intraday_snapshot | v8_intraday_precise_sched |
            v8_cn_fetch_cloud_selfhosted | v8_cn_fetch_experiments | v8_dajijin_fetch | v8_shareholder_change_fetch | v8_market_thermo |
            v8_us_hk_map | v8_morning_plan | v8_national_team | v8_nolost_guard | v8_final_recommend_history |
            v8_alimi_heartbeat | v8_invest_avoid | v8_fr_leaders_followup | deploy-v8-site | v8_intraday_liveness_guard |
@@ -8695,6 +8696,14 @@ window.__renderIndexObserve = function(){
              门禁前移 [4/8] 恒红。本项即该缺口的收口（名单见 align_logic_ops.py MUST_HAVE_CRON、文档见本清单）。
          3 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急 / 事件驱动）：
            v8_algo_run | v8_build_deploy | v8_align_gate
+         2026-11-19 补登记（小九 · GitHub schedule 日间失灵根治）：
+           · v8_intraday_precise_sched —— 盘中精准调度器（低峰 5 entry 互相 dedupe 启动 +
+             实例内部本机时钟逐档 dispatch 三链：lemoncat 14 档/实时报价/国债期货；
+             档位容差 7min + 新鲜度兜底 >25min 补派 + 20min 接力短实例）。
+           · v8_cn_fetch_intraday_lemoncat —— 由 MUST 降入 ALLOW_NO_CRON：11-16~11-19 实测
+             GitHub schedule 日间系统性失灵（盘中 cron 白天零投递，积压深夜空转），14 条日间
+             cron 全部拆除，触发权移交精准调度器；本链仅 workflow_dispatch。
+           ⚠️ 教训：GitHub 盘中/日间精准触发不许依赖 schedule（2026-11-19 钉死）。
          2026-09-10 CN runner2号机「派发源精简」清理（防止名单积灰再次误导）：
            · v8_freshness_watch / v8_slot_scheduler —— 文件已删除 → 从名单彻底移除
            · v8_cn_fetch / v8_algo / v8_sync_v6_data / v8_sync_legacy —— 文件早已不存在 → 删除死登记
