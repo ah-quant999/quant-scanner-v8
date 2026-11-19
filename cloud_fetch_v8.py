@@ -453,6 +453,10 @@ def _restamp_fib_for_premarket():
 import requests as _requests
 
 _EM_DELAY = "https://push2delay.eastmoney.com"
+
+# 🆕 2026-11-19 主人令「平均股价换成我的800005」：本卡官方源切换标签（由 _fetch_800005_eastmoney
+#   / _fetch_880003_history 成功通道写入，f_avg_price_880003 读取后写进 source/index_name/ma_caliber）
+_AVG_PRICE_SRC_TAG = ""
 _EM_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
@@ -5698,6 +5702,53 @@ def main(category=None, only=None):
             "up_down_last_date": up_down_last_date,
         }
 
+    def _fetch_800005_eastmoney(days=430):
+        """🆕 2026-11-19 主人令「平均股价换成我的800005跟踪更新」：
+        东方财富官方「A股平均股价」800005（searchapi QuoteID=47.800005, MktNum=47,
+        PinYin=AGPJGJ）日K 真值主源。host 顺序：
+          ① push2delay kline 镜像（资金流同款境外可达镜像，kline 端点实测自证）
+          ② push2his（仅 cn-IP 可达 · 2026-10-17 实锤，selfhosted 班走通）
+        返回 [(date, close, high, low), ...] 升序；失败返回 []。
+        口径防护（09-28 断层教训）：本源成功即【整段重建】，绝不与自算序列拼接。"""
+        global _AVG_PRICE_SRC_TAG
+        for _host in ("https://push2delay.eastmoney.com",
+                      "https://push2his.eastmoney.com"):
+            for _att in range(2):
+                try:
+                    r = _requests.get(
+                        _host + "/api/qt/stock/kline/get",
+                        params={
+                            "secid": "47.800005", "klt": "101", "fqt": "1",
+                            "fields1": "f1,f2,f3,f4,f5,f6",
+                            "fields2": "f51,f52,f53,f54,f55,f56,f57",
+                            "beg": "0", "end": "20500101", "lmt": str(days + 20),
+                            "ut": "fa5fd1943c7b386f172d6893dbfba1a9",
+                            "_": int(time.time() * 1000),
+                        },
+                        headers=_EM_HEADERS, timeout=25,
+                    )
+                    j = r.json()
+                    kl = ((j.get("data") or {}).get("klines")) or []
+                    recs = []
+                    for ln in kl:
+                        p = ln.split(",")
+                        # f51日期,f52开,f53收,f54高,f55低 —— KDJ 需 H/L/C 三元组
+                        if len(p) >= 5:
+                            try:
+                                recs.append((p[0], float(p[2]), float(p[3]), float(p[4])))
+                            except ValueError:
+                                continue
+                    if len(recs) >= 2:
+                        _AVG_PRICE_SRC_TAG = "A股平均股价(东财800005官方)"
+                        print(f"  [800005] {_host.split('//')[1].split('.')[0]} "
+                              f"取到 {len(recs)} 根日K（官方A股平均股价）")
+                        return recs
+                except Exception:
+                    if _att == 0:
+                        time.sleep(1.5)
+        print("  [800005] 东财官方源两 host 全失败 → 落回 880003 官方链")
+        return []
+
     def _fetch_880003_tdx(days=430):
         """🛠 2026-10-21 主通道（主人令「MA30/KDJ-K」实测发现）：东财 push2his 对
         880003（通达信自编指数）恒返回 0 根（生产数据 index_880003 从未写入、
@@ -5789,14 +5840,23 @@ def main(category=None, only=None):
           实测东财对 880003 恒返回 0 根（index_880003 从未写入的根因）→
           主通道改 pytdx 官方协议（_fetch_880003_tdx），东财降级兜底。
         """
+        # 🔴 2026-11-19 主人令：主源切换 = 东财官方 800005「A股平均股价」（主人实际盯盘标的）。
+        #   通道顺序：800005 东财官方 → pytdx 880003 → 腾讯 880003 → 东财 push2his 47.800005 重试。
+        #   88.0003/90.0003 旧 secid 恒返回 0 根（10-21 实锤），按死代码清理原则移除。
+        em8 = _fetch_800005_eastmoney(days)
+        if em8:
+            return em8
         tdx = _fetch_880003_tdx(days)
         if tdx:
+            global _AVG_PRICE_SRC_TAG
+            _AVG_PRICE_SRC_TAG = "通达信880003(官方指数·pytdx)"
             return tdx
         # 腾讯财经日K 回退（云端 ubuntu 直连可达，支持通达信 880003 代码）—— 2026-11-04 主人令根治
         txc = _fetch_880003_tencent(days)
         if txc:
+            _AVG_PRICE_SRC_TAG = "通达信880003(官方指数·腾讯)"
             return txc
-        for secid in ("88.0003", "90.0003"):
+        for secid in ("47.800005",):
             for _att in range(2):
                 try:
                     r = _requests.get(
@@ -5913,9 +5973,10 @@ def main(category=None, only=None):
             "ma30_ready": n >= 30,
             "ma60_ready": n >= 60,
             "kdj_k": kdj_k,
-            "source": "通达信880003(官方指数)",
-            "index_name": "平均股价(通达信880003官方指数)",
-            "ma_caliber": "通达信880003(官方指数)",
+            "source": (_AVG_PRICE_SRC_TAG or "通达信880003(官方指数)"),
+            "index_name": ("平均股价(A股平均股价·东财800005官方)" if "800005" in _AVG_PRICE_SRC_TAG
+                           else "平均股价(通达信880003官方指数)"),
+            "ma_caliber": (_AVG_PRICE_SRC_TAG or "通达信880003(官方指数)"),
             "history_days": len(hist),
             "history_880003": hist,
         })
