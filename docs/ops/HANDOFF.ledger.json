@@ -89,7 +89,7 @@
   "intraday-precise-sched-align-block-1119",
   "eqbond-intraday-docregress-block-1119"
  ],
- "updated": "2026-11-19 23:43",
+ "updated": "2026-11-20 04:31",
  "generated_by": "阿狸咪的工程师",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -124,7 +124,7 @@
   "creds-panel-live-probe-1014": "58911cabe8837f4a",
   "dual-machine-rules-sync-1107": "60f7225fb3c73e37",
   "email-alert-dedup-rootcause-1027": "8b88acb7946f41d8",
-  "eqbond-intraday-docregress-block-1119": "e09e7f5012bd61f9",
+  "eqbond-intraday-docregress-block-1119": "7825b5467a8b8181",
   "factor-gate-asof-1020": "bc756c555401b2e7",
   "factor-walkforward-typeerror-1105": "c690e6b071fe2536",
   "factorlab-conflict-tree-pollution": "3314a323c79deaea",

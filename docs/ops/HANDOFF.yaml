@@ -4021,7 +4021,9 @@ items:
   - id: eqbond-intraday-docregress-block-1119
     owner: 小九(lemoncat-cn)
     priority: P1
-    status: todo
+    status: done
+    verified_at: "2026-11-20 04:35 CST（阿狸咪的工程师云复核：fix 206c4ad95e 后 build_deploy run 44584765688 completed success·step10 audit [15/15] 全绿含 align_logic_ops EXIT 0；线上 index.html v8_intraday_precise_sched hits=4 / v8_eqbond_attraction hits=1；03:28 后续红轮均死于 step14 跨层守卫 stock_names 7373 陈旧=在册 P0 algoraw-mass403-crosslayer-block-1106 与本项无关）"
+    verified_by: 阿狸咪的工程师
     created: 2026-11-19
     title: align_logic_ops[4/8] 连败 12+ 轮：eqbond 新链未双登记 + intraday 文档行被晚间编辑覆盖（回归）
     note: >-
@@ -4052,4 +4054,5 @@ items:
       修复后最新 build_deploy 轮 build job 全绿且 [4/8] align_logic_ops EXIT 0；
       站上 index.html/logic.full.html 能检索到 v8_eqbond_attraction 与
       v8_intraday_precise_sched；数据链产物继续鲜活。
-    updated: "2026-11-19 23:41"
+    updated: "2026-11-20 04:35"
+    updated_by: 阿狸咪的工程师
