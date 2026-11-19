@@ -75,3 +75,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/v8_morning_plan_fallback.py
+
+      # 🔴🔴 2026-11-19 最高优先级主人令「实时数据怎么还没更新！」根治：盘中调度器
+      #   lemoncat schedule 再次被 GitHub 整段漏触发（实测 11-19 开盘 09:30/09:40 档
+      #   0 run，实时卡全停盘前/昨收）。交易日盘中窗 09:25-11:35/12:55-15:05 CST
+      #   随看门狗每 15 分检查：lemoncat 最近班 >25min（链最大档间隔 20min+余量）且
+      #   无在跑班 ⇒ 判漏触发，补派 lemoncat（幂等只读+派发，正常班次零写操作）。
+      - name: 盘中调度器漏触发兜底（lemoncat 停摆即补派）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/v8_intraday_sched_fallback.py
