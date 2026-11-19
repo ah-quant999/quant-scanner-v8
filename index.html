@@ -16001,6 +16001,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           : '<span style="font-size:10.5px;color:#f97316;border:1px solid rgba(249,115,22,0.5);border-radius:4px;padding:0 5px;line-height:1.5">备源 上交所（Kimi 断源自动切换）</span>';
         var totalLabel = isKimi ? '累计净流入（2024以来）' : ('累计（自建起点 ' + ((A.daily && A.daily[0] && A.daily[0][0]) || '—') + '）');
         var h = '';
+        /* 主源/备源动态标签行（断源自切时橙标提示） */
+        h += '<div style="margin-bottom:8px">' + srcTag + '</div>';
         /* 汇总胶囊 4 列 */
         h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">';
         var chips = [
