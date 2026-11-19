@@ -2751,7 +2751,8 @@ window.STRATEGY_WALKFORWARD = {
           // 第一行（唯一一行）：标题 + 数据 + 超买超卖 + MA30偏离 + KDJ
           h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
           // 2026-08-30：标签不再硬写 880003（数据可能来自全A等权口径），按 source 字段自述
-          var _srcTag=(ap.source&&String(ap.source).indexOf('880003')>=0)?'880003':'全A等权';
+          /* 2026-11-19 主人令：跟踪标的切换为东财官方 800005「A股平均股价」，标签按 source 自述 */
+          var _srcTag=(ap.source&&String(ap.source).indexOf('800005')>=0)?'800005':((ap.source&&String(ap.source).indexOf('880003')>=0)?'880003':'全A等权');
           h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+'">💰 平均股价·'+_srcTag+'</span>';
           h+=lightDot(_chg>0.2?'green':(_chg<-0.2?'red':'yellow'), 11);  // 2026-11-02：lightText 已并入红涨绿跌(green名=利好→红，red名=利空→绿)；均价涨=up=利好→'green'名→红点
           h+='<b style="font-size:15px">'+Number(ap.avg_price).toFixed(2)+'</b>';
