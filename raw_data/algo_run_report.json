@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-11-20 17:17:45",
-  "run_start": "2026-11-20 16:44:35",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-11-20 22:00:07",
+  "run_start": "2026-11-20 19:49:05",
+  "ok": 45,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout success!"
+    }
+  ],
   "skipped_by_time_gate": []
 }

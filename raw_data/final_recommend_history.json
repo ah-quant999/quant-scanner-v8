@@ -1,13 +1,13 @@
 {
-  "generated": "2026-11-20 17:18:00",
-  "update_time": "2026-11-20 17:18:00",
+  "generated": "2026-11-20 21:57:57",
+  "update_time": "2026-11-20 21:57:57",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
   "n_top": 3,
-  "days": 44,
+  "days": 45,
   "date_from": "2026-09-03",
-  "date_to": "2026-11-19",
+  "date_to": "2026-11-20",
   "by_date": {
     "2026-09-03": {
       "date": "2026-09-03",
@@ -1934,6 +1934,50 @@
           "name": "莲花控股",
           "close": 9.01,
           "close_date": "2026-11-19",
+          "final_score": 4.7,
+          "resonance": 1,
+          "sources": [
+            "因子榜"
+          ]
+        }
+      ]
+    },
+    "2026-11-20": {
+      "date": "2026-11-20",
+      "update_time": "2026-11-20 21:55:32",
+      "file": "final_recommend_20261120.json",
+      "degraded": true,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "300790",
+          "name": "宇瞳光学",
+          "close": 13.78,
+          "close_date": "2026-11-20",
+          "final_score": 4.7,
+          "resonance": 1,
+          "sources": [
+            "因子榜"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "601991",
+          "name": "大唐发",
+          "close": 4.48,
+          "close_date": "2026-11-20",
+          "final_score": 4.7,
+          "resonance": 1,
+          "sources": [
+            "因子榜"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "300083",
+          "name": "创世纪",
+          "close": 8.64,
+          "close_date": "2026-11-20",
           "final_score": 4.7,
           "resonance": 1,
           "sources": [

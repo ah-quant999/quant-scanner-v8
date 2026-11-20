@@ -1,6 +1,6 @@
 {
-"update_time": "2026-11-20 08:15:47",
-"total": 8027,
+"update_time": "2026-11-20 21:54:23",
+"total": 8029,
 "new_listings_count": 0,
 "delisted_count": 0,
 "new_listings": [],
@@ -8,6 +8,6 @@
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8027,
-"fresh_universe": 8027
+"old_universe": 8029,
+"fresh_universe": 8029
 }

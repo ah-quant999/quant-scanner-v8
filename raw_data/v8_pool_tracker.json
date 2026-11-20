@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-20 06:30:49",
+  "update_time": "2026-11-20 19:49:05",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,52 +9,52 @@
   "items": [],
   "sentiment_meta": {
     "phase": "回暖",
-    "score": 38.0,
-    "delta_pct": 0.0,
+    "score": 48.0,
+    "delta_pct": 21.74,
     "advice": "🌱 情绪回暖：可适度参与，盯紧最高板扩展",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "存储芯片",
-        "type": "概念",
-        "net": 43.66
-      },
-      {
-        "name": "权重股",
-        "type": "概念",
-        "net": 32.33
-      },
-      {
-        "name": "大基金持股",
-        "type": "概念",
-        "net": 31.33
-      },
-      {
-        "name": "中芯概念",
-        "type": "概念",
-        "net": 30.79
-      },
-      {
-        "name": "半导体",
+        "name": "印制电路板",
         "type": "行业",
-        "net": 30.51
+        "net": 20.39
+      },
+      {
+        "name": "元件",
+        "type": "行业",
+        "net": 18.72
+      },
+      {
+        "name": "裸眼3D",
+        "type": "概念",
+        "net": 15.25
+      },
+      {
+        "name": "昨日高换手",
+        "type": "概念",
+        "net": 14.58
+      },
+      {
+        "name": "红利破净股",
+        "type": "概念",
+        "net": 8.91
       }
     ],
     "top_out": [
       {
-        "name": "铁路运输",
+        "name": "其他养殖",
         "type": "行业",
         "net": -0.01
       },
       {
-        "name": "海洋捕捞",
+        "name": "家纺",
         "type": "行业",
         "net": -0.01
       },
       {
-        "name": "纺织鞋类制造",
+        "name": "长材",
         "type": "行业",
         "net": -0.01
       }
