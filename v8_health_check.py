@@ -373,7 +373,7 @@ CARD_DEFS = [
     #   掉进通用扫描 1440 红线判 fail 却无 heal_cat ⇒ 自愈链够不到、且定时 workflow 跳步骤 → 永久停更。
     #   补登记 + heal_cat='local_gen'，巡检发现 stale 直接本地跑生成器并推送真实数据。
     {"id": "NATIONAL_TEAM", "name": "国家队活跃度", "page": "暂未上架", "freq": "工作日20:50(纯本地生成)", "max_age": 1440, "heal_cat": "local_gen", "key_fields": ["score", "subs"], "raw_file": "national_team.json", "producer": "v8/gen_national_team.py"},
-    {"id": "SECTOR_YEAR_FLOW", "name": "板块年度主力净流入", "page": "暂未上架", "freq": "工作日20:50(纯本地生成)", "max_age": 1440, "heal_cat": "local_gen", "key_fields": ["sectors"], "raw_file": "sector_year_flow.json", "producer": "v8/gen_sector_year_flow.py"},
+    {"id": "SECTOR_YEAR_FLOW", "name": "板块年度主力净流入", "page": "暂未上架", "freq": "工作日15:45(cn专链v8_sector_year_flow)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["sectors"], "raw_file": "sector_year_flow.json", "producer": "cloud_fetch_v8.f_sector_year_flow (cn专链)"},  # 🛡 2026-11-20 审计订正：原 freq/heal_cat/producer 三项全过时（11-09 拆 national_team 本地步骤后唯一档位=云端post_close，境外IP软失败⇒结构性断链 11-12/11-14/11-19 三次复发）；现役=cn runner 专链 15:45，heal_cat 对齐 SECTOR_TECH_JUDG 先例
     # 📊 2026-11-19 主人令：股票型ETF申赎净流入·观测卡（Kimi/Wind 主源+上交所备源，断源自切）。
     #   随 v8_cn_fetch_cloud post_close 主抓后由 fetcher 产出 raw → update_v8 生成；周末顺延给 2880 容错。
     {"id": "ETF_FLOW_OBS", "name": "股票型ETF申赎净流入·观测", "page": "暂未上架", "freq": "每交易日盘后(随v8_cn_fetch_cloud post_close)", "max_age": 2880, "heal_cat": "cloud_fetch", "key_fields": ["active_source", "update_time"], "raw_file": "etf_flow_obs.json", "producer": "v8/fetch_etf_flow_obs.py"},

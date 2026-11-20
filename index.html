@@ -12971,7 +12971,7 @@ function drawUpDownChart(){
 
           {name:'主升/启动板块·龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', maturity:'T+1', slots:['21:45'], note:'观测类·板块龙头'},
           {name:'市场利率环境', source:'MARKET_REGIME', freq:'收盘后1次', slots:['19:15'], note:'宏观利率环境'},
-          {name:'板块年度主力净流入', source:'SECTOR_YEAR_FLOW', freq:'工作日20:50(纯本地生成)', slots:['20:50'], note:'板块年度资金流'},
+          {name:'板块年度主力净流入', source:'SECTOR_YEAR_FLOW', freq:'工作日15:45(cn专链v8_sector_year_flow)', slots:['15:45'], note:'板块年度资金流'},  /* 🛡 2026-11-20 白班审计根治：原档位云端 post_close 境外IP软失败 ⇒ 11-12/11-14/11-19 三次停更复发；新建 cn 专链 */
           {name:'国家队活跃度', source:'NATIONAL_TEAM', freq:'工作日20:50', slots:['20:50'], note:'托盘代理信号'},
           {name:'股票型ETF申赎净流入·观测', source:'ETF_FLOW_OBS', freq:'每交易日盘后(随v8_cn_fetch_cloud post_close)', slots:['17:20'], note:'观测类·Wind主源+上交所备源'},
 

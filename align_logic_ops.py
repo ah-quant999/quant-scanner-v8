@@ -178,6 +178,10 @@ MUST_HAVE_CRON = {
     #   · v8_sector_tech（cron 交易日 16:00，cn runner，产 data/SECTOR_TECH_JUDG.js）
     "v8_bond_futures": "国债期货利率罗盘(TL30Y·cn盘中30分)",
     "v8_sector_tech": "板块技术研判(申万一级31·L4分级·cn盘后16:00)",
+    # 🛡 2026-11-20 白班审计根治：f_sector_year_flow 东财 cn-IP 硬约束源，原唯一登记档位
+    #   v8_cn_fetch_cloud post_close 固定 runs-on ubuntu-latest（境外软失败）⇒ 11-12/11-14/11-19
+    #   三次 27.9h+ 停更同款复发。新建 cn 专链（15:45 CST 收盘定稿，幂等闸门防重复）。
+    "v8_sector_year_flow": "板块年度主力净流入(工作日15:45·cn runner专链·东财fflow cn-IP硬约束)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
