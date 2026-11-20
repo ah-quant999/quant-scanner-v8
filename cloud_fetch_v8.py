@@ -215,7 +215,11 @@ CATEGORY_MAP = {
     #   定稿成交额；云端境外轮失败为软失败不阻断，同既有语义）。消费方 v8/gen_national_team.py
     #   20:50 读 raw_data/broad_etf_volume.json（时序：17:20 落盘 → 20:50 生成，无竞态）。
     "BROAD_ETF_VOLUME": "post_close",
-    "OVERSEAS_MARKETS": "premarket,intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：盘前档随08:25盘前cron刷新（日经/KOSPI 08:00先于A股开盘，2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」）+ 盘中每轮刷新
+    "OVERSEAS_MARKETS": "premarket,intraday,post_close",  # 亚太市场(日经/恒生/KOSPI/台湾)：盘前08:25+盘中每轮+盘后档均刷新。
+    # 🔴 2026-11-19 一劳永逸：加 post_close 的根因——16:30 后 intraday 档会被「盘后静默窗」剔除，
+    #   而盘后 17:20/18:20/19:20 档若不含本变量 ⇒ 收盘后亚太卡永不刷新（主人实测停在16:26、韩国/中国台湾修复后仍不更新）。
+    #   登记 post_close 后：既是 genuine post_close 不被静默窗剔除，盘后轮次也照常抓亚太收盘数据。
+    #   🛡 2026-11-20 白班重放：本行连同 znb 备源曾被夜班 10031dc656 陈旧基底整文件重写抹除，206c4ad95e 只还原了 index.html 漏了本文件。
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：注释写「盘后数据页」却只在盘前抓 —— 语义错配。
     #   页面把这两张卡标成「收盘后/盘后」，但盘后档不抓 → 卡片永远显示早上那一档的时间。
@@ -1612,17 +1616,22 @@ def _fetch_us_overnight():
     return _fetch_us_overnight_yahoo()
 
 
-# 新浪国际指数备源代码 → 与 _fetch_overseas_indices 的东财 code 一一对应
-_SINA_OVERSEAS = (("int_hangseng", "HSI"), ("int_nikkei", "N225"),
-                  ("int_kospi", "KS11"), ("int_taiwan", "TWII"))
+# 新浪国际指数备源代码 → 与 _fetch_overseas_indices 的东财 code 一一对应。
+# 🔴 2026-11-19 一劳永逸根治：int_kospi/int_taiwan 已停供（返回空串），
+#   经实测改用新浪全球指数 znb_KOSPI(首尔综合) / znb_TWJQ(台湾加权)，均为当日实时有效点位。
+#   每个 em_code 可按优先级配多个候选，取第一个非空有效值。
+_SINA_OVERSEAS = (("HSI", ("int_hangseng",)), ("N225", ("int_nikkei",)),
+                  ("KS11", ("znb_KOSPI", "int_kospi")),
+                  ("TWII", ("znb_TWJQ", "int_taiwan")))
 
 
 def _fetch_overseas_sina():
     """新浪国际指数备源（东财 push2delay 全灭时兜底）。
     返回 {东财code: {"f12": code, "f2": 点位, "f3": 涨跌幅%}}，与东财 diff 行同构。
-    接口：https://hq.sinajs.cn/list=int_hangseng,int_nikkei,int_kospi,int_taiwan
+    接口：https://hq.sinajs.cn/list=<所有候选代码>
     返回形如 `var hq_str_int_hangseng="恒生指数,24560.33,-81.23,-0.33,...";`
-    （字段序：名称, 现价, 涨跌额, 涨跌幅%…）。需 Referer，编码 gb2312。"""
+    或 `var hq_str_znb_KOSPI="首尔综合指数,5114.20,46.76,0.92,...";`
+    （字段序：名称, 现价, 涨跌额, 涨跌幅%…；znb_ 与 int_ 前 4 字段同构）。需 Referer，编码 gb2312。"""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -1631,21 +1640,24 @@ def _fetch_overseas_sina():
     }
     out = {}
     try:
-        codes = ",".join(c for c, _ in _SINA_OVERSEAS)
-        r = _requests.get(f"https://hq.sinajs.cn/list={codes}", headers=headers, timeout=15)
+        all_codes = sorted({c for _, cands in _SINA_OVERSEAS for c in cands})
+        r = _requests.get(f"https://hq.sinajs.cn/list={','.join(all_codes)}", headers=headers, timeout=15)
         r.encoding = "gb2312"
-        for c, em_code in _SINA_OVERSEAS:
-            m = re.search(r'hq_str_%s="([^"]*)"' % c, r.text or "")
-            if not m:
-                continue
-            f = (m.group(1) or "").split(",")
-            if len(f) < 4:
-                continue
-            try:
-                price, pct = float(f[1]), float(f[3])
-            except Exception:
-                continue
-            out[em_code] = {"f12": em_code, "f2": price, "f3": pct}
+        for em_code, cands in _SINA_OVERSEAS:
+            for c in cands:
+                m = re.search(r'hq_str_%s="([^"]*)"' % c, r.text or "")
+                if not m:
+                    continue
+                f = (m.group(1) or "").split(",")
+                if len(f) < 4:
+                    continue
+                try:
+                    price, pct = float(f[1]), float(f[3])
+                except Exception:
+                    continue
+                if price > 0:
+                    out[em_code] = {"f12": em_code, "f2": price, "f3": pct}
+                    break
     except Exception as e:
         print(f"    ⚠️ 海外指数新浪备源失败: {e}")
     return out
@@ -1725,7 +1737,7 @@ def _fetch_overseas_indices():
     if len(by_code) < len(sec_map):
         sina_all = _fetch_overseas_sina()
         _added = 0
-        for _c, _em in _SINA_OVERSEAS:
+        for _em, _cands in _SINA_OVERSEAS:
             if _em not in by_code and _em in sina_all:
                 by_code[_em] = sina_all[_em]
                 _added += 1
@@ -1762,7 +1774,7 @@ def _fetch_overseas_indices():
 
 
 def f_overseas_markets():
-    """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→premarket,intraday，盘前08:25+盘中每30分刷新）。
+    """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→premarket,intraday,post_close（盘前08:25+盘中每轮+盘后档均刷新））。
     恒生指数/日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
     数据真实抓取，绝不编造点位。
     🔴 2026-09-24 一劳永逸（小九）：原实现抓取失败仍返回全 null 对象 ⇒ 每轮把昨日
