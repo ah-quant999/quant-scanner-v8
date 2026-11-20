@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-21 01:59",
-  "republish_time": "2026-11-21 05:07:03",
+  "republish_time": "2026-11-21 06:39:42",
   "data_date": "2026-11-20",
   "rule_ver": 2,
   "top_n": 5,
@@ -110,35 +110,35 @@
           "name": "重庆路桥",
           "price": 4.02,
           "chg": 3.61,
-          "main_net": null
+          "main_net": 10097094.0
         },
         {
           "code": "001965",
           "name": "招商公路",
           "price": 11.05,
           "chg": 1.66,
-          "main_net": null
+          "main_net": -34193100.0
         },
         {
           "code": "601816",
           "name": "京沪高铁",
           "price": 5.43,
           "chg": 1.5,
-          "main_net": null
+          "main_net": 96385504.0
         },
         {
           "code": "600350",
           "name": "山东高速",
           "price": 11.9,
           "chg": 0.93,
-          "main_net": null
+          "main_net": 12828360.0
         },
         {
           "code": "000429",
           "name": "粤高速Ａ",
           "price": 14.34,
           "chg": 0.91,
-          "main_net": null
+          "main_net": 24851596.0
         }
       ],
       "match": "alias:exact"
@@ -146,42 +146,42 @@
     {
       "name": "小金属",
       "bk": "BK1027",
-      "cons_count": 25,
+      "cons_count": 27,
       "leaders": [
+        {
+          "code": "920068",
+          "name": "天工股份",
+          "price": 11.21,
+          "chg": 0.81,
+          "main_net": 225302.0
+        },
         {
           "code": "600301",
           "name": "华锡有色",
           "price": 44.45,
           "chg": -0.67,
-          "main_net": null
+          "main_net": -15241643.0
         },
         {
           "code": "600111",
           "name": "北方稀土",
           "price": 31.91,
           "chg": -2.33,
-          "main_net": null
+          "main_net": -227435067.0
         },
         {
           "code": "002978",
           "name": "安宁股份",
           "price": 21.51,
           "chg": -3.54,
-          "main_net": null
+          "main_net": -680881.0
         },
         {
           "code": "601958",
           "name": "金钼股份",
           "price": 15.44,
           "chg": -3.86,
-          "main_net": null
-        },
-        {
-          "code": "001280",
-          "name": "中国铀业",
-          "price": 47.22,
-          "chg": -3.97,
-          "main_net": null
+          "main_net": -21866550.0
         }
       ],
       "match": "exact"
@@ -579,5 +579,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-21 03:21:08 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-21 05:07:03 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-21 03:21:08 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-21 06:39:42 跟随 FINAL 重算(一劳永逸)"
 }
