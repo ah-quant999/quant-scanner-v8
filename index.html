@@ -1409,14 +1409,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          （2026-10-26~11-20 期间生成器未挂链，data/*.js 被 bot 重建清掉，故内联保活；11-21 起已挂链根治） -->
     <script>
 window.RISK_GUARD = {
-  "update_time": "2026-10-26 07:51:43",
-  "source": "RISK_GUARD_INPUT.json · equity(累计净值)",
-  "has_equity": true,
-  "equity_points": 121,
-  "max_drawdown": 0.0603,
-  "peak_idx": 120,
-  "trough_idx": 55,
-  "tier": "正常",
+  "update_time": "2026-11-21 06:25:45",
+  "source": "PORTFOLIO(westock 练习赛组合) total_assets 真实累积 · 现有 1 点",
+  "has_equity": false,
+  "equity_points": 1,
+  "curve_range": "2026-11-19~2026-11-19",
+  "max_drawdown": 0.0,
+  "peak_idx": 0,
+  "trough_idx": 0,
+  "tier": "正常(真实净值累积中)",
   "multiplier": 1.0,
   "thresholds": [
     {
@@ -1440,7 +1441,7 @@ window.RISK_GUARD = {
       "tier": "清仓"
     }
   ],
-  "note": "策略真实最大回撤 6.03%，触发「正常」档 ⇒ 仓位乘数 ×1.00。前端执行卡已据此真实缩放每只建议仓位。"
+  "note": "🛡 2026-11-21 根治：旧内联值由假曲线(RISK_GUARD_INPUT 手工线性构造)派生，已根除。现=真实账户净值逐日累积中（<2点），回撤闸暂 ×1.00；E 批挂链后 data/RISK_GUARD.js 日更并覆盖本兜底。"
 };
     </script>
     <script>
