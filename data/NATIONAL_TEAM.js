@@ -1,7 +1,7 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-19",
-  "update_time": "2026-11-20 15:51:16",
-  "source_time": "2026-11-20 15:51:07",
+  "update_time": "2026-11-20 16:03:00",
+  "source_time": "2026-11-20 16:02:52",
   "score": 76.6,
   "verdict": "高活跃·国家队明确托盘",
   "verdict_color": "#ef5350",
