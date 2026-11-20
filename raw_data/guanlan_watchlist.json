@@ -1,10 +1,10 @@
 {
   "version": "2.0",
-  "updated": "2026-11-20 21:34:11",
+  "updated": "2026-11-21 00:27:46",
   "sources": [
     "guanlan"
   ],
-  "total": 14,
+  "total": 25,
   "stocks": [
     {
       "name": "机器人",
@@ -51,6 +51,17 @@
       "added_date": "2026-11-20"
     },
     {
+      "name": "一拖股份",
+      "code": "601038",
+      "full_code": "sh601038",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "野村",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
       "name": "联想集团",
       "code": "0992",
       "full_code": "0992.HK",
@@ -58,6 +69,28 @@
       "market": "港股",
       "institution": "摩根士丹利",
       "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "绿的谐波",
+      "code": "688017",
+      "full_code": "sh688017",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "奥比中光",
+      "code": "688322",
+      "full_code": "sh688322",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
       "source": "外资研投",
       "added_date": "2026-11-20"
     },
@@ -102,6 +135,72 @@
       "market": "港股",
       "institution": "摩根大通",
       "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "宁沪高速",
+      "code": "600377",
+      "full_code": "sh600377",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "长电科技",
+      "code": "600584",
+      "full_code": "sh600584",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "中微公司",
+      "code": "688012",
+      "full_code": "sh688012",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "拓荆科技",
+      "code": "688072",
+      "full_code": "sh688072",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "中科飞测",
+      "code": "688361",
+      "full_code": "sh688361",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "芯原股份",
+      "code": "688521",
+      "full_code": "sh688521",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
       "source": "外资研投",
       "added_date": "2026-11-20"
     },
@@ -155,6 +254,28 @@
       "full_code": "00700.HK",
       "exchange": "HK",
       "market": "港股",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "芯源微",
+      "code": "688037",
+      "full_code": "sh688037",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "寒武纪",
+      "code": "688256",
+      "full_code": "sh688256",
+      "exchange": "SH",
+      "market": "沪市",
       "institution": "瑞银",
       "rating": "买入",
       "source": "外资研投",
