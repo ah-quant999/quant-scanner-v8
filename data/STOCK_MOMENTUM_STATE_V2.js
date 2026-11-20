@@ -1,13 +1,13 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-20 15:50:24",
+  "generated": "2026-11-20 15:55:06",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
-  "total_unique_stocks": 183,
+  "total_unique_stocks": 182,
   "total_appearances": 573,
-  "kline_available": 183,
+  "kline_available": 182,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
@@ -13307,7 +13307,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002771",
      "name": "真视通",
      "date": "2026-11-02",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -14109,7 +14109,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "symbol": "sz002771",
      "name": "真视通",
      "date": "2026-11-02",
-     "count": 3,
+     "count": 4,
      "categories": [
       "强势股",
       "短线选股",
@@ -16183,86 +16183,6 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 14.3
-    },
-    {
-     "code": "002724",
-     "symbol": "sz002724",
-     "name": "海洋王",
-     "date": "2026-11-20",
-     "count": 1,
-     "categories": [
-      "加速",
-      "短线选股",
-      "突破"
-     ],
-     "change_pct": 10.0,
-     "sel_change_pct": 10.0,
-     "data_available": true,
-     "consec_before": 0,
-     "stage": "主升",
-     "consecutive_up_days": 0,
-     "max_gain_pct": 0.0,
-     "max_drawdown_pct": 0.0,
-     "t1_gain_pct": 0.0,
-     "t3_gain_pct": 0.0,
-     "t5_gain_pct": 0.0,
-     "t10_gain_pct": 0.0,
-     "last_gain_pct": 0.0,
-     "pattern": "普通",
-     "note": "连涨前0天 回撤0.0%",
-     "daily_returns": [
-      {
-       "T": "T+1",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+2",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+3",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+4",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+5",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+6",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+7",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+8",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+9",
-       "date": "",
-       "gain": null
-      },
-      {
-       "T": "T+10",
-       "date": "",
-       "gain": null
-      }
-     ],
-     "entry_price": 13.09
     }
    ]
   }

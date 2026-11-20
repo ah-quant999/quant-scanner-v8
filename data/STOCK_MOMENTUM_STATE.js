@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-20 15:50",
- "generated": "2026-11-20 15:50",
+ "update_time": "2026-11-20 15:55",
+ "generated": "2026-11-20 15:55",
  "meta": {
-  "generated": "2026-11-20 15:50",
+  "generated": "2026-11-20 15:55",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12356,13 +12356,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "002724",
-      "name": "海洋王",
-      "change_pct": 3.037,
-      "price": 8.82,
-      "category": "突破"
-     },
-     {
       "code": "603386",
       "name": "骏亚科技",
       "change_pct": 10.03,
@@ -12372,8 +12365,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002620",
       "name": "*ST瑞和",
-      "change_pct": 5.985,
-      "price": 5.49,
+      "change_pct": 7.915,
+      "price": 5.59,
       "category": "突破"
      },
      {
@@ -12381,6 +12374,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金新农",
       "change_pct": 9.942,
       "price": 3.76,
+      "category": "突破"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.014,
+      "price": 15.82,
       "category": "突破"
      }
     ],
@@ -12390,13 +12390,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "龙版传媒",
       "change_pct": 9.986,
       "price": 16.19,
-      "category": "加速"
-     },
-     {
-      "code": "002724",
-      "name": "海洋王",
-      "change_pct": 3.037,
-      "price": 8.82,
       "category": "加速"
      }
     ],
@@ -12409,13 +12402,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "002724",
-      "name": "海洋王",
-      "change_pct": 3.037,
-      "price": 8.82,
-      "category": "短线选股"
-     },
-     {
       "code": "603386",
       "name": "骏亚科技",
       "change_pct": 10.03,
@@ -12425,8 +12411,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002620",
       "name": "*ST瑞和",
-      "change_pct": 5.985,
-      "price": 5.49,
+      "change_pct": 7.915,
+      "price": 5.59,
       "category": "短线选股"
      },
      {
@@ -12434,6 +12420,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金新农",
       "change_pct": 9.942,
       "price": 3.76,
+      "category": "短线选股"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.014,
+      "price": 15.82,
       "category": "短线选股"
      }
     ],
@@ -12448,8 +12441,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002620",
       "name": "*ST瑞和",
-      "change_pct": 5.985,
-      "price": 5.49,
+      "change_pct": 7.915,
+      "price": 5.59,
       "category": "强势股"
      },
      {
@@ -12457,6 +12450,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金新农",
       "change_pct": 9.942,
       "price": 3.76,
+      "category": "强势股"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 10.014,
+      "price": 15.82,
       "category": "强势股"
      }
     ]
