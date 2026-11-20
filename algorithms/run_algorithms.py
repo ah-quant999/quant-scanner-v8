@@ -384,6 +384,14 @@ ORDER = [
     #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
     "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
     "track_resonance.py",   # 🆕 2026-11-10 主人令「科学修复」：与 STAGES["E"] 末步成对补挂（否则 assert _STAGE_UNION==set(ORDER) 崩链）
+    # 🛡 2026-11-21 主人令「哪些卡没更新·一劳永逸修复」：以下三个生成器此前从未挂链
+    #   （10-26 手工跑过一次后 data/*.js 被 bot 重建清掉，线上 404，前端只能内联冻结快照保活
+    #   → RISK_GUARD 停 10-26 且输入是假曲线/STRATEGY_WALKFORWARD 停 10-26/FINAL_RECOMMEND_REPLAY 停 11-16）。
+    #   现正式挂 E 批链尾（输入 raw_data/history 与 data/PORTFOLIO.js 在 E 批时均已就绪）。
+    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "gen_strategy_walkforward.py",    # → data/STRATEGY_WALKFORWARD.js（策略级样本外稳定性，读 final_recommend 历史快照）
+    "gen_final_recommend_replay.py",  # → data/FINAL_RECOMMEND_REPLAY.js（最终推荐回放，读历史快照）
+    "risk_guard.py",                  # → data/RISK_GUARD.js（真实回撤闸：PORTFOLIO total_assets 逐日真实累积，假曲线已根除）
     ]
 
 
@@ -508,6 +516,11 @@ STAGES = {
         # 🆕 2026-10-19 主人令「最终推荐回测日更」：与 ORDER 成对补挂（gen_final_recommend_backtest.py）。
         "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
         "track_resonance.py",   # 🆕 2026-11-10 主人令「科学修复」：最强共振跟踪接入主链 E 批；update_v8 随后自动重建 data/RESONANCE_TRACK.js
+        # 🛡 2026-11-21 主人令「哪些卡没更新·一劳永逸修复」（与 ORDER 成对）：策略级三件套挂链尾，
+        #   根治「10-26 手工跑一次→bot 重建清掉→线上404→前端内联冻结」的卡死链。
+        "gen_strategy_walkforward.py",    # → data/STRATEGY_WALKFORWARD.js（读 final_recommend 历史快照，纯本地计算）
+        "gen_final_recommend_replay.py",  # → data/FINAL_RECOMMEND_REPLAY.js（最终推荐回放）
+        "risk_guard.py",                  # → data/RISK_GUARD.js（真实回撤闸：PORTFOLIO total_assets 逐日累积；旧假曲线已根除）
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 前置到 B 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）
