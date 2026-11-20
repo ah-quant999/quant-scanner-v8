@@ -1,1 +1,1 @@
-window.LIMIT_UP_BROKEN = {"update_time":"2026-11-20 09:18:27","date":"2026-11-20","total":0,"note":"东方财富炸板股池（真实）：盘中触及涨停但收盘未封住","stocks":[],"republish_time":"2026-11-20 09:20:59"};
+window.LIMIT_UP_BROKEN = {"update_time":"2026-11-20 09:43:08","date":"2026-11-20","total":1,"note":"东方财富炸板股池（真实）：盘中触及涨停但收盘未封住","stocks":[{"code":"300812","name":"易天股份","chg":19.2,"price":17.88,"limit_price":18.0,"amount":2.23,"turnover":7.46,"first_seal":"094242","broken_times":1,"zt_stat":"0/0","amplitude":22.6,"industry":"消费电子"}],"republish_time":"2026-11-20 09:58:04"};
