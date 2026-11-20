@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-11-20 06:09:35",
-  "run_start": "2026-11-20 05:42:49",
-  "ok": 12,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-11-20 08:16:55",
+  "run_start": "2026-11-20 06:30:49",
+  "ok": 18,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "backtest_expectancy.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
   "skipped_by_time_gate": []
 }
