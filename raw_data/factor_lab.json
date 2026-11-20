@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-21 00:58:24",
+  "update_time": "2026-11-21 04:20:03",
   "data_date": "2026-11-20",
   "meta": {
     "data_date": "2026-11-20",
@@ -378,18 +378,6 @@
     ],
     "bottom": [
       {
-        "code": "sz.002148",
-        "name": "北纬科技",
-        "close": 10.06,
-        "close_date": "2026-11-20",
-        "liquid": true,
-        "abn": 4.828,
-        "factor_at": -4.8281,
-        "roe_ttm": null,
-        "size_proxy": 4777244467.7,
-        "asof_ym": "2026-11"
-      },
-      {
         "code": "sz.001219",
         "name": "青岛食品",
         "close": 25.12,
@@ -399,6 +387,18 @@
         "factor_at": -4.0551,
         "roe_ttm": null,
         "size_proxy": 1433102794.9,
+        "asof_ym": "2026-11"
+      },
+      {
+        "code": "sz.002148",
+        "name": "北纬科技",
+        "close": 9.3,
+        "close_date": "2026-11-19",
+        "liquid": true,
+        "abn": 3.974,
+        "factor_at": -3.9739,
+        "roe_ttm": null,
+        "size_proxy": 4650054986.2,
         "asof_ym": "2026-11"
       },
       {
@@ -414,42 +414,6 @@
         "asof_ym": "2026-11"
       },
       {
-        "code": "sz.002425",
-        "name": "凯撒文化",
-        "close": 3.39,
-        "close_date": "2026-11-20",
-        "liquid": true,
-        "abn": 3.746,
-        "factor_at": -3.746,
-        "roe_ttm": null,
-        "size_proxy": 2512225380.1,
-        "asof_ym": "2026-11"
-      },
-      {
-        "code": "sz.300949",
-        "name": "奥雅股份",
-        "close": 50.56,
-        "close_date": "2026-11-20",
-        "liquid": true,
-        "abn": 3.719,
-        "factor_at": -3.7193,
-        "roe_ttm": null,
-        "size_proxy": 1625455216.2,
-        "asof_ym": "2026-11"
-      },
-      {
-        "code": "sz.301209",
-        "name": "联合化学",
-        "close": 46.26,
-        "close_date": "2026-11-20",
-        "liquid": true,
-        "abn": 3.636,
-        "factor_at": -3.6361,
-        "roe_ttm": null,
-        "size_proxy": 3468552429.6,
-        "asof_ym": "2026-11"
-      },
-      {
         "code": "sh.600715",
         "name": "文投控股",
         "close": 2.85,
@@ -462,15 +426,27 @@
         "asof_ym": "2026-11"
       },
       {
-        "code": "sz.001318",
-        "name": "阳光乳业",
-        "close": 11.08,
-        "close_date": "2026-11-20",
+        "code": "sz.300949",
+        "name": "奥雅股份",
+        "close": 53.81,
+        "close_date": "2026-11-19",
         "liquid": true,
-        "abn": 3.418,
-        "factor_at": -3.4179,
+        "abn": 3.519,
+        "factor_at": -3.5188,
         "roe_ttm": null,
-        "size_proxy": 2928137638.1,
+        "size_proxy": 1603664343.3,
+        "asof_ym": "2026-11"
+      },
+      {
+        "code": "sz.002425",
+        "name": "凯撒文化",
+        "close": 3.77,
+        "close_date": "2026-11-19",
+        "liquid": true,
+        "abn": 3.363,
+        "factor_at": -3.363,
+        "roe_ttm": null,
+        "size_proxy": 2463810265.2,
         "asof_ym": "2026-11"
       },
       {
@@ -486,16 +462,40 @@
         "asof_ym": "2026-11"
       },
       {
-        "code": "sz.002696",
-        "name": "百洋股份",
-        "close": 6.67,
-        "close_date": "2026-11-20",
+        "code": "sz.001318",
+        "name": "阳光乳业",
+        "close": 11.47,
+        "close_date": "2026-11-19",
         "liquid": true,
-        "abn": 2.923,
-        "factor_at": -2.9227,
+        "abn": 3.259,
+        "factor_at": -3.2592,
         "roe_ttm": null,
-        "size_proxy": 3098420780.7,
+        "size_proxy": 2911815680.1,
         "asof_ym": "2026-11"
+      },
+      {
+        "code": "sz.301209",
+        "name": "联合化学",
+        "close": 57.82,
+        "close_date": "2026-11-19",
+        "liquid": true,
+        "abn": 3.219,
+        "factor_at": -3.2189,
+        "roe_ttm": null,
+        "size_proxy": 3417434872.6,
+        "asof_ym": "2026-11"
+      },
+      {
+        "code": "sh.601949",
+        "name": "中国出版",
+        "close": 6.26,
+        "close_date": "2026-09-11",
+        "liquid": true,
+        "abn": 2.895,
+        "factor_at": -2.8947,
+        "roe_ttm": null,
+        "size_proxy": 1898350698.5,
+        "asof_ym": "2026-09"
       }
     ]
   },
@@ -1134,7 +1134,7 @@
     ]
   },
   "yield_rank": {
-    "update_time": "2026-11-21 00:58:24",
+    "update_time": "2026-11-21 04:20:03",
     "meta": {
       "cost_pct_roundtrip": 0.3,
       "entry": "信号日次一交易日开盘",
@@ -1354,6 +1354,27 @@
         "n_t30": 35,
         "yield_t60": 0.875,
         "win_t60": 42.9,
+        "n_t60": 35
+      },
+      {
+        "code": "sz.300706",
+        "name": "阿石创",
+        "n_klines": 96,
+        "available": true,
+        "yield_t5": 13.531,
+        "win_t5": 80.0,
+        "n_t5": 35,
+        "yield_t10": 22.957,
+        "win_t10": 85.7,
+        "n_t10": 35,
+        "yield_t20": 36.247,
+        "win_t20": 97.1,
+        "n_t20": 35,
+        "yield_t30": 39.562,
+        "win_t30": 85.7,
+        "n_t30": 35,
+        "yield_t60": 4.99,
+        "win_t60": 71.4,
         "n_t60": 35
       },
       {
@@ -1609,45 +1630,24 @@
         "n_t60": 30
       },
       {
-        "code": "sz.002931",
-        "name": "锋龙股份",
-        "n_klines": 801,
-        "available": true,
-        "yield_t5": 4.156,
-        "win_t5": 47.6,
-        "n_t5": 189,
-        "yield_t10": 10.627,
-        "win_t10": 46.0,
-        "n_t10": 189,
-        "yield_t20": 28.206,
-        "win_t20": 47.1,
-        "n_t20": 189,
-        "yield_t30": 42.842,
-        "win_t30": 41.8,
-        "n_t30": 189,
-        "yield_t60": 68.557,
-        "win_t60": 34.9,
-        "n_t60": 189
-      },
-      {
         "code": "sz.300489",
         "name": "光智科技",
-        "n_klines": 801,
+        "n_klines": 250,
         "available": true,
-        "yield_t5": 6.552,
-        "win_t5": 58.7,
+        "yield_t5": 6.752,
+        "win_t5": 58.2,
         "n_t5": 189,
-        "yield_t10": 13.634,
-        "win_t10": 60.3,
+        "yield_t10": 13.632,
+        "win_t10": 59.8,
         "n_t10": 189,
-        "yield_t20": 28.024,
+        "yield_t20": 28.21,
         "win_t20": 68.3,
         "n_t20": 189,
-        "yield_t30": 42.734,
+        "yield_t30": 42.603,
         "win_t30": 72.5,
         "n_t30": 189,
-        "yield_t60": 102.755,
-        "win_t60": 80.4,
+        "yield_t60": 103.444,
+        "win_t60": 81.5,
         "n_t60": 189
       },
       {
