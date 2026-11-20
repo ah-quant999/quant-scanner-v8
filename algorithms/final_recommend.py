@@ -742,6 +742,43 @@ def main():
     print(f"[regime] 市场状态={_regime_name or '未知'}({_regime_date}) ok={_regime_ok} "
           f"开仓={_open_regime} 推票数 {TOP_N}→{_effective_top_n}")
 
+    # ── 🔴 2026-11-21 主人令·指数趋势门控（防守模式减半推票）──
+    # 回测分段证据（2026-11-21 只读核验，真实日K，上证 000001）：收盘<MA20 且 MA20 向下时
+    #   上涨段(6-09~9-15)误触发39% / 下跌段(9-18~10-19)触发75% / 震荡段(10-20~11-19)触发96%；
+    #   后两段因子榜Top3 T+5 -5.04%~-7.79%、T+20 -23%~-27.7%（胜率最低1.4%）⇒
+    #   触发期推票减半（复用 10-14 减半公式 TOP_N→max(2,TOP_N-1)）并写入产物供前端展示。
+    # 数据：raw_data/kline_cache/000001.json（与 FACTOR_LAB_BACKTEST 同款依赖）；
+    #   缺失/异常 ⇒ 不触发（保守放行），绝不阻断主流程。
+    # 回退：V8_INDEX_TREND_GATE=0。
+    _index_gate = {"triggered": False, "close": None, "ma20": None, "note": ""}
+    if os.environ.get("V8_INDEX_TREND_GATE", "1").strip() != "0":
+        try:
+            _sh_path = os.path.join(ROOT, "raw_data", "kline_cache", "000001.json")
+            with open(_sh_path, encoding="utf-8") as _f:
+                _sh_rows = json.load(_f)
+            _sh_close = [safe_float(r.get("close")) for r in _sh_rows if safe_float(r.get("close")) > 0]
+            if len(_sh_close) >= 21:
+                _ig_c = _sh_close[-1]
+                _ig_ma = sum(_sh_close[-20:]) / 20.0
+                _ig_ma_prev = sum(_sh_close[-21:-1]) / 20.0
+                _index_gate["close"] = round(_ig_c, 2)
+                _index_gate["ma20"] = round(_ig_ma, 2)
+                if _ig_c < _ig_ma and _ig_ma < _ig_ma_prev:
+                    _index_gate["triggered"] = True
+                    _index_gate["note"] = ("上证收盘<MA20且MA20向下 → 防守模式：推票减半"
+                                           "（2026-11-21 主人令·该状态历史回测推票 T+20 -23%~-27.7%）")
+                    if _effective_top_n > max(2, TOP_N - 1):
+                        _effective_top_n = max(2, TOP_N - 1)
+                        _action_label = "观察（指数趋势防守：该状态历史回测推票大幅负期望）"
+                else:
+                    _index_gate["note"] = "指数趋势正常"
+            else:
+                _index_gate["note"] = f"上证K线不足21根（{len(_sh_close)}），保守放行"
+        except Exception as _ig_e:
+            _index_gate["note"] = f"门控数据不可用（保守放行）: {_ig_e}"
+        print(f"[index-gate] 上证趋势门控: triggered={_index_gate['triggered']} "
+              f"close={_index_gate['close']} ma20={_index_gate['ma20']} 推票数→{_effective_top_n}")
+
     # ═══════════════════════════════════════════════════════════════════════════
     # 🔴🔴 2026-10-14 主人令「只允许 excess5>0 的源入榜」·真实流 edge 闸门
     # 🔴 2026-10-18 主人令「完全下架」：本闸门随四量终极整体下架移除。
@@ -1185,9 +1222,12 @@ def main():
                 r["signals"].append("强势跟踪·当日新入选")
                 r["reasons"].append(f"强势跟踪（短线情绪选股）当日新入选·强度分 {_sc:g}")
                 r["enter_dates"].append(_ima_dd)
+                # 🔴 2026-11-21 主人令：高手短线正edge源纳入Top3竞位（覆盖 2026-10-20 不竞位口径）。
+                #   标记后由下方竞位排序段按「同量纲映射分」参与统一排序；V8_IMA_COMPETE=0 回退。
+                r["_ima_new_compete"] = True
                 _ima_in += 1
             print(f"[ima-intake] 强势跟踪入池：当日池 {len(_ima_norm)} 只中"
-                  f"新入选 {len(_ima_new)} 只 ⇒ 入池 {_ima_in} 只（入池展示·不竞位 Top3，2026-10-20 主人令）")
+                  f"新入选 {len(_ima_new)} 只 ⇒ 入池 {_ima_in} 只（当日新入选入池·按 2026-11-21 主人令参与 Top3 竞位）")
         else:
             print("  [info] V8_IMA_INTAKE=0：强势跟踪入池已手动关闭")
 
@@ -1465,13 +1505,52 @@ def main():
             _e["mix_pct"] = 0.0
     # 排序（2026-10-20 主人令「同序」）：因子榜原序优先（同序），未命中票按
     #   mix_pct 降序仅定候选池展示序、永不进 Top3 竞位。
-    scored.sort(key=lambda x: (
-        0 if x.get("_aligned_topfactor") else 1,
-        _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
-        -safe_float(x.get("mix_pct") or 0),
-    ))
-    print("  [唯一口径] final_score 取自因子榜 total_score，命中 %d/%d 只；"
-          "Top 选取仅认因子榜原序（2026-10-20 主人令：口径和评分都一致）" % (_al_hit, len(scored)))
+    # ── 🔴🔴 2026-11-21 主人令「高手短线正edge源纳入Top3竞位」（覆盖 2026-10-20 不竞位口径）──
+    # 回测证据（2026-11-21 只读join回测：扣0.3%双边成本、真实日K、自校验与官方 IMA 回测
+    #   逐周期偏差≤0.4pp 胜率/≤0.39pp 收益，186/188 信号复现）：
+    #   · 高手全量信号 T+5 +2.11%/T+20 +12.45%（全站唯一强正edge链路）
+    #   · 因子榜Top3现状 T+5 -2.79%/T+20 -10.92%（分段核验：任何 regime 均负 edge）
+    #   · 纳入竞位(高手优先) vs 现状 配对差：T+1 +0.19pp → T+20 +2.46pp/笔，方向全周期一致；
+    #     组合实际变化日 6/9 为正。
+    #   · 分regime：高手上涨段 T+5 +4.46%(胜率61.3%) / 下跌段 T+5 -5.04%(22.2%) ⇒ regime敏感，
+    #     防守由「指数趋势门控 index_trend_gate」承担（本排序不复写 regime 逻辑）。
+    # 评分口径（延续 2026-10-20 主人令「口径和评分都一致」的本意=同量纲可比，杜绝 78.0 插队）：
+    #   高手票 final_score = 当日因子榜分区间 [_fv_lo,_fv_hi] 线性映射（池内 min-max 归一化，
+    #   头部=_fv_hi 与因子榜头部同分同量纲）；绝不写 0-100 原始强度分。
+    # 同分 tie-break：高手票优先（回测 B2 口径）。回退：V8_IMA_COMPETE=0 ⇒ 恢复 10-20 纯因子榜序。
+    V8_IMA_COMPETE = os.environ.get("V8_IMA_COMPETE", "1").strip() != "0"
+    if V8_IMA_COMPETE and _fv_raw:
+        _ima_mapped = 0
+        for _e in scored:
+            if _e.get("_aligned_topfactor"):
+                continue                      # 已在因子榜：final_score=total_score，不覆写
+            if "强势跟踪" not in (_e.get("sources") or []):
+                continue                      # 仅当日新入选竞位；老票延续命中仅 tag 不竞位（10-14 分层不变）
+            _raw = safe_float((_e.get("source_scores") or {}).get("强势跟踪"))
+            _mapped = (_fv_lo + (_raw - _ima_lo) / (_ima_hi - _ima_lo) * (_fv_hi - _fv_lo)
+                       if _ima_hi > _ima_lo else _fv_hi)
+            _e["final_score"] = round(_mapped, 2)
+            _e["buy_score"] = _e["final_score"]
+            _e["reasons"].append("高手短线新入选·纳入Top3竞位（2026-11-21 主人令，映射分与因子榜同量纲）")
+            _ima_mapped += 1
+        print(f"[ima-compete] 高手短线竞位：{_ima_mapped} 只按同量纲映射分参与统一排序（V8_IMA_COMPETE=1，2026-11-21 主人令）")
+    if V8_IMA_COMPETE:
+        scored.sort(key=lambda x: (
+            -safe_float(x.get("final_score") or 0),
+            0 if (not x.get("_aligned_topfactor") and "强势跟踪" in (x.get("sources") or [])) else 1,
+            _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
+            -safe_float(x.get("mix_pct") or 0),
+        ))
+        print("  [竞位口径] Top 选取 = 统一 final_score 降序（因子票=因子榜total_score，高手票=同量纲映射分；"
+              "同分高手优先；2026-11-21 主人令）")
+    else:
+        scored.sort(key=lambda x: (
+            0 if x.get("_aligned_topfactor") else 1,
+            _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
+            -safe_float(x.get("mix_pct") or 0),
+        ))
+        print("  [唯一口径] final_score 取自因子榜 total_score，命中 %d/%d 只；"
+              "Top 选取仅认因子榜原序（2026-10-20 主人令：口径和评分都一致；V8_IMA_COMPETE=0 回退态）" % (_al_hit, len(scored)))
 
     # ── Top3 选取（2026-08-11 主人令：公平竞争，谁好谁上）──
     # 2026-09-20 主人令唯一口径 + 2026-10-20 主人令「口径和评分都一致」重申：
@@ -1822,6 +1901,8 @@ def main():
             "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；"
                     "ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）",
         },
+        # 🔴 2026-11-21 主人令·指数趋势门控回显（上证收盘<MA20 且 MA20向下 ⇒ 推票减半防守）
+        "index_trend_gate": _index_gate,
         # 🔴 2026-10-18 主人令「完全下架」：realflow_gate 回显字段随闸门移除。
         #   下架裁决（T+5 -1.68%/胜率 33.71%/n=89）已入 HANDOFF algo-audit-1017，不在产物复述。
         # 🔴🔴 2026-10-14 主人令「符合入选的，凭因子真实排序」：强势跟踪入池回显。
