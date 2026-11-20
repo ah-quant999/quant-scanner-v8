@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-20 08:59",
- "generated": "2026-11-20 08:59",
+ "update_time": "2026-11-20 15:37",
+ "generated": "2026-11-20 15:37",
  "meta": {
-  "generated": "2026-11-20 08:59",
+  "generated": "2026-11-20 15:37",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12351,50 +12351,36 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 3.808,
-      "price": 14.72,
+      "change_pct": 9.986,
+      "price": 16.19,
       "category": "突破"
      },
      {
-      "code": "301391",
-      "name": "卡莱特",
-      "change_pct": 19.974,
-      "price": 55.98,
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 3.037,
+      "price": 8.82,
       "category": "突破"
      },
      {
-      "code": "002514",
-      "name": "*ST宝馨",
-      "change_pct": 7.895,
-      "price": 2.05,
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 10.03,
+      "price": 14.59,
       "category": "突破"
      },
      {
-      "code": "920690",
-      "name": "捷众科技",
-      "change_pct": 7.854,
-      "price": 17.99,
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 5.985,
+      "price": 5.49,
       "category": "突破"
      },
      {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.45,
-      "price": 8.92,
-      "category": "突破"
-     },
-     {
-      "code": "688981",
-      "name": "中芯国际",
-      "change_pct": 6.212,
-      "price": 122.25,
-      "category": "突破"
-     },
-     {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.502,
-      "price": 26.6,
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.942,
+      "price": 3.76,
       "category": "突破"
      }
     ],
@@ -12402,29 +12388,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 3.808,
-      "price": 14.72,
+      "change_pct": 9.986,
+      "price": 16.19,
       "category": "加速"
      },
      {
-      "code": "301391",
-      "name": "卡莱特",
-      "change_pct": 19.974,
-      "price": 55.98,
-      "category": "加速"
-     },
-     {
-      "code": "002514",
-      "name": "*ST宝馨",
-      "change_pct": 7.895,
-      "price": 2.05,
-      "category": "加速"
-     },
-     {
-      "code": "920690",
-      "name": "捷众科技",
-      "change_pct": 7.854,
-      "price": 17.99,
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 3.037,
+      "price": 8.82,
       "category": "加速"
      }
     ],
@@ -12432,73 +12404,59 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 3.808,
-      "price": 14.72,
+      "change_pct": 9.986,
+      "price": 16.19,
       "category": "短线选股"
      },
      {
-      "code": "301391",
-      "name": "卡莱特",
-      "change_pct": 19.974,
-      "price": 55.98,
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 3.037,
+      "price": 8.82,
       "category": "短线选股"
      },
      {
-      "code": "002514",
-      "name": "*ST宝馨",
-      "change_pct": 7.895,
-      "price": 2.05,
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 10.03,
+      "price": 14.59,
       "category": "短线选股"
      },
      {
-      "code": "920690",
-      "name": "捷众科技",
-      "change_pct": 7.854,
-      "price": 17.99,
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 5.985,
+      "price": 5.49,
       "category": "短线选股"
      },
      {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.45,
-      "price": 8.92,
-      "category": "短线选股"
-     },
-     {
-      "code": "688981",
-      "name": "中芯国际",
-      "change_pct": 6.212,
-      "price": 122.25,
-      "category": "短线选股"
-     },
-     {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.502,
-      "price": 26.6,
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.942,
+      "price": 3.76,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "600983",
-      "name": "惠而浦",
-      "change_pct": 4.45,
-      "price": 8.92,
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 10.03,
+      "price": 14.59,
       "category": "强势股"
      },
      {
-      "code": "688981",
-      "name": "中芯国际",
-      "change_pct": 6.212,
-      "price": 122.25,
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 5.985,
+      "price": 5.49,
       "category": "强势股"
      },
      {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.502,
-      "price": 26.6,
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.942,
+      "price": 3.76,
       "category": "强势股"
      }
     ]
