@@ -1,11 +1,22 @@
 {
   "version": "2.0",
-  "updated": "2026-11-20 19:26:04",
+  "updated": "2026-11-20 20:32:18",
   "sources": [
     "guanlan"
   ],
   "total": 26,
   "stocks": [
+    {
+      "name": "机器人",
+      "code": "300024",
+      "full_code": "sz300024",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
     {
       "name": "阿里巴巴",
       "code": "09988",
@@ -87,17 +98,6 @@
       "name": "三花智控",
       "code": "002050",
       "full_code": "sz002050",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "摩根大通",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "机器人",
-      "code": "300024",
-      "full_code": "sz300024",
       "exchange": "SZ",
       "market": "深市",
       "institution": "摩根大通",
