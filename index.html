@@ -416,6 +416,13 @@ window.V8_CAL = {weeks:[],legend:[]};
   window._parseAsCST = function(ts){
     if(!ts) return null;
     var s = String(ts).trim();
+    /* 🛡 2026-11-20 主人令「未来预测更新于无今日/昨日」一劳永逸根治：
+       历史/部分生成器写的是 "YYYY-MM-DD HH:MM CST"（无秒 + 裸 CST 后缀），原正则要求秒、
+       裸后缀又不命中时区分支 ⇒ new Date 解析失败 ⇒ _fmtAshareRel 原样输出整串，
+       卡头胶囊就丢了「今日/昨日」相对语义。此处在解析前统一剥离裸时区文字并补秒，
+       一处改全站所有「更新于」受益，不动数据真值、不动语义。 */
+    s = s.replace(/\s*(CST|GMT\+8|UTC\+8|北京时间)\s*$/i, '').trim();
+    if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(s)) s += ':00';
     // ISO 8601 带 Z / +00:00 / -00:00 视为 UTC，转北京时间（+8h）
     var m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/);
     if(m){
