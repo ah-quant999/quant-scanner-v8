@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-21 00:24",
+  "update_time": "2026-11-21 01:59",
   "data_date": "2026-11-20",
   "data_date_source": "kline",
   "fetch_date": "2026-11-21",
@@ -1149,14 +1149,14 @@
       "pct_60d": -12.91,
       "pct_90d": -7.38,
       "pct_180d": -26.0,
-      "pct_52w": null,
+      "pct_52w": -13.54,
       "relative_5d": -9.21,
       "relative_20d": -11.98,
       "relative_30d": -16.68,
       "relative_60d": -12.91,
       "relative_90d": -7.38,
       "relative_180d": -26.0,
-      "relative_52w": null
+      "relative_52w": -13.54
     },
     {
       "name": "通信服务",
