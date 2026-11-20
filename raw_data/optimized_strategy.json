@@ -11,7 +11,7 @@
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 31937,
+    "total_signals": 31936,
     "periods": {
       "T+5": {
         "win_rate_pct": 49.1,
@@ -33,7 +33,7 @@
       "win_rate_pct": 49.1,
       "avg_return_pct": -0.02
     },
-    "total_signals": 94229
+    "total_signals": 94102
   },
   "config": {
     "enabled": true,
