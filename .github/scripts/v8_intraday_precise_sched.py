@@ -44,6 +44,13 @@ TARGETS = {
     "v8_cred_expiry_watch.yml": {
         "slots": ["09:10"],
         "fresh_window": ("09:05", "09:40"), "fresh_thresh": 40},
+    # 2026-11-20 10:10 小九：🩺 健康巡检 patrol 本身也中 GitHub schedule 日间失灵（实测
+    #   今日仅 09:10 一档，09:38/10:08 零投递 → 看板状态灯日间不刷新，正是主人「很晚才刷
+    #   出来」观感的看板侧根因）。收编进调度器 30 分逐档 dispatch（patrol 自带去抖锁，
+    #   重复 dispatch 安全；fresh 兜底防整段漏档）。
+    "v8_health_patrol.yml": {
+        "slots": [f"{h:02d}:{m}" for h in range(9, 22) for m in ("08", "38")],
+        "fresh_window": ("09:05", "21:40"), "fresh_thresh": 40},
 }
 ENDS = {"morning": "14:45", "afternoon": "16:38"}
 RELAY_EVERY_MIN = 20   # 🛡 11-19 实测有外部黑手在实例跑 ~28min 时取消 run（#1 实证）——
