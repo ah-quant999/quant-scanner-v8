@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-20 23:23:24",
- "window": "2026-06-10 ~ 2026-11-18",
+ "generated": "2026-11-21 02:00:07",
+ "window": "2026-06-10 ~ 2026-11-20",
  "criteria": "龙虎榜: inst_net>0 且 yz_net>0 且 (inst+yz)≥8000万; 转债剔除",
  "entry": "T+1 开盘买入, 单边成本0.15%, 净口径; 未成熟期限标 pending",
  "benchmark": "880003 平均股价(等权全A)·同成本口径",
- "n_signals": 402,
+ "n_signals": 404,
  "n_tracked": 370,
  "per_horizon": {
   "T+1": {
@@ -8832,6 +8832,28 @@
    "inst_yi": 1.188,
    "yz_yi": 0.124,
    "sum_yi": 1.312,
+   "entry": null,
+   "status": "pending_t1"
+  },
+  {
+   "date": "2026-11-20",
+   "code": "000823",
+   "name": "超声电子",
+   "pct": 9.982,
+   "inst_yi": 0.433,
+   "yz_yi": 0.707,
+   "sum_yi": 1.139,
+   "entry": null,
+   "status": "pending_t1"
+  },
+  {
+   "date": "2026-11-20",
+   "code": "000889",
+   "name": "中嘉博创",
+   "pct": -1.397,
+   "inst_yi": 0.987,
+   "yz_yi": 0.119,
+   "sum_yi": 1.106,
    "entry": null,
    "status": "pending_t1"
   }
