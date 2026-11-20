@@ -142,7 +142,13 @@ CARD_DEFS = [
     #   · BOND_FUTURES 走专链 v8_bond_futures.yml（cn，盘中30分），heal_cat=futures 同型
     #   · SECTOR_TECH_JUDG 走专链 v8_sector_tech.yml（cn，盘后1次），heal_cat=algo_run 日频
     {"id": "BOND_FUTURES", "name": "国债期货利率罗盘", "page": "实时数据", "freq": "盘中每30分", "max_age": 45, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": False, "heal_cat": "futures", "producer": "v8/gen_bond_futures.py"},
-    {"id": "SECTOR_TECH_JUDG", "name": "板块技术研判", "page": "盘后数据", "freq": "盘后1次", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": True, "heal_cat": "algo_run", "producer": "v8/gen_sector_tech_judg.py"},
+    {"id": "SECTOR_TECH_JUDG", "name": "板块技术研判", "page": "暂未上架", "freq": "盘后1次", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": True, "heal_cat": "algo_run", "producer": "v8/gen_sector_tech_judg.py"},  # 🚚 2026-11-20 审计订正：11-18 卡已迁 unlistedPanel（暂未上架·主升/启动上方），page 从「盘后数据」随卡迁正，与看板组序/任务看板三方对齐
+    # ⚖️ 2026-11-20 审计补登记（小九·五层对齐审计）：EQBOND_ATTRACTION（股债性价比·温度计，11-19 新卡）
+    #   此前 CARD_DEFS 完全漏登记 ⇒ 只落 check_all_data_files 通用兜底（all_* 灯挂「全量数据」组），
+    #   看板「盘后数据」页组无灯 → 真故障须翻兜底组才可见。按 10-27/11-08 补登先例补齐，
+    #   producer=v8/gen_eqbond_attraction.py（akshare 真数据重算），档位=交易日 19:20 云端专链
+    #   v8_eqbond_attraction.yml + v8_cn_fetch_cloud 主抓链 workflow_run 兜底（GHA schedule 漂移防护）。
+    {"id": "EQBOND_ATTRACTION", "name": "股债性价比·温度计", "page": "盘后数据", "freq": "交易日19:20(云端专链v8_eqbond_attraction)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "producer": "v8/gen_eqbond_attraction.py"},
     # 盘后数据
     # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
     # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。
