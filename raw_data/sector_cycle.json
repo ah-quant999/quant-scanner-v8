@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-20 05:02:33",
+  "update_time": "2026-11-20 09:42:56",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "11/20"
   ],
   "columns": 30,
-  "cycle_count": 13,
+  "cycle_count": 14,
   "cycles": [
     {
       "sector": "AI算力",
@@ -24,7 +24,7 @@
       "hot_days": 25,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 201,
+      "total": 199,
       "ongoing": true
     },
     {
@@ -37,20 +37,20 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1688,
+      "total": 1658,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "10/12",
-      "end": "11/20",
+      "end": "11/19",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 26,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 25,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 219,
+      "total": 214,
       "ongoing": true
     },
     {
@@ -69,14 +69,14 @@
     {
       "sector": "机器人",
       "start": "10/12",
-      "end": "11/20",
+      "end": "11/19",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 28,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 481,
+      "total": 477,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 30,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 283,
+      "total": 274,
       "ongoing": true
     },
     {
@@ -108,14 +108,14 @@
     {
       "sector": "白酒消费",
       "start": "10/12",
-      "end": "11/20",
+      "end": "11/19",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 28,
       "peak": 17,
       "peak_date": "11/02",
-      "total": 194,
+      "total": 187,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 18,
       "peak": 18,
       "peak_date": "11/17",
-      "total": 126,
+      "total": 118,
       "ongoing": true
     },
     {
@@ -182,6 +182,19 @@
       "peak_date": "11/12",
       "total": 20,
       "ongoing": false
+    },
+    {
+      "sector": "半导体",
+      "start": "11/20",
+      "end": "11/20",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "11/20",
+      "total": 3,
+      "ongoing": true
     }
   ]
 }
