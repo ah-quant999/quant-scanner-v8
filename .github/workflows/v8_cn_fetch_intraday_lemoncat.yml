@@ -1,5 +1,15 @@
 # 九宝量化 v8.0 — 盘中准点档调度器（14 档 · 跑 GitHub ubuntu-latest）
 #
+# 🔴🔴 2026-11-20 10:45 小九 单链化重构（主人令「10点20了主站还在9点45」·连续多日盘中延迟根因）：
+#   【实测】当日云端主力 9 档 dispatch 全部 cancelled（同组新 dispatch 顶掉旧 run），云端盘中
+#   从未真正执行；数据全靠 12min 超时后的 selfhosted 兜底续命 → 每档延迟 15-25 分钟。
+#   【修法】① 守卫在途探测扩为 selfhosted+云端双链（原只查云端，selfhosted 在跑时误判无在途
+#   → 派云端 → 顶掉正在写 main 的 selfhosted，10:14 档 selfhosted 即被 10:22 档顶杀实证）；
+#   ② cn runner 在线（单位机 7:45-17:45 覆盖全部盘中档）时直派 selfhosted 为唯一主力，
+#   离线才回落云端；③ 轮询超时不再派兜底（老「超时→兜底→顶掉在跑」路径删除），长跑交给
+#   守卫避让；④ 每档顺手派 v8_intraday_snapshot（快照链 schedule 同样日间失灵，
+#   SECTOR_FUND_FLOW_INTRADAY 卡 11-19 14:49 实证）。
+#
 # 🔴 2026-09-10 CN runner2号机更正：本调度器**已不再跑在 [self-hosted, cn]**，改 GitHub 托管 ubuntu-latest。
 #   根因：共享标签 [self-hosted, cn] 会让 14 档落到家里机（违反双机分时），且机器忙/离线时档位
 #   排队积压、错时执行（实测 09-10 的 15:29 / 16:23 / 17:22 / 18:01 / 19:03 / 19:29 / 19:45 / 20:04
@@ -121,15 +131,22 @@ jobs:
           if [ "$GO" = "true" ]; then
             # 🛡 零解析依赖（2026-09-10 最终版）：直接按状态向 GitHub 查，服务端过滤；
             #    取值只用 grep/cut（POSIX 必带），不用 python/jq —— 解析器一旦失败就会静默放行。
+            # 🔴 2026-11-20 10:45 小九（主人令「10点20了主站还在9点45」根因修复·守卫补盲）：
+            #    在途探测原「只查 v8_cn_fetch_cloud」——今日实测 10:14 selfhosted 兜底正在跑
+            #    （数据正在产出），10:22 档守卫没查 selfhosted → 误判无在途 → 派云端 → 同组
+            #    把正在写 main 的 selfhosted 顶掉（当日云端 9 连杀 + selfhosted 被顶 1 次，
+            #    盘中数据全靠 12min 超时兜底续命）。扩为双链在途探测，任一在途即让位。
             INFLIGHT_TS=""; INFLIGHT_ID=""; INFLIGHT_ST=""
-            for ST in in_progress queued pending; do
-              curl -sS -o /tmp/q.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_cn_fetch_cloud.yml/runs?status=$ST&per_page=1" 2>/dev/null
-              T=$(grep -o '"created_at":"[^"]*"' /tmp/q.json 2>/dev/null | head -1 | cut -d'"' -f4)
-              if [ -n "$T" ]; then
-                INFLIGHT_TS="$T"; INFLIGHT_ST="$ST"
-                INFLIGHT_ID=$(grep -o '"id":[0-9]*' /tmp/q.json 2>/dev/null | head -1 | cut -d: -f2)
-                break
-              fi
+            for WFCHK in v8_cn_fetch_cloud_selfhosted.yml v8_cn_fetch_cloud.yml; do
+              for ST in in_progress queued pending; do
+                curl -sS -o /tmp/q.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/$WFCHK/runs?status=$ST&per_page=1" 2>/dev/null
+                T=$(grep -o '"created_at":"[^"]*"' /tmp/q.json 2>/dev/null | head -1 | cut -d'"' -f4)
+                if [ -n "$T" ]; then
+                  INFLIGHT_TS="$T"; INFLIGHT_ST="$ST"
+                  INFLIGHT_ID=$(grep -o '"id":[0-9]*' /tmp/q.json 2>/dev/null | head -1 | cut -d: -f2)
+                  break 2
+                fi
+              done
             done
             if [ -n "$INFLIGHT_TS" ]; then
               AGE=$(( ( $(date -u +%s) - $(date -u -d "$INFLIGHT_TS" +%s) ) / 60 )) 2>/dev/null
@@ -155,9 +172,67 @@ jobs:
             echo "::notice title=盘中档跳过::$WHY"
           fi
 
-      - name: "🚀 dispatch 云端主力 v8_cn_fetch_cloud（category=intraday）"
-        id: dispatch_cloud
+      # 🔴 2026-11-20 10:45 小九（单链化根治·结构重排）：runner 在线探测前移到 dispatch 之前
+      #   （原在 check_cloud 之后、fallback 之前——单链化后 dispatch 目标本身取决于探测结果）。
+      - name: "CN runner 在线探测（周末/双机下线时回落云端主力，灭红 run 洪水）"
+        id: check_cn_runner
+        # [甲护栏 2026-11-08 最低风险·纯新增] 派发 cn 兜底前先查 [self-hosted, cn] runner 是否在线。
+        #   根因：周末无 CN runner 在线时，外部自动化/看门狗绕过守卫直派 selfhosted -> 排队层瞬时失败 -> 70 红 run 洪水。
+        #   探测失败默认 online=true（宁可派发也不漏兜底），只有明确查到无在线 cn runner 才跳过。
         if: steps.guard.outputs.go == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+          ONLINE="true"
+          HTTP_CODE=$(curl -sS -o /tmp/cn_runners.json -w "%{http_code}" -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "$REPO/actions/runners?per_page=100")
+          if [ "$HTTP_CODE" = "200" ]; then
+            BOTH=$(jq -r '[.runners[]? | select(.status=="online") | select(([.labels[]?.name] | index("cn") != null and index("self-hosted") != null))] | length' /tmp/cn_runners.json 2>/dev/null)
+            if [ "${BOTH:-0}" = "0" ]; then
+              ONLINE="false"
+            fi
+          fi
+          echo "online=$ONLINE" >> "$GITHUB_OUTPUT"
+          if [ "$ONLINE" = "false" ]; then
+            echo "info: 无 CN 自托管 runner 在线（周末/双机下线属预期）-> 回落云端主力"
+          else
+            echo "ok: 查到在线 CN runner -> 本档派 cn 主力"
+          fi
+
+      - name: "🚀 dispatch 盘中主力 v8_cn_fetch_cloud_selfhosted（cn IP 直连·单链化）"
+        id: dispatch_cn
+        # 🔴 2026-11-20 10:45 小九（主人令「10点20了主站还在9点45」·单链化根治）：
+        #   当日实测：云端主力 9 档 dispatch 全部 cancelled（同并发组新 dispatch 顶掉旧 run，
+        #   「1 running + 1 pending」语义下 cancel-in-progress:false 也保不住），云端盘中从未
+        #   真正执行，数据全靠 12 分钟超时后的 selfhosted 兜底续命 → 每档延迟 15-25 分钟（连续多日，
+        #   正是主人「盘中更新很晚才刷出来」的慢性根因）。
+        #   治本：盘中档**单链化**——cn runner 在线（单位机 7:45-17:45 覆盖全部盘中档）时直派
+        #   selfhosted（中国 IP 直连中国源，不再绕道云端）；cn runner 离线才回落云端主力。
+        #   每档只派一条链 + 守卫双链在途探测 ⇒ 同组互杀从结构上消失。
+        if: steps.guard.outputs.go == 'true' && steps.check_cn_runner.outputs.online == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cn.json -w "%{http_code}" -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$REPO/actions/workflows/v8_cn_fetch_cloud_selfhosted.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"category":"intraday"}}')
+          if [ "$HTTP_CODE" = "204" ]; then
+            echo "✅ cn 主力 dispatch OK (204) → CN runner cn IP 直连中国源（单链化）"
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "⚠️ cn 主力 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cn.json)"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error title=v8-intraday-dispatch-fail::盘中档 cn 主力 dispatch 失败(HTTP=$HTTP_CODE)，本档数据可能缺失，请立即排查"
+          fi
+
+      - name: "☁️ cn runner 离线时回落云端主力 v8_cn_fetch_cloud（保底路径）"
+        id: dispatch_cloud
+        if: steps.guard.outputs.go == 'true' && steps.check_cn_runner.outputs.online != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -169,28 +244,31 @@ jobs:
             "$REPO/actions/workflows/v8_cn_fetch_cloud.yml/dispatches" \
             -d '{"ref":"main","inputs":{"category":"intraday"}}')
           if [ "$HTTP_CODE" = "204" ]; then
-            echo "✅ 云端 dispatch OK (204)"
+            echo "✅ 云端回落 dispatch OK (204)"
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
-            echo "⚠️ 云端 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cloud.json)"
+            echo "⚠️ 云端回落 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cloud.json)"
             echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::error title=v8-intraday-dispatch-fail::盘中档云端主力 dispatch 失败(HTTP=$HTTP_CODE)，本档数据可能缺失，已转 CN 兜底；若兜底也失败请查 v8_cn_fetch_cloud_selfhosted"
+            echo "::error title=v8-intraday-dispatch-fail::盘中档云端回落 dispatch 失败(HTTP=$HTTP_CODE)，本档数据可能缺失"
           fi
 
-      - name: "⏳ 实时轮询云端 run 状态（最多 12 分钟，每 30s 探测）"
-        if: steps.dispatch_cloud.outputs.ok == 'true'
+      - name: "⏳ 实时轮询本档 run 状态（最多 12 分钟，每 30s 探测）"
+        id: check_cn
+        # 🔴 2026-11-20 单链化：轮询对象随 dispatch 目标（cn 主力 / 云端回落）。
+        if: steps.dispatch_cn.outputs.ok == 'true' || steps.dispatch_cloud.outputs.ok == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHAIN_WF: ${{ steps.dispatch_cn.outputs.ok == 'true' && 'v8_cn_fetch_cloud_selfhosted.yml' || 'v8_cn_fetch_cloud.yml' }}
         shell: bash
         run: |
           set +e
-          echo "档期起点: $(TZ=Asia/Shanghai date '+%F %T') CST, 开始实时轮询云端 run..."
+          echo "档期起点: $(TZ=Asia/Shanghai date '+%F %T') CST, 开始实时轮询 $CHAIN_WF ..."
           REPO="ah-quant999/quant-scanner-v8"
           DONE=0
           for i in $(seq 1 24); do
             sleep 30
             STATUS=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=3" \
+              "https://api.github.com/repos/$REPO/actions/workflows/$CHAIN_WF/runs?per_page=3" \
               | python -c "
             import sys, json, datetime
             try:
@@ -214,136 +292,47 @@ jobs:
                 print('NONE')
             " 2>/dev/null)
             echo "  轮询#$i: [$STATUS] @ $(TZ=Asia/Shanghai date '+%H:%M:%S')"
-            if [ "$STATUS" = "completed success" ]; then
-              echo "✅ 云端本档已完成 @ $(TZ=Asia/Shanghai date '+%F %T') CST"; DONE=1; break
-            fi
+            case "$STATUS" in
+              "completed success")
+                echo "✅ 本档已完成 @ $(TZ=Asia/Shanghai date '+%F %T') CST"
+                echo "run_status=success" >> "$GITHUB_OUTPUT"; DONE=1; break ;;
+              completed\ *)
+                echo "⚠️ 本档 run 终态异常: $STATUS"
+                echo "run_status=$STATUS" >> "$GITHUB_OUTPUT"; DONE=1; break ;;
+            esac
           done
           if [ "$DONE" = "0" ]; then
-            echo "⚠️ 轮询 12 分钟云端仍未成功 → 交由后续兜底步处理"
+            # 🔴 2026-11-20 单链化：>12min 长跑不干预不告警——它就是本档唯一生产链，等它自然
+            #    完成；守卫双链在途探测会让下一档自动避让，绝不再叠派顶掉（11-20 前「超时→
+            #    派兜底→顶掉在跑 run」的老路径已删除）。
+            echo "⏳ 轮询 12 分钟仍在跑 → 不干预，等它自然完成（下档守卫自动避让）"
+            echo "run_status=still_running" >> "$GITHUB_OUTPUT"
           fi
           echo "档期检查点: $(TZ=Asia/Shanghai date '+%F %T') CST"
 
-      - name: "🔍 gh api 查云端 run 状态"
-        id: check_cloud
-        if: steps.dispatch_cloud.outputs.ok == 'true'
-        # 🔴 2026-09-10 修正（Bug ⑤）：探测脚本自身报错时原会 step failure，
-        #    而 need_fallback 从未赋值 → 兜底落空（实测 run 34433613329：
-        #    check failure → 兜底 skipped，整档白跑）。
-        #    探测只是"看看云端跑完没"，失败绝不该阻断；兜底条件已覆盖 outcome != success。
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          # 🔴 2026-09-10：GitHub Actions 的 bash 默认带 -e，探测链任意一环非零即中断整步
-          #    → need_fallback 永远写不进 OUTPUT → 兜底落空。探测全程关 errexit，
-          #    任何异常都转为"判定为需要兜底"，由兜底条件统一接住。
-          set +e
-          REPO="ah-quant999/quant-scanner-v8"
-          RESP=$(curl -sS -o /tmp/check.json -w "%{http_code}" \
-            -H "Authorization: token $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5")
-          if [ "$RESP" != "200" ]; then
-            echo "⚠️ API 查询失败 HTTP=$RESP, 默认按云端失败处理（兜底）"
-            echo "status=unknown" >> "$GITHUB_OUTPUT"
-            echo "conclusion=unknown" >> "$GITHUB_OUTPUT"
-            echo "need_fallback=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # 解析最近 30 分钟内 v8_cn_fetch_cloud 的 run
-          # 🔴 2026-09-10 修正：原硬编码 python3。CN runner1号机 cn runner 是 Windows + Git Bash，
-          #    实测同机其他 yml（v8_cn_fetch_cloud_selfhosted.yml / v8_lhb_fetch.yml
-          #    / v8_stock_quote_refresh.yml）一律用 `python`。统一用自动探测。
-          PY_CMD=$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
-          echo "使用解释器: $PY_CMD"
-          $PY_CMD --version 2>&1 | head -1
-          STATUS=$($PY_CMD -c "
-          import json, datetime
-          try:
-              with open('/tmp/check.json') as f: data = json.load(f)
-          except Exception as e:
-              print(f'PARSE_FAIL|{e}')
-              raise SystemExit(0)
-          now = datetime.datetime.now(datetime.timezone.utc)
-          for r in data.get('workflow_runs', []):
-              created = r.get('created_at', '')
-              if not created: continue
-              try:
-                  ts = datetime.datetime.fromisoformat(created.replace('Z','+00:00'))
-              except Exception: continue
-              age_min = (now - ts).total_seconds() / 60
-              if age_min < 30:
-                  print(f\"{r.get('status')}|{r.get('conclusion')}\")
-                  break
-          else:
-              print('NONE_FOUND|')
-          " 2>/tmp/py_err.txt || echo "PY_FAIL|$(head -c 80 /tmp/py_err.txt 2>/dev/null)")
-          IFS='|' read -r s c <<<"$STATUS"
-          echo "云端最近 run: status=[$s] conclusion=[$c]"
-          echo "status=$s" >> "$GITHUB_OUTPUT"
-          echo "conclusion=$c" >> "$GITHUB_OUTPUT"
-          if [ "$s" = "completed" ] && [ "$c" = "success" ]; then
-            echo "✅ 云端本档成功"
-            echo "need_fallback=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "⚠️ 云端本档失败/超时/无 run → 触发CN runner1号机 cn IP 兜底"
-            echo "need_fallback=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: "CN runner 在线探测（周末/双机下线时跳过兜底，灭红 run 洪水）"
-        id: check_cn_runner
-        # [甲护栏 2026-11-08 最低风险·纯新增] 派发 cn 兜底前先查 [self-hosted, cn] runner 是否在线。
-        #   根因：周末无 CN runner 在线时，外部自动化/看门狗绕过守卫直派 selfhosted -> 排队层瞬时失败 -> 70 红 run 洪水。
-        #   探测失败默认 online=true（宁可派发也不漏兜底），只有明确查到无在线 cn runner 才跳过。
+      - name: "📸 派发板块资金日内快照 v8_intraday_snapshot（独立组·零互杀）"
+        id: snapshot_cn
+        # 🔴 2026-11-20 10:45 小九：快照链自己的 10 分钟 schedule 也在「GitHub 日间失灵」家族
+        #   （今日 09:52 后零 schedule run，全靠 cn_fetch 内 dispatcher 偶发续命），SECTOR_FUND_FLOW_INTRADAY
+        #   卡 11-19 14:49（主力净额分时卡整日无增量）。快照写盘文件与抓取链不相交 + 独立并发组
+        #   cancel-in-progress:true 幂等去重 ⇒ 每档顺手派发一次，无损安全，顺手把日间失灵兜住。
         if: steps.guard.outputs.go == 'true'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
-          ONLINE="true"
-          HTTP_CODE=$(curl -sS -o /tmp/cn_runners.json -w "%{http_code}" -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "$REPO/actions/runners?per_page=100")
-          if [ "$HTTP_CODE" = "200" ]; then
-            BOTH=$(jq -r '[.runners[]? | select(.status=="online") | select(([.labels[]?.name] | index("cn") != null and index("self-hosted") != null))] | length' /tmp/cn_runners.json 2>/dev/null)
-            if [ "${BOTH:-0}" = "0" ]; then
-              ONLINE="false"
-            fi
-          fi
-          echo "online=$ONLINE" >> "$GITHUB_OUTPUT"
-          if [ "$ONLINE" = "false" ]; then
-            echo "info: 无 CN 自托管 runner 在线（周末/双机下线属预期）-> 跳过 cn 兜底，不产生红 run"
-          else
-            echo "ok: 查到在线 CN runner（或探测失败默认派发）-> 允许 cn 兜底"
-          fi
-
-      - name: "🛡️ CN runner1号机 cn IP 兜底（云端 dispatch 失败 或 云端跑失败 时均触发）"
-        id: fallback_cn
-        # 🔴 2026-09-10 二修（Bug ② + ⑤ 完备条件）：
-        #    ② 原只写 need_fallback == 'true' → 云端 dispatch 失败时该变量从未赋值 → 兜底永不触发。
-        #    ⑤ check 探测自身 failure 时同样从未赋值 → 兜底再次落空。
-        #    现以 outcome 为准做完备覆盖：只要「dispatch 没成功」或「没探测成功」或「探测说要兜底」，
-        #    一律兜底。宁可多跑一次 cn 兜底，也不能因为探测链路问题丢掉整档数据。
-        # 🔴 2026-09-10 同步加守卫门：守卫拦截（本档跳过）时 ok 为空串，原条件 `ok != 'true'`
-        #    会成立 → 无脑触发 cn 兜底，等于绕开守卫。必须先确认守卫放行。
-        if: steps.guard.outputs.go == 'true' && steps.check_cn_runner.outputs.online == 'true' && (steps.dispatch_cloud.outputs.ok != 'true' || steps.check_cloud.outcome != 'success' || steps.check_cloud.outputs.need_fallback == 'true')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
-          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cn.json -w "%{http_code}" -X POST \
+          HTTP_CODE=$(curl -sS -o /tmp/dispatch_snap.json -w "%{http_code}" -X POST \
             -H "Authorization: token $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "$REPO/actions/workflows/v8_cn_fetch_cloud_selfhosted.yml/dispatches" \
-            -d '{"ref":"main","inputs":{"category":"intraday"}}')
+            "$REPO/actions/workflows/v8_intraday_snapshot.yml/dispatches" \
+            -d '{"ref":"main"}')
           if [ "$HTTP_CODE" = "204" ]; then
-            echo "✅ cn 兜底 dispatch OK (204) → CN runner1号机本机 cn IP 直连中国源"
+            echo "✅ snapshot dispatch OK (204)"
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
-            echo "⚠️ cn 兜底 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cn.json)"
+            echo "⚠️ snapshot dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_snap.json)"
             echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::error title=v8-intraday-cnfallback-fail::盘中档 CN 兜底 dispatch 也失败(HTTP=$HTTP_CODE)，本档数据完全缺失！盘中卡将显示旧值，请立即排查"
           fi
 
       - name: "📝 档期状态汇总"
@@ -354,10 +343,11 @@ jobs:
             echo "## 盘中准点档·本档总结"
             echo "- 档期: \`$(TZ=Asia/Shanghai date '+%F %T')\` CST"
             echo "- 守卫: \`go=${{ steps.guard.outputs.go }}\`（false = 本档按设计跳过，非故障）"
-            echo "- 云端 dispatch: \`${{ steps.dispatch_cloud.outcome }}\`"
-            echo "- 云端 run 状态: \`${{ steps.check_cloud.outputs.status }}/${{ steps.check_cloud.outputs.conclusion }}\`"
-            echo "- 兜底触发: \`${{ steps.check_cloud.outputs.need_fallback }}\`"
-            echo "- cn 兜底 dispatch: \`${{ steps.fallback_cn.outcome }}\`"
+            echo "- cn runner 在线: \`${{ steps.check_cn_runner.outputs.online }}\`"
+            echo "- cn 主力 dispatch: \`${{ steps.dispatch_cn.outcome }}\`"
+            echo "- 云端回落 dispatch: \`${{ steps.dispatch_cloud.outcome }}\`"
+            echo "- 本档 run 轮询: \`${{ steps.check_cn.outputs.run_status }}\`"
+            echo "- 快照 dispatch: \`${{ steps.snapshot_cn.outcome }}\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # 🔴 2026-09-09 主人令「软失败但强制 ::error:: 告警」（对齐 09-08 消费层软失败策略）：
@@ -366,12 +356,13 @@ jobs:
         if: always()
         shell: bash
         env:
-          V8_CLOUD_DISPATCH: ${{ steps.dispatch_cloud.outcome }}
-          V8_CLOUD_CHECK: ${{ steps.check_cloud.outcome }}
-          V8_CN_FALLBACK: ${{ steps.fallback_cn.outcome }}
+          V8_DISPATCH_CN: ${{ steps.dispatch_cn.outcome }}
+          V8_DISPATCH_CLOUD: ${{ steps.dispatch_cloud.outcome }}
+          V8_CHECK_CN: ${{ steps.check_cn.outcome }}
+          V8_SNAPSHOT_CN: ${{ steps.snapshot_cn.outcome }}
         run: |
           FAILED=""
-          for sid in dispatch_cloud check_cloud fallback_cn; do
+          for sid in dispatch_cn dispatch_cloud check_cn snapshot_cn; do
             eval "v=\"\${V8_${sid^^}:-}\""
             if [ "$v" = "failure" ] || [ "$v" = "cancelled" ]; then
               FAILED="$FAILED $sid"
