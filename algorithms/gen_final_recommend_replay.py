@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import statistics as st
 import sys
 from pathlib import Path
@@ -203,7 +204,9 @@ def main(argv=None):
     ap.add_argument("--dry", action="store_true", help="只打印不写（默认）")
     ap.add_argument("--write", action="store_true", help="写正式产物")
     args = ap.parse_args(argv)
-    do_write = args.write and not args.dry
+    # 🛡 2026-11-21 挂链 E 批（主人令「哪些卡没更新·一劳永逸修复」）：链内（run_algorithms 统一注入
+    #   V8_IN_CHAIN=1）无参调用 ⇒ 默认写盘，否则挂链也不产出；--dry 仍可显式压制；手工探查默认 dry 不变。
+    do_write = (args.write or os.environ.get("V8_IN_CHAIN") == "1") and not args.dry
 
     signals, days, empty = load_signals()
     periods = per_horizon(signals)
