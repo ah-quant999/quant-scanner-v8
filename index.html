@@ -8109,11 +8109,11 @@ c.innerHTML = h;
       + '<div style="border:1px solid rgba(192,132,252,0.63);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt)">'
       +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">📌 核心：</b>在 <b style="color:var(--txt)">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「概念想象空间 + 业绩正向 + ROE≥10%」三项齐的股票。</div>'
       +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列;按未来空间分（成长45%+质量35%+拐点20%）降序，资金为辅助验证。</div>'
-      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;border-left:3px solid #ffd024"><b style="color:#ffd024">🔥 主题会动：</b>7 个长期主题作为稳定分组锚点（人工知识，非行情可得），另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
+      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;border-left:3px solid #ffd024"><b style="color:#ffd024">🔥 主题会动：</b>主题分组的关键词表是人工知识（非行情可得），但<b style="color:var(--txt)">位次全由真实资金定</b>：全部主题（长期主题 + 🔥 新热点）一律按当日净额降序<b style="color:var(--txt)">混排</b>——资金持续流出会自然沉底，🏃5日 = 5 日连续净流出真实证据；另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（🔥 前缀）。仅研究参考，不构成投资建议。</div>'
       + '</div>'
-      // 2026-10-02 晚 主人令：第一行固定 7 个长期主题种子，🔥金色热点独占第二行
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">' + chipsSeed + '</div>'
-      + (chipsDyn ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">' + chipsDyn + '</div>' : '')
+      // 2026-11-21 主人令「不要 7 个固定的」根治：废除 10-02 旧两行布局（种子一行/热点一行），
+      //   全部主题混排单行、位次纯按当日净额降序——🔥 前缀仅作来源标识、不再占独立席位
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">' + chipsSeed + chipsDyn + '</div>'
       + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:rgba(148,163,184,.06);border-radius:6px;line-height:1.7">'
       +   '<b style="color:var(--sub)">🚀 主题未来空间分</b>（红=主力净额·辅助验证；🚀=该主题三项齐最高未来空间分）：' + (hasFund ? rankStr : '<span style="color:#ffd024">资金源 SECTOR_FUND_FLOW 未加载</span>')
       + '</div>'
