@@ -1,7 +1,7 @@
 {
-  "update_time": "2026-11-22 00:47:27",
-  "run_start": "2026-11-21 22:31:20",
-  "ok": 50,
+  "update_time": "2026-11-22 02:39:05",
+  "run_start": "2026-11-22 01:04:30",
+  "ok": 38,
   "fail": 1,
   "failed_scripts": [
     {
@@ -9,5 +9,18 @@
       "reason": "超时 >40min"
     }
   ],
-  "skipped_by_time_gate": []
+  "skipped_by_time_gate": [
+    "fetch_fundamental_quality.py",
+    "fetch_stock_names.py",
+    "fetch_stock_quote_v8.py",
+    "fetch_sh_index_fib.py",
+    "fetch_inst_trade.py",
+    "fetch_sector_rs.py",
+    "fetch_lhb.py",
+    "fetch_orphan_suspension.py",
+    "fetch_orphan_market_alerts.py",
+    "fetch_orphan_nt_data.py",
+    "fetch_orphan_sector_fund_flow.py",
+    "fetch_weekend_run.py"
+  ]
 }

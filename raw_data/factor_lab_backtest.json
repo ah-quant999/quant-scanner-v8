@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-22 00:45:13",
+  "update_time": "2026-11-22 02:37:01",
   "universe": "重点池 A股（kline_cache）",
   "cost_roundtrip": 0.002,
   "rebalance": "每10个交易日，入场=次日开盘",
