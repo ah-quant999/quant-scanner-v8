@@ -1,10 +1,10 @@
 {
   "version": "2.0",
-  "updated": "2026-11-21 17:45:02",
+  "updated": "2026-11-21 20:06:23",
   "sources": [
     "guanlan"
   ],
-  "total": 25,
+  "total": 24,
   "stocks": [
     {
       "name": "机器人",
@@ -230,17 +230,6 @@
       "name": "长川科技",
       "code": "300604",
       "full_code": "sz300604",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "瑞银",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "华大九天",
-      "code": "301269",
-      "full_code": "sz301269",
       "exchange": "SZ",
       "market": "深市",
       "institution": "瑞银",
