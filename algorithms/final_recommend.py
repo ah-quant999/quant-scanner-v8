@@ -1909,13 +1909,19 @@ def main():
         # 🔴 2026-10-20 主人令「要口径和评分都一致」：竞位形态废止——入池保留
         #   （sources/signals/候选池展示），但不凭强度分混排竞位 Top3；
         #   要进最终推荐，须先进入当日因子榜（26 因子真实打分、同序同分）。
+        # 🔴 2026-11-21 主人令（P0 回测：高手源 T+20 超额 +15.84%·全站唯一强正edge）：
+        #   恢复 Top3 竞位——入池高手票按「同量纲映射分」与因子榜统一排序（V8_IMA_COMPETE=1 默认），
+        #   V8_IMA_COMPETE=0 回退至 10-20 纯因子榜序；产物 rule 字段必须与实际开关状态一致（真实标注）。
         "ima_intake": {
             "data_date": _ima_dd,
             "pool_total": len(_ima_norm) if ima else 0,
             "new_selected": _ima_in if ima else 0,
-            "rule": "first_selected==data_date（当日新入选）⇒ 入池独立源（展示+候选池）；"
-                    "2026-10-20 起不参与 Top3 竞位——最终推荐严格=当日因子榜前 N 名"
-                    "（同序同分），进最终推荐须先入因子榜",
+            "rule": ("first_selected==data_date（当日新入选）⇒ 入池独立源（展示+候选池）；"
+                     + ("2026-11-21 主人令：参与 Top3 竞位——高手票按同量纲映射分与因子榜统一排序"
+                        "（V8_IMA_COMPETE=1），进最终推荐仍须先入因子榜池"
+                        if os.environ.get("V8_IMA_COMPETE", "1").strip() != "0" else
+                        "2026-10-20 口径：不参与 Top3 竞位（V8_IMA_COMPETE=0 回退态）——"
+                        "最终推荐严格=当日因子榜前 N 名（同序同分），进最终推荐须先入因子榜")),
             "note": "09-18 walk-forward 曾测「高手跟踪」作四量加分项边际 −1.76pp（n=13、回放口径、"
                     "四量池上下文）——与本处「IMA 自身信号真实流」非同口径同场景，如实并列不隐瞒；"
                     "回退开关 V8_IMA_INTAKE=0",
