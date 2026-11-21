@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-21 17:37",
+  "update_time": "2026-11-22 00:03",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -527,17 +527,11 @@
     {
       "name": "冰雪产业",
       "net": 2.01,
-      "net_5d": -85.52,
-      "net_20d": -348.25,
+      "net_5d": 0,
+      "net_20d": 0,
       "type": "概念",
-      "net_10d": -223.63,
-      "net_10d_days": 10,
-      "net_60d": -736.56,
-      "net_60d_days": 44,
       "consecutive_days": 2,
-      "trend": "in",
-      "net_5d_days": 2,
-      "net_20d_days": 2
+      "trend": "in"
     },
     {
       "name": "白酒概念",
@@ -1076,17 +1070,11 @@
     {
       "name": "冰雪产业",
       "net": 2.01,
-      "net_5d": -85.52,
-      "net_20d": -348.25,
+      "net_5d": 0,
+      "net_20d": 0,
       "type": "概念",
-      "net_10d": -223.63,
-      "net_10d_days": 10,
-      "net_60d": -736.56,
-      "net_60d_days": 44,
       "consecutive_days": 2,
-      "trend": "in",
-      "net_5d_days": 2,
-      "net_20d_days": 2
+      "trend": "in"
     },
     {
       "name": "白酒概念",
@@ -1693,6 +1681,21 @@
       "net_60d_days": 60
     },
     {
+      "name": "虚拟现实",
+      "net": -35.72,
+      "net_5d": -37.28,
+      "net_20d": 72.15,
+      "net_60d": 51.24,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": -59.3,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
       "name": "养老概念",
       "net": -2.71,
       "net_5d": 10.56,
@@ -1766,21 +1769,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 57
-    },
-    {
-      "name": "美容护理",
-      "net": 1.92,
-      "net_5d": 7.89,
-      "net_20d": 29.82,
-      "net_60d": 68.08,
-      "type": "行业",
-      "consecutive_days": 19,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 19.72,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
     }
   ],
   "trend_60d": [
