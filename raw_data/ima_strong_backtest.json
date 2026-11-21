@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21 05:04:47",
+ "generated": "2026-11-21 13:29:49",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -34,13 +34,13 @@
  "skipped_no_signal_date": 0,
  "signal_days": 57,
  "signal_date_range": "2026-06-09 ~ 2026-11-20",
- "ima_update_time": "2026-11-21 00:25:20",
+ "ima_update_time": "2026-11-21 05:02:07",
  "source_coverage": {
   "rows_parsed": 8,
   "expected": null,
   "source_channel": "full-snapshot",
   "snapshot_fetched_at": "2026-11-20 17:02:12",
-  "snapshot_age_h": 7.39,
+  "snapshot_age_h": 12.0,
   "truncated": false,
   "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
  },
@@ -138,7 +138,7 @@
    "best_return": 128.08,
    "worst_return": -33.53,
    "max_drawdown": -12.69,
-   "bench_avg_return": -3.0046,
+   "bench_avg_return": -3.0053,
    "bench_win_rate": 40.22,
    "bench_days": 55
   },
@@ -153,8 +153,8 @@
    "best_return": 137.41,
    "worst_return": -30.73,
    "max_drawdown": -15.38,
-   "bench_avg_return": -3.1561,
-   "bench_win_rate": 39.4,
+   "bench_avg_return": -3.1606,
+   "bench_win_rate": 39.38,
    "bench_days": 53
   },
   "45d": {
@@ -183,8 +183,8 @@
    "best_return": 104.44,
    "worst_return": -25.49,
    "max_drawdown": -23.54,
-   "bench_avg_return": -5.9661,
-   "bench_win_rate": 32.35,
+   "bench_avg_return": -5.9728,
+   "bench_win_rate": 32.33,
    "bench_days": 38
   },
   "75d": {
@@ -198,8 +198,8 @@
    "best_return": 105.63,
    "worst_return": -27.07,
    "max_drawdown": -28.5,
-   "bench_avg_return": -7.6216,
-   "bench_win_rate": 30.8,
+   "bench_avg_return": -7.6375,
+   "bench_win_rate": 30.74,
    "bench_days": 27
   },
   "90d": {
@@ -213,8 +213,8 @@
    "best_return": 34.77,
    "worst_return": -11.86,
    "max_drawdown": -27.13,
-   "bench_avg_return": -12.4344,
-   "bench_win_rate": 26.24,
+   "bench_avg_return": -12.4374,
+   "bench_win_rate": 26.22,
    "bench_days": 16
   },
   "180d": {
