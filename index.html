@@ -15516,7 +15516,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           hh+='</div>';
         });
         hh+='</div>';
-        hh += '<div style="margin-top:8px;font-size:10.5px;color:var(--dim);line-height:1.5">🎯 ETF映射/龙头为<span style="color:var(--gold)">静态参考（2026-08-18 归档，非每日刷新）</span>；板块净额/涨跌为实时口径。</div>';
+        var _emapTs = emap.update_time || '—';
+        hh += '<div style="margin-top:8px;font-size:10.5px;color:var(--dim);line-height:1.5">🎯 ETF映射为<span style="color:var(--gold)">每周刷新的参考映射（生成于 '+_emapTs+'，板块名↔ETF真名匹配，非实时）</span>；板块净额/涨跌为实时口径。</div>';
         cEl.innerHTML = hh;
       }
       // 🚀 2026-09-18 主人令：已升为独立卡 #sectorLeadersCard（置于本卡上方）。

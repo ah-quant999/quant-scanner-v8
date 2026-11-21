@@ -37,6 +37,9 @@ DATA_SOURCES = {
     "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
+    # 🆕 2026-11-21 主人令「B 新建」：概念→ETF 映射周更（gen_concept_etf_map.py），
+    #   顶层 dict 直接转换（_write_js dict 分支），消费端 window.CONCEPT_ETF_MAP[板块名].etf 兼容旧结构。
+    "concept_etf_map.json":        "CONCEPT_ETF_MAP",
     # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
     #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。
     #   前端 window.STOCK_PROFILE 由 STOCK_LIST 就地合成（index.html:15290-15304）；
@@ -404,6 +407,8 @@ CATEGORY_MAP = {
     "FACTOR_LAB_BACKTEST": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
+    # 🆕 2026-11-21 主人令「B 新建」：概念→ETF 映射（生成器自带 7 天周更门控，盘后档转换）
+    "CONCEPT_ETF_MAP": "post_close",
     # 🆕 2026-08-31：v8 选股生命周期跟踪归属盘后（依赖算法跟踪池，每日盘后产出）。
     "V8_POOL_TRACKER": "post_close",
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
