@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-22 02:43:13",
-  "update_time": "2026-11-22 02:43:13",
+  "generated": "2026-11-22 04:40:37",
+  "update_time": "2026-11-22 04:40:37",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -1988,7 +1988,7 @@
     },
     "2026-11-21": {
       "date": "2026-11-21",
-      "update_time": "2026-11-22 02:34:30",
+      "update_time": "2026-11-22 04:38:08",
       "file": "final_recommend_20261122.json",
       "degraded": false,
       "top3": [
@@ -1996,8 +1996,8 @@
           "rank": 1,
           "code": "601211",
           "name": "国泰海通",
-          "close": null,
-          "close_date": null,
+          "close": 16.6,
+          "close_date": "2026-11-22",
           "final_score": 4.7,
           "resonance": 1,
           "sources": [
