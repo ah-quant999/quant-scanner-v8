@@ -106,6 +106,33 @@ def _attach_meta(stocks):
             s["board"] = board
     return stocks
 
+def _load_prev_universe():
+    """🛡 2026-11-21 一劳永逸：上一版全名单多级回退读取（ETF 失败护栏 / 总数不足补全共用）。
+
+    根因：out/stock_names.json 不入 git，云端每轮全新 checkout 后 out/ 恒缺席 ⇒
+    原「失败不覆盖」护栏在云端永远读不到旧文件 ⇒ 东财 push2 限流致 ETF 抓空时
+    （11-20 起 fund_etf_spot_em 报 Push2RateLimitError）ETF 段清零、总数 8,029 < 9000，
+    被 update_v8 转换层守卫拦截 → data/STOCK_LIST.js 停 11-19。
+    修复：回退链 out/ → raw_data/stock_names.json（已入仓、云端每轮 checkout 即在，
+    恒可达），沿用旧版 ETF 段为真值续命（真值非编造，与 10-01 护栏同一原则）。
+    """
+    _cands = [
+        OUTPUT,
+        os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "raw_data", "stock_names.json")),
+    ]
+    for _p in _cands:
+        try:
+            with open(_p, "r", encoding="utf-8") as _f:
+                _obj = json.load(_f)
+            if isinstance(_obj, dict):
+                _obj = _obj.get("data", _obj)
+            if isinstance(_obj, list) and _obj:
+                return _obj
+        except Exception:
+            continue
+    return []
+
+
 def _fetch_a_share_via_eastmoney():
     """东方财富全量 A 股代码→名称（akshare stock_zh_a_spot_em 经常超时丢数据时的兜底）"""
     import requests
@@ -275,14 +302,10 @@ def main():
         # ETF 全量(约1620只)静默清零（09-21 起固化 5 天未自愈的根因；
         # 且 8027 只 > 4000 兜底阈值，<4000 补全分支永远救不了）。
         # 现改为：失败(None/空)时沿用旧文件中的 ETF 条目（真值非编造）并打显式告警。
-        try:
-            with open(OUTPUT, "r", encoding="utf-8") as _f:
-                _old_all = json.load(_f)
-            if isinstance(_old_all, dict):
-                _old_all = _old_all.get("data", _old_all)
-            _old_etf = [s for s in (_old_all or []) if isinstance(s, dict) and s.get("market") == "etf"]
-        except Exception:
-            _old_etf = []
+        # 🛡 2026-11-21：旧文件读取改走 _load_prev_universe() 多级回退——
+        #   原 out/stock_names.json 云端不入仓恒缺席，护栏在云端从未真正生效。
+        _old_all = _load_prev_universe()
+        _old_etf = [s for s in (_old_all or []) if isinstance(s, dict) and s.get("market") == "etf"]
         if _old_etf:
             print(f"  ::error title=v8-etf-fetch-fail::ETF 抓取失败/为空，沿用旧文件 {len(_old_etf)} 只（失败不覆盖）")
             etf_stocks = _old_etf
@@ -298,28 +321,36 @@ def main():
     if len(all_stocks) < 4000:
         # 抓取不足：保留旧文件，但仍把 py / 行业 / 概念 / 板块 重新合并进去，避免数据回退
         print(f"  ⚠️ 新抓取总数 {len(all_stocks)} 不足（预期>4000），尝试沿用并补全旧文件")
-        try:
-            with open(OUTPUT, "r", encoding="utf-8") as f:
-                old = json.load(f)
-            if isinstance(old, dict):
-                old = old.get("data", old)
-            if isinstance(old, list) and len(old) >= 4000:
-                # 合并旧文件，保留旧文件里的港股/ETF 以防本次抓失败
-                old_seen = {s["code"] for s in all_stocks}
-                for s in old:
-                    if s.get("code") not in old_seen:
-                        all_stocks.append(s)
-                        old_seen.add(s["code"])
-                print(f"  ✅ 沿用旧文件补全后 {len(all_stocks)} 只，继续补全元数据")
-            else:
-                print("  ⚠️ 旧文件也不足，放弃写入")
-                return
-        except Exception as e:
-            print(f"  ⚠️ 读取旧文件失败: {e}，放弃写入")
+        # 🛡 2026-11-21：旧文件读取改走 _load_prev_universe() 多级回退（raw_data 入仓恒可达）
+        old = _load_prev_universe()
+        if isinstance(old, list) and len(old) >= 4000:
+            # 合并旧文件，保留旧文件里的港股/ETF 以防本次抓失败
+            old_seen = {s["code"] for s in all_stocks}
+            for s in old:
+                if s.get("code") not in old_seen:
+                    all_stocks.append(s)
+                    old_seen.add(s["code"])
+            print(f"  ✅ 沿用旧文件补全后 {len(all_stocks)} 只，继续补全元数据")
+        else:
+            _old_n = len(old) if isinstance(old, list) else 0
+            print(f"  ⚠️ 旧文件也不足（{_old_n} 只），放弃写入")
             return
 
     _attach_py(all_stocks)
     _attach_meta(all_stocks)
+
+    # 🛡 2026-11-21 一劳永逸（对齐 update_v8 STOCK_LIST ≥9000 转换层守卫）：
+    #   合并补全后仍 <9000 且上一版 ≥9000（健康）→ 拒写盘。若照写，
+    #   raw_data/stock_names.json 会被残缺版覆盖 ⇒ 污染「失败不覆盖」护栏的回退源，
+    #   下轮 ETF/A股 沿用的"旧版"也成残版 ⇒ 恶性循环。拒写保住回退源，等下轮重试。
+    if len(all_stocks) < 9000:
+        _prev_gate = _load_prev_universe()
+        _prev_n = len(_prev_gate) if isinstance(_prev_gate, list) else 0
+        if _prev_n >= 9000:
+            print(f"  ::error title=v8-stock-names-incomplete::合并补全后仍 {len(all_stocks)} 只 < 9000"
+                  f"（上一版 {_prev_n} 只健康），拒写 {OUTPUT} 以保住护栏回退源，等下轮重试")
+            return
+        print(f"  ⚠️ 本轮 {len(all_stocks)} 只 < 9000 且无健康上一版（{_prev_n} 只），仍写盘（首跑/历史即残缺场景）")
 
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(all_stocks, f, ensure_ascii=False, indent=0)
