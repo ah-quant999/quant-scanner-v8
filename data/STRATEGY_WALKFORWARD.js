@@ -1,6 +1,6 @@
 window.STRATEGY_WALKFORWARD = {
-  "update_time": "2026-11-21 08:44:40",
-  "source": "raw_data/history/final_recommend_*.json（50 个每日快照）",
+  "update_time": "2026-11-21 13:23:14",
+  "source": "raw_data/history/final_recommend_*.json（51 个每日快照）",
   "method": "因子清账 + 胜率加权 组合的【样本外选股稳定性】walk-forward（非收益率 OOS，历史快照无已实现盈亏）",
   "is_ratio": 0.7,
   "is_window": {
@@ -11,11 +11,11 @@ window.STRATEGY_WALKFORWARD = {
     "avg_final_score": 16.769
   },
   "oos_window": {
-    "n": 15,
-    "overlap_ratio": 0.4,
-    "industry_hhi": 0.541,
-    "max_industry_pct": 57.773,
-    "avg_final_score": 23.895
+    "n": 16,
+    "overlap_ratio": 0.375,
+    "industry_hhi": 0.538,
+    "max_industry_pct": 57.288,
+    "avg_final_score": 22.696
   },
   "verdict": "样本外需关注 ⚠️",
   "stable": false,
@@ -325,6 +325,12 @@ window.STRATEGY_WALKFORWARD = {
       "overlap_ratio": 0.367,
       "industry_hhi": 0.4889,
       "max_industry_pct": 53.3
+    },
+    {
+      "date": "20261121",
+      "overlap_ratio": 0.367,
+      "industry_hhi": 0.4833,
+      "max_industry_pct": 51.7
     }
   ],
   "rows": [
@@ -776,6 +782,15 @@ window.STRATEGY_WALKFORWARD = {
       "overlap_ratio": 0.0,
       "industry_hhi": 0.3333,
       "max_industry_pct": 33.3,
+      "avg_final_score": 4.7
+    },
+    {
+      "date": "20261121",
+      "n": 2,
+      "overlap": 0,
+      "overlap_ratio": 0.0,
+      "industry_hhi": 0.5,
+      "max_industry_pct": 50.0,
       "avg_final_score": 4.7
     }
   ]
