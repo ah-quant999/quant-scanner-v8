@@ -1,101 +1,5 @@
 [
  {
-  "date": "2026-08-19",
-  "time": "22:59:54",
-  "overall": "fail",
-  "summary": {
-   "ok": 99,
-   "warn": 8,
-   "fail": 8,
-   "total": 115
-  },
-  "warn_items": [
-   {
-    "id": "dom_taskScheduleBody",
-    "name": "DOM #taskScheduleBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttBackBody",
-    "name": "DOM #ttBackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttThrBody",
-    "name": "DOM #ttThrBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttSvlBody",
-    "name": "DOM #ttSvlBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttTrackBody",
-    "name": "DOM #ttTrackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsAdvBody",
-    "name": "DOM #stcrdsAdvBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsEliteBody",
-    "name": "DOM #stcrdsEliteBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_healthCheckBody",
-    "name": "DOM #healthCheckBody",
-    "message": "静态占位符(JS渲染)"
-   }
-  ],
-  "fail_items": [
-   {
-    "id": "SH_FIB",
-    "name": "市场温度计",
-    "message": "更新于 今日 15:39；超过阈值 360 分钟"
-   },
-   {
-    "id": "SIX_DIM_RADAR",
-    "name": "六维共振雷达",
-    "message": "更新于 今日 15:39；超过阈值 360 分钟"
-   },
-   {
-    "id": "CANDIDATE",
-    "name": "候选池",
-    "message": "更新于 今日 15:44；超过阈值 360 分钟"
-   },
-   {
-    "id": "INST_TRADE",
-    "name": "机构买卖",
-    "message": "更新于 今日 15:39；超过阈值 360 分钟"
-   },
-   {
-    "id": "COCKPIT_ADVICE",
-    "name": "驾驶舱",
-    "message": "更新于 今日 16:25；超过阈值 360 分钟"
-   },
-   {
-    "id": "TOP10_DAILY",
-    "name": "全站精选",
-    "message": "更新于 今日 15:49；超过阈值 360 分钟"
-   },
-   {
-    "id": "STOCK_RPS",
-    "name": "相对强度",
-    "message": "更新于 今日 15:49；超过阈值 360 分钟"
-   },
-   {
-    "id": "dom_phMacroBody",
-    "name": "DOM #phMacroBody",
-    "message": "未找到元素"
-   }
-  ],
-  "tz": "Asia/Shanghai"
- },
- {
   "date": "2026-08-22",
   "time": "22:44:33",
   "overall": "warn",
@@ -4217,6 +4121,29 @@
     "id": "CFFEX_POSITION",
     "name": "IF会员持仓择时",
     "message": "更新于 昨日 05:31；超过阈值 1045 分钟"
+   }
+  ]
+ },
+ {
+  "date": "2026-11-22",
+  "time": "04:38:08",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 130,
+   "warn": 0,
+   "fail": 1,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 131
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "CFFEX_POSITION",
+    "name": "IF会员持仓择时",
+    "message": "更新于 11-20 05:31；超过阈值 2408 分钟"
    }
   ]
  }
