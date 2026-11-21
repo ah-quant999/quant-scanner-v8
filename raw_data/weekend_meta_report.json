@@ -1,13 +1,15 @@
 {
-"update_time": "2026-11-21 15:42:21",
-"total": 8029,
+"update_time": "2026-11-21 18:14:08",
+"total": 7284,
 "new_listings_count": 0,
 "delisted_count": 0,
 "new_listings": [],
 "delisted": [],
 "meta_enriched": 0,
-"guard_tripped": false,
-"guard_reasons": [],
+"guard_tripped": true,
+"guard_reasons": [
+"单轮退市 745 只 > 阈值 80 只（真实退市每日 0~5 只）"
+],
 "old_universe": 8029,
-"fresh_universe": 8029
+"fresh_universe": 7284
 }

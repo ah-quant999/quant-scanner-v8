@@ -1,15 +1,15 @@
 {
- "update_time": "2026-11-21 14:46:31",
+ "update_time": "2026-11-21 17:16:02",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w] × conf(n_h)；h∈{5:(6.0,0.15),10:(2.0,0.1)}；conf(n)=max(0.15,min(1,n/12)) 小样本可信度折扣（2026-11-01 防小样本霸榜）；2026-11-18 主人令收益率再平衡：T+5均益唯一主项、T+10慢变量减权、胜率腿减半(占比≤8%)",
-  "n_signals": 2332,
+  "n_signals": 2334,
   "n_stocks": 388,
   "signal_date_range": [
    "2026-06-06",
-   "2026-11-20"
+   "2026-11-21"
   ]
  },
  "stocks": [
@@ -6571,13 +6571,14 @@
   {
    "code": "300900",
    "name": "广联航空",
-   "n_signals": 2,
+   "n_signals": 3,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-11-18",
-   "last_seen": "2026-11-20",
-   "is_final": false,
+   "last_seen": "2026-11-21",
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 1,
@@ -6696,13 +6697,14 @@
   {
    "code": "600999",
    "name": "招商证券",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-11-18",
-   "last_seen": "2026-11-20",
-   "is_final": false,
+   "last_seen": "2026-11-21",
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 1,
