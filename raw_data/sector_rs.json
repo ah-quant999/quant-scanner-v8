@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-11-21 22:41",
+  "update_time": "2026-11-22 00:55",
   "data_date": "2026-11-20",
   "data_date_source": "kline",
-  "fetch_date": "2026-11-21",
+  "fetch_date": "2026-11-22",
   "data_available": true,
   "source": "同花顺",
   "sectors": [
@@ -239,6 +239,24 @@
       "relative_90d": -13.01,
       "relative_180d": -31.4,
       "relative_52w": -29.54
+    },
+    {
+      "name": "风电设备",
+      "pct_day": -5.39,
+      "pct_5d": -12.81,
+      "pct_20d": -15.94,
+      "pct_30d": -23.82,
+      "pct_60d": -21.74,
+      "pct_90d": -23.69,
+      "pct_180d": -43.44,
+      "pct_52w": -35.61,
+      "relative_5d": -12.81,
+      "relative_20d": -15.94,
+      "relative_30d": -23.82,
+      "relative_60d": -21.74,
+      "relative_90d": -23.69,
+      "relative_180d": -43.44,
+      "relative_52w": -35.61
     },
     {
       "name": "非金属材料",
@@ -833,6 +851,24 @@
       "relative_90d": -12.41,
       "relative_180d": -33.46,
       "relative_52w": -29.98
+    },
+    {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
     },
     {
       "name": "贸易",
@@ -1719,6 +1755,24 @@
       "relative_52w": -38.87
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "电力",
       "pct_day": -2.86,
       "pct_5d": -5.37,
@@ -1753,24 +1807,6 @@
       "relative_90d": -10.86,
       "relative_180d": -38.65,
       "relative_52w": -31.49
-    },
-    {
-      "name": "小家电",
-      "pct_day": -6.03,
-      "pct_5d": -6.36,
-      "pct_20d": -6.9,
-      "pct_30d": -9.78,
-      "pct_60d": -5.2,
-      "pct_90d": 0.77,
-      "pct_180d": -22.34,
-      "pct_52w": -22.12,
-      "relative_5d": -6.36,
-      "relative_20d": -6.9,
-      "relative_30d": -9.78,
-      "relative_60d": -5.2,
-      "relative_90d": 0.77,
-      "relative_180d": -22.34,
-      "relative_52w": -22.12
     }
   ],
   "strong_relative_5d": [
@@ -1901,6 +1937,24 @@
       "relative_52w": -38.87
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "电力",
       "pct_day": -2.86,
       "pct_5d": -5.37,
@@ -1935,24 +1989,6 @@
       "relative_90d": -10.86,
       "relative_180d": -38.65,
       "relative_52w": -31.49
-    },
-    {
-      "name": "小家电",
-      "pct_day": -6.03,
-      "pct_5d": -6.36,
-      "pct_20d": -6.9,
-      "pct_30d": -9.78,
-      "pct_60d": -5.2,
-      "pct_90d": 0.77,
-      "pct_180d": -22.34,
-      "pct_52w": -22.12,
-      "relative_5d": -6.36,
-      "relative_20d": -6.9,
-      "relative_30d": -9.78,
-      "relative_60d": -5.2,
-      "relative_90d": 0.77,
-      "relative_180d": -22.34,
-      "relative_52w": -22.12
     }
   ],
   "strong_20d": [
@@ -3175,6 +3211,24 @@
       "relative_52w": -10.79
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "小家电",
       "pct_day": -6.03,
       "pct_5d": -6.36,
@@ -3209,24 +3263,6 @@
       "relative_90d": -0.57,
       "relative_180d": -34.65,
       "relative_52w": -31.42
-    },
-    {
-      "name": "机场航运",
-      "pct_day": -2.06,
-      "pct_5d": -1.49,
-      "pct_20d": 4.19,
-      "pct_30d": 1.05,
-      "pct_60d": -2.03,
-      "pct_90d": -0.74,
-      "pct_180d": -27.89,
-      "pct_52w": -27.76,
-      "relative_5d": -1.49,
-      "relative_20d": 4.19,
-      "relative_30d": 1.05,
-      "relative_60d": -2.03,
-      "relative_90d": -0.74,
-      "relative_180d": -27.89,
-      "relative_52w": -27.76
     }
   ],
   "strong_relative_90d": [
@@ -3357,6 +3393,24 @@
       "relative_52w": -10.79
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "小家电",
       "pct_day": -6.03,
       "pct_5d": -6.36,
@@ -3391,24 +3445,6 @@
       "relative_90d": -0.57,
       "relative_180d": -34.65,
       "relative_52w": -31.42
-    },
-    {
-      "name": "机场航运",
-      "pct_day": -2.06,
-      "pct_5d": -1.49,
-      "pct_20d": 4.19,
-      "pct_30d": 1.05,
-      "pct_60d": -2.03,
-      "pct_90d": -0.74,
-      "pct_180d": -27.89,
-      "pct_52w": -27.76,
-      "relative_5d": -1.49,
-      "relative_20d": 4.19,
-      "relative_30d": 1.05,
-      "relative_60d": -2.03,
-      "relative_90d": -0.74,
-      "relative_180d": -27.89,
-      "relative_52w": -27.76
     }
   ],
   "strong_180d": [
@@ -3449,6 +3485,24 @@
       "relative_52w": 15.98
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "公路铁路运输",
       "pct_day": -2.08,
       "pct_5d": -2.75,
@@ -3573,24 +3627,6 @@
       "relative_90d": 2.83,
       "relative_180d": -17.11,
       "relative_52w": -10.79
-    },
-    {
-      "name": "黑色家电",
-      "pct_day": -6.92,
-      "pct_5d": -9.02,
-      "pct_20d": -7.81,
-      "pct_30d": -7.5,
-      "pct_60d": -6.35,
-      "pct_90d": -9.9,
-      "pct_180d": -17.89,
-      "pct_52w": -11.68,
-      "relative_5d": -9.02,
-      "relative_20d": -7.81,
-      "relative_30d": -7.5,
-      "relative_60d": -6.35,
-      "relative_90d": -9.9,
-      "relative_180d": -17.89,
-      "relative_52w": -11.68
     }
   ],
   "strong_relative_180d": [
@@ -3631,6 +3667,24 @@
       "relative_52w": 15.98
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "公路铁路运输",
       "pct_day": -2.08,
       "pct_5d": -2.75,
@@ -3755,24 +3809,6 @@
       "relative_90d": 2.83,
       "relative_180d": -17.11,
       "relative_52w": -10.79
-    },
-    {
-      "name": "黑色家电",
-      "pct_day": -6.92,
-      "pct_5d": -9.02,
-      "pct_20d": -7.81,
-      "pct_30d": -7.5,
-      "pct_60d": -6.35,
-      "pct_90d": -9.9,
-      "pct_180d": -17.89,
-      "pct_52w": -11.68,
-      "relative_5d": -9.02,
-      "relative_20d": -7.81,
-      "relative_30d": -7.5,
-      "relative_60d": -6.35,
-      "relative_90d": -9.9,
-      "relative_180d": -17.89,
-      "relative_52w": -11.68
     }
   ],
   "strong_52w": [
@@ -3903,6 +3939,24 @@
       "relative_52w": -5.11
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "小金属",
       "pct_day": -5.27,
       "pct_5d": -14.69,
@@ -3937,24 +3991,6 @@
       "relative_90d": -2.33,
       "relative_180d": -15.86,
       "relative_52w": -8.44
-    },
-    {
-      "name": "保险",
-      "pct_day": 0.39,
-      "pct_5d": 1.52,
-      "pct_20d": 4.52,
-      "pct_30d": -1.47,
-      "pct_60d": 1.5,
-      "pct_90d": 2.83,
-      "pct_180d": -17.11,
-      "pct_52w": -10.79,
-      "relative_5d": 1.52,
-      "relative_20d": 4.52,
-      "relative_30d": -1.47,
-      "relative_60d": 1.5,
-      "relative_90d": 2.83,
-      "relative_180d": -17.11,
-      "relative_52w": -10.79
     }
   ],
   "strong_relative_52w": [
@@ -4085,6 +4121,24 @@
       "relative_52w": -5.11
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "小金属",
       "pct_day": -5.27,
       "pct_5d": -14.69,
@@ -4119,24 +4173,6 @@
       "relative_90d": -2.33,
       "relative_180d": -15.86,
       "relative_52w": -8.44
-    },
-    {
-      "name": "保险",
-      "pct_day": 0.39,
-      "pct_5d": 1.52,
-      "pct_20d": 4.52,
-      "pct_30d": -1.47,
-      "pct_60d": 1.5,
-      "pct_90d": 2.83,
-      "pct_180d": -17.11,
-      "pct_52w": -10.79,
-      "relative_5d": 1.52,
-      "relative_20d": 4.52,
-      "relative_30d": -1.47,
-      "relative_60d": 1.5,
-      "relative_90d": 2.83,
-      "relative_180d": -17.11,
-      "relative_52w": -10.79
     }
   ],
   "weak_5d": [
@@ -4449,6 +4485,24 @@
       "relative_52w": -21.53
     },
     {
+      "name": "煤炭开采加工",
+      "pct_day": -1.39,
+      "pct_5d": -5.02,
+      "pct_20d": -6.76,
+      "pct_30d": -16.4,
+      "pct_60d": -11.84,
+      "pct_90d": 0.88,
+      "pct_180d": -7.07,
+      "pct_52w": -8.14,
+      "relative_5d": -5.02,
+      "relative_20d": -6.76,
+      "relative_30d": -16.4,
+      "relative_60d": -11.84,
+      "relative_90d": 0.88,
+      "relative_180d": -7.07,
+      "relative_52w": -8.14
+    },
+    {
       "name": "养殖业",
       "pct_day": -1.25,
       "pct_5d": -7.7,
@@ -4483,24 +4537,6 @@
       "relative_90d": 0.77,
       "relative_180d": -22.34,
       "relative_52w": -22.12
-    },
-    {
-      "name": "黑色家电",
-      "pct_day": -6.92,
-      "pct_5d": -9.02,
-      "pct_20d": -7.81,
-      "pct_30d": -7.5,
-      "pct_60d": -6.35,
-      "pct_90d": -9.9,
-      "pct_180d": -17.89,
-      "pct_52w": -11.68,
-      "relative_5d": -9.02,
-      "relative_20d": -7.81,
-      "relative_30d": -7.5,
-      "relative_60d": -6.35,
-      "relative_90d": -9.9,
-      "relative_180d": -17.89,
-      "relative_52w": -11.68
     }
   ],
   "index": {
