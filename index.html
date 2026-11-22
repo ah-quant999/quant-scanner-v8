@@ -2269,6 +2269,18 @@ window.STRATEGY_WALKFORWARD = {
     </div>
     <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
     </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════════════
+         🎯 因子榜 Top10（2026-11-22 主人令：因子榜属「因子实验室」产物，从选股池 tab 迁入本页，
+            置于「🏆 当日因子计分榜」下方；只展示 Top10，避免与「最终推荐」混淆）
+         数据源：TOP10_DAILY.top10（与计分榜同源），每日盘后随算法链刷新
+         ═════════════════════════════════════════════════════════════════════════ -->
+    <div class="card" id="factorTop10Card" style="border-left:4px solid #26d9c2;margin-top:16px">
+      <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>因子榜 Top10 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
+      <div id="stFinalSelSummary" class="tp-stocklist"></div>
+      <div id="stFinalSelList" class="tp-stocklist"></div>
+      <div class="note">口径：金股池按「预期前瞻收益」综合分降序的精选子集（selection_mode=top_by_expected_return，由 generate_top10.py 每日产出·收益率预测优先：前瞻期望 exp_ret ±15 + 证据门控因子 + winrate 置信微调 ±5，历史实绩不再定排序）。本卡 = <b>因子榜 Top10（本榜前 10 名）</b>；🏷 Top5 = 本榜前 5 名。⚠️ 本榜 = 金股池内收益率排序榜，非独立另建池，非「最终推荐」（最终推荐为独立管线）。</div>
+    </div>
     </div>  </section>
 
   <!-- ============ 🔍 个股查询（2026-08-09 提升为一级导航） ============ -->
@@ -3420,16 +3432,7 @@ function fmtSigned(v){
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
     <!-- ===== 2026-09-11 主人令纠正：候选股池来源级新鲜感不在选股策略页，已移至运维页数据健康总览卡内 ===== -->
-      <!-- ===== 2026-10-26 主人令：终选输出卡片置于「金股池」上方（数据源 TOP10_DAILY.top10，每日盘后随算法链刷新）===== -->
-      <div class="card" style="border-left:4px solid #26d9c2">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>终选输出 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
-        <div id="stFinalSelSummary" class="tp-stocklist"></div>
-        <div id="stFinalSelList" class="tp-stocklist"></div>
-        <div id="stFinalSelMore" style="display:none;margin:6px 0 4px">
-          <button id="stFinalSelMoreBtn" onclick="window.toggleStFinalSel()" style="background:transparent;color:#26d9c2;border:1px solid #26d9c2;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer">▾ 展开全部</button>
-        </div>
-        <div class="note">口径：金股池（~800 只）按「预期前瞻收益」综合分降序的精选子集（selection_mode=top_by_expected_return，由 generate_top10.py 每日产出·收益率预测优先：前瞻期望 exp_ret ±15 + 证据门控因子 + winrate 置信微调 ±5，历史实绩不再定排序，不再强制金钻+缠论双共振）。本卡 = <b>当日终选输出全量（top20）</b>；🏷 Top5 = 本榜收益率+胜率降序前 5 名（即设计上应推的「最终推荐」）。⚠️ 终选=金股池收益率+胜率榜，非独立另建池。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
-      </div>
+      <!-- ===== 2026-11-22 主人令：因子榜Top10卡已迁入「最终推荐 → 因子实验室」积分榜下方（本卡属因子实验室产物，不属选股池）；渲染触发同步迁移 ===== -->
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #ffd024">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">⭐</span>金股池 <span id="stGoldPoolTime">—</span> <span id="stGoldPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">累计信号池 · 盘后</span></h3>
@@ -15206,13 +15209,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     _goldPoolExpanded = !_goldPoolExpanded;
     renderStGoldPool();
   };
-  // ===== 2026-10-26 主人令：终选输出卡片渲染（数据源 TOP10_DAILY.top10）=====
-  var _finalSelExpanded = false;
+  // ===== 因子榜 Top10 卡片渲染（数据源 TOP10_DAILY.top10；2026-11-22 改名+只展示前10）=====
   window.renderFinalSelection = function(){
     const $ = id => document.getElementById(id);
     const TD = window.TOP10_DAILY || {};
     const arr = (TD.top10 && Array.isArray(TD.top10)) ? TD.top10 : [];
-    // 时间胶囊（终选输出为盘前定稿·盘中不刷新，与选股池[盘后]口径区分）
+    // 时间胶囊（因子榜为盘前定稿·盘中不刷新，与选股池[盘后]口径区分）
     const tEl = $('stFinalSelTime');
     const ts = TD.update_time || '';
     if(tEl){
@@ -15221,11 +15223,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           : ((window._fmtAshareRel && window._fmtAshareRel(ts)) || String(ts).slice(0,16).replace('T',' '));
       }catch(e){ tEl.textContent = String(ts).slice(0,16).replace('T',' '); }
     }
-    const sumEl = $('stFinalSelSummary'), listEl = $('stFinalSelList'), moreWrap = $('stFinalSelMore');
+    const sumEl = $('stFinalSelSummary'), listEl = $('stFinalSelList');
     if(!arr.length){
       if(sumEl) sumEl.innerHTML = '';
-      if(listEl) listEl.innerHTML = '<div class="note" style="text-align:center">终选输出数据暂不可用（data/TOP10_DAILY.js 待算法链更新）</div>';
-      if(moreWrap) moreWrap.style.display = 'none';
+      if(listEl) listEl.innerHTML = '<div class="note" style="text-align:center">因子榜数据暂不可用（data/TOP10_DAILY.js 待算法链更新）</div>';
       return;
     }
     // 摘要 pills
@@ -15234,15 +15235,15 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       const modeTxt = mode.indexOf('high_conviction') >= 0 ? '高信念共振' : (mode || '—');
       const pill = (t,c)=>'<span style="background:'+c+'1a;color:'+c+';border:1px solid '+c+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap">'+t+'</span>';
       sumEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px">'
-        + pill('🎯 终选 <b>'+arr.length+'</b> 只','#26d9c2')
+        + pill('🎯 因子榜 <b>'+Math.min(arr.length,10)+'</b> 只','#26d9c2')
         + '<span title="selection_mode='+ (mode||'—') +'" style="color:#41c9ff;border:1px solid #41c9ff4d;border-radius:4px;padding:2px 7px;white-space:nowrap">模式 '+modeTxt+'</span>'
         + (TD.hc_count != null ? pill('双共振 <b>'+TD.hc_count+'</b> 只','#ffd024') : '')
         + (TD.total_scored != null ? pill('金股池 <b>'+TD.total_scored+'</b> 只','#c084fc') : '')
         + '<span style="color:var(--dim);margin-left:auto">金股池 → 预期前瞻收益综合分降序（未来收益优先）</span>'
         + '</div>';
     }
-    // 列表（Top5 标 🏷）
-    const limit = _finalSelExpanded ? arr.length : 12;
+    // 列表（Top5 标 🏷）— 2026-11-22 主人令：只展示 Top10
+    const limit = Math.min(arr.length, 10);
     const top5 = arr.slice(0,5).map(s=>String(s.code));
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">';
     arr.slice(0, limit).forEach(function(s){
@@ -15263,19 +15264,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     });
     h += '</div>';
     if(listEl) listEl.innerHTML = h;
-    if(moreWrap){
-      moreWrap.style.display = arr.length > 12 ? 'block' : 'none';
-      const btn = $('stFinalSelMoreBtn');
-      if(btn) btn.textContent = _finalSelExpanded ? '▴ 收起' : ('▾ 展开全部（共 '+arr.length+' 只）');
-    }
   };
-  window.toggleStFinalSel = function(){
-    _finalSelExpanded = !_finalSelExpanded;
-    window.renderFinalSelection();
-  };
-  // 选股池子页统一渲染入口：终选输出（上）+ 金股池（中）+ 观测候选股池（下）
+  // 选股池子页统一渲染入口：金股池（上）+ 观测候选股池（下）｜因子榜Top10 已迁入因子实验室，渲染随之迁移
   window.renderStPoolAll = function(){
-    try{ if(window.renderFinalSelection) window.renderFinalSelection(); }catch(e){ try{ console.warn('[终选输出] 渲染失败', e); }catch(_){} }
     try{ renderStGoldPool(); }catch(e){ try{ console.warn('[金股池] 渲染失败', e); }catch(_){} }
     try{ renderStPool(); }catch(e){ try{ console.warn('[选股池] 渲染失败', e); }catch(_){} }
   };
@@ -18068,6 +18059,7 @@ hm += '</div>'; // /ulPaneBacktest
   window.__renderFactorPane = function(){
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
     try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
+    try{ if(typeof window.renderFinalSelection==='function') window.renderFinalSelection(); }catch(e){ console.warn('因子榜Top10卡渲染失败', e); }
     try{ if(typeof window.__renderExecAlgo==='function') window.__renderExecAlgo(); }catch(e){ console.warn('收益转化算法渲染失败', e); }
     /* 📦 2026-11-17 主人令：按收益率排选卡迁入「选股策略→回测跟踪」(st-bt)，渲染触发随之迁出（见 switchSt bt 分支）。 */
   };
