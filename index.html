@@ -16531,13 +16531,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var body = document.getElementById('cashflowBody');
     if(!body) return;
     var D = window.CASHFLOW_QUALITY;
-    var tm = document.getElementById('cashflowTime');
     if(!D){ body.innerHTML = '<div class="note" style="color:#fbbf24">现金流数据未注入（data/CASHFLOW_QUALITY.js 缺失），如实留空不编造。</div>'; return; }
-    if(tm) tm.textContent = (D.period_label||'—') + ' · 算于 ' + (D.calc_date||'—').slice(5);
+    // 💰 2026-11-22 二次令：统一卡头 +「🦊 更新于」胶囊（读数据真值 calc_date，不写死），保留「观测·不参与选股」标签。
+    var hd = document.getElementById('cashflowHeader');
+    if(hd && typeof window.v8CardHeader === 'function'){
+      hd.innerHTML = window.v8CardHeader('&#x1F4B0;', 'A股现金流质量榜',
+        (D.period_label||'—') + ' · 现金含量=每股经营现金流/每股收益',
+        'update_time', {update_time:D.calc_date, slot:'盘后', horizon:'中长线'})
+        + '<div style="padding:0 14px 9px;margin-top:-2px"><span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span></div>';
+    }
     try{
       var GRN='#34d399', RED='#ef5350', AMB='#fbbf24', DIM='var(--dim)', CY='#41c9ff';
       var stocks = D.stocks||[], uni = D.universe||{}, crit = D.criteria||{};
       if(!stocks.length){ body.innerHTML = '<div class="note">本期无票通过现金流质量闸，如实留空不凑数。</div>'; return; }
+      // 🛡 2026-11-22 三次令：行业字段缺失的股票无法执行「剔金融」闸 —— 如实标出，不让口径说明越过证据。
+      var _noInd = stocks.filter(function(s){ return !s.industry || s.industry==='—' || s.industry==='-'; });
       var col = function(v){ return v>=0 ? RED : GRN; };
       var sgn = function(v,d){ if(v===null||v===undefined) return '—'; return (v>=0?'+':'') + Number(v).toFixed(d===undefined?1:d); };
 
@@ -16546,7 +16554,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       h += '<div style="background:#34d39912;border:1px solid #34d39933;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.65;color:'+DIM+'">'
          + '<b style="color:'+GRN+'">口径</b>：现金含量 = 每股经营现金流 ÷ 每股收益（每赚1元利润实收多少现金，衡量盈利质量，非绝对规模）。'
          + '全市场 <b style="color:'+CY+'">'+(uni.all||'—')+'</b> 只 → 质量闸后 <b style="color:'+CY+'">'+(uni.after_filter||'—')+'</b> 只 → 取前 '+stocks.length+'。'
-         + '闸：'+(crit.gates||'—')+'。</div>';
+         + '闸：'+(crit.gates||'—')+'。</div>'
+         + (_noInd.length ? '<div style="background:#fbbf2412;border:1px solid #fbbf2438;border-radius:6px;padding:7px 10px;margin-bottom:11px;font-size:11px;color:#fbbf24">'
+            + '⚠ 本期 '+_noInd.length+' 只行业字段缺失（'+_noInd.map(function(s){return s.name;}).join('、')+'）：「剔金融」闸对其<b>无法核验</b>，如实标注，不声称已剔除。</div>' : '');
 
       // 表格
       h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px">';
@@ -16576,7 +16586,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 
       // 诚实边界（置底）
       h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">'
-         + '⚠ '+(D.boundary||'')+' 公告日期：'+stocks[0].ann_date+' 起。数据源：'+(D.source||'akshare')+'。</div>';
+         + '⚠ '+(D.boundary||'')+' 公告日期：'+stocks[0].ann_date+' 起。数据源：'+(D.source||'akshare')+'。<br>'
+         + '📌 本榜<b>无收益回测</b>，不是长期持有组合；高现金含量可由低 EPS 放大（本期 EPS '+Math.min.apply(null,stocks.map(function(s){return s.eps;})).toFixed(2)+'~'+Math.max.apply(null,stocks.map(function(s){return s.eps;})).toFixed(2)+'），不等于未来收益更高。</div>';
       body.innerHTML = h;
     }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">现金流榜渲染异常：'+e.message+'</div>'; console.warn('[cashflow]',e); }
   };
@@ -16791,11 +16802,8 @@ h += '<div class="card" style="margin-bottom:16px">'
 
 // 💰 2026-11-22 主人令：A股现金流质量榜卡，置于「板块技术研判」卡下方。数据源 data/CASHFLOW_QUALITY.js（gen_cashflow_quality.py 真实计算）。
 h += '<div class="card" id="cashflowCard" style="margin-bottom:16px;border-left:4px solid #34d399">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
-   + '<span style="font-size:15px;font-weight:700;color:#34d399">&#x1F4B0; A股现金流质量榜</span>'
-   + '<span id="cashflowTime" style="font-size:11px;color:var(--dim)">&#x2014;</span>'
-   + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span>'
-   + '</div>'
+   // 💰 2026-11-22 二次令：卡头改为全站统一 v8CardHeader（含「🦊 更新于」胶囊）；defer 数据到达后由 __renderCashflow 填充。
+   + '<div id="cashflowHeader"></div>'
    + '<div id="cashflowBody"><div class="note">现金流数据加载中&#x2026;</div></div></div>';
 
 // 🚀 2026-09-18 主人令：主升/启动 板块·龙头股 独立卡（观测类首卡，置于「概念/行业 → ETF·龙头 参考」卡上方）
