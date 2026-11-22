@@ -46,6 +46,9 @@ DATA_SOURCES = {
     # 🆕 2026-11-22 主人令：回调企稳池展示数据源（gen_pullback_pool.py 产出，
     #   顶层 dict（带 stocks list）直接转换，「选股策略 → 🔄 回调池」子tab 消费 window.PULLBACK_POOL）。
     "pullback_pool.json":          "PULLBACK_POOL",
+    # 🆕 2026-11-22 主人令「跟踪回测看有没有更好」：前瞻跟踪台账（gen_pullback_pool.py 同链产出，
+    #   逐日记录严格信号 + 次日开盘买价 + 回填 T+5/T+20 真实收益与超额，前端回调池卡展示跟踪战报）。
+    "pullback_track.json":         "PULLBACK_TRACK",
     # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
     #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。
     #   前端 window.STOCK_PROFILE 由 STOCK_LIST 就地合成（index.html:15290-15304）；
@@ -419,6 +422,7 @@ CATEGORY_MAP = {
     "BACKTEST_EXPECTANCY": "post_close",
     # 🆕 2026-11-22 主人令：回调企稳池展示数据，每天盘后随算法链刷新
     "PULLBACK_POOL": "post_close",
+    "PULLBACK_TRACK": "post_close",
     # 🆕 2026-08-31：v8 选股生命周期跟踪归属盘后（依赖算法跟踪池，每日盘后产出）。
     "V8_POOL_TRACKER": "post_close",
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，

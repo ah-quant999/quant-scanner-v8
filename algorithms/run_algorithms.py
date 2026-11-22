@@ -258,7 +258,7 @@ ORDER = [
     #   ⚠️ 必须在 fetch_orphan_sector_fund_flow.py 之后——输入消费 sector_fund_flow / concept_ranking 真名。
     "gen_concept_etf_map.py",           # → out/concept_etf_map.json（→raw_data→update_v8 转 CONCEPT_ETF_MAP.js）
     # 🆕 2026-11-22 主人令（与 STAGES["A"] 成对）：回调企稳池展示数据源（只读 kline_cache，无外部依赖）
-    "gen_pullback_pool.py",             # → raw_data/pullback_pool.json（→update_v8 转 PULLBACK_POOL.js → 选股策略·回调池子tab）
+    "gen_pullback_pool.py",             # → raw_data/pullback_pool.json（展示前10）+ pullback_track.json（前瞻跟踪台账）→ PULLBACK_POOL.js / PULLBACK_TRACK.js
     # ── 最终推荐（final_recommend.py）──
     #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。

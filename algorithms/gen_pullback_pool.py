@@ -46,8 +46,17 @@ PREV_UP = 0.06                 # 过去60日涨幅门槛
 VOL_SHRINK = 0.85              # 缩量系数
 LOW_LOOK = 3                   # 近几日不创新低
 MIN_BARS = 250                 # 老票闸（时点K线根数）
-MAX_QUALITY_STOCKS = 60        # 输出上限（宁缺毋滥，取质量分最高的）
+MAX_QUALITY_STOCKS = 10        # 展示上限：主人令 2026-11-22「每天按评分显示前10只就够了」
+                               # ⚠️ 只限流展示，绝不放宽信号口径。实测(pp_topk_check.py)：严格信号内取前10
+                               #    与全量等价（同日配对 -0.07%，CI跨0，14/31胜出），不损害收益；
+                               #    而放宽企稳凑10只会亏（pp_score_duel.py：配对 -1.44%/日）。故信号闸一个不动。
 MAX_STALE_DAYS = 5             # 新鲜度闸：K线末日距今>5自然日视为停更，宁缺毋滥不输出（铁律①数据及时）
+
+# 前瞻跟踪台账（主人令 2026-11-22「跟踪回测，看有没有更好」）
+# 每天把当日命中票的信号日+次日开盘买价落盘；后续用真实K线回填 T+5/T+20 收益，
+# 与因子榜同口径对比。台账独立于展示池，不参与任何排序。
+TRACK_FILE = os.path.join(ROOT, "raw_data", "pullback_track.json")
+TRACK_HORIZONS = (5, 20)       # 跟踪持有周期（交易日）
 
 
 def _num(x):
@@ -140,6 +149,106 @@ def _signal_at(K, t):
     return True, quality, round(dd * 100, 2), round(vol_ratio, 3), round(ma5_gap * 100, 2)
 
 
+def _load_benchmark():
+    """中证1000 日线：date -> (open, close)，用于算前瞻超额收益"""
+    p = os.path.join(ROOT, "raw_data", "index_history_multi.json")
+    try:
+        j = json.load(open(p, encoding="utf-8"))
+        ks = j["data"]["000852.SH"]["klines"]
+        return {str(r["d"]): (_num(r.get("o")), _num(r.get("c"))) for r in ks}
+    except Exception:
+        return {}
+
+
+def _update_track(today_results, sig_date):
+    """前瞻跟踪台账：
+    1) 把当日命中票(最多前10)按 sig_date 追加落盘，记录信号日次日开盘买价(若K线已到位)；
+    2) 对台账中已成熟(信号日之后已有 T+20 根K线)的票，回填真实 T+5/T+20 收益与超额；
+    3) 未成熟的保留 buy_price 占位，等后续自然补齐。绝不回写/篡改历史信号日与质量分。
+    """
+    # 读旧台账
+    track = {"version": 1, "caliber": "严格企稳信号·次日开盘买·T+5/T+20收盘卖·扣0.3%·基准中证1000",
+             "last_update": "", "days": {}}
+    try:
+        old = json.load(open(TRACK_FILE, encoding="utf-8"))
+        if isinstance(old, dict) and isinstance(old.get("days"), dict):
+            track = old
+    except Exception:
+        pass
+
+    days = track["days"]
+    bm = _load_benchmark()
+
+    # ① 追加当日信号（按 code 去重，同日同票只留一条）
+    #    ⚠️ 0 信号日（如周末/大跌日）不新增，但仍继续走 ② 回填历史，不能早退。
+    if sig_date:
+        bucket = days.setdefault(sig_date, {})
+        for x in today_results:
+            code = x["code"]
+            K = _load_kline(code)
+            buy_price = None
+            buy_date = ""
+            if K and sig_date in K["d"]:
+                t = K["d"].index(sig_date)
+                if t + 1 < len(K["d"]):
+                    buy_price = K["o"][t + 1]
+                    buy_date = K["d"][t + 1]
+            if code not in bucket:
+                bucket[code] = {
+                    "name": x.get("name", ""),
+                    "quality": x["quality"],
+                    "dd20": x["dd20"],
+                    "vol_ratio": x["vol_ratio"],
+                    "ma5_gap": x["ma5_gap"],
+                    "buy_date": buy_date,
+                    "buy_price": round(buy_price, 4) if buy_price else None,
+                    "r5": None, "r20": None, "excess20": None,
+                }
+
+    # ② 回填所有未成熟信号（遍历全台账，幂等）
+    for sd, codes in days.items():
+        for code, rec in codes.items():
+            if rec.get("r20") is not None:
+                continue  # 已回填，跳过
+            K = _load_kline(code)
+            if not K or sd not in K["d"]:
+                continue
+            t = K["d"].index(sd)
+            bi = t + 1
+            if bi >= len(K["d"]):
+                continue
+            buy = K["o"][bi]
+            if not buy:
+                continue
+            if not rec.get("buy_price"):
+                rec["buy_price"] = round(buy, 4)
+                rec["buy_date"] = K["d"][bi]
+            # T+5
+            if t + 5 < len(K["d"]) and rec.get("r5") is None:
+                sell5 = K["c"][t + 5]
+                if sell5:
+                    rec["r5"] = round((sell5 / buy - 1 - 0.003) * 100, 2)
+            # T+20
+            if t + 20 < len(K["d"]):
+                sell20 = K["c"][t + 20]
+                if sell20:
+                    rec["r20"] = round((sell20 / buy - 1 - 0.003) * 100, 2)
+                    bd, sd20 = K["d"][bi], K["d"][t + 20]
+                    if bd in bm and sd20 in bm:
+                        bo, bc = bm[bd]
+                        _, ec = bm[sd20]
+                        if bo and bc:
+                            rec["excess20"] = round(rec["r20"] - (ec / bo - 1) * 100, 2)
+
+    track["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    os.makedirs(os.path.dirname(TRACK_FILE), exist_ok=True)
+    with open(TRACK_FILE, "w", encoding="utf-8") as f:
+        json.dump(track, f, ensure_ascii=False, indent=2)
+    matured = sum(1 for ds in days.values() for r in ds.values() if r.get("r20") is not None)
+    total = sum(len(ds) for ds in days.values())
+    print(f"[pullback-track] 台账累计 {total} 条信号 / {len(days)} 个信号日，已成熟回填 {matured} 条 → {TRACK_FILE}")
+
+
 def main():
     names = _load_names()
     results = []
@@ -178,11 +287,13 @@ def main():
             "sig_date": K["d"][t],
         })
     results.sort(key=lambda x: -x["quality"])
-    results = results[:MAX_QUALITY_STOCKS]
+    all_hits = list(results)                       # 全量命中 → 供前瞻跟踪台账（样本充分）
+    results = results[:MAX_QUALITY_STOCKS]         # 展示限流前10（不放宽信号）
     out = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "caliber": ("无前视·老票(判定时刻K线>=250)·回撤6-22%/过去60日涨>=6%/近3日不创新低/"
-                    "缩量<0.85xMA5量/站上MA5·实时口径判到最后一根K线·仅展示不参与Top3排序"),
+                    "缩量<0.85xMA5量/站上MA5·严格信号一个不放宽·按质量分取前10仅限流展示·"
+                    "不参与Top3排序·前瞻跟踪逐日回填T+5/T+20真实收益"),
         "signal_date": results[0]["sig_date"] if results else "",
         "scanned": scanned,
         "stale_skipped": stale_skipped,
@@ -196,6 +307,11 @@ def main():
     print(f"[pullback-pool] 信号日={out['signal_date']}  输出={OUTPUT}")
     for x in results[:10]:
         print(f"  {x['code']} {x['name']:<8} 质量={x['quality']:.3f} 回撤={x['dd20']:+.1f}% 量比={x['vol_ratio']:.2f}")
+    # 前瞻跟踪：全量命中落台账（当日0只则只回填历史，不新增）
+    try:
+        _update_track(all_hits, out["signal_date"])
+    except Exception as e:
+        print(f"[pullback-track] 台账更新异常（不影响展示池）：{e}")
 
 
 if __name__ == "__main__":
