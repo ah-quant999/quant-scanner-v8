@@ -1,66 +1,5 @@
 [
  {
-  "date": "2026-08-22",
-  "time": "22:44:33",
-  "overall": "warn",
-  "summary": {
-   "ok": 105,
-   "warn": 8,
-   "fail": 1,
-   "total": 114
-  },
-  "warn_items": [
-   {
-    "id": "dom_taskScheduleBody",
-    "name": "DOM #taskScheduleBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttBackBody",
-    "name": "DOM #ttBackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttThrBody",
-    "name": "DOM #ttThrBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttSvlBody",
-    "name": "DOM #ttSvlBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttTrackBody",
-    "name": "DOM #ttTrackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsAdvBody",
-    "name": "DOM #stcrdsAdvBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsEliteBody",
-    "name": "DOM #stcrdsEliteBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_healthCheckBody",
-    "name": "DOM #healthCheckBody",
-    "message": "静态占位符(JS渲染)"
-   }
-  ],
-  "fail_items": [
-   {
-    "id": "dom_phMacroBody",
-    "name": "DOM #phMacroBody",
-    "message": "未找到元素"
-   }
-  ],
-  "tz": "Asia/Shanghai"
- },
- {
   "date": "2026-08-23",
   "time": "22:46:11",
   "overall": "warn",
@@ -4144,6 +4083,29 @@
     "id": "CFFEX_POSITION",
     "name": "IF会员持仓择时",
     "message": "更新于 11-20 05:31；超过阈值 2408 分钟"
+   }
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "time": "04:47:59",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 137,
+   "warn": 0,
+   "fail": 1,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 138
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "DO_NOT_DELETE",
+    "name": "防误删清单",
+    "message": "更新于 11-16 04:03；超过阈值 10080 分钟"
    }
   ]
  }
