@@ -15289,6 +15289,92 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     try{ renderStGoldPool(); }catch(e){ try{ console.warn('[金股池] 渲染失败', e); }catch(_){} }
     try{ renderStPool(); }catch(e){ try{ console.warn('[选股池] 渲染失败', e); }catch(_){} }
   };
+  // ===== ⚖️ 今日选股对比卡（回调池 vs 最终推荐；2026-11-22 主人令「两种的当天对比做成一张卡放回调池顶部」）=====
+  //   左边=回调池当日命中（window.PULLBACK_POOL），右边=最终推荐当日名单（window.FINAL_RECOMMEND_DATA）。
+  //   下方=两边真实回测 T+5/T+20 同口径收益对照（最终推荐读 FINAL_RECOMMEND_BACKTEST.periods，
+  //   回调池读 PULLBACK_TRACK 台账聚合）。任一方样本未成熟就如实显示"待成熟"，绝不编数、不跨口径硬比。
+  function buildPullbackCompareCard(){
+    const pill=(t,c)=>'<span style="background:'+c+'1a;color:'+c+';border:1px solid '+c+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap">'+t+'</span>';
+    const cUp=(x)=> x>0?'#ef5350':(x<0?'#26a69a':'var(--dim)');
+    const f=(x)=> (x>0?'+':'')+Number(x).toFixed(2)+'%';
+    const P = window.PULLBACK_POOL || {};
+    const FR = window.FINAL_RECOMMEND_DATA || {};
+    const FRB = window.FINAL_RECOMMEND_BACKTEST || {};
+    const pb = (P.stocks && Array.isArray(P.stocks)) ? P.stocks : [];
+    const fr = (FR.stocks && Array.isArray(FR.stocks)) ? FR.stocks : [];
+    const frSet = {}; fr.forEach(function(s){ frSet[String(s.code||'')]=true; });
+    const pbSet = {}; pb.forEach(function(s){ pbSet[String(s.code||'')]=true; });
+    function list(arr, side){
+      if(!arr.length) return '<div style="color:var(--dim);font-size:11px;padding:4px 0">— 当日无命中（如实空）—</div>';
+      return arr.map(function(s){
+        const code=String(s.code||''), name=s.name||'—';
+        const both = frSet[code] && pbSet[code];
+        const score = side==='pb' ? ('Q'+(typeof s.quality==='number'?s.quality.toFixed(3):'—')) : (typeof s.final_score==='number'?s.final_score.toFixed(1):'—');
+        return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11.5px;border-bottom:1px solid var(--border)">'
+          + '<span style="color:var(--txt);font-weight:600">'+name+'</span>'
+          + (both ? '<span style="font-size:9px;font-weight:700;color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:3px;padding:0 4px">双选</span>' : '')
+          + '<span style="margin-left:auto;color:var(--dim);font-family:monospace;font-size:10px">'+code+'</span>'
+          + '<span style="color:#38bdf8;font-size:10px;min-width:34px;text-align:right">'+score+'</span>'
+          + '</div>';
+      }).join('');
+    }
+    // 收益对照：最终推荐 periods
+    const p5 = (FRB.periods && FRB.periods['5d']) || {};
+    const p20 = (FRB.periods && FRB.periods['20d']) || {};
+    const fr5 = (!p5.immature && typeof p5.avg_return==='number') ? p5.avg_return : null;
+    const fr20 = (!p20.immature && typeof p20.avg_return==='number') ? p20.avg_return : null;
+    // 收益对照：回调池台账聚合
+    let n20=0,s20=0,nEx=0,sEx=0,n5=0,s5=0;
+    try{
+      const T = window.PULLBACK_TRACK || {};
+      const days = (T.days && typeof T.days==='object') ? T.days : {};
+      Object.keys(days).forEach(function(sd){
+        const codes=days[sd]||{};
+        Object.keys(codes).forEach(function(c){
+          const r=codes[c]||{};
+          if(typeof r.r20==='number'){n20++;s20+=r.r20;}
+          if(typeof r.excess20==='number'){nEx++;sEx+=r.excess20;}
+          if(typeof r.r5==='number'){n5++;s5+=r.r5;}
+        });
+      });
+    }catch(e){}
+    const pb5 = n5>0 ? s5/n5 : null;
+    const pb20 = n20>0 ? s20/n20 : null;
+    const pbEx = nEx>0 ? sEx/nEx : null;
+    const cell=(label,frv,pbv,extra)=>{
+      const fcell=(v)=> v===null ? '<span style="color:var(--dim)">待成熟</span>' : '<b style="color:'+cUp(v)+'">'+f(v)+'</b>';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11.5px;border-bottom:1px solid var(--border)">'
+        + '<span style="color:var(--dim);min-width:52px">'+label+'</span>'
+        + '<span style="color:var(--dim)">终推 </span>'+fcell(frv)
+        + '<span style="color:var(--border);margin:0 2px">│</span>'
+        + '<span style="color:var(--dim)">回调 </span>'+fcell(pbv)
+        + (extra||'')
+        + '</div>';
+    };
+    const bothCodes = Object.keys(pbSet).filter(function(c){return frSet[c];});
+    const bothLine = bothCodes.length
+      ? '<div style="margin-top:6px;font-size:10.5px;color:#fbbf24">🎯 双选重叠 '+bothCodes.length+' 只：'+bothCodes.map(function(c){var s=pb.filter(function(x){return String(x.code)===c;})[0]||{};return (s.name||c)+'('+c+')';}).join('、')+'</div>'
+      : '<div style="margin-top:6px;font-size:10.5px;color:var(--dim)">🎯 双选重叠 0 只 —— 两套算法今日选出完全不同的票（口径差异：终推=因子榜硬闸Top5，回调=企稳信号）</div>';
+    let html = '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid #fbbf24;border-radius:8px;padding:10px 14px;margin-bottom:12px">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--txt)">⚖️ 今日选股对比 · 回调池 vs 最终推荐</span>'
+      + pill('终推 '+(fr.length)+' 只','#f59e0b') + pill('回调 '+(pb.length)+' 只','#38bdf8')
+      + (FR.update_time ? '<span style="color:var(--dim);font-size:10px;margin-left:auto">终推更新 '+String(FR.update_time).slice(5,16)+'</span>' : '')
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + '<div><div style="font-size:11px;font-weight:700;color:#38bdf8;margin-bottom:3px">🔄 回调企稳池（严格信号·质量分前10）</div>'+list(pb,'pb')+'</div>'
+      + '<div><div style="font-size:11px;font-weight:700;color:#f59e0b;margin-bottom:3px">🏆 最终推荐（因子榜硬闸 Top5）</div>'+list(fr,'fr')+'</div>'
+      + '</div>'
+      + bothLine
+      + '<div style="margin-top:9px;padding-top:6px;border-top:1px solid var(--border)">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:3px">📈 真实回测收益对照（同口径：次日开盘买·扣0.3%·真实K线）</div>'
+      + cell('T+5 均收益', fr5, pb5)
+      + cell('T+20 均收益', fr20, pb20, (pbEx!==null ? '<span style="margin-left:auto;color:var(--dim);font-size:10px">回调超额中证1000 <b style="color:'+cUp(pbEx)+'">'+f(pbEx)+'</b></span>' : ''))
+      + '</div>'
+      + '<div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px">口径：终推收益来自其真实信号流回测（'+ (FRB.signal_date_range||'—') +'），回调池收益来自前瞻跟踪台账（逐日锁定、后续真实K线回填）。两边样本数/时段不同，仅作方向性对照，非严格配对检验；"待成熟"=持有未满对应交易日、无真实数据，不编造。</div>'
+      + '</div>';
+    return html;
+  }
   // ===== 🔄 回调池子tab 渲染（数据源 window.PULLBACK_POOL；2026-11-22 主人令新建）=====
   //   独立于因子榜的观察源，只展示不参与Top3排序；当下0只=下跌未企稳，如实空态不凑数。
   window.renderPullbackPool = function(){
@@ -15369,7 +15455,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){ trackHtml=''; }
     const note = '<div class="note" style="margin-top:10px">口径：'+ (P.caliber || '无前视·老票回调企稳信号')
       + '。本卡为<b>观察源</b>，独立于因子榜，不参与 Top3 排序（Top3 仍受因子榜硬闸约束）。信号为真实K线计算，命中数为0即代表当时全市场无合格企稳票，不补位、不伪造。</div>';
-    host.innerHTML = head + sum + body + trackHtml + note;
+    let cmpHtml = '';
+    try{ cmpHtml = buildPullbackCompareCard() || ''; }catch(e){ cmpHtml = ''; }
+    host.innerHTML = cmpHtml + head + sum + body + trackHtml + note;
   };
   function renderStPool(){
     const $ = id => document.getElementById(id);
