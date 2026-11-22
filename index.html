@@ -1404,6 +1404,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/AUDIT_TRAIL.js?v=043c9aaad7" defer></script>
 <script src="data/HEALTH_CHECK.js?v=53e9af74ee" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=3b592dc410" defer></script>
+    <!-- 🌊 2026-11-22 主人令：康波周期观测卡（中国经济 × A股）数据源，gen_kondratiev.py 真实计算；放暂未上架顶部 -->
+    <script src="data/KONDRATIEV.js?v=0" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=3e858c33d9" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=7f5399ee6d" defer></script>
@@ -16389,6 +16391,84 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }catch(e){ console.warn('[fillEtfFlowObs]', e); }
     };
 
+  // 🌊 康波周期卡渲染（2026-11-22 主人令；数据源 window.KONDRATIEV ← gen_kondratiev.py 真实计算）
+  //   诚实铁律：长波阶段=学界理论框架锚定（非数据拟合）；中短周期/分位/波谷=本机真实数据实测。严格分离展示。
+  window.__renderKondratiev = function(){
+    var body = document.getElementById('kondratievBody');
+    if(!body) return;
+    var D = window.KONDRATIEV;
+    var tm = document.getElementById('kondTime');
+    if(!D){ body.innerHTML = '<div class="note" style="color:#fbbf24">康波数据未注入（data/KONDRATIEV.js 缺失），如实留空不编造。</div>'; return; }
+    if(tm) tm.textContent = '算于 ' + (D.calc_date||'—');
+    try{
+      var A = D.a_share||{}, C = D.cn_economy||{}, T = D.theory||{};
+      var RED='#ef5350', GRN='#26a69a', CY='#38bdf8', AMB='#fbbf24', DIM='var(--dim)';
+      var col = function(v){ return v>=0 ? RED : GRN; }; // 红涨绿跌
+      var sgn = function(v,d){ return (v>=0?'+':'') + Number(v).toFixed(d===undefined?1:d); };
+      var h = '';
+
+      // ① 诚实边界声明（置顶，绝不把理论锚定伪装成拟合结论）
+      h += '<div style="background:#fbbf2415;border:1px solid #fbbf2444;border-radius:6px;padding:8px 11px;margin-bottom:14px;font-size:11.5px;line-height:1.7;color:'+DIM+'">'
+         + '<b style="color:'+AMB+'">⚠ 口径边界</b>：康波长波 50–60 年，而 A股仅 '+(A.years||'—')+' 年、GDP 仅 '+(C.gdp&&C.gdp.years||'—')+' 年，'
+         + '<b>均不足一个完整康波</b>。下方「长波阶段」为学界理论框架锚定（'+(T.scholar||'康德拉季耶夫长波')+'），<b style="color:'+AMB+'">非本机数据拟合</b>；'
+         + '「中短周期 / 分位 / 波谷」才是本机真实数据实测。本卡为观测研判，不进选股排序。</div>';
+
+      // ② 双轨对照
+      h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">';
+
+      // 左轨：中国经济
+      var gdp=C.gdp||{}, cpi=C.cpi||{}, ppi=C.ppi||{};
+      h += '<div style="border:1px solid var(--border);border-radius:8px;padding:12px">';
+      h += '<div style="font-size:13px;font-weight:700;color:'+CY+';margin-bottom:9px">🇨🇳 中国经济</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-bottom:3px">康波长波阶段 · 理论锚定</div>';
+      h += '<div style="font-size:14px;font-weight:600;margin-bottom:2px">第'+(T.wave||'—')+'波 · '+(T.stage||'—')+'</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-bottom:10px">'+(T.name||'')+'（'+(T.span||'')+'）</div>';
+      h += '<div style="border-top:1px dashed var(--border);padding-top:9px;font-size:11px;color:'+DIM+';margin-bottom:6px">中周期实测 · 真实数据</div>';
+      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;padding:3px 0"><span>GDP增速 <span style="color:'+DIM+'">('+(gdp.span||'—').split(' ~ ')[1]+')</span></span><b style="color:'+col(gdp.current-5)+'">'+(gdp.current!==undefined?sgn(gdp.current)+'%':'—')+'</b></div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin:-1px 0 6px">历史分位 '+(gdp.pctile!==undefined?gdp.pctile+'%（近'+(gdp.years||'—')+'年低位区）':'—')+' · 均值 '+(gdp.mean||'—')+'%</div>';
+      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;padding:3px 0"><span>CPI</span><b style="color:'+col(cpi.current-2)+'">'+(cpi.current!==undefined?sgn(cpi.current)+'%':'—')+'</b></div>';
+      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;padding:3px 0"><span>PPI</span><b style="color:'+col(ppi.current)+'">'+(ppi.current!==undefined?sgn(ppi.current)+'%':'—')+'</b></div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-top:6px;line-height:1.6">PPI('+(ppi.pctile||'—')+'%分位) 高于 CPI('+(cpi.pctile||'—')+'%分位)：上游涨价、需求偏弱，<b style="color:'+AMB+'">剪刀差</b>——名义再通胀未传导至居民端。</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-top:8px;border-top:1px dashed var(--border);padding-top:7px">阶段判读：<b style="color:'+col(-1)+'">'+(C.phase||'—')+'</b></div>';
+      h += '</div>';
+
+      // 右轨：A股
+      var cyc = A.fft_cycles||[];
+      var troughs = A.troughs||[], gaps = A.trough_gaps||[];
+      h += '<div style="border:1px solid var(--border);border-radius:8px;padding:12px">';
+      h += '<div style="font-size:13px;font-weight:700;color:'+CY+';margin-bottom:9px">📈 A股（上证指数）</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-bottom:3px">康波长波阶段 · 理论锚定</div>';
+      h += '<div style="font-size:14px;font-weight:600;margin-bottom:2px">第'+(T.wave||'—')+'波 · '+(T.stage||'—')+'</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-bottom:10px">A股 '+(A.span||'—')+'（仅 '+(A.years||'—')+' 年，覆盖约 0.6 波长）</div>';
+      h += '<div style="border-top:1px dashed var(--border);padding-top:9px;font-size:11px;color:'+DIM+';margin-bottom:6px">中短周期实测 · FFT（月度同比去趋势）</div>';
+      h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px">';
+      cyc.forEach(function(c,i){ var nm = c.years<=4.5?'基钦':(c.years>=6?'朱格拉':'中周期'); h += '<span style="background:'+CY+'18;color:'+CY+';border-radius:4px;padding:3px 8px;font-size:11.5px">'+nm+' ≈ '+c.years+'年 <span style="color:'+DIM+'">(功率'+c.power+')</span></span>'; });
+      h += '</div>';
+      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;padding:3px 0"><span>当前点位 <span style="color:'+DIM+'">('+(A.asof||'—')+')</span></span><b style="color:'+RED+'">'+(A.close||'—')+'</b></div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin:-1px 0 6px">历史分位 '+(A.price_pctile||'—')+'% · 高于120月线 '+sgn(A.ma120_gap_pct)+'%（'+A.ma120+'）</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-bottom:4px">历史大底（年度收盘局部低点）：</div>';
+      h += '<div style="font-size:11.5px;line-height:1.8">' + troughs.map(function(t){return t.year+'('+Math.round(t.close)+')';}).join(' → ') + '</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-top:4px">波谷间隔 '+(gaps.join('/')||'—')+' 年 <b style="color:'+AMB+'">（逐次缩短）</b> · 距最近底约 '+(A.yrs_since_trough||'—')+' 年</div>';
+      h += '<div style="font-size:11px;color:'+DIM+';margin-top:8px;border-top:1px dashed var(--border);padding-top:7px">阶段判读：<b style="color:'+RED+'">'+(A.phase||'—')+'</b></div>';
+      h += '</div>';
+
+      h += '</div>';
+
+      // ③ 合并研判
+      h += '<div style="background:#38bdf80d;border:1px solid #38bdf833;border-radius:8px;padding:11px 12px;margin-top:12px">';
+      h += '<div style="font-size:13px;font-weight:700;color:'+CY+';margin-bottom:6px">🧭 合并研判 · 两周期叠加</div>';
+      h += '<div style="font-size:12px;line-height:1.85;color:var(--txt)">'
+         + '<b style="color:'+AMB+'">长波（理论）</b>：中国经济与A股同处第五次康波「衰退→萧条」筑底区，长波级别的机会在孕育、但未确认。<br>'
+         + '<b style="color:'+RED+'">中周期（实测）</b>：A股处朱格拉升段中后段、点位已到历史 '+(A.price_pctile||'—')+'% 高分位；经济增速却在近21年 '+(gdp.pctile||'—')+'% 低位——<b style="color:'+AMB+'">股价位置与基本面背离</b>。<br>'
+         + '<b style="color:'+CY+'">叠加结论</b>：长波底部 + 中周期高位 = 「底部区域中的阶段性高位」，指数级别行情需经济增速确认拐点；波谷间隔缩短提示周期在加速。'
+         + '</div>';
+      h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:8px;line-height:1.6">数据源：'+ (D.source||'akshare') +'。长波阶段为学界框架定位，不构成收益预测或投资建议；此为观测卡，不进 Top3 / 终选。</div>';
+      h += '</div>';
+
+      body.innerHTML = h;
+    }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">康波卡渲染异常：'+e.message+'</div>'; console.warn('[kondratiev]',e); }
+  };
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -16408,7 +16488,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
+      var names = ['__renderKondratiev', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       /* 🔬 2026-11-18 主人令：+renderSectorTech（板块技术研判卡迁入本骨架，主升/启动卡上方；派发名单同步补入，幂等重渲无害） */
       var probe = document.getElementById('themeValueBody');
@@ -16536,6 +16616,14 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //     同批开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block">'
+// 🌊 2026-11-22 主人令：康波周期卡（中国经济 × A股 双轨对照）置顶。数据源 data/KONDRATIEV.js（gen_kondratiev.py 真实计算）。
+h += '<div class="card" id="kondratievCard" style="margin-bottom:16px;border-left:4px solid #38bdf8">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+   + '<span style="font-size:15px;font-weight:700;color:#38bdf8">&#x1F30A; 康波周期 &#183; 中国经济 &times; A股</span>'
+   + '<span id="kondTime" style="font-size:11px;color:var(--dim)">&#x2014;</span>'
+   + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span>'
+   + '</div>'
+   + '<div id="kondratievBody"><div class="note">康波数据加载中&#x2026;</div></div></div>';
 h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-left:4px solid #c084fc">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
    + '<span style="font-size:15px;font-weight:700;color:#c084fc">&#x1F9ED; 综合研判</span>'
