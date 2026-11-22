@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-22 16:16:47",
+  "update_time": "2026-11-22 16:33:50",
   "count": 20,
   "date_range": "2026-11-19 ~ 2026-11-20",
   "reports": [
@@ -257,7 +257,7 @@
       "date": "2026-11-20",
       "stocks": [
         {
-          "name": "0013",
+          "name": "和黄医药",
           "code": "0013",
           "full_code": "0013.HK",
           "exchange": "HK",

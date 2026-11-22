@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "updated": "2026-11-22 16:16:48",
+  "updated": "2026-11-22 16:33:50",
   "sources": [
     "guanlan"
   ],
@@ -73,7 +73,7 @@
       "added_date": "2026-11-20"
     },
     {
-      "name": "0013",
+      "name": "和黄医药",
       "code": "0013",
       "full_code": "0013.HK",
       "exchange": "HK",
