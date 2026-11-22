@@ -101,6 +101,9 @@ MUST_HAVE_CRON = {
     #   10-05 建链时漏双登记，Pre-deploy audit [4/8] 连续红灯阻断 deploy；
     #   已同步在运维页卡片调度表（index.html#sec-op）挂文档行。
     "v8_market_thermo": "未来预测数据fetcher(交易日16:10)",
+    # 2026-11-23 主人令：康波周期观测卡月度刷新（每月10日18:00 CST）
+    #   algorithms/gen_kondratiev.py → data/KONDRATIEV.js + ?v 同步；三处同批登记防 [4/8] 门禁红。
+    "v8_kondratiev_monthly": "康波周期月度刷新(每月10日18:00)",
     # 🔴 2026-09-23 当日撤销登记并删除文件（小九；主人拍板「删」）。
     #   原意：自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending。
     #   删因（两处设计级缺陷，均已实测）：
