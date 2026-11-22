@@ -1406,6 +1406,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/COMMODITY_ELASTICITY.js?v=3b592dc410" defer></script>
     <!-- 🌊 2026-11-22 主人令：康波周期观测卡（中国经济 × A股）数据源，gen_kondratiev.py 真实计算；放暂未上架顶部 -->
     <script src="data/KONDRATIEV.js?v=b39045fa42" defer></script>
+    <!-- 💰 2026-11-22 主人令：A股现金流质量榜数据源，gen_cashflow_quality.py 真实计算；放板块技术研判卡下方 -->
+    <script src="data/CASHFLOW_QUALITY.js?v=0" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=3e858c33d9" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=7f5399ee6d" defer></script>
@@ -16469,6 +16471,62 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">康波卡渲染异常：'+e.message+'</div>'; console.warn('[kondratiev]',e); }
   };
 
+  // 💰 A股现金流质量榜渲染（2026-11-22 主人令；数据源 window.CASHFLOW_QUALITY ← gen_cashflow_quality.py）
+  //   主排序=现金含量(每股经营现金流/每股收益)，辅助列=每股现金流规模/ROE/营收增速；红涨绿跌；纯观测不进选股。
+  window.__renderCashflow = function(){
+    var body = document.getElementById('cashflowBody');
+    if(!body) return;
+    var D = window.CASHFLOW_QUALITY;
+    var tm = document.getElementById('cashflowTime');
+    if(!D){ body.innerHTML = '<div class="note" style="color:#fbbf24">现金流数据未注入（data/CASHFLOW_QUALITY.js 缺失），如实留空不编造。</div>'; return; }
+    if(tm) tm.textContent = (D.period_label||'—') + ' · 算于 ' + (D.calc_date||'—').slice(5);
+    try{
+      var GRN='#34d399', RED='#ef5350', AMB='#fbbf24', DIM='var(--dim)', CY='#41c9ff';
+      var stocks = D.stocks||[], uni = D.universe||{}, crit = D.criteria||{};
+      if(!stocks.length){ body.innerHTML = '<div class="note">本期无票通过现金流质量闸，如实留空不凑数。</div>'; return; }
+      var col = function(v){ return v>=0 ? RED : GRN; };
+      var sgn = function(v,d){ if(v===null||v===undefined) return '—'; return (v>=0?'+':'') + Number(v).toFixed(d===undefined?1:d); };
+
+      var h = '';
+      // 口径说明
+      h += '<div style="background:#34d39912;border:1px solid #34d39933;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.65;color:'+DIM+'">'
+         + '<b style="color:'+GRN+'">口径</b>：现金含量 = 每股经营现金流 ÷ 每股收益（每赚1元利润实收多少现金，衡量盈利质量，非绝对规模）。'
+         + '全市场 <b style="color:'+CY+'">'+(uni.all||'—')+'</b> 只 → 质量闸后 <b style="color:'+CY+'">'+(uni.after_filter||'—')+'</b> 只 → 取前 '+stocks.length+'。'
+         + '闸：'+(crit.gates||'—')+'。</div>';
+
+      // 表格
+      h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px">';
+      h += '<thead><tr style="border-bottom:1px solid var(--border);color:'+DIM+';font-weight:600;text-align:left">'
+         + '<th style="padding:6px 5px;width:26px">#</th>'
+         + '<th style="padding:6px 5px">股票</th>'
+         + '<th style="padding:6px 5px;text-align:right" title="每股经营现金流÷每股收益">现金含量</th>'
+         + '<th style="padding:6px 5px;text-align:right" title="每股经营现金流(元)">每股现金流</th>'
+         + '<th style="padding:6px 5px;text-align:right">ROE</th>'
+         + '<th style="padding:6px 5px;text-align:right">营收增速</th>'
+         + '<th style="padding:6px 5px">行业/市场</th>'
+         + '</tr></thead><tbody>';
+      stocks.forEach(function(s,i){
+        var rankColor = i<3 ? AMB : DIM;
+        var mktColor = s.market==='北交所' ? AMB : (s.market==='科创板'?'#c084fc':(s.market==='创业板'?'#41c9ff':DIM));
+        h += '<tr style="border-bottom:1px solid var(--border)">'
+           + '<td style="padding:6px 5px;color:'+rankColor+';font-weight:600">'+(i+1)+'</td>'
+           + '<td style="padding:6px 5px"><b>'+s.name+'</b> <span style="color:'+DIM+'">'+s.code+'</span></td>'
+           + '<td style="padding:6px 5px;text-align:right;color:'+GRN+';font-weight:600">'+Number(s.quality).toFixed(1)+'×</td>'
+           + '<td style="padding:6px 5px;text-align:right;color:'+CY+'">'+Number(s.cash_ps).toFixed(2)+'</td>'
+           + '<td style="padding:6px 5px;text-align:right;color:'+col(s.roe)+'">'+sgn(s.roe)+'%</td>'
+           + '<td style="padding:6px 5px;text-align:right;color:'+col(s.rev_growth)+'">'+sgn(s.rev_growth)+'%</td>'
+           + '<td style="padding:6px 5px;color:'+DIM+'">'+s.industry+' <span style="color:'+mktColor+'">['+s.market+']</span></td>'
+           + '</tr>';
+      });
+      h += '</tbody></table></div>';
+
+      // 诚实边界（置底）
+      h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">'
+         + '⚠ '+(D.boundary||'')+' 公告日期：'+stocks[0].ann_date+' 起。数据源：'+(D.source||'akshare')+'。</div>';
+      body.innerHTML = h;
+    }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">现金流榜渲染异常：'+e.message+'</div>'; console.warn('[cashflow]',e); }
+  };
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -16488,7 +16546,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderKondratiev', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
+      var names = ['__renderKondratiev', '__renderCashflow', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       /* 🔬 2026-11-18 主人令：+renderSectorTech（板块技术研判卡迁入本骨架，主升/启动卡上方；派发名单同步补入，幂等重渲无害） */
       var probe = document.getElementById('themeValueBody');
@@ -16681,6 +16739,15 @@ h += '<div class="card" style="margin-bottom:16px">'
    + '<div id="sectorTechBody" style="font-size:13px;color:var(--txt);">加载中…</div>'
    + '<div class="note note-insight">📌 共振置信度分级 L4(四项全满足)＞L3(三项)＞L2(两项)＞L1。四项=资金(net＞0且涨＞0)+趋势(EMA多头≥2)+位置(近60日分位≥70%)+量价(5日量比≥1.1)。压力=近20/60日高点，支撑=EMA20/波段底50%。东财一级行业指数点位，日频盘后研判非盘中实时信号；红涨绿跌。仅观测，不改选股排序。</div>'
    + '</div>';
+
+// 💰 2026-11-22 主人令：A股现金流质量榜卡，置于「板块技术研判」卡下方。数据源 data/CASHFLOW_QUALITY.js（gen_cashflow_quality.py 真实计算）。
+h += '<div class="card" id="cashflowCard" style="margin-bottom:16px;border-left:4px solid #34d399">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+   + '<span style="font-size:15px;font-weight:700;color:#34d399">&#x1F4B0; A股现金流质量榜</span>'
+   + '<span id="cashflowTime" style="font-size:11px;color:var(--dim)">&#x2014;</span>'
+   + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span>'
+   + '</div>'
+   + '<div id="cashflowBody"><div class="note">现金流数据加载中&#x2026;</div></div></div>';
 
 // 🚀 2026-09-18 主人令：主升/启动 板块·龙头股 独立卡（观测类首卡，置于「概念/行业 → ETF·龙头 参考」卡上方）
 //   数据 window.SECTOR_LEADERS（data/SECTOR_LEADERS.js，scripts/fetch_sector_leaders.py 盘后生成）。
