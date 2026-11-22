@@ -56,7 +56,7 @@ MAX_STALE_DAYS = 5             # 新鲜度闸：K线末日距今>5自然日视�
 # 每天把当日命中票的信号日+次日开盘买价落盘；后续用真实K线回填 T+5/T+20 收益，
 # 与因子榜同口径对比。台账独立于展示池，不参与任何排序。
 TRACK_FILE = os.path.join(ROOT, "raw_data", "pullback_track.json")
-TRACK_HORIZONS = (5, 20)       # 跟踪持有周期（交易日）
+TRACK_HORIZONS = (1, 2, 3, 5, 10, 20, 30, 45, 60, 75, 90, 180, 250)  # 跟踪持有周期（交易日）；2026-11-22 主人令：与最终推荐回测13档统一口径
 
 
 def _num(x):
@@ -161,23 +161,39 @@ def _load_benchmark():
 
 
 def _update_track(today_results, sig_date):
-    """前瞻跟踪台账：
+    """前瞻跟踪台账（2026-11-22 主人令：13档持有期，与最终推荐回测统一口径）：
     1) 把当日命中票(最多前10)按 sig_date 追加落盘，记录信号日次日开盘买价(若K线已到位)；
-    2) 对台账中已成熟(信号日之后已有 T+20 根K线)的票，回填真实 T+5/T+20 收益与超额；
-    3) 未成熟的保留 buy_price 占位，等后续自然补齐。绝不回写/篡改历史信号日与质量分。
+    2) 对台账中每条信号，按 TRACK_HORIZONS=(1,2,3,5,10,20,30,45,60,75,90,180,250) 逐档回填
+       真实收益 r_{n} 与超额 excess_{n}（已成熟档才写，未成熟保留 None 等后续补齐）；
+    3) 兼容旧台账 r5/r20/excess20 字段（读到后迁移进新字段，不删旧字段）。
+       绝不回写/篡改历史信号日与质量分；全档幂等。
     """
     # 读旧台账
-    track = {"version": 1, "caliber": "严格企稳信号·次日开盘买·T+5/T+20收盘卖·扣0.3%·基准中证1000",
-             "last_update": "", "days": {}}
+    track = {"version": 2,
+             "caliber": "严格企稳信号·次日开盘买·T+1/2/3/5/10/20/30/45/60/75/90/180/250收盘卖·扣0.3%·基准中证1000",
+             "horizons": list(TRACK_HORIZONS), "last_update": "", "days": {}}
     try:
         old = json.load(open(TRACK_FILE, encoding="utf-8"))
         if isinstance(old, dict) and isinstance(old.get("days"), dict):
             track = old
     except Exception:
         pass
+    track["version"] = 2
+    track["caliber"] = ("严格企稳信号·次日开盘买·T+1/2/3/5/10/20/30/45/60/75/90/180/250收盘卖"
+                        "·扣0.3%·基准中证1000（13档，与最终推荐回测同口径）")
+    track["horizons"] = list(TRACK_HORIZONS)
 
     days = track["days"]
     bm = _load_benchmark()
+
+    # 旧字段 → 新字段迁移辅助（r5→r_5, r20→r_20, excess20→excess_20）
+    def _migrate(rec):
+        for n in (5, 20):
+            oldk = "r%d" % n
+            if oldk in rec and ("r_%d" % n) not in rec:
+                rec["r_%d" % n] = rec[oldk]
+        if "excess20" in rec and "excess_20" not in rec:
+            rec["excess_20"] = rec["excess20"]
 
     # ① 追加当日信号（按 code 去重，同日同票只留一条）
     #    ⚠️ 0 信号日（如周末/大跌日）不新增，但仍继续走 ② 回填历史，不能早退。
@@ -194,7 +210,7 @@ def _update_track(today_results, sig_date):
                     buy_price = K["o"][t + 1]
                     buy_date = K["d"][t + 1]
             if code not in bucket:
-                bucket[code] = {
+                rec = {
                     "name": x.get("name", ""),
                     "quality": x["quality"],
                     "dd20": x["dd20"],
@@ -202,14 +218,16 @@ def _update_track(today_results, sig_date):
                     "ma5_gap": x["ma5_gap"],
                     "buy_date": buy_date,
                     "buy_price": round(buy_price, 4) if buy_price else None,
-                    "r5": None, "r20": None, "excess20": None,
                 }
+                for n in TRACK_HORIZONS:
+                    rec["r_%d" % n] = None
+                    rec["excess_%d" % n] = None
+                bucket[code] = rec
 
-    # ② 回填所有未成熟信号（遍历全台账，幂等）
+    # ② 回填所有信号的所有档位（遍历全台账，幂等）
     for sd, codes in days.items():
         for code, rec in codes.items():
-            if rec.get("r20") is not None:
-                continue  # 已回填，跳过
+            _migrate(rec)
             K = _load_kline(code)
             if not K or sd not in K["d"]:
                 continue
@@ -223,30 +241,34 @@ def _update_track(today_results, sig_date):
             if not rec.get("buy_price"):
                 rec["buy_price"] = round(buy, 4)
                 rec["buy_date"] = K["d"][bi]
-            # T+5
-            if t + 5 < len(K["d"]) and rec.get("r5") is None:
-                sell5 = K["c"][t + 5]
-                if sell5:
-                    rec["r5"] = round((sell5 / buy - 1 - 0.003) * 100, 2)
-            # T+20
-            if t + 20 < len(K["d"]):
-                sell20 = K["c"][t + 20]
-                if sell20:
-                    rec["r20"] = round((sell20 / buy - 1 - 0.003) * 100, 2)
-                    bd, sd20 = K["d"][bi], K["d"][t + 20]
-                    if bd in bm and sd20 in bm:
+            # 逐档回填（每档独立判断成熟，互不阻塞）
+            for n in TRACK_HORIZONS:
+                rk = "r_%d" % n
+                if rec.get(rk) is not None:
+                    continue  # 该档已回填
+                if t + n >= len(K["d"]):
+                    continue  # 未成熟
+                sell = K["c"][t + n]
+                if not sell:
+                    continue
+                rec[rk] = round((sell / buy - 1 - 0.003) * 100, 2)
+                # 超额（中证1000，基准缺则留空）
+                ek = "excess_%d" % n
+                if rec.get(ek) is None:
+                    bd, sd_n = K["d"][bi], K["d"][t + n]
+                    if bd in bm and sd_n in bm:
                         bo, bc = bm[bd]
-                        _, ec = bm[sd20]
+                        _, ec = bm[sd_n]
                         if bo and bc:
-                            rec["excess20"] = round(rec["r20"] - (ec / bo - 1) * 100, 2)
+                            rec[ek] = round(rec[rk] - (ec / bo - 1) * 100, 2)
 
     track["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     os.makedirs(os.path.dirname(TRACK_FILE), exist_ok=True)
     with open(TRACK_FILE, "w", encoding="utf-8") as f:
         json.dump(track, f, ensure_ascii=False, indent=2)
-    matured = sum(1 for ds in days.values() for r in ds.values() if r.get("r20") is not None)
+    matured = sum(1 for ds in days.values() for r in ds.values() if r.get("r_20") is not None)
     total = sum(len(ds) for ds in days.values())
-    print(f"[pullback-track] 台账累计 {total} 条信号 / {len(days)} 个信号日，已成熟回填 {matured} 条 → {TRACK_FILE}")
+    print(f"[pullback-track] 台账累计 {total} 条信号 / {len(days)} 个信号日，T+20已成熟 {matured} 条，13档逐档回填 → {TRACK_FILE}")
 
 
 def main():

@@ -3545,27 +3545,10 @@ function fmtSigned(v){
         回测已证<b style="color:var(--down)">无稳定超额</b>——次日买入≈抛硬币、中期持有单调负超额；<b>不参与你的选股排选</b>，仅作结构性观察。
       </div>
       <div id="resonTrackContainer"></div>
-
-    <!-- ═══════════════════════════════════════════════════
-         📈 按收益率排选（真实回测）（2026-11-15 主人令「因子也要按收益率来排选」）
-         读 window.FACTOR_LAB.yield_rank（v8/factor_lab_gen.py + v8/factor_yield.py 产出）：
-         对因子实验室候选股用本地真实日K回测各持有期真实收益率+胜率，按 T+20 平均收益降序排选；
-         与「回测跟踪页·最终推荐真实收益率回测」同引擎同口径（本榜=因子候选池，那卡=终选真实信号流）。
-         📦 2026-11-17 主人令「怎么放到因子实验室了」：本卡整卡迁入「🎯 选股策略 → 📊 回测跟踪」（最强共振卡之后）；渲染触发同步迁移（__renderFactorPane 摘出 → switchSt bt 分支 + st-bt 就绪重试）。
-         ═══════════════════════════════════════════════════ -->
-    <div class="card" id="factorYieldCard" style="border-left:4px solid #22c55e;margin-top:16px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-        <span style="font-size:15px;font-weight:700;color:var(--txt)">📈 按收益率排选（真实回测）</span>
-        <span id="fyUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
-        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#22c55e;border:1px solid #22c55e4d">真实日K · 扣成本0.30%</span>
-      </div>
-      <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:8px">
-        <b style="color:#22c55e">怎么读</b>：本榜把因子实验室的候选股，用<b>真实历史日K</b>回测各持有期收益（入场=次一交易日开盘、出场=t+N 收盘、双边成本 0.30%），按 <b>T+20 平均收益降序</b>排选——<b style="color:var(--gold)">因子也要按收益率来排</b>。
-        与「回测跟踪页·最终推荐真实收益率」同引擎同口径：本榜=因子候选池，那卡=终选真实信号流（算法链每日真实选股快照）。
-        <b style="color:#ffd024">⚠️ 口径提示：样本内回看 · 非每日真实信号流</b>——因子候选池自带强势股偏置（本榜回看的是历史趋势延续），<b>非未来收益预期</b>；与上方「最终推荐·真实收益率回测」（每日真实终选信号流）性质不同，勿混读。
-      </div>
-      <div id="factorYieldBody" style="padding:4px 2px 2px"><div class="note">加载中…</div></div>
-    </div>
+      <!-- 🗑 2026-11-22 主人令「这卡没用了，删除吧」：原「📈 按收益率排选（真实回测）」卡（factorYieldCard，
+           读 FACTOR_LAB.yield_rank 的样本内回看榜）整卡删除——样本内回看非真实信号流、自带强势股偏置，
+           与宗旨「选出未来收益率最高」无关且易误导。数据源 FACTOR_LAB_BACKTEST 仍由算法链产出（供每日因子计算卡徽章用），
+           仅前端展示卡与渲染/调度同步下线。 -->
     </div><!--/st-bt-->
 
   </section>
@@ -14764,7 +14747,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     body.innerHTML = keys.map(function(p){
       var k=p[0], v=periods[p[1]]||{};
       var immature = (v.samples==null || v.samples===0);
-      var samp = immature ? '<span style="color:var(--dim)">0（未成熟）</span>' : (v.samples==null?'—':v.samples);
+      // 🆕 2026-11-22 主人令「这卡T+5怎么这么好」：样本<30 加醒目警示——
+      //   T+5 仅6只(5胜1负)，均值+13.44%被单只+55.17%极值拉高，中位仅+8.33%、最差-15.3%，
+      //   统计上完全不可靠。此处只如实标注小样本，不改数、不粉饰。
+      var _small = (!immature && v.samples>0 && v.samples<30)
+        ? ' <span title="样本不足30：均值/胜率易被极端值扭曲，仅供参考，不可作收益率承诺" style="display:inline-block;margin-left:4px;padding:0 4px;border-radius:6px;font-size:9px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.4);cursor:help;white-space:nowrap">⚠小样本 n='+v.samples+'</span>' : '';
+      var samp = immature ? '<span style="color:var(--dim)">0（未成熟）</span>' : ((v.samples==null?'—':v.samples)+_small);
       function wrap(val, cls){
         if(immature || val==null) return '<td style="color:var(--dim)">—</td>';
         return '<td'+(cls?' '+cls:'')+'>'+val+'</td>';
@@ -15092,7 +15080,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(n==='bt'){
       setTimeout(function(){ try{ window.renderResonanceTrack(); }catch(e){ console.warn('[bt] resonTrack', e); } }, 30);
       setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[bt] backtest', e); } }, 60);
-      setTimeout(function(){ try{ window.__renderFactorYield(); }catch(e){ console.warn('[bt] factorYield', e); } }, 90);  // 📦 2026-11-17 迁入：因子候选池收益率排选（第三张）
+      /* 🗑 2026-11-22：原 __renderFactorYield 调度随卡删除（按收益率排选卡已下线） */
     }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
@@ -15113,7 +15101,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       // 🆕 2026-11-22 主人令：回调池子tab 就绪判定（PULLBACK_POOL.js 注入即可；count=0 也是合法真值态）
       pullback:function(){return !!(window.PULLBACK_POOL&&typeof window.PULLBACK_POOL.count==='number');},
       // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
-      bt:function(){return !!((window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST)||(window.FACTOR_LAB&&window.FACTOR_LAB.yield_rank));},  // 📦 2026-11-17 迁入第三卡：FACTOR_LAB.yield_rank 任一源到位即可补渲
+      bt:function(){return !!(window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST);},  // 🗑 2026-11-22：FACTOR_LAB.yield_rank 判据随按收益率排选卡删除
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};
@@ -15294,18 +15282,27 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     try{ renderStPool(); }catch(e){ try{ console.warn('[选股池] 渲染失败', e); }catch(_){} }
   };
   // ===== ⚖️ 今日选股对比卡（回调池 vs 最终推荐；2026-11-22 主人令「两种的当天对比做成一张卡放回调池顶部」）=====
-  //   左边=回调池当日命中（window.PULLBACK_POOL），右边=最终推荐当日名单（window.FINAL_RECOMMEND_DATA）。
-  //   下方=两边真实回测 T+5/T+20 同口径收益对照（最终推荐读 FINAL_RECOMMEND_BACKTEST.periods，
-  //   回调池读 PULLBACK_TRACK 台账聚合）。任一方样本未成熟就如实显示"待成熟"，绝不编数、不跨口径硬比。
+  //   左边=回调池当日命中（window.PULLBACK_POOL），右边=最终推荐当日名单（window.TOP10_DAILY.top10，
+  //   与上方最终推荐卡同源同序；2026-11-22 修正：原误读已弃用的 FINAL_RECOMMEND_DATA.stocks 导致名单不一致）。
+  //   下方=两边真实回测 13档 同口径收益对照（最终推荐读 FINAL_RECOMMEND_BACKTEST.periods，
+  //   回调池读 PULLBACK_TRACK 台账聚合），带样本数+小样本警示。任一方未成熟如实"待成熟"，绝不编数、不跨口径硬比。
   function buildPullbackCompareCard(){
     const pill=(t,c)=>'<span style="background:'+c+'1a;color:'+c+';border:1px solid '+c+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap">'+t+'</span>';
     const cUp=(x)=> x>0?'#ef5350':(x<0?'#26a69a':'var(--dim)');
     const f=(x)=> (x>0?'+':'')+Number(x).toFixed(2)+'%';
     const P = window.PULLBACK_POOL || {};
-    const FR = window.FINAL_RECOMMEND_DATA || {};
+    // 🔴 2026-11-22 主人令「为什么最终推荐的股不一致，应该统一口径」：
+    //   主站「最终推荐Top5」卡唯一真源 = TOP10_DAILY.top10（renderFinalRecInner 同款），
+    //   FINAL_RECOMMEND_DATA.stocks 是已弃用的陈旧错批字段（主站代码已明注）。本卡必须同源同序，
+    //   否则对比卡右侧与上方最终推荐卡名单对不上（实测：前者08:55的国泰海通/大唐发，后者11-20的广联航空/招商证券/国泰海通）。
+    const TD = window.TOP10_DAILY || {};
     const FRB = window.FINAL_RECOMMEND_BACKTEST || {};
     const pb = (P.stocks && Array.isArray(P.stocks)) ? P.stocks : [];
-    const fr = (FR.stocks && Array.isArray(FR.stocks)) ? FR.stocks : [];
+    const tdRaw = (TD.top10 && Array.isArray(TD.top10)) ? TD.top10.slice() : [];
+    tdRaw.sort(function(a,b){ return (Number(b.total_score)||0)-(Number(a.total_score)||0); });
+    const fr = tdRaw.slice(0,5).map(function(s){
+      return {code:String(s.code||'').replace(/^\./,''), name:s.name, final_score:s.total_score};
+    });
     const frSet = {}; fr.forEach(function(s){ frSet[String(s.code||'')]=true; });
     const pbSet = {}; pb.forEach(function(s){ pbSet[String(s.code||'')]=true; });
     function list(arr, side){
@@ -15322,13 +15319,24 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           + '</div>';
       }).join('');
     }
-    // 收益对照：最终推荐 periods
-    const p5 = (FRB.periods && FRB.periods['5d']) || {};
-    const p20 = (FRB.periods && FRB.periods['20d']) || {};
-    const fr5 = (!p5.immature && typeof p5.avg_return==='number') ? p5.avg_return : null;
-    const fr20 = (!p20.immature && typeof p20.avg_return==='number') ? p20.avg_return : null;
-    // 收益对照：回调池台账聚合
-    let n20=0,s20=0,nEx=0,sEx=0,n5=0,s5=0;
+    // 收益对照：13档统一口径（2026-11-22 主人令「只有T+20？应该统一」）
+    const CMP_H = [1,2,3,5,10,20,30,45,60,75,90,180,250];
+    // 最终推荐：读真实信号流回测 periods
+    const frAgg = {};
+    CMP_H.forEach(function(n){
+      const p = (FRB.periods && FRB.periods[n+'d']) || {};
+      frAgg[n] = {
+        avg: (!p.immature && typeof p.avg_return==='number') ? p.avg_return : null,
+        n: p.samples||0,
+        win: (typeof p.win_rate==='number') ? p.win_rate : null,
+        med: (typeof p.median_return==='number') ? p.median_return : null,
+        best: (typeof p.best_return==='number') ? p.best_return : null
+      };
+    });
+    // 回调池：13档台账聚合（兼容旧 r5/r20 字段）
+    const pbAgg = {};
+    CMP_H.forEach(function(n){ pbAgg[n]={s:0,c:0}; });
+    let pbExS=0,pbExC=0;
     try{
       const T = window.PULLBACK_TRACK || {};
       const days = (T.days && typeof T.days==='object') ? T.days : {};
@@ -15336,15 +15344,24 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         const codes=days[sd]||{};
         Object.keys(codes).forEach(function(c){
           const r=codes[c]||{};
-          if(typeof r.r20==='number'){n20++;s20+=r.r20;}
-          if(typeof r.excess20==='number'){nEx++;sEx+=r.excess20;}
-          if(typeof r.r5==='number'){n5++;s5+=r.r5;}
+          CMP_H.forEach(function(n){
+            let v = r['r_'+n];
+            if(v==null && (n===5||n===20)) v = r['r'+n];  // 旧字段兼容
+            if(typeof v==='number'){ pbAgg[n].s+=v; pbAgg[n].c++; }
+          });
+          let ex = r['excess_20']; if(ex==null) ex = r['excess20'];
+          if(typeof ex==='number'){ pbExS+=ex; pbExC++; }
         });
       });
     }catch(e){}
-    const pb5 = n5>0 ? s5/n5 : null;
-    const pb20 = n20>0 ? s20/n20 : null;
-    const pbEx = nEx>0 ? sEx/nEx : null;
+    CMP_H.forEach(function(n){ pbAgg[n].avg = pbAgg[n].c>0 ? pbAgg[n].s/pbAgg[n].c : null; });
+    const pbEx = pbExC>0 ? pbExS/pbExC : null;
+    const fr5=frAgg[5].avg, fr20=frAgg[20].avg;
+    const pb5=pbAgg[5].avg, pb20=pbAgg[20].avg;
+    // 小样本警示：任一档样本 < 30 且有意义时提示（T+5 的 83.3% 就是 6 只里 5 只，均值被极值拉高）
+    function smallWarn(agg){
+      return (agg.n>0 && agg.n<30) ? '<span title="样本不足30，均值/胜率易被极端值扭曲，仅供观察，不可作决策依据" style="margin-left:4px;font-size:9px;color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:3px;padding:0 4px;cursor:help">小样本 n='+agg.n+'</span>' : '';
+    }
     const cell=(label,frv,pbv,extra)=>{
       const fcell=(v)=> v===null ? '<span style="color:var(--dim)">待成熟</span>' : '<b style="color:'+cUp(v)+'">'+f(v)+'</b>';
       return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11.5px;border-bottom:1px solid var(--border)">'
@@ -15358,24 +15375,44 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     const bothCodes = Object.keys(pbSet).filter(function(c){return frSet[c];});
     const bothLine = bothCodes.length
       ? '<div style="margin-top:6px;font-size:10.5px;color:#fbbf24">🎯 双选重叠 '+bothCodes.length+' 只：'+bothCodes.map(function(c){var s=pb.filter(function(x){return String(x.code)===c;})[0]||{};return (s.name||c)+'('+c+')';}).join('、')+'</div>'
-      : '<div style="margin-top:6px;font-size:10.5px;color:var(--dim)">🎯 双选重叠 0 只 —— 两套算法今日选出完全不同的票（口径差异：终推=因子榜硬闸Top5，回调=企稳信号）</div>';
+      : '<div style="margin-top:6px;font-size:10.5px;color:var(--dim)">🎯 双选重叠 0 只 —— 两套算法今日选出完全不同的票（口径差异：终推=终选输出Top5，回调=企稳信号）</div>';
     let html = '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid #fbbf24;border-radius:8px;padding:10px 14px;margin-bottom:12px">'
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
       + '<span style="font-size:14px;font-weight:700;color:var(--txt)">⚖️ 今日选股对比 · 回调池 vs 最终推荐</span>'
       + pill('终推 '+(fr.length)+' 只','#f59e0b') + pill('回调 '+(pb.length)+' 只','#38bdf8')
-      + (FR.update_time ? '<span style="color:var(--dim);font-size:10px;margin-left:auto">终推更新 '+String(FR.update_time).slice(5,16)+'</span>' : '')
+      + (TD.update_time ? '<span style="color:var(--dim);font-size:10px;margin-left:auto">终推更新 '+String(TD.update_time).slice(5,16)+'</span>' : '')
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
       + '<div><div style="font-size:11px;font-weight:700;color:#38bdf8;margin-bottom:3px">🔄 回调企稳池（严格信号·质量分前10）</div>'+list(pb,'pb')+'</div>'
-      + '<div><div style="font-size:11px;font-weight:700;color:#f59e0b;margin-bottom:3px">🏆 最终推荐（因子榜硬闸 Top5）</div>'+list(fr,'fr')+'</div>'
+      + '<div><div style="font-size:11px;font-weight:700;color:#f59e0b;margin-bottom:3px">🏆 最终推荐（终选输出 Top5 · 与上方卡同源同序）</div>'+list(fr,'fr')+'</div>'
       + '</div>'
       + bothLine
       + '<div style="margin-top:9px;padding-top:6px;border-top:1px solid var(--border)">'
-      + '<div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:3px">📈 真实回测收益对照（同口径：次日开盘买·扣0.3%·真实K线）</div>'
-      + cell('T+5 均收益', fr5, pb5)
-      + cell('T+20 均收益', fr20, pb20, (pbEx!==null ? '<span style="margin-left:auto;color:var(--dim);font-size:10px">回调超额中证1000 <b style="color:'+cUp(pbEx)+'">'+f(pbEx)+'</b></span>' : ''))
+      + '<div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:5px">📈 真实回测收益对照 · 13档同口径 <span style="font-size:9.5px;color:var(--dim);font-weight:400">次日开盘买·扣0.3%·真实K线</span></div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:10.5px">'
+      + '<thead><tr style="color:var(--dim);text-align:right;border-bottom:1px solid var(--border)">'
+      + '<th style="text-align:left;padding:3px 4px">持有期</th>'
+      + '<th style="padding:3px 4px">终推均收益</th><th style="padding:3px 4px">终推样本</th>'
+      + '<th style="padding:3px 4px">回调均收益</th><th style="padding:3px 4px">回调样本</th>'
+      + '</tr></thead><tbody>'
+      + CMP_H.map(function(n){
+          var a=frAgg[n], b=pbAgg[n];
+          var fa = a.avg===null ? '<span style="color:var(--dim)">待成熟</span>' : '<b style="color:'+cUp(a.avg)+'">'+f(a.avg)+'</b>';
+          var fb = b.avg===null ? '<span style="color:var(--dim)">待成熟</span>' : '<b style="color:'+cUp(b.avg)+'">'+f(b.avg)+'</b>';
+          return '<tr style="border-bottom:1px solid var(--border);text-align:right">'
+            + '<td style="text-align:left;padding:3px 4px;color:var(--sub)">T+'+n+'</td>'
+            + '<td style="padding:3px 4px">'+fa+'</td>'
+            + '<td style="padding:3px 4px;color:var(--dim)">'+(a.n||'—')+smallWarn(a)+'</td>'
+            + '<td style="padding:3px 4px">'+fb+'</td>'
+            + '<td style="padding:3px 4px;color:var(--dim)">'+(b.c||'—')+'</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>'
+      + (pbEx!==null ? '<div style="margin-top:5px;font-size:10px;color:var(--dim)">回调 T+20 超额中证1000 <b style="color:'+cUp(pbEx)+'">'+f(pbEx)+'</b></div>' : '')
       + '</div>'
-      + '<div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px">口径：终推收益来自其真实信号流回测（'+ (FRB.signal_date_range||'—') +'），回调池收益来自前瞻跟踪台账（逐日锁定、后续真实K线回填）。两边样本数/时段不同，仅作方向性对照，非严格配对检验；"待成熟"=持有未满对应交易日、无真实数据，不编造。</div>'
+      + '<div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px">口径：终推=其真实信号流回测（'+(FRB.signal_date_range||'—')+'），回调=前瞻台账（逐日锁定·真实K线回填），均次日开盘买·扣0.3%，13档已统一。'
+      + '<b style="color:#fbbf24">⚠️ 小样本警示</b>：样本&lt;30 的档位均值/胜率易被极端值扭曲（如终推 T+5 = 6 只里 5 只、均值被 +55% 极值拉到 +13.44%，中位仅 +8.33%），仅供观察，<b>不可当收益率承诺</b>。'
+      + '两边样本数/时段不同，非严格配对检验；"待成熟"=持有未满对应交易日、无真实数据，不编造。</div>'
       + '</div>';
     return html;
   }
@@ -15424,37 +15461,54 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       });
       body += '</div>';
     }
-    // 🔭 前瞻跟踪战报（window.PULLBACK_TRACK）：真实K线逐日回填的 T+5/T+20 收益与超额
+    // 🔭 前瞻跟踪战报（window.PULLBACK_TRACK）：真实K线逐日回填的13档收益与超额（2026-11-22 扩档）
     let trackHtml = '';
     try{
       const T = window.PULLBACK_TRACK || {};
       const days = (T.days && typeof T.days==='object') ? T.days : {};
-      let n20=0,nEx=0,n5=0,s20=0,sEx=0,s5=0,win20=0;
+      const H = [1,2,3,5,10,20,30,45,60,75,90,180,250];
+      const agg = {}; H.forEach(function(n){ agg[n]={sum:0,cnt:0,win:0}; });
+      let exS=0,exC=0;
       Object.keys(days).forEach(function(sd){
         const codes = days[sd]||{};
         Object.keys(codes).forEach(function(c){
           const r = codes[c]||{};
-          if(typeof r.r20==='number'){ n20++; s20+=r.r20; if(r.r20>0) win20++; }
-          if(typeof r.excess20==='number'){ nEx++; sEx+=r.excess20; }
-          if(typeof r.r5==='number'){ n5++; s5+=r.r5; }
+          H.forEach(function(n){
+            let v = r['r_'+n]; if(v==null && (n===5||n===20)) v = r['r'+n];
+            if(typeof v==='number'){ agg[n].sum+=v; agg[n].cnt++; if(v>0) agg[n].win++; }
+          });
+          let ex = r['excess_20']; if(ex==null) ex = r['excess20'];
+          if(typeof ex==='number'){ exS+=ex; exC++; }
         });
       });
       const f=(x)=> (x>0?'+':'')+x.toFixed(2)+'%';
       const cUp=(x)=> x>0?'#ef5350':(x<0?'#26a69a':'var(--dim)'); // 红涨绿跌
-      if(n20>0){
-        const avg20=s20/n20, avgEx=nEx>0?sEx/nEx:null, avg5=n5>0?s5/n5:null, wr=win20/n20*100;
+      const totalSignals = Object.keys(days).reduce(function(a,sd){return a+Object.keys(days[sd]||{}).length;},0);
+      if(totalSignals>0){
+        const exAvg = exC>0 ? exS/exC : null;
         trackHtml = '<div style="margin-top:10px;background:var(--card);border:1px solid var(--border);border-left:3px solid #38bdf8;border-radius:6px;padding:8px 12px;font-size:12px;line-height:1.9">'
-          + '<div style="font-weight:700;color:var(--txt);margin-bottom:2px">🔭 前瞻跟踪战报 <span style="font-size:10px;color:var(--dim);font-weight:400">真实K线回填 · 次日开盘买 · 扣0.3%</span></div>'
-          + '<div style="color:var(--dim)">已成熟 <b style="color:var(--txt)">'+n20+'</b> 条信号 · '
-          + 'T+5 均 <b style="color:'+(avg5!==null?cUp(avg5):'var(--dim)')+'">'+(avg5!==null?f(avg5):'—')+'</b> · '
-          + 'T+20 均 <b style="color:'+cUp(avg20)+'">'+f(avg20)+'</b> · '
-          + '胜率 <b style="color:var(--txt)">'+wr.toFixed(1)+'%</b>'
-          + (avgEx!==null ? ' · 超额中证1000 <b style="color:'+cUp(avgEx)+'">'+f(avgEx)+'</b>' : '')
-          + '</div>'
-          + '<div style="font-size:10.5px;color:var(--dim)">信号逐日锁定、收益由后续真实K线回填（无前视）；随盘后自动更新，样本累积后可与因子榜同口径对比。</div>'
+          + '<div style="font-weight:700;color:var(--txt);margin-bottom:5px">🔭 前瞻跟踪战报 <span style="font-size:10px;color:var(--dim);font-weight:400">真实K线回填 · 次日开盘买 · 扣0.3% · 13档与终推同口径</span></div>'
+          + '<div style="color:var(--dim);margin-bottom:6px">台账累计 <b style="color:var(--txt)">'+totalSignals+'</b> 条信号 / '+Object.keys(days).length+' 个信号日'
+          + (exAvg!==null ? ' · T+20超额中证1000 <b style="color:'+cUp(exAvg)+'">'+f(exAvg)+'</b>' : '') + '</div>'
+          + '<table style="width:100%;border-collapse:collapse;font-size:10.5px"><thead><tr style="color:var(--dim);text-align:right;border-bottom:1px solid var(--border)">'
+          + '<th style="text-align:left;padding:3px 4px">持有期</th><th style="padding:3px 4px">样本</th><th style="padding:3px 4px">均收益</th><th style="padding:3px 4px">胜率</th></tr></thead><tbody>'
+          + H.map(function(n){
+              var g=agg[n];
+              if(!g.cnt) return '<tr style="text-align:right;color:var(--dim)"><td style="text-align:left;padding:3px 4px">T+'+n+'</td><td colspan="3" style="padding:3px 4px">待成熟</td></tr>';
+              var avg=g.sum/g.cnt, wr=g.win/g.cnt*100;
+              var warn=(g.cnt<30)?'<span title="样本不足30，均值/胜率易被极端值扭曲" style="margin-left:3px;font-size:9px;color:#fbbf24">⚠n='+g.cnt+'</span>':'';
+              return '<tr style="text-align:right;border-bottom:1px solid var(--border)">'
+                + '<td style="text-align:left;padding:3px 4px;color:var(--sub)">T+'+n+'</td>'
+                + '<td style="padding:3px 4px;color:var(--dim)">'+g.cnt+warn+'</td>'
+                + '<td style="padding:3px 4px"><b style="color:'+cUp(avg)+'">'+f(avg)+'</b></td>'
+                + '<td style="padding:3px 4px;color:'+(wr>=50?'#ef5350':'#26a69a')+'">'+wr.toFixed(1)+'%</td>'
+                + '</tr>';
+            }).join('')
+          + '</tbody></table>'
+          + '<div style="font-size:10px;color:var(--dim);margin-top:5px">信号逐日锁定、收益由后续真实K线回填（无前视）；⚠样本&lt;30 档位易被极端值扭曲，仅供观察。随盘后自动累积更新。</div>'
           + '</div>';
       } else {
-        trackHtml = '<div class="note" style="margin-top:10px;font-size:11px">🔭 前瞻跟踪：台账已建立，等待信号成熟回填 T+5/T+20 真实收益（持有满20个交易日后自动出现）。</div>';
+        trackHtml = '<div class="note" style="margin-top:10px;font-size:11px">🔭 前瞻跟踪：台账已建立（13档），等待信号成熟后逐档回填真实收益（T+1 最先成熟，T+250 需满250个交易日）。</div>';
       }
     }catch(e){ trackHtml=''; }
     const note = '<div class="note" style="margin-top:10px">口径：'+ (P.caliber || '无前视·老票回调企稳信号')
@@ -18349,56 +18403,8 @@ hm += '</div>'; // /ulPaneBacktest
         （skipped=true，skip_reason=「FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 因子融合整体跳过」），
         且内容与「入选后打分全表」「🏆 当日因子计分榜」口径重复，故不再保留；
      ③ stFaHost 空壳骨架已移除 —— 本函数只负责子页两卡的就地填充。 */
-  // ═══════════════════════════════════════════════════════════════
-  // 📈 按收益率排选（真实回测，2026-11-15 主人令「因子也要按收益率来排选」）
-  //   读 window.FACTOR_LAB.yield_rank（factor_lab_gen.py / factor_yield.py 产出，本地真实日K回测）
-  //   按 T+20 平均收益降序渲染；与回测跟踪页·最终推荐真实收益率同引擎同口径。
-  // ═══════════════════════════════════════════════════════════════
-  window.__renderFactorYield = function(){
-    var host = document.getElementById('factorYieldBody');
-    if(!host) return;
-    var D = window.FACTOR_LAB;
-    var YR = D && D.yield_rank;
-    var _e = (typeof _esc==='function')?_esc:function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
-    function _num(v,d){ if(v==null||isNaN(Number(v))) return '—'; var n=Number(v); return (n>0?'+':'')+n.toFixed(d==null?2:d)+'%'; }
-    function _col(v){ if(v==null) return 'var(--dim)'; return v>0?'var(--up)':'var(--down)'; }
-    if(!YR || !YR.ranked || !YR.ranked.length){
-      host.innerHTML='<div style="padding:18px;text-align:center;color:var(--dim);font-size:12px">因子收益率排选数据未就绪（因子实验室刷新后自动显示）</div>';
-      return;
-    }
-    var bs=document.getElementById('fyUpdSlot');
-    if(bs && YR.update_time && typeof window._uBadge==='function'){ bs.innerHTML=window._uBadge('盘后','因子回测',YR.update_time); }
-    function _cell(y,w){ return _num(y,2)+'<span style="color:var(--dim);font-size:10px"> · '+(w!=null?w:'—')+'%</span>'; }
-    var rows='';
-    YR.ranked.forEach(function(r,i){
-      if(!r.available){
-        rows+='<tr><td style="padding:4px 8px;color:var(--dim)">'+(i+1)+'</td>'
-          +'<td style="padding:4px 8px">'+_e(r.code)+' '+_e(r.name)+'</td>'
-          +'<td colspan="6" style="padding:4px 8px;color:var(--dim);font-size:11px">K线不足('+(r.n_klines||0)+'根)·不参排</td></tr>';
-        return;
-      }
-      rows+='<tr>'
-        +'<td style="padding:4px 8px;color:var(--dim)">'+(i+1)+'</td>'
-        +'<td style="padding:4px 8px;white-space:nowrap">'+_e(r.code)+' '+_e(r.name)+'</td>'
-        +'<td style="padding:4px 8px;color:'+_col(r.yield_t5)+'">'+_cell(r.yield_t5,r.win_t5)+'</td>'
-        +'<td style="padding:4px 8px;color:'+_col(r.yield_t10)+'">'+_cell(r.yield_t10,r.win_t10)+'</td>'
-        +'<td style="padding:4px 8px;color:'+_col(r.yield_t20)+';font-weight:700">'+_cell(r.yield_t20,r.win_t20)+'</td>'
-        +'<td style="padding:4px 8px;color:'+_col(r.yield_t30)+'">'+_cell(r.yield_t30,r.win_t30)+'</td>'
-        +'<td style="padding:4px 8px;color:'+_col(r.yield_t60)+'">'+_cell(r.yield_t60,r.win_t60)+'</td>'
-        +'<td style="padding:4px 8px;color:var(--dim);font-size:10px">'+(r.n_t20||0)+'笔</td>'
-        +'</tr>';
-    });
-    host.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:12px">'
-      +'<thead><tr style="color:var(--dim);text-align:left">'
-      +'<th style="padding:4px 8px">#</th><th style="padding:4px 8px">代码/名称</th>'
-      +'<th style="padding:4px 8px">T+5<br><span style="font-weight:400;font-size:10px">收益·胜率</span></th>'
-      +'<th style="padding:4px 8px">T+10</th>'
-      +'<th style="padding:4px 8px">T+20★</th>'
-      +'<th style="padding:4px 8px">T+30</th>'
-      +'<th style="padding:4px 8px">T+60</th>'
-      +'<th style="padding:4px 8px">样本</th>'
-      +'</tr></thead><tbody>'+rows+'</tbody></table>';
-  };
+  /* 🗑 2026-11-22 主人令「这卡没用了，删除吧」：__renderFactorYield（按收益率排选卡渲染器）整函数删除。
+     卡壳 #factorYieldCard 同笔移除；数据源 FACTOR_LAB_BACKTEST 仍产出供每日因子计算卡徽章使用。 */
 
   window.__renderFactorPane = function(){
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
