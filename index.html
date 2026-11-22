@@ -173,7 +173,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=4f8420806b" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=0c31d0c068" defer></script>
-<script src="data/INVEST_AVOID.js?v=49251bd7de" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=eb94c3f503" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=d06a760fa5" defer></script>
     <script src="data/KEY_NOTICES.js?v=1c35a04dac" defer></script>
@@ -16453,9 +16453,17 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var body = document.getElementById('kondratievBody');
     if(!body) return;
     var D = window.KONDRATIEV;
-    var tm = document.getElementById('kondTime');
     if(!D){ body.innerHTML = '<div class="note" style="color:#fbbf24">康波数据未注入（data/KONDRATIEV.js 缺失），如实留空不编造。</div>'; return; }
-    if(tm) tm.textContent = '算于 ' + (D.calc_date||'—');
+    // 🌊 2026-11-23 二次令：统一 v8CardHeader +「🦊 更新于」胶囊（读 calc_date 真值），删除旧「算于」文案。
+    var hd = document.getElementById('kondHeader');
+    if(hd && typeof window.v8CardHeader === 'function'){
+      hd.innerHTML = window.v8CardHeader('&#x1F30A;', '③ 康波周期 · 中国经济 × A股',
+        '长波理论锚定 + 中短周期实测 · 观测不进选股',
+        'update_time', {update_time:D.calc_date, slot:'盘后', horizon:'中长线'})
+        + '<div style="padding:0 14px 9px;margin-top:-2px;display:flex;gap:6px;flex-wrap:wrap">'
+        + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 · 不参与选股</span>'
+        + '<span style="font-size:11px;color:#8b93a1;border:1px solid #8b93a155;border-radius:4px;padding:1px 6px">📆 每月10日更新 · 宏观源滞后如实标注</span></div>';
+    }
     try{
       var A = D.a_share||{}, C = D.cn_economy||{}, T = D.theory||{};
       var RED='#ef5350', GRN='#26a69a', CY='#38bdf8', AMB='#fbbf24', DIM='var(--dim)';
@@ -19187,19 +19195,14 @@ h+=`</div>`;
     hm += '<div style="border:1px solid rgba(255,208,36,.35);border-radius:9px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.8;color:var(--dim);background:rgba(255,208,36,.05)">'
        + '<b style="color:#ffd024">📆 更新频率（逐卡真实标注）：</b>'
        + '①27年走势 / ②PE分位 所在大卡 = <b style="color:var(--txt)">交易日 16:10（16:25 兜底）日更</b>，其中 PE 分位<b>月末补齐</b>、社融<b>次月中旬（约10–15日，央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>；'
-       + '③康波周期 = <b style="color:#fbbf24">当前按次手动生成，无每月固定日、未接入自动月更</b>（源数据 GDP 季度 / CPI·PPI 月度）；'
+       + '③康波周期 = <b style="color:#fbbf24">每月10日 18:00 自动更新</b>（v8_kondratiev_monthly；不设1日因 CPI/PPI 次月上旬才发布，1日会系统滞后一个月；GDP 季度/CPI·PPI 月度按可得最新值如实标注）；'
        + '④2027推演 = <b style="color:var(--txt)">随大卡每交易日刷新</b>（情景概率滚动更新）。'
        + '<br><span style="color:#8b93a1">①→④ 是研判链：长期趋势 → 估值水位 → 长波定位 → 年度推演；均为观测研究，不构成买卖建议。</span></div>';
     hm += '<div class="card" id="futureCardBody" style="margin-bottom:16px;border-left:4px solid #ffd024"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">🔮 未来预测 · 牛熊观测台 加载中…</div></div>';
     // 🌊 第③层：康波周期（整卡从「暂未上架」迁入，容器 id / 渲染函数不变）
     hm += '<div class="card" id="kondratievCard" style="margin-bottom:16px;border-left:4px solid #38bdf8">'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
-       + '<span style="font-size:14px;font-weight:800;color:#ffd024">③</span>'
-       + '<span style="font-size:15px;font-weight:700;color:#38bdf8">&#x1F30A; 康波周期 &#183; 中国经济 &times; A股</span>'
-       + '<span id="kondTime" style="font-size:11px;color:var(--dim)">&#x2014;</span>'
-       + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span>'
-       + '<span style="font-size:11px;color:#8b93a1;border:1px solid #8b93a155;border-radius:4px;padding:1px 6px">📆 按次生成 · 非月更</span>'
-       + '</div>'
+       // 🌊 2026-11-23 二次令：卡头统一由 __renderKondratiev 用 v8CardHeader 填充（含「🦊 更新于」）。
+       + '<div id="kondHeader"></div>'
        + '<div id="kondratievBody"><div class="note">康波数据加载中&#x2026;</div></div></div>';
     // ④ 第4层：2027 年度展望（原 big card 内 ③ 小节拆出为独立卡，编号顺延为 ④；内容仍由 __renderFutureCard 同源渲染）
     hm += '<div class="card" id="futureOutlookCard" style="margin-bottom:16px;border-left:4px solid #c084fc">'

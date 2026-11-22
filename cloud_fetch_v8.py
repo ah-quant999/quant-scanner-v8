@@ -3317,8 +3317,19 @@ def f_cffex_position():
         if dkey in have:
             continue
         try:
-            big = get_ak().get_cffex_rank_table(date=ds, vars_list=["IF"])
-        except Exception:
+            _ak = get_ak()
+            # 🔴 2026-11-23 一劳永逸（真根因）：akshare 1.20.42 早已无 `get_cffex_rank_table`
+            #   （本机实测 AttributeError）⇒ 旧调用 60 天全异常被 continue 吞掉 ⇒ job 全绿、
+            #   卡 data_date 永久停在 11-19，健康巡检反复 fail。现统一走现行 API
+            #   `futures_rank_table_cffex`（返回 {合约: DataFrame}，字段口径不变），
+            #   老版本保留别名兜底，绝不因库升级静默断链。
+            _rank_fn = getattr(_ak, "futures_rank_table_cffex", None) or getattr(_ak, "get_cffex_rank_table", None)
+            if _rank_fn is None:
+                print("  ⚠️ cffex_position: 当前 akshare 无中金所排名接口，跳过本轮（不伪造）")
+                return None
+            big = _rank_fn(date=ds, vars_list=["IF"])
+        except Exception as e:
+            print(f"  ⚠️ cffex_position {dkey}: 抓取异常 {type(e).__name__}: {e}")
             continue                    # 非交易日/接口抖动：静默跳过该日
         if not isinstance(big, dict):
             continue
@@ -6153,8 +6164,15 @@ def main(category=None, only=None):
             try:
                 _prev = json.loads(out_path.read_text(encoding="utf-8") or "{}")
                 if str(_prev.get("update_time", ""))[:10] == _today.isoformat():
-                    print("  [sector_year_flow] 今日已产出 → 跳过重抓（幂等闸门）")
-                    return None
+                    # 🔴 2026-11-23 一劳永逸（真根因）：旧闸只比「日期」⇒ 早晨 09:31 的半成品
+                    #   会让 15:45/16:20 盘后专链整日 skip，卡面永远停在早盘值并在盘后被判
+                    #   「数据中断」（主人 11-23 截图实证 update_time=11-20 09:31）。
+                    #   现在必须同时满足「同日 + 已过 15:00 盘后定稿」才跳过；早盘旧档强制重抓。
+                    _pt = datetime.strptime(_prev["update_time"], "%Y-%m-%d %H:%M:%S")
+                    if _pt.hour >= 15:
+                        print("  [sector_year_flow] 今日盘后已产出 → 跳过重抓（幂等闸门）")
+                        return None
+                    print(f"  [sector_year_flow] 今日仅有早盘旧档 {_prev['update_time']}（<15:00）→ 强制重抓盘后定稿")
             except Exception:
                 pass
         cur_year, prev_year = _today.year, _today.year - 1

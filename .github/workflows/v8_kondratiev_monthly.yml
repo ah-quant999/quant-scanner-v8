@@ -1,0 +1,123 @@
+# 🌊 v8 康波周期观测卡（中国经济 × A股）月度刷新
+#
+# 2026-11-23 主人令「定时任务也要加上」：
+#   · 卡位：观测平台 > 未来预测 第③层（纯观测，不进 Top3 / 终选）；
+#   · 节拍：**每月10日 18:00 CST**（cron 10:00 UTC）。
+#     为什么不按主人初提的「每月1日」：akshare 的 CPI/PPI 次月上旬（约9日）才发布上月值，
+#     1日抓到的必是上上月，系统性滞后一个月，违背「数据真实且及时」。10日可取上月完整值；
+#     GDP 为季度值，按可得最新期如实标注，不伪造月频。
+#   · 源：akshare stock_zh_index_daily(sh000001) + macro_china_gdp/cpi/ppi（全公开真实序列）。
+#   · 幂等：内容未变则只跳过推送，不制造空提交；data js 有变才同步 index.html ?v 缓存戳。
+#
+# 安全铁律：只推 raw_data/kondratiev.json + data/KONDRATIEV.js + index.html 的 ?v 戳；
+#           不碰其他 data/*.js、不改算法链、不碰 index.html 正文。
+name: "🌊 v8 康波周期月度刷新 (10日 18:00)"
+
+on:
+  schedule:
+    - cron: '0 10 10 * *'   # 每月10日 18:00 CST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-kondratiev-monthly
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Shanghai
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+
+    steps:
+      - name: "📥 checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🐍 setup python + deps"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: "📦 install"
+        run: python -m pip install --quiet akshare==1.20.42 pandas numpy requests
+
+      - name: "🧮 生成康波真数据"
+        run: |
+          python algorithms/gen_kondratiev.py
+          test -s data/KONDRATIEV.js
+          echo "✅ data/KONDRATIEV.js: $(wc -c < data/KONDRATIEV.js) bytes"
+
+      - name: "📤 推送 raw + data + ?v（无变化零提交）"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, json, base64, hashlib, time, urllib.request, urllib.error
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          API = "https://api.github.com/repos/" + REPO
+          H = {"Authorization": "Bearer " + TOK, "Content-Type": "application/json",
+               "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              with urllib.request.urlopen(req, timeout=90) as r:
+                  return json.load(r)
+
+          def git_sha(raw):
+              return hashlib.sha1(b"blob %d\0" % len(raw) + raw).hexdigest()
+
+          def put(path, raw, msg, retries=5):
+              url = API + "/contents/" + path
+              for i in range(retries):
+                  try:
+                      cur = api("GET", url)
+                      if cur.get("sha") == git_sha(raw):
+                          print("[skip] identical:", path)
+                          return False
+                      payload = {"message": msg, "content": base64.b64encode(raw).decode(),
+                                 "branch": "main", "sha": cur["sha"]}
+                      api("PUT", url, payload)
+                      print("pushed", path, len(raw))
+                      return True
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409, 422) and i < retries - 1:
+                          time.sleep(2 + i)
+                          continue
+                      raise
+              return False
+
+          raw_js = open("data/KONDRATIEV.js", "rb").read()
+          raw_raw = open("raw_data/kondratiev.json", "rb").read()
+          if not raw_js or not raw_raw:
+              raise SystemExit("empty output refuse push")
+          stamp = hashlib.sha1(raw_js).hexdigest()[:10]
+          put("raw_data/kondratiev.json", raw_raw, "data: kondratiev raw refresh (%s)" % stamp)
+          changed = put("data/KONDRATIEV.js", raw_js, "data: KONDRATIEV monthly refresh %s" % stamp)
+          if not changed:
+              print("no data change, skip cache stamp")
+              raise SystemExit(0)
+
+          ex = api("GET", API + "/contents/index.html")
+          if ex.get("encoding") == "base64":
+              html = base64.b64decode(ex["content"]).decode("utf-8")
+          else:
+              blob = api("GET", API + "/git/blobs/" + ex["sha"])
+              html = base64.b64decode(blob["content"]).decode("utf-8")
+          new_html, n = re.subn(r'(data/KONDRATIEV\.js\?v=)([a-f0-9]+)',
+                                lambda m: m.group(1) + stamp, html)
+          if n == 0:
+              print("WARN index.html 未找到 KONDRATIEV.js?v=")
+          elif new_html != html:
+              put("index.html", new_html.encode("utf-8"),
+                  "chore(cache): KONDRATIEV.js?v=%s" % stamp)
+          print("done stamp", stamp)
+          PY
