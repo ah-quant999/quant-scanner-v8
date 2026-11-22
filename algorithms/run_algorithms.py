@@ -257,6 +257,8 @@ ORDER = [
     #   ETF 真值锚定 stock_names ETF 段 + 板块名↔ETF 真名关键词匹配；周更门控 7 天（幂等跳过）。
     #   ⚠️ 必须在 fetch_orphan_sector_fund_flow.py 之后——输入消费 sector_fund_flow / concept_ranking 真名。
     "gen_concept_etf_map.py",           # → out/concept_etf_map.json（→raw_data→update_v8 转 CONCEPT_ETF_MAP.js）
+    # 🆕 2026-11-22 主人令（与 STAGES["A"] 成对）：回调企稳池展示数据源（只读 kline_cache，无外部依赖）
+    "gen_pullback_pool.py",             # → raw_data/pullback_pool.json（→update_v8 转 PULLBACK_POOL.js → 选股策略·回调池子tab）
     # ── 最终推荐（final_recommend.py）──
     #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。
@@ -422,7 +424,10 @@ STAGES = {
         "fetch_orphan_suspension.py", "fetch_orphan_market_alerts.py",
         "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py",
         # 🆕 2026-11-21 主人令「B 新建」（与 ORDER 成对）：概念→ETF 映射周更生成器
-        "gen_concept_etf_map.py"],
+        "gen_concept_etf_map.py",
+        # 🆕 2026-11-22 主人令（与 ORDER 成对）：回调企稳池展示数据源，只读 kline_cache →
+        #   raw_data/pullback_pool.json（→update_v8 转 PULLBACK_POOL.js → 选股策略·回调池子tab 展示）。
+        "gen_pullback_pool.py"],
     "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
         # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。

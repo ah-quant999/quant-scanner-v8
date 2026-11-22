@@ -43,6 +43,9 @@ DATA_SOURCES = {
     # 🆕 2026-11-21 主人令「因子审计·一劳永逸」：backtest_expectancy 回测产物发布为 data/*.js，
     #   消除因子计分卡 P2 显示层硬表镜像的 2 个月滞后（卡片动态读取链①已预埋 window.BACKTEST_EXPECTANCY）。
     "backtest_expectancy.json":    "BACKTEST_EXPECTANCY",
+    # 🆕 2026-11-22 主人令：回调企稳池展示数据源（gen_pullback_pool.py 产出，
+    #   顶层 dict（带 stocks list）直接转换，「选股策略 → 🔄 回调池」子tab 消费 window.PULLBACK_POOL）。
+    "pullback_pool.json":          "PULLBACK_POOL",
     # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
     #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。
     #   前端 window.STOCK_PROFILE 由 STOCK_LIST 就地合成（index.html:15290-15304）；
@@ -414,6 +417,8 @@ CATEGORY_MAP = {
     "CONCEPT_ETF_MAP": "post_close",
     # 🆕 2026-11-21 主人令「因子审计」：回测期望产物每日盘后转换发布（P2 信号 edge 真值源）
     "BACKTEST_EXPECTANCY": "post_close",
+    # 🆕 2026-11-22 主人令：回调企稳池展示数据，每天盘后随算法链刷新
+    "PULLBACK_POOL": "post_close",
     # 🆕 2026-08-31：v8 选股生命周期跟踪归属盘后（依赖算法跟踪池，每日盘后产出）。
     "V8_POOL_TRACKER": "post_close",
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，

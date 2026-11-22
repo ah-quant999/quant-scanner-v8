@@ -3401,6 +3401,8 @@ function fmtSigned(v){
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
+      <!-- 🆕 2026-11-22 主人令：回调池子tab（回调企稳信号展示；独立于因子榜的观察源，不参与Top3排序） -->
+      <button class="st-tab" data-st="pullback" onclick="switchSt('pullback')">🔄 回调池</button>
       <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）子页 tab 随算法整支下架删除 -->
       <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 tab 随算法整支下架删除 -->
       <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
@@ -3480,6 +3482,15 @@ function fmtSigned(v){
       </div>
     </div><!--/st-life-->
 
+    <!-- ===== TAB 页面：🔄 回调池（2026-11-22 主人令新建，置于强势跟踪右侧）=====
+         数据源 window.PULLBACK_POOL（gen_pullback_pool.py 产出，每日盘后随算法链刷新）。
+         定位：独立于因子榜的观察源，用真值+前瞻持续验证；不参与 Top3 排序（Top3 硬闸 _aligned_topfactor 约束仍在）。
+         当下命中 0 只属正常（下跌尚未企稳），如实展示空态，不凑数（宁缺毋滥）。 -->
+    <div id="st-pullback" class="st-pane">
+      <div class="card" id="pullbackBody" style="border-left:4px solid #38bdf8">
+        <div class="note" style="padding:20px;text-align:center;color:var(--dim)">🔄 回调池 加载中…</div>
+      </div>
+    </div><!--/st-pullback-->
 
 
 
@@ -8412,7 +8423,7 @@ window.__renderIndexObserve = function(){
      该提交在删 __renderFactorLab 死代码时把本函数连带删掉，但下方调用点仍在
      ⇒ ReferenceError: _renderPostReady is not defined，策略回测区初始渲染全挂。
      按该提交本意剔除 __renderFactorLab 调用，其余 11 个渲染函数实测均存活。 */
-  function _renderPostReady(){ try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
+  function _renderPostReady(){ try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){} try{ window.renderPullbackPool(); }catch(e){}
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
@@ -15057,6 +15068,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
+    // 🆕 2026-11-22 主人令：回调池子tab 渲染（window.PULLBACK_POOL）
+    if(n==='pullback' && typeof window.renderPullbackPool==='function') setTimeout(window.renderPullbackPool, 30);
     /* 🔴🔴 2026-09-19 CN runner2号机的工程师：此处原有两处**死调度**，已删除（实测铁证）
        · __renderLifecycleSection → 目标 #lifeBody              容器 DOM 定义 **0**
        · __renderStrongBreakout   → 目标 #strongBreakoutBody   容器 DOM 定义 **0**
@@ -15089,6 +15102,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist))&&!!window.GOLD_POOL;},  // 2026-09-11：金股池卡片并入 pool 子页，需 GOLD_POOL 就绪
       /* 🔴 2026-10-11 主人令「完全下架」：tc/crds 就绪判定随两策略下架移除 */
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
+      // 🆕 2026-11-22 主人令：回调池子tab 就绪判定（PULLBACK_POOL.js 注入即可；count=0 也是合法真值态）
+      pullback:function(){return !!(window.PULLBACK_POOL&&typeof window.PULLBACK_POOL.count==='number');},
       // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
       bt:function(){return !!((window.RESONANCE_TRACK&&window.FINAL_RECOMMEND_BACKTEST)||(window.FACTOR_LAB&&window.FACTOR_LAB.yield_rank));},  // 📦 2026-11-17 迁入第三卡：FACTOR_LAB.yield_rank 任一源到位即可补渲
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
@@ -15269,6 +15284,55 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   window.renderStPoolAll = function(){
     try{ renderStGoldPool(); }catch(e){ try{ console.warn('[金股池] 渲染失败', e); }catch(_){} }
     try{ renderStPool(); }catch(e){ try{ console.warn('[选股池] 渲染失败', e); }catch(_){} }
+  };
+  // ===== 🔄 回调池子tab 渲染（数据源 window.PULLBACK_POOL；2026-11-22 主人令新建）=====
+  //   独立于因子榜的观察源，只展示不参与Top3排序；当下0只=下跌未企稳，如实空态不凑数。
+  window.renderPullbackPool = function(){
+    const host = document.getElementById('pullbackBody');
+    if(!host) return;
+    const P = window.PULLBACK_POOL || {};
+    const arr = (P.stocks && Array.isArray(P.stocks)) ? P.stocks : [];
+    const cnt = (typeof P.count === 'number') ? P.count : arr.length;
+    const pill = (t,c)=>'<span style="background:'+c+'1a;color:'+c+';border:1px solid '+c+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap">'+t+'</span>';
+    const ts = P.update_time || '';
+    let head = '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--txt)">🔄 回调企稳池</span>'
+      + '<span style="font-size:10px;font-weight:700;color:#38bdf8;border:1px solid rgba(56,189,248,.35);padding:1px 7px;border-radius:10px;white-space:nowrap">观察源 · 不入Top3</span>'
+      + (ts ? '<span style="color:var(--dim);font-size:11px;margin-left:auto">'+String(ts).slice(0,16).replace('T',' ')+'</span>' : '')
+      + '</div>';
+    let sum = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px">'
+      + pill('🎯 命中 <b>'+cnt+'</b> 只', cnt>0 ? '#ef5350' : '#94a3b8')
+      + (P.signal_date ? pill('信号日 '+P.signal_date,'#38bdf8') : '')
+      + (typeof P.scanned === 'number' ? pill('扫描老票 <b>'+P.scanned+'</b>','#a78bfa') : '')
+      + (typeof P.stale_skipped === 'number' ? pill('停更剔除 <b>'+P.stale_skipped+'</b>','#94a3b8') : '')
+      + '</div>';
+    let body = '';
+    if(!arr.length){
+      body = '<div class="note" style="text-align:center;padding:18px;line-height:1.8">'
+        + '当前无回调企稳信号（下跌尚未企稳）——<b style="color:var(--txt)">宁缺毋滥，不凑数</b>。<br>'
+        + '信号定义：老票(判定时刻K线≥250)·自近20日高点回撤6–22%·过去60日涨≥6%·近3日不创新低·缩量&lt;0.85×MA5量·站上MA5。'
+        + '</div>';
+    } else {
+      body = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">';
+      arr.forEach(function(s){
+        const code = String(s.code||''), name = s.name||'—';
+        const q = (typeof s.quality === 'number') ? s.quality : 0;
+        const dd = (typeof s.dd20 === 'number') ? s.dd20 : 0;
+        const vr = (typeof s.vol_ratio === 'number') ? s.vol_ratio : 0;
+        body += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px">';
+        body += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:3px">';
+        body += '<span style="font-weight:700;color:var(--txt)">'+name+'</span>';
+        body += '<span style="color:var(--dim);font-size:10px;font-family:monospace">'+code+'</span>';
+        body += '<span style="margin-left:auto;font-size:11px;color:#38bdf8" title="信号质量分（仅排序用，非胜率承诺）">Q '+q.toFixed(3)+'</span>';
+        body += '</div>';
+        body += '<div style="margin-top:3px;font-size:10.5px;color:var(--dim)">回撤 <b style="color:#26a69a">'+dd.toFixed(1)+'%</b> · 量比 '+vr.toFixed(2)+' · 信号日 '+(s.sig_date||'')+'</div>';
+        body += '</div>';
+      });
+      body += '</div>';
+    }
+    const note = '<div class="note" style="margin-top:10px">口径：'+ (P.caliber || '无前视·老票回调企稳信号')
+      + '。本卡为<b>观察源</b>，独立于因子榜，不参与 Top3 排序（Top3 仍受因子榜硬闸约束）。信号为真实K线计算，命中数为0即代表当时全市场无合格企稳票，不补位、不伪造。</div>';
+    host.innerHTML = head + sum + body + note;
   };
   function renderStPool(){
     const $ = id => document.getElementById(id);
