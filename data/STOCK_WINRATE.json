@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-22 05:55:28",
+ "update_time": "2026-11-22 08:02:53",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -6571,7 +6571,7 @@
   {
    "code": "300900",
    "name": "广联航空",
-   "n_signals": 4,
+   "n_signals": 3,
    "kinds": [
     "final",
     "top10"
@@ -6697,7 +6697,7 @@
   {
    "code": "600999",
    "name": "招商证券",
-   "n_signals": 5,
+   "n_signals": 4,
    "kinds": [
     "final",
     "top10"
@@ -6748,13 +6748,14 @@
   {
    "code": "601211",
    "name": "国泰海通",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-11-18",
-   "last_seen": "2026-11-20",
-   "is_final": false,
+   "last_seen": "2026-11-21",
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 1,
@@ -6773,13 +6774,13 @@
   {
    "code": "601991",
    "name": "大唐发",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-11-18",
-   "last_seen": "2026-11-20",
+   "last_seen": "2026-11-21",
    "is_final": true,
    "horizons": {
     "1": {
