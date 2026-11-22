@@ -18948,9 +18948,9 @@ h+=`</div>`;
     // ── 统一卡头（2026-10-05 主人令：新卡顶部加卡片名+更新于，全站统一 v8CardHeader）──
     var html=window.v8CardHeader('&#x1F52E;','未来预测 · ①②长期趋势与估值','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标（③康波 / ④2027 见下方独立卡）','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
     html+='<div style="padding:14px">';
-    // 📆 逐卡频率标注（非整卡月更）：本卡交易日 16:10/16:25 日更；月频只有所列字段，禁止冒充固定月更日。
+    // 📆 逐卡频率标注（非整卡月更）：本卡交易日 16:10 日更；月频只有所列字段，禁止冒充固定月更日。
     html+='<div style="font-size:11px;line-height:1.7;color:var(--dim);border:1px solid rgba(255,208,36,.28);border-radius:7px;padding:7px 10px;margin-bottom:11px">'
-       + '📆 <b style="color:#ffd024">本卡交易日 16:10（16:25 兜底）日更</b>；月频字段：PE 分位<b>月末补齐</b>、社融<b>次月中旬（央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>。'
+       + '📆 <b style="color:#ffd024">本卡交易日 16:10 日更</b>；月频字段：PE 分位<b>月末补齐</b>、社融<b>次月中旬（央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>。'
        + '<span style="color:#8b93a1">①27年走势 / ②PE分位 均为月度序列，右端末档为进行中月份，交易日滚动改写。</span></div>';
     // ── KPI 行已移至「上证/沪深300 点位条」之后（2026-10-05 二次令）──
     // ── 分析方法（核心/用法/限制）──
@@ -19189,13 +19189,13 @@ h+=`</div>`;
     hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #41c9ff"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
     hm += '</div>'; // /obsPaneMarket
     // ══ 子页③：🔮 未来预测（2026-11-22 二次令：4 层观测链 = ①27年走势 ②PE分位 ③康波长波 ④2027推演）══
-    //   频率铁律（主人令「标明每月几日更新」）：本页没有「整卡月更」卡——①②所在大卡与④均为交易日 16:10/16:25 日更，
+    //   频率铁律（主人令「标明每月几日更新」）：本页没有「整卡月更」卡——①②所在大卡与④均为交易日 16:10 日更，
     //   仅其中部分字段为月频（PE月末补齐 / 社融次月中旬 / PMI月末或次月初）；③康波卡为按次手动生成，未接入自动月更。
     //   禁止把月频字段冒充整卡月更，也禁止编造固定日期。
     hm += '<div id="obsPaneFuture" style="display:' + (_act==='future' ? 'block' : 'none') + '">';
     hm += '<div style="border:1px solid rgba(255,208,36,.35);border-radius:9px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.8;color:var(--dim);background:rgba(255,208,36,.05)">'
        + '<b style="color:#ffd024">📆 更新频率（逐卡真实标注）：</b>'
-       + '①27年走势 / ②PE分位 所在大卡 = <b style="color:var(--txt)">交易日 16:10（16:25 兜底）日更</b>，其中 PE 分位<b>月末补齐</b>、社融<b>次月中旬（约10–15日，央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>；'
+       + '①27年走势 / ②PE分位 所在大卡 = <b style="color:var(--txt)">交易日 16:10 日更</b>，其中 PE 分位<b>月末补齐</b>、社融<b>次月中旬（约10–15日，央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>；'
        + '③康波周期 = <b style="color:#fbbf24">每月10日 18:00 自动更新</b>（v8_kondratiev_monthly；不设1日因 CPI/PPI 次月上旬才发布，1日会系统滞后一个月；GDP 季度/CPI·PPI 月度按可得最新值如实标注）；'
        + '④2027推演 = <b style="color:var(--txt)">随大卡每交易日刷新</b>（情景概率滚动更新）。'
        + '<br><span style="color:#8b93a1">①→④ 是研判链：长期趋势 → 估值水位 → 长波定位 → 年度推演；均为观测研究，不构成买卖建议。</span></div>';
