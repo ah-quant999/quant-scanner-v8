@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-22 12:30",
- "generated": "2026-11-22 12:30",
+ "update_time": "2026-11-22 16:19",
+ "generated": "2026-11-22 16:19",
  "meta": {
-  "generated": "2026-11-22 12:30",
+  "generated": "2026-11-22 16:19",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 29,
+  "total_days": 31,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -12338,6 +12338,244 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "华胜天成",
       "change_pct": 10.007,
       "price": 16.82,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-19",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.808,
+      "price": 14.72,
+      "category": "突破"
+     },
+     {
+      "code": "002514",
+      "name": "*ST宝馨",
+      "change_pct": 7.895,
+      "price": 2.05,
+      "category": "突破"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 7.854,
+      "price": 17.99,
+      "category": "突破"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
+      "category": "突破"
+     },
+     {
+      "code": "002367",
+      "name": "康力电梯",
+      "change_pct": 3.766,
+      "price": 4.96,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.808,
+      "price": 14.72,
+      "category": "加速"
+     },
+     {
+      "code": "002514",
+      "name": "*ST宝馨",
+      "change_pct": 7.895,
+      "price": 2.05,
+      "category": "加速"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 7.854,
+      "price": 17.99,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.808,
+      "price": 14.72,
+      "category": "短线选股"
+     },
+     {
+      "code": "002514",
+      "name": "*ST宝馨",
+      "change_pct": 7.895,
+      "price": 2.05,
+      "category": "短线选股"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 7.854,
+      "price": 17.99,
+      "category": "短线选股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
+      "category": "短线选股"
+     },
+     {
+      "code": "002367",
+      "name": "康力电梯",
+      "change_pct": 3.766,
+      "price": 4.96,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.502,
+      "price": 26.6,
+      "category": "强势股"
+     },
+     {
+      "code": "002367",
+      "name": "康力电梯",
+      "change_pct": 3.766,
+      "price": 4.96,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-20",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.986,
+      "price": 16.19,
+      "category": "突破"
+     },
+     {
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 10.03,
+      "price": 14.59,
+      "category": "突破"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 7.915,
+      "price": 5.59,
+      "category": "突破"
+     },
+     {
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 3.713,
+      "price": 17.32,
+      "category": "突破"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.942,
+      "price": 3.76,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.986,
+      "price": 16.19,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.986,
+      "price": 16.19,
+      "category": "短线选股"
+     },
+     {
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 10.03,
+      "price": 14.59,
+      "category": "短线选股"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 7.915,
+      "price": 5.59,
+      "category": "短线选股"
+     },
+     {
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 3.713,
+      "price": 17.32,
+      "category": "短线选股"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.942,
+      "price": 3.76,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 10.03,
+      "price": 14.59,
+      "category": "强势股"
+     },
+     {
+      "code": "002620",
+      "name": "*ST瑞和",
+      "change_pct": 7.915,
+      "price": 5.59,
+      "category": "强势股"
+     },
+     {
+      "code": "600410",
+      "name": "华胜天成",
+      "change_pct": 3.713,
+      "price": 17.32,
+      "category": "强势股"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 9.942,
+      "price": 3.76,
       "category": "强势股"
      }
     ]
