@@ -1404,7 +1404,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/AUDIT_TRAIL.js?v=043c9aaad7" defer></script>
 <script src="data/HEALTH_CHECK.js?v=53e9af74ee" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=3b592dc410" defer></script>
-    <!-- 🌊 2026-11-22 主人令：康波周期观测卡（中国经济 × A股）数据源，gen_kondratiev.py 真实计算；放暂未上架顶部 -->
+    <!-- 🌊 2026-11-22 主人令：康波周期观测卡（中国经济 × A股）数据源，gen_kondratiev.py 真实计算；2026-11-22 二次令迁至「观测平台>未来预测」第③层 -->
     <script src="data/KONDRATIEV.js?v=b39045fa42" defer></script>
     <!-- 💰 2026-11-22 主人令：A股现金流质量榜数据源，gen_cashflow_quality.py 真实计算；放板块技术研判卡下方 -->
     <script src="data/CASHFLOW_QUALITY.js?v=5ed792fa1f" defer></script>
@@ -16600,7 +16600,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderKondratiev', '__renderCashflow', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
+      // 🌊 2026-11-22 二次令：__renderKondratiev 已迁往未来预测页派发，本页不再调用（避免空跑）。
+      var names = ['__renderCashflow', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillEtfFlowObs', '__renderMarketState', '__renderComprehensiveSynthesis', 'renderSectorTech'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       /* 🔬 2026-11-18 主人令：+renderSectorTech（板块技术研判卡迁入本骨架，主升/启动卡上方；派发名单同步补入，幂等重渲无害） */
       var probe = document.getElementById('themeValueBody');
@@ -16728,14 +16729,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //     同批开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block">'
-// 🌊 2026-11-22 主人令：康波周期卡（中国经济 × A股 双轨对照）置顶。数据源 data/KONDRATIEV.js（gen_kondratiev.py 真实计算）。
-h += '<div class="card" id="kondratievCard" style="margin-bottom:16px;border-left:4px solid #38bdf8">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
-   + '<span style="font-size:15px;font-weight:700;color:#38bdf8">&#x1F30A; 康波周期 &#183; 中国经济 &times; A股</span>'
-   + '<span id="kondTime" style="font-size:11px;color:var(--dim)">&#x2014;</span>'
-   + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span>'
-   + '</div>'
-   + '<div id="kondratievBody"><div class="note">康波数据加载中&#x2026;</div></div></div>';
+// 🪪 2026-11-22 二次令：康波周期卡已整卡迁往「观测平台 > 未来预测」第③层，本页不再保留卡壳/派发。
+//   数据源 data/KONDRATIEV.js 仍由 index.html 头部注入；__renderKondratiev 改由 __obsRenderPane('future') 调用。
 h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-left:4px solid #c084fc">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
    + '<span style="font-size:15px;font-weight:700;color:#c084fc">&#x1F9ED; 综合研判</span>'
@@ -18806,7 +18801,8 @@ h+=`</div>`;
     if(tab !== 'macro' && tab !== 'market' && tab !== 'future') tab = 'macro';
     var names = (tab === 'market')
       ? ['__renderObsSummary', '__renderElliottWave', '__renderFibWindow', '__renderCiticPeObserve', '__renderIndexObserve', '__renderCycleBreadth']
-      : (tab === 'future' ? ['__renderFutureCard'] : []);
+      // 🌊 2026-11-22 二次令：未来预测页 4 层 = ①②大卡 + ③康波独立卡 + ④2027推演独立卡。
+      : (tab === 'future' ? ['__renderFutureCard', '__renderKondratiev'] : []);
     var probe = document.getElementById(tab === 'market' ? 'elliottWaveBody' : (tab === 'future' ? 'futureCardBody' : 'maharoCard'));
     if(probe) probe.setAttribute('data-obspane', tab);
     var out = [];
@@ -18819,6 +18815,8 @@ h+=`</div>`;
       __renderCiticPeObserve: ['citicPeObserveBody', 'citicPeObserveInner', '&#x1F321; 中信 PE 观测'],
       __renderIndexObserve: ['indexObserveBody', 'indexObserveInner', '&#x1F4C8; A股指数观测'],
       __renderCycleBreadth: ['cycleBreadthBody', 'cycleBreadthInner', '&#x1F4CA; 周期位置 + 广度观测'],
+      __renderKondratiev: ['kondratievCard', 'kondratievBody', '&#x1F30A; 康波周期'],
+      __renderFutureCard: ['futureCardBody', 'futureCardBody', '&#x1F52E; 未来预测'],
       _fillMahoroCard: ['maharoCard', 'maharoCardInner', '&#x1F916; AI 速览（Mahoro）'],
     };
     var __obsFbShow = function(k, kind, msg){
@@ -18884,8 +18882,11 @@ h+=`</div>`;
     var T = window.MARKET_THERMO;
     var host = document.getElementById('futureCardBody');
     if(!host) return;
+    // 2026-11-22 二次令：④2027推演从本卡拆为独立卡（#futureOutlookCard），仍由本函数同源渲染。
+    var outlookHost = document.getElementById('futureOutlookBody');
     if(!T || !T.D || !T.D.dates || !T.D.dates.length){
       host.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim)">&#x1F52E; MARKET_THERMO 数据未就绪（生成器尚未产出或加载失败）</div>';
+      if(outlookHost) outlookHost.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim)">④ 2027 年度展望待 MARKET_THERMO 数据就绪后渲染</div>';
       return;
     }
     var D = T.D, EXT = T.EXT || {}, SPOT = T.SPOT || {}, c = D.current;
@@ -18928,13 +18929,17 @@ h+=`</div>`;
     var base12=fwd12(50,60);
 
     // ── 统一卡头（2026-10-05 主人令：新卡顶部加卡片名+更新于，全站统一 v8CardHeader）──
-    var html=window.v8CardHeader('&#x1F52E;','未来预测','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标 + 2027情景推演','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
+    var html=window.v8CardHeader('&#x1F52E;','未来预测 · ①②长期趋势与估值','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标（③康波 / ④2027 见下方独立卡）','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
     html+='<div style="padding:14px">';
+    // 📆 逐卡频率标注（非整卡月更）：本卡交易日 16:10/16:25 日更；月频只有所列字段，禁止冒充固定月更日。
+    html+='<div style="font-size:11px;line-height:1.7;color:var(--dim);border:1px solid rgba(255,208,36,.28);border-radius:7px;padding:7px 10px;margin-bottom:11px">'
+       + '📆 <b style="color:#ffd024">本卡交易日 16:10（16:25 兜底）日更</b>；月频字段：PE 分位<b>月末补齐</b>、社融<b>次月中旬（央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>。'
+       + '<span style="color:#8b93a1">①27年走势 / ②PE分位 均为月度序列，右端末档为进行中月份，交易日滚动改写。</span></div>';
     // ── KPI 行已移至「上证/沪深300 点位条」之后（2026-10-05 二次令）──
     // ── 分析方法（核心/用法/限制）──
     html+='<div style="border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.75;font-size:12px;color:var(--txt)">'
       +'<b style="color:'+C_AMB+'">&#x1F4CC; 核心：</b>本页用「市场温度(val10) + EDHEC牛熊状态机 + 9项牛转熊先行指标」三维研判A股所处周期位置，并给出2027年度多情景推演；全部数据来自 v8 日更管线(window.MARKET_THERMO)，零未来函数。<br>'
-      +'<b style="color:'+C_AMB+'">&#x1F4A1; 用法：</b>①看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「贵不贵/险不险/牛熊哪一程」；②看2027情景表定「预期与仓位倾向」；③图①看长周期位置、图②看估值分位。<br>'
+      +'<b style="color:'+C_AMB+'">&#x1F4A1; 用法：</b>先看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「贵不贵/险不险/牛熊哪一程」；①图①看长期趋势、②图②看估值分位；③看康波长波定位；④看2027情景表定「预期与仓位倾向」。<br>'
       +'<b style="color:'+C_AMB+'">&#x26A0; 限制：</b>情景表为研究性推演(非买卖建议)，概率随数据滚动更新；社融/PMI等宏观源滞后1–5个月属正常并已如实标注；本页只判「周期位置与风险水位」，不给具体买卖点。'
       +'</div>';
     // ── 一句话结论（2026-10-16 主人令「都是活卡不要死的」：禁硬编码死文案——
@@ -18997,26 +19002,33 @@ h+=`</div>`;
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
     html+='<div id="futureC2" style="height:260px"></div>';
     html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(T.generated):T.generated)+'（每日刷新）<br>📅 两图为月度序列，右端末档 = <b style="color:'+C_TXT+'">'+D.dates[D.dates.length-1]+'</b>（当月至今·进行中，交易日滚动更新；估值分位为月频，当月值月末补齐）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
-    // ── 2027 情景 ──
+    // ── ④ 2027 情景（2026-11-22 二次令：原 big card 内 ③ 小节独立成卡，编号顺延 ④；数据仍走同一 MARKET_THERMO）──
     function tgt(v,r){ return Math.round(v*(1+r/100)); }
     var scn=[{name:'牛市',p:25,r:[15,22],col:C_GRN,drv:'强财政货币延续 + 居民资金入市 + 估值扩张 + 盈利兑现'},
              {name:'基准',p:50,r:[8,14],col:C_BLU,drv:'政策托底 + 盈利弱复苏 + 估值中性(val10='+(_v10==null?'—':_v10)+(_v10Tag?'·'+_v10Tag:'')+') + 区间下沿均值回归'},
              {name:'熊市',p:25,r:[-13,-5],col:C_RED,drv:'外部冲击 + 盈利证伪 + 流动性收紧 + 杠杆退潮'}];
-    html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px">&#x2462; 2027 年度展望（多因子情景法 · 1年维度 · 研究性推演非买卖建议）</div>';
-    html+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">情景</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">概率</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">上证综指</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">沪深300</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">核心驱动</th></tr></thead><tbody>';
+    var outHtml='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0">'
+      +'<span style="font-size:14px;font-weight:800;color:#ffd024">④</span>'
+      +'<span style="font-size:14px;font-weight:800;color:var(--cyan)">2027 年度展望 · 多因子情景推演</span>'
+      +'<span style="font-size:11px;color:#8b93a1;border:1px solid #8b93a155;border-radius:4px;padding:1px 6px">📆 交易日日更 · 研究性推演非买卖建议</span></div>'
+      +'<div style="padding:12px 14px">';
+    outHtml+='<div style="font-size:13px;color:var(--dim);line-height:1.7;margin-bottom:9px">1 年维度 · 概率与点位锚随当日真实数据滚动刷新；仅作研究与仓位倾向参考，不给买卖点。</div>';
+    outHtml+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">情景</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">概率</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">上证综指</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">沪深300</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim)">核心驱动</th></tr></thead><tbody>';
     scn.forEach(function(x){
-      html+='<tr><td style="border:1px solid var(--border);padding:6px;font-weight:800;color:'+x.col+'">'+x.name+'</td>'
+      outHtml+='<tr><td style="border:1px solid var(--border);padding:6px;font-weight:800;color:'+x.col+'">'+x.name+'</td>'
         +'<td style="border:1px solid var(--border);padding:6px">'+x.p+'%</td>'
         +'<td style="border:1px solid var(--border);padding:6px">'+tgt(SPOT.sh,x.r[0])+' ~ '+tgt(SPOT.sh,x.r[1])+'</td>'
         +'<td style="border:1px solid var(--border);padding:6px">'+tgt(SPOT.hs300,x.r[0])+' ~ '+tgt(SPOT.hs300,x.r[1])+'</td>'
         +'<td style="border:1px solid var(--border);padding:6px;text-align:left;color:var(--dim);font-size:11px">'+x.drv+'</td></tr>';
     });
-    html+='</tbody></table>';
-    html+='<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7">&#x1F4CC; 数据锚：val10&#x2208;[50,60] 时，历史之后12个月等权指数均值 <b style="color:'+C_TXT+'">+'+(base12==null?'—':base12)+'%</b>（27年数据实算）。'
+    outHtml+='</tbody></table>';
+    outHtml+='<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7">&#x1F4CC; 数据锚：val10&#x2208;[50,60] 时，历史之后12个月等权指数均值 <b style="color:'+C_TXT+'">+'+(base12==null?'—':base12)+'%</b>（27年数据实算）。'
       +(_tsfY==null?'社融脉冲待接入。':(_tsfY<0?('&#x26A0;&#xFE0F; 活跃黄旗：社融脉冲已转负（'+_tsfY+'%），信用扩张失速是历史上每轮熊市的宏观先兆。'):('&#x2705; 黄旗未激活：社融脉冲仍为正（'+_tsfY+'%）。')))
       +'红灯条件 = val10 冲上 80 或 脉冲 ≤ −10%——当前 val10='+(_v10==null?'—':_v10)+' / 脉冲='+(_tsfY==null?'—':_tsfY)+'%，已触发 '+_redN+'/2。数据更新：'+T.generated+'。</div>';
+    outHtml+='</div>';
     html+='</div>'; // /卡头下方内容包裹层（2026-10-05）
     host.innerHTML=html;
+    if(outlookHost) outlookHost.innerHTML=outHtml; // ④ 独立卡同源落盘
     // ── x 轴末档刻度（2026-10-16 主人令「底轴不是应该写到今天么」：原 interval 回调函数
     //    的末档 clause 实测不渲染（末档标签 2026-09 不显示，用户看着像停在 2025-12）⇒ 改
     //    interval:0 + formatter 对非刻度位返回空串（空串不占位不叠字），保「每 26 个月一档」
@@ -19030,7 +19042,8 @@ h+=`</div>`;
       if(_oC1) _oC1.innerHTML=_oMsg;
       if(_oC2) _oC2.innerHTML=_oMsg;
       if(!window.__OBS_RETRY){
-        window.__OBS_RETRY=function(){ if(typeof window.__obsRenderPane==='function') window.__obsRenderPane(tab); };
+        // 🛡 2026-11-22 修补：原回调引用未定义的 tab ⇒ ECharts 迟到时抛 ReferenceError，未来预测卡永久降级。
+        window.__OBS_RETRY=function(){ if(typeof window.__obsRenderPane==='function') window.__obsRenderPane('future'); };
         document.addEventListener('echartsready', window.__OBS_RETRY);
       }
       return;
@@ -19158,9 +19171,31 @@ h+=`</div>`;
     // ── 卡4：A股指数观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
     hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #41c9ff"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
     hm += '</div>'; // /obsPaneMarket
-    // ══ 子页③：🔮 未来预测（2026-10-05 主人令：牛转熊指标观测台 + 27年走势 + 估值带 + 2027情景；数据 MARKET_THERMO 日更）══
+    // ══ 子页③：🔮 未来预测（2026-11-22 二次令：4 层观测链 = ①27年走势 ②PE分位 ③康波长波 ④2027推演）══
+    //   频率铁律（主人令「标明每月几日更新」）：本页没有「整卡月更」卡——①②所在大卡与④均为交易日 16:10/16:25 日更，
+    //   仅其中部分字段为月频（PE月末补齐 / 社融次月中旬 / PMI月末或次月初）；③康波卡为按次手动生成，未接入自动月更。
+    //   禁止把月频字段冒充整卡月更，也禁止编造固定日期。
     hm += '<div id="obsPaneFuture" style="display:' + (_act==='future' ? 'block' : 'none') + '">';
+    hm += '<div style="border:1px solid rgba(255,208,36,.35);border-radius:9px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.8;color:var(--dim);background:rgba(255,208,36,.05)">'
+       + '<b style="color:#ffd024">📆 更新频率（逐卡真实标注）：</b>'
+       + '①27年走势 / ②PE分位 所在大卡 = <b style="color:var(--txt)">交易日 16:10（16:25 兜底）日更</b>，其中 PE 分位<b>月末补齐</b>、社融<b>次月中旬（约10–15日，央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>；'
+       + '③康波周期 = <b style="color:#fbbf24">当前按次手动生成，无每月固定日、未接入自动月更</b>（源数据 GDP 季度 / CPI·PPI 月度）；'
+       + '④2027推演 = <b style="color:var(--txt)">随大卡每交易日刷新</b>（情景概率滚动更新）。'
+       + '<br><span style="color:#8b93a1">①→④ 是研判链：长期趋势 → 估值水位 → 长波定位 → 年度推演；均为观测研究，不构成买卖建议。</span></div>';
     hm += '<div class="card" id="futureCardBody" style="margin-bottom:16px;border-left:4px solid #ffd024"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">🔮 未来预测 · 牛熊观测台 加载中…</div></div>';
+    // 🌊 第③层：康波周期（整卡从「暂未上架」迁入，容器 id / 渲染函数不变）
+    hm += '<div class="card" id="kondratievCard" style="margin-bottom:16px;border-left:4px solid #38bdf8">'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+       + '<span style="font-size:14px;font-weight:800;color:#ffd024">③</span>'
+       + '<span style="font-size:15px;font-weight:700;color:#38bdf8">&#x1F30A; 康波周期 &#183; 中国经济 &times; A股</span>'
+       + '<span id="kondTime" style="font-size:11px;color:var(--dim)">&#x2014;</span>'
+       + '<span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span>'
+       + '<span style="font-size:11px;color:#8b93a1;border:1px solid #8b93a155;border-radius:4px;padding:1px 6px">📆 按次生成 · 非月更</span>'
+       + '</div>'
+       + '<div id="kondratievBody"><div class="note">康波数据加载中&#x2026;</div></div></div>';
+    // ④ 第4层：2027 年度展望（原 big card 内 ③ 小节拆出为独立卡，编号顺延为 ④；内容仍由 __renderFutureCard 同源渲染）
+    hm += '<div class="card" id="futureOutlookCard" style="margin-bottom:16px;border-left:4px solid #c084fc">'
+       + '<div id="futureOutlookBody"><div class="note">④ 2027 年度展望加载中&#x2026;</div></div></div>';
     hm += '</div>'; // /obsPaneFuture
     var _host = document.getElementById('obsHost');
 
@@ -19172,8 +19207,11 @@ h+=`</div>`;
     try{
       var _pMg = document.getElementById('obsPaneMacro');
       var _pKg = document.getElementById('obsPaneMarket');
+      var _pFu = document.getElementById('obsPaneFuture');
       if(_pMg && _pMg.parentElement !== _host){ _host.appendChild(_pMg); console.warn('[obsGuard] obsPaneMacro 层级错位，已自动修复'); }
       if(_pKg && _pKg.parentElement !== _host){ _host.appendChild(_pKg); console.warn('[obsGuard] obsPaneMarket 层级错位，已自动修复'); }
+      // 2026-11-22 二次令：未来预测页扩为 4 卡，同步纳入层级护栏（防骨架错位导致整页隐藏）
+      if(_pFu && _pFu.parentElement !== _host){ _host.appendChild(_pFu); console.warn('[obsGuard] obsPaneFuture 层级错位，已自动修复'); }
     }catch(e){}
     // 🔴 2026-09-12 补漏：机构研究·AI 解析卡的填充函数 _fillMahoroCard 原先全局
     //   只在 renderUnlisted 里被调用；宿主迁到本页后无任何触发 → 卡永久「加载中」。
