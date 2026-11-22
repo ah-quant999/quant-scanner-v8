@@ -1,10 +1,10 @@
 {
   "version": "2.0",
-  "updated": "2026-11-22 20:11:39",
+  "updated": "2026-11-22 20:32:36",
   "sources": [
     "guanlan"
   ],
-  "total": 14,
+  "total": 9,
   "stocks": [
     {
       "name": "机器人",
@@ -23,7 +23,7 @@
       "full_code": "09988.HK",
       "exchange": "HK",
       "market": "港股",
-      "institution": "瑞银",
+      "institution": "高盛",
       "rating": "买入",
       "source": "外资研投",
       "added_date": "2026-11-20"
@@ -102,61 +102,6 @@
       "market": "港股",
       "institution": "摩根大通",
       "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "通富微电",
-      "code": "002156",
-      "full_code": "sz002156",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "瑞银",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "北方华创",
-      "code": "002371",
-      "full_code": "sz002371",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "瑞银",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "长川科技",
-      "code": "300604",
-      "full_code": "sz300604",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "瑞银",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "华大九天",
-      "code": "301269",
-      "full_code": "sz301269",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "瑞银",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-20"
-    },
-    {
-      "name": "腾讯控股",
-      "code": "00700",
-      "full_code": "00700.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "瑞银",
-      "rating": "买入",
       "source": "外资研投",
       "added_date": "2026-11-20"
     }
