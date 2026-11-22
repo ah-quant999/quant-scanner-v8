@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-11-22 08:24:39",
+  "check_time": "2026-11-22 22:52:12",
   "last_trade_close": "2026-11-20 15:30:00",
   "is_trading_day": false,
   "core_stale": [],
@@ -81,6 +81,8 @@
     "STOCK_LIST": "post_close",
     "CONCEPT_ETF_MAP": "post_close",
     "BACKTEST_EXPECTANCY": "post_close",
+    "PULLBACK_POOL": "post_close",
+    "PULLBACK_TRACK": "post_close",
     "V8_POOL_TRACKER": "post_close",
     "AVG_PRICE_DATA": "intraday,post_close",
     "SECTOR_YEAR_FLOW": "post_close",
