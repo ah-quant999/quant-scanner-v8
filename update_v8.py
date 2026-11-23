@@ -1865,6 +1865,28 @@ def run_experiment_cards():
     else:
         print("[experiment] ⚠️ 缺失 scripts/momentum_common_filter.py，跳过")
 
+    # 🔬 2026-11-23 13:20 主人令「周度？不能实时？」→ 分型×共振回测实时化接线：
+    #   gen_fractal_confluence.py 每轮重算（全程 ~8-15s）：当下判读用「历史定稿bar+东财/新浪/
+    #   腾讯三源级联实时bar」合成（盘中随最新价跳动）；回测胜率表只用已收盘定稿bar（今日半根K线
+    #   绝不混入统计口径，防盘中污染）。实时源失败自动回落昨日收盘口径（live=false 不编造）。
+    #   盘中成交量未满日 vol_shrink=null 如实不判量。cn runner 主力链（中国IP）三源全可达。
+    fractal_py = Path(__file__).resolve().parent / "scripts" / "gen_fractal_confluence.py"
+    if fractal_py.exists():
+        print(f"[experiment] ▶ gen_fractal_confluence.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(fractal_py)],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ gen_fractal_confluence 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ gen_fractal_confluence 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/gen_fractal_confluence.py，跳过")
+
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
     #   停止调用 algo_backtest_compare.py 生成该死数据。
     # 🔵 2026-09-13 状态更新（阿狸咪的工程师，主人令「只要接入算法链的选股策略都要有回测」）：
