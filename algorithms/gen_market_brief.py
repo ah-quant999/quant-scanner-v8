@@ -371,8 +371,59 @@ def _anomaly_signal(text):
     return "yellow"
 
 
-def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup):
-    """基于规则生成 3~6 条市场异动（每项附 signal 灯；上限 6 条见函数末尾 unique[:6]）"""
+def detect_etf_pace_anomaly(etf_pace):
+    """2026-11-24 主人令（A方案）：ETF量能配速 → AI速览一条（盘中实时·时序一致）。
+
+    🛡 铁律护栏：
+      · 新鲜度：非当日数据一律不出（速览 16:30 冻结，配速盘中实时，同源同频）；
+      · 只在有明确信号（放量hot / 缩量cool / 异动灯light）时才产出，无信号不凑数；
+      · 只报代表品种（放量/异动灯里取前2），不堆砌；观测参考，非交易指令。
+      · 红涨绿跌：放量=red灯、缩量=green灯、异动灯按 win_dir 方向。
+    """
+    if not etf_pace or not isinstance(etf_pace, dict):
+        return None
+    # 新鲜度：data_date 必须是今天
+    from datetime import datetime as _dt
+    today = _dt.now().strftime("%Y-%m-%d")
+    if etf_pace.get("data_date") != today:
+        print(f"  ⏭️ ETF配速条跳过：data_date={etf_pace.get('data_date')} 非今日")
+        return None
+    summ = etf_pace.get("summary") or {}
+    n_hot, n_cool, n_light = (summ.get("hot") or 0), (summ.get("cool") or 0), (summ.get("light") or 0)
+    if n_hot + n_cool + n_light <= 0:
+        return None  # 盘中暂无明确信号，不凑数
+    items = etf_pace.get("items") or {}
+    def _top(state_key, limit=2):
+        out = []
+        for code, v in items.items():
+            if not isinstance(v, dict):
+                continue
+            hit = (v.get("state") == state_key) if state_key in ("hot", "cool") else ((v.get("win_pct") or 0) > 90)
+            if hit and v.get("pace") is not None:
+                out.append(f"{v.get('name', code)} {v['pace']:.2f}×")
+            if len(out) >= limit:
+                break
+        return out
+    parts = []
+    if n_hot:
+        parts.append(f"放量{n_hot}只（{'、'.join(_top('hot'))}）")
+    if n_cool:
+        parts.append(f"缩量{n_cool}只")
+    if n_light:
+        parts.append(f"局部异动灯{n_light}只")
+    text = "ETF量能配速：" + "；".join(parts) + "，盘中量能异动（观测参考）"
+    return {
+        "tag": "ETF配速",
+        "emoji": "⚡",
+        "text": text,
+        "color": "purple",
+        "signal": "red" if n_hot > n_cool else ("green" if n_cool > n_hot else "yellow"),
+    }
+
+
+def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup, etf_pace=None):
+    """基于规则生成 3~6 条市场异动（每项附 signal 灯；上限 6 条见函数末尾 unique[:6]）
+    2026-11-24：新增 etf_pace 参数（ETF量能配速条，盘中实时，有明确信号才占一席）"""
     anomalies = []
     by_code = {it["code"]: it for it in indices}
 
@@ -683,6 +734,17 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
                 "signal": "red",
             })
 
+    # 2026-11-24 主人令（A方案）：ETF量能配速条（盘中实时）——在去重截6前插入，
+    #   有明确信号才占一席；放在 ETF资金条之后保持同族相邻。无信号/非当日 detect 函数返回 None。
+    _pace_a = detect_etf_pace_anomaly(etf_pace)
+    if _pace_a:
+        _ins = len(anomalies)
+        for _i, _a in enumerate(anomalies):
+            if _a.get("tag") == "ETF资金":
+                _ins = _i + 1
+                break
+        anomalies.insert(_ins, _pace_a)
+
     # 去重并限制条数
     # 🛡 2026-09-11：上限 5 → 6 —— 新增「行业资金」独立行后，若仍限 5 条会把原有的
     #   「涨停热度 / 个股异动」挤掉（行为回退）。
@@ -925,8 +987,13 @@ def main():
             "amount": it.get("amount", 0),
         })
 
+    # 2026-11-24 主人令（A方案）：ETF量能配速条（盘中实时）。同源读 raw_data/etf_pace.json，
+    #   新鲜度守卫复用 load_raw_fresh（非当日不下发），在 detect_anomalies 内截6前插入，
+    #   严格保持6条上限、配速条有信号才占一席。
+    etf_pace, _pace_fresh = load_raw_fresh("etf_pace.json", max_age_min=45, what="ETF配速(etf_pace)")
+
     # 异动
-    anomalies = detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup)
+    anomalies = detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup, etf_pace)
 
     # 操作建议
     strategies = build_strategy(sentiment_label, health, anomalies, indices, etf_daily, concepts, capital)

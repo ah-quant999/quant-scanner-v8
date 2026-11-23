@@ -117,10 +117,16 @@ jobs:
         id: genaudit
         shell: powershell
         run: |
-          $dow = (Get-Date).DayOfWeek.value__
+          # 🔴 铁律 2026-11-24：一切以北京时间为准；UTC 只取调度归属日锚点。
+          # cron '10 8 / 25 8 * * 1-5'(UTC) = 北京工作日 16:10/16:25；锚定触发日还原北京 16:10 判星期。
+          $triggerDateUtc = (Get-Date).ToUniversalTime().Date
+          $bjSchedule = $triggerDateUtc.AddHours(16).AddMinutes(10)   # 调度归属日 → 北京 16:10
+          $dow = [int]$bjSchedule.DayOfWeek
+          $bjNow = (Get-Date).ToUniversalTime().AddHours(8)
+          Write-Host ("[gate] 北京时间={0} | 调度归属北京工作日={1}" -f $bjNow.ToString('yyyy-MM-dd HH:mm'), $bjSchedule.ToString('yyyy-MM-dd HH:mm'))
           # 2026-10-17：周末闸仅对 schedule 生效；workflow_dispatch 允许（幂等，主人周末手动跑批惯例）
           if (($dow -eq 0 -or $dow -ge 6) -and '${{ github.event_name }}' -eq 'schedule') {
-            Write-Host "[skip] weekend (scheduled)"
+            Write-Host "[skip] 周末(调度归属的北京工作日, scheduled)"
             "outcome=skipped" | Out-File -Append -FilePath $env:GITHUB_OUTPUT -Encoding utf8
             exit 0
           }

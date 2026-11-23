@@ -105,14 +105,19 @@ jobs:
         shell: powershell
         continue-on-error: true
         run: |
-          # trading-day gate (default): weekends silently skipped (fetch_lhb has its own
+          # trading-day gate: 🔴 铁律 2026-11-24 一切以北京时间为准；UTC 只取调度归属日锚点。
+          # cron '30 9 * * 1-5'(UTC) = 北京工作日 17:30；延迟不跨 UTC 触发日，锚定后还原北京 17:30 判星期。
           $skip = "${{ github.event.inputs.skip_trading_day_gate || 'false' }}"
           if ($skip -eq 'true') {
             Write-Host "skip_trading_day_gate=true: force run"
           } else {
-            $dow = (Get-Date).DayOfWeek.value__
+            $triggerDateUtc = (Get-Date).ToUniversalTime().Date
+            $bjSchedule = $triggerDateUtc.AddHours(17).AddMinutes(30)   # 调度归属日 → 北京 17:30
+            $dow = [int]$bjSchedule.DayOfWeek
+            $bjNow = (Get-Date).ToUniversalTime().AddHours(8)
+            Write-Host ("[gate] 北京时间={0} | 调度归属北京工作日={1}" -f $bjNow.ToString('yyyy-MM-dd HH:mm'), $bjSchedule.ToString('yyyy-MM-dd HH:mm'))
             if ($dow -eq 0 -or $dow -ge 6) {
-              Write-Host "[skip] weekend, exit ok"
+              Write-Host "[skip] 周末(调度归属的北京工作日), exit ok"
               exit 0
             }
           }

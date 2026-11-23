@@ -7782,7 +7782,7 @@ c.innerHTML = h;
   window.__tvAuto = true;   // 2026-11-01 主人令「死卡」根治：默认跟随当日资金热度第一主题；手动点 chip 后由 __tvSetTheme 置 false 锁定
   // 🔴 2026-09-13 主人令（主人第三次重申「这个主题是会变动的吧，不能写死啊」）：
   //   主题清单由「写死 7 个」改为「种子 + 自动追加」双轨，全集在每次渲染时按当日资金榜重建。
-  //   · 种子（__TV_SEED_THEMES）= 7 个长期主题，提供稳定的分组语义（人工知识，无法从行情数据自动得出）；
+  //   · 种子（__TV_SEED_THEMES）= 7 个基础分组，仅提供关键词归类语义（人工知识，无法从行情数据自动得出），非固定席位、不代表长期看好；
   //   · 自动追加（__TV_DYN_KEYS）= 当日 SECTOR_FUND_FLOW「概念」资金榜中**未被任何种子关键词覆盖**的
   //     板块，按当日主力净额降序取前 TV_DYN_MAX 个 → 主题集合随每日行情变化，不再恒定 7 个。
   //   ⚠️ 兼容：__TV_THEMES 指向「运行时全集」，渲染函数构建后覆盖它（未构建前退化为种子全集）。
@@ -7835,7 +7835,7 @@ c.innerHTML = h;
     // ---- 🔴 2026-09-13 主人令：主题全集 = 种子(长期主题) + 自动追加(当日资金榜新热点) ----
     //   主人第三次重申「主题是会变动的，不能写死」⇒ 原先只渲染 7 个写死主题，
     //   现改为每次渲染都按当日 SECTOR_FUND_FLOW 概念资金榜重建全集：
-    //     ① 种子：7 个长期主题（label + 关键词表，人工知识）；
+    //     ① 种子：7 个基础分组（label + 关键词表，人工知识；仅归类、不固定席位）；
     //     ② 自动追加：资金榜里“未被任何种子关键词覆盖”的概念板块，按当日主力净额降序取前 TV_DYN_MAX 个。
     //   → 主题集合每天随行情变化；动态主题 chip 用金色描边 + 🔥 前缀区分于长期主题。
     (function(){
@@ -8127,9 +8127,9 @@ c.innerHTML = h;
       + window.v8CardHeader('🔭','主题空间 · 概念资金热度','概念 × 资金热度 × 三项齐交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
       + '<div style="padding:12px 14px">'
       + '<div style="border:1px solid rgba(192,132,252,0.63);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt)">'
-      +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">📌 核心：</b>在 <b style="color:var(--txt)">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「概念想象空间 + 业绩正向 + ROE≥10%」三项齐的股票。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">📌 核心：</b>在当日 <b style="color:var(--txt)">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个基础分组〔仅关键词归类、非固定席位〕+ <b style="color:#fcd34d">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「概念想象空间 + 业绩正向 + ROE≥10%」三项齐的股票。</div>'
       +   '<div style="font-size:12.5px;margin-bottom:5px"><b style="color:#c4b5fd">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列;按未来空间分（成长45%+质量35%+拐点20%）降序，资金为辅助验证。</div>'
-      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;border-left:3px solid #ffd024"><b style="color:#ffd024">🔥 主题会动：</b>主题分组的关键词表是人工知识（非行情可得），但<b style="color:var(--txt)">位次全由真实资金定</b>：全部主题（长期主题 + 🔥 新热点）一律按当日净额降序<b style="color:var(--txt)">混排</b>——资金持续流出会自然沉底，🏃5日 = 5 日连续净流出真实证据；另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（🔥 前缀）。仅研究参考，不构成投资建议。</div>'
+      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;border-left:3px solid #ffd024"><b style="color:#ffd024">🔥 主题会动：</b>基础分组的关键词表只是人工归类（非行情可得、也<b>不代表长期看好</b>），主题去留与位次<b style="color:var(--txt)">全由真实资金定</b>：全部主题（基础分组 + 🔥 新热点）一律按当日净额降序<b style="color:var(--txt)">混排</b>——资金持续流出会自然沉底，🏃5日 = 5 日连续净流出真实证据；另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（🔥 前缀）。仅研究参考，不构成投资建议。</div>'
       + '</div>'
       // 2026-11-21 主人令「不要 7 个固定的」根治：废除 10-02 旧两行布局（种子一行/热点一行），
       //   全部主题混排单行、位次纯按当日净额降序——🔥 前缀仅作来源标识、不再占独立席位
@@ -8152,7 +8152,7 @@ c.innerHTML = h;
       // 2026-09-13 主人令：A/B/C 分档后不再截断，删除「仅展示前 N 只」提示行。
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6">口径：板块资金取概念类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
       + '⚠️ 主题净额为<b>跨板块直加</b>，成分股跨板块重叠会放大绝对值（如算力·CPO 聚合 13 板块）——看<b>相对排序</b>更可靠，绝对值仅供参考；'
-      + 'chip 按<b>当日真实净额降序</b>排列（2026-11-21 主人令：长期主题不再固定席位），🏃5日 = TREND 多日持续流出真实证据。'
+      + 'chip 按<b>当日真实净额降序</b>排列（基础分组不固定席位、去留随资金），🏃5日 = TREND 多日持续流出真实证据。'
       + '卡内符号：🚀=未来空间分（成长+质量+拐点合成，越高越具大涨空间）/ 🔥=资金流入+基本面证据 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
   };
@@ -16578,10 +16578,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
          + '<th style="padding:6px 5px;text-align:right">营收增速</th>'
          + '<th style="padding:6px 5px">行业/市场</th>'
          + '</tr></thead><tbody>';
+      // 🛡 2026-11-24 主人令：只显示前3名，其余折叠（点按钮展开），不删数据、可完整核验。
       stocks.forEach(function(s,i){
         var rankColor = i<3 ? AMB : DIM;
         var mktColor = s.market==='北交所' ? AMB : (s.market==='科创板'?'#c084fc':(s.market==='创业板'?'#41c9ff':DIM));
-        h += '<tr style="border-bottom:1px solid var(--border)">'
+        h += '<tr'+(i>=3?' class="cfExtraRow" style="display:none;border-bottom:1px solid var(--border)"':' style="border-bottom:1px solid var(--border)"')+'>'
            + '<td style="padding:6px 5px;color:'+rankColor+';font-weight:600">'+(i+1)+'</td>'
            + '<td style="padding:6px 5px"><b>'+s.name+'</b> <span style="color:'+DIM+'">'+s.code+'</span></td>'
            + '<td style="padding:6px 5px;text-align:right;color:'+GRN+';font-weight:600">'+Number(s.quality).toFixed(1)+'×</td>'
@@ -16592,11 +16593,36 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
            + '</tr>';
       });
       h += '</tbody></table></div>';
+      if(stocks.length>3){
+        h += '<div style="text-align:center;margin-top:7px"><button type="button" id="cfFoldBtn" onclick="(function(){var rows=document.querySelectorAll(\'#cashflowBody .cfExtraRow\');var btn=document.getElementById(\'cfFoldBtn\');var open=btn.getAttribute(\'data-open\')===\'1\';rows.forEach(function(r){r.style.display=open?\'none\':\'\';});btn.setAttribute(\'data-open\',open?\'0\':\'1\');btn.textContent=open?(\'▼ 展开其余 \'+(stocks.length-3)+\' 只\'):\'▲ 收起\';})()" data-open="0" style="background:transparent;border:1px solid var(--border);color:'+CY+';border-radius:5px;padding:4px 14px;font-size:11.5px;cursor:pointer">▼ 展开其余 '+(stocks.length-3)+' 只</button></div>';
+      }
 
       // 诚实边界（置底）
       h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">'
          + '⚠ '+(D.boundary||'')+' 公告日期：'+stocks[0].ann_date+' 起。数据源：'+(D.source||'akshare')+'。<br>'
-         + '📌 本榜<b>无收益回测</b>，不是长期持有组合；高现金含量可由低 EPS 放大（本期 EPS '+Math.min.apply(null,stocks.map(function(s){return s.eps;})).toFixed(2)+'~'+Math.max.apply(null,stocks.map(function(s){return s.eps;})).toFixed(2)+'），不等于未来收益更高。</div>';
+         + '高现金含量可由低 EPS 放大（本期 EPS '+Math.min.apply(null,stocks.map(function(s){return s.eps;})).toFixed(2)+'~'+Math.max.apply(null,stocks.map(function(s){return s.eps;})).toFixed(2)+'），不等于未来收益更高。</div>';
+
+      // 📊 2026-11-24 主人令：卡底写真实回测（C方案复核后结论，诚实展示"全样本正超额 + 风格中性收敛 + 近期衰减"）
+      h += '<div style="margin-top:11px;padding:10px 11px;background:#0b1622aa;border:1px solid var(--border);border-radius:7px">'
+         + '<div style="font-size:11.5px;color:'+CY+';font-weight:600;margin-bottom:7px">📊 历史回测（无前视·扣双边0.16%·2020Q1~2025Q3 共23季报截面）</div>'
+         + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:430px">'
+         + '<thead><tr style="color:'+DIM+';border-bottom:1px solid var(--border)">'
+         + '<th style="padding:4px 3px;text-align:left">持有期</th>'
+         + '<th style="padding:4px 3px;text-align:right" title="相对沪深300大盘">对沪深300</th>'
+         + '<th style="padding:4px 3px;text-align:right" title="相对中证1000小盘——剥离小盘风格">对中证1000</th>'
+         + '<th style="padding:4px 3px;text-align:right" title="相对国证2000微盘">对国证2000</th>'
+         + '</tr></thead><tbody>'
+         + '<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 3px">T+20</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+3.70%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+2.53%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+2.00%</td></tr>'
+         + '<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 3px">T+60</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+4.39%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+1.73%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+0.85%</td></tr>'
+         + '<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 3px">T+120</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+4.55%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+1.49%</td><td style="padding:4px 3px;text-align:right;color:'+GRN+'">-0.17%</td></tr>'
+         + '<tr><td style="padding:4px 3px">T+250</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+12.51%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+7.83%</td><td style="padding:4px 3px;text-align:right;color:'+RED+'">+4.00%</td></tr>'
+         + '</tbody></table></div>'
+         + '<div style="font-size:10px;color:'+DIM+';margin-top:7px;line-height:1.6">'
+         + '⚠ <b style="color:'+AMB+'">大部分超额是小盘风格 beta</b>：越用小盘基准超额越收敛，T+120 对国证2000 已转负。<br>'
+         + '⚠ <b style="color:'+AMB+'">近年年衰减</b>：2023-25 对小盘基准无 edge（T+20 对中证1000 -0.06%、T+120 -2.04%）。<br>'
+         + '⚠ 13 只北交所票（8%）因数据源客观限制无法回测，已剔除；样本仅23期、持有期重叠，t值偏乐观。<br>'
+         + '📌 全样本对沪深300超额统计显著，但<b>不进选股/Top3/终选</b>——本榜仍为观测项。</div>'
+         + '</div>';
       body.innerHTML = h;
     }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">现金流榜渲染异常：'+e.message+'</div>'; console.warn('[cashflow]',e); }
   };

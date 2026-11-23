@@ -101,8 +101,15 @@ jobs:
           if ($skip -eq 'true') {
             Write-Host "skip_trading_day_gate=true: force run"
           } else {
-            $dow = (Get-Date).DayOfWeek.value__
-            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend, exit ok"; exit 0 }
+            # 🔴 铁律 2026-11-24：一切以北京时间为准；UTC 只取调度归属日锚点，判断口径全北京时间。
+            # cron '30 12 * * 1-5'(UTC) = 北京工作日 20:30；GitHub 延迟可能把周五档推到北京周六凌晨，
+            # 用(Get-Date)当下时间判周末会误 skip。故锚定 cron 触发日 → 还原北京 20:30 判星期。
+            $triggerDateUtc = (Get-Date).ToUniversalTime().Date
+            $bjSchedule = $triggerDateUtc.AddHours(20).AddMinutes(30)   # 调度归属日 → 北京 20:30
+            $dow = [int]$bjSchedule.DayOfWeek
+            $bjNow = (Get-Date).ToUniversalTime().AddHours(8)
+            Write-Host ("[gate] 北京时间={0} | 调度归属北京工作日={1}" -f $bjNow.ToString('yyyy-MM-dd HH:mm'), $bjSchedule.ToString('yyyy-MM-dd HH:mm'))
+            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] 周末(调度归属的北京工作日), exit ok"; exit 0 }
           }
           cd $env:GITHUB_WORKSPACE
           python algorithms/fetch_dajijin_reduction.py --window 120
