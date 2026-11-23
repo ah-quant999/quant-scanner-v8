@@ -1,1 +1,1 @@
-window.HB_XIAOJIU = {"last_time":"2026-11-23 15:12:42","status":"warn","machine":"lemoncat-cn","source":"v8_runner_guard","update_time":"2026-11-23 15:12:42","republish_time":"2026-11-23 16:11:05"};
+window.HB_XIAOJIU = {"last_time":"2026-11-23 17:40:43","status":"ok","machine":"lemoncat-cn","source":"v8_runner_guard","update_time":"2026-11-23 17:40:43","republish_time":"2026-11-23 18:29:17"};
