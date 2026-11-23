@@ -1,13 +1,13 @@
 window.STOCK_MOMENTUM_ENHANCED = {
  "meta": {
-  "generated": "2026-11-23 21:53:26",
+  "generated": "2026-11-23 22:33:45",
   "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
   "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "method": "涨幅≥3.0% + 量比≥1.2(4日均量) + 突破98%20日高 + RS前25%",
-  "total_unique_stocks": 185,
-  "total_appearances": 621,
-  "kline_available": 185,
+  "total_unique_stocks": 186,
+  "total_appearances": 622,
+  "kline_available": 186,
   "kline_unavailable": 0,
   "kline_ratio": 1.0
  },
@@ -12180,7 +12180,7 @@ window.STOCK_MOMENTUM_ENHANCED = {
    ]
   },
   "2026-11": {
-   "count": 71,
+   "count": 72,
    "leaders": [
     {
      "code": "600410",
@@ -12203,9 +12203,9 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "max_drawdown_pct": 0.0,
      "t1_gain_pct": 10.01,
      "t3_gain_pct": 13.28,
-     "t5_gain_pct": 13.28,
-     "t10_gain_pct": 13.28,
-     "last_gain_pct": 13.28,
+     "t5_gain_pct": 8.89,
+     "t10_gain_pct": 8.89,
+     "last_gain_pct": 8.89,
      "pattern": "普通",
      "note": "连涨前0天 回撤0.0%",
      "daily_returns": [
@@ -12226,8 +12226,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+4",
-       "date": "",
-       "gain": null
+       "date": "2026-11-23",
+       "gain": 8.89
       },
       {
        "T": "T+5",
@@ -15167,8 +15167,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "t1_gain_pct": 10.0,
      "t3_gain_pct": -10.88,
      "t5_gain_pct": -19.41,
-     "t10_gain_pct": -19.41,
-     "last_gain_pct": -19.41,
+     "t10_gain_pct": -16.18,
+     "last_gain_pct": -16.18,
      "pattern": "波动大",
      "note": "连涨前0天 回撤19.71%",
      "daily_returns": [
@@ -15199,8 +15199,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+6",
-       "date": "",
-       "gain": null
+       "date": "2026-11-23",
+       "gain": -16.18
       },
       {
        "T": "T+7",
@@ -15806,9 +15806,9 @@ window.STOCK_MOMENTUM_ENHANCED = {
      "max_drawdown_pct": 0.0,
      "t1_gain_pct": 10.01,
      "t3_gain_pct": 13.28,
-     "t5_gain_pct": 13.28,
-     "t10_gain_pct": 13.28,
-     "last_gain_pct": 13.28,
+     "t5_gain_pct": 8.89,
+     "t10_gain_pct": 8.89,
+     "last_gain_pct": 8.89,
      "pattern": "普通",
      "note": "连涨前0天 回撤0.0%",
      "daily_returns": [
@@ -15829,8 +15829,8 @@ window.STOCK_MOMENTUM_ENHANCED = {
       },
       {
        "T": "T+4",
-       "date": "",
-       "gain": null
+       "date": "2026-11-23",
+       "gain": 8.89
       },
       {
        "T": "T+5",
@@ -16184,6 +16184,86 @@ window.STOCK_MOMENTUM_ENHANCED = {
       }
      ],
      "entry_price": 57.88
+    },
+    {
+     "code": "601689",
+     "symbol": "sh601689",
+     "name": "拓普集团",
+     "date": "2026-11-23",
+     "count": 1,
+     "categories": [
+      "强势股",
+      "短线选股",
+      "突破"
+     ],
+     "change_pct": 10.0,
+     "sel_change_pct": 10.0,
+     "data_available": true,
+     "consec_before": 0,
+     "stage": "震荡",
+     "consecutive_up_days": 0,
+     "max_gain_pct": 0.0,
+     "max_drawdown_pct": 0.0,
+     "t1_gain_pct": 0.0,
+     "t3_gain_pct": 0.0,
+     "t5_gain_pct": 0.0,
+     "t10_gain_pct": 0.0,
+     "last_gain_pct": 0.0,
+     "pattern": "普通",
+     "note": "连涨前0天 回撤0.0%",
+     "daily_returns": [
+      {
+       "T": "T+1",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+2",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+3",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+4",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+5",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+6",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+7",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+8",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+9",
+       "date": "",
+       "gain": null
+      },
+      {
+       "T": "T+10",
+       "date": "",
+       "gain": null
+      }
+     ],
+     "entry_price": 52.92
     },
     {
      "code": "000702",
