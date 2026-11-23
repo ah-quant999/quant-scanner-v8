@@ -1,5 +1,5 @@
 window.FRACTAL_CONFLUENCE = {
- "update_time": "2026-11-24 00:27:50",
+ "update_time": "2026-11-24 00:40:34",
  "sample": {
   "start": "2005-01-04",
   "end": "2026-11-23",
@@ -168,7 +168,7 @@ window.FRACTAL_CONFLUENCE = {
   "dev250": -16.9,
   "vol_shrink": true,
   "live": true,
-  "as_of": "00:27",
+  "as_of": "00:40",
   "last_bottom": "2026-11-06",
   "last_top": "2026-11-23"
  },
