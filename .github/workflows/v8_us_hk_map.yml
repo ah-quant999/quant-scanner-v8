@@ -23,6 +23,7 @@ name: "🌐 v8 隔夜美股映射 fetcher (cn runner)"
 on:
   schedule:
     # 工作日 05:35 CST（UTC 21:35 前一日）= 美股收盘后首抓；08:15 CST（UTC 00:15）= 盘前兜底。
+    # 🔁 2026-11-23 触改重注册：11-21起两档cron再次零触发（注册丢失老病复发）。
     # 🔁 2026-11-17 10:17 触改重注册：今晨两档 cron 零触发（GitHub schedule 注册丢失老病，期指卡 11-13 / 国家队链同款）⇒ 触改本行强制重新注册 schedule，验收=11-18 05:35 CST 档准点触发。
     - cron: '35 21 * * 1-5'
     - cron: '15 0 * * 1-5'
@@ -53,6 +54,11 @@ jobs:
       # 🔴 cn runner（Windows）默认 GBK —— 本脚本打印中文会 UnicodeEncodeError('gbk') 崩链。
       PYTHONIOENCODING: utf-8
       PYTHONUTF8: "1"
+      # 🔁 2026-11-23：启用守卫文档内置逃生舱。本链 step1 已用 Contents API 从 main 现取全部
+      #   执行脚本（cloud_fetch_v8.py / update_v8.py 等），落后代码风险结构性排除；
+      #   11-20 起三连败根因 = update_v8.py 内嵌 v8_ws_sync_guard 对 .github/scripts/v8_stage_gate.py
+      #   恒拉不齐（fail-closed），非数据真失败 ⇒ 本链显式跳过工作树守卫。
+      V8_SKIP_WS_GUARD: "1"
     timeout-minutes: 25
     steps:
       - name: "📝 同步源码（Contents API · 同域，避开 raw 302）"

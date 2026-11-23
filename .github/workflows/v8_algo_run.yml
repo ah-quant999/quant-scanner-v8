@@ -451,6 +451,22 @@ jobs:
             python algorithms/run_algorithms.py --stage $stage
           }
 
+      - name: "💰 现金流质量榜（gen_cashflow_quality.py · 2026-11-23 补调度）"
+        # 2026-11-23 主人令「全仓零调用方根治」：algorithms/gen_cashflow_quality.py 此前无任何
+        #   调度挂载（产物 data/CASHFLOW_QUALITY.js 线上停 2026-11-22 23:08 手动版）⇒ 挂进本盘后链。
+        #   产出 raw_data/cashflow_quality.json + data/CASHFLOW_QUALITY.js（脚本直写，不经 update_v8 映射）；
+        #   推送走链尾既有通道：raw 由 api_push_raw walk_raw 覆盖，data/CASHFLOW_QUALITY.js 已
+        #   同步登记 api_push_raw.walk_extra + _EXTRA_FILES（?v 原子重写，2026-11-23 配套）。
+        #   依赖：akshare（本链「校验 Python / 安装 A股依赖」步已装，复用）。
+        #   非阻断：akshare datacenter-web 偶发抖动不打断盘后主链，但打 ::error 显式告警不假 success。
+        continue-on-error: true
+        shell: powershell
+        run: |
+          python algorithms/gen_cashflow_quality.py
+          if ($LASTEXITCODE -ne 0) {
+            echo "::error title=cashflow-quality-failed::gen_cashflow_quality.py 非零退出（akshare stock_yjbb_em 抓取失败?），本轮 CASHFLOW_QUALITY.js 不刷新，线上保留旧版"
+          }
+
       # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
       #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。

@@ -27,6 +27,7 @@ name: "📋 v8 盘前预案生成器 (cn runner)"
 
 on:
   schedule:
+    # 🔁 2026-11-23 触改重注册：11-20 12:22 后本链零运行（GitHub schedule 注册丢失老病复发，同 us_hk_map 11-21 同款）⇒ 触改本行强制重新注册 schedule。
     - cron: '50 23 * * 0-4'   # 北京 07:50 工作日（UTC 前一日 23:50；0-4=UTC周日~周四=北京周一~周五）
   workflow_dispatch:
 

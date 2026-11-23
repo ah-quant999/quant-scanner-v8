@@ -188,14 +188,26 @@ def main():
                             print(f"[{tm}] fresh-rescue {wf} age={age:.0f}min", flush=True)
         time.sleep(20)
     # 🛡 接力：非自然到期（被取消/超硬截止前退出）→ 退出前派下一班，链条永不断
+    # 🔴 2026-11-23 10:32 relay 403 单次失败致十分钟调度真空实证，故加退避重试：
+    #   原 relay dispatch 为单次 POST，失败仅 print ERR 即断链 → 盘中目标链整段漏档
+    #   （主人 10:42 报「主站更新又停了」即此）。现改 3 次重试退避（10s/30s，每次重新 POST）；
+    #   3 次全失败打 ::error 显式红标告警。只改本 relay 段，fresh-rescue 共用的 dispatch() 不动。
     now = datetime.datetime.now(BJ)
     if now < end_dt - datetime.timedelta(minutes=5):
-        try:
-            st, _ = req(API + SELF_WF + "/dispatches", "POST",
-                        {"ref": "main", "inputs": {"phase": "relay", "end_bj": end}})
-            print(f"[{hm(now)}] relay -> 下一班(end={end}) dispatch={st}", flush=True)
-        except Exception as e:
-            print(f"[{hm(now)}] relay dispatch ERR {e}", flush=True)
+        _relay_ok = False
+        for _attempt, _wait in enumerate((0, 10, 30)):
+            if _wait:
+                time.sleep(_wait)
+            try:
+                st, _ = req(API + SELF_WF + "/dispatches", "POST",
+                            {"ref": "main", "inputs": {"phase": "relay", "end_bj": end}})
+                print(f"[{hm(now)}] relay -> 下一班(end={end}) dispatch={st} (attempt {_attempt+1}/3)", flush=True)
+                _relay_ok = True
+                break
+            except Exception as e:
+                print(f"[{hm(now)}] relay dispatch ERR (attempt {_attempt+1}/3) {e}", flush=True)
+        if not _relay_ok:
+            print(f"::error title=relay-dispatch-failed::relay dispatch 3次重试(含10s/30s退避)全失败，下一班接力未派出 → 盘中调度链将出现真空，请人工 dispatch {SELF_WF} (phase=relay)", flush=True)
     print(f"done end={hm(datetime.datetime.now(BJ))}", flush=True)
 
 
