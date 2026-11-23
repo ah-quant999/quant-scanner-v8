@@ -1908,6 +1908,27 @@ def run_experiment_cards():
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_volume_divergence.py，跳过")
 
+    # 🆕 2026-11-23 主人拍板"做"：ETF 量能配速+局部异动灯（data/ETF_PACE.js ← gen_etf_pace.py）：
+    #   热度榜 30 只同池；①配速比=今日累计成交÷近20交易日同一时刻均累计成交（新浪5min K含额，
+    #   1023条≈22日，东财兜底）②局部异动灯=最近15分钟窗口放量分位（>90亮灯红涨绿跌标向）。
+    #   全程 ~3s（30线程并发）。卡内子块（不新增卡，避免膨胀）；口径详情见 logic.html。失败隔离。
+    etfpace_py = Path(__file__).resolve().parent / "scripts" / "gen_etf_pace.py"
+    if etfpace_py.exists():
+        print(f"[experiment] ▶ gen_etf_pace.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(etfpace_py)],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ gen_etf_pace 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ gen_etf_pace 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/gen_etf_pace.py，跳过")
+
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
     #   停止调用 algo_backtest_compare.py 生成该死数据。
     # 🔵 2026-09-13 状态更新（阿狸咪的工程师，主人令「只要接入算法链的选股策略都要有回测」）：
