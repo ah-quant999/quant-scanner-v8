@@ -132,7 +132,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=f05f7b8661" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=d30f85c4c4" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=dfbe938b86" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=723ac45aab" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=f33eb82eea" defer></script>
     <script src="data/CRED_LEDGER.js?v=ed6577bd0d" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
@@ -157,7 +157,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=f83ba99632" defer></script>
 <script src="data/MARGIN_DATA.js?v=a1eadf2fe0" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=03dbd1c2f2" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=7607984afd" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=878a653a0f" defer></script>
 <script src="data/BOND_FUTURES.js?v=12e57a8eb6" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=a36fb917d0" defer></script>
 <script src="data/IPO_DATA.js?v=3be90a9c82" defer></script>
@@ -173,7 +173,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=3a42b7f82c" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=0c31d0c068" defer></script>
-<script src="data/INVEST_AVOID.js?v=86a70dee36" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=3e7a5bd246" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=5bd6d61cdb" defer></script>
     <script src="data/KEY_NOTICES.js?v=37b9db67de" defer></script>
@@ -1354,7 +1354,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=55e2ab4398" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=bd63444efd" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=52412e0d8c" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=071f25fe31" defer></script>
 <script src="data/VOLATILITY.js?v=80f9c0ff01" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=b13c700741" defer></script>
@@ -20493,7 +20493,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=f15ecb4283', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=a1a117c7cb', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8772dbee95', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=2463100c19', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
