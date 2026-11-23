@@ -1,20 +1,12 @@
 {
-  "update_time": "2026-11-23 21:37:17",
-  "run_start": "2026-11-23 19:12:35",
-  "ok": 49,
-  "fail": 3,
+  "update_time": "2026-11-23 23:06:49",
+  "run_start": "2026-11-23 22:37:19",
+  "ok": 14,
+  "fail": 1,
   "failed_scripts": [
     {
-      "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    },
-    {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "退出码 1 | logout failed!"
-    },
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "factor_walkforward.py",
+      "reason": "退出码 1 | TypeError: bad operand type for unary -: 'NoneType'"
     }
   ],
   "skipped_by_time_gate": []
