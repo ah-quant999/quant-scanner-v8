@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-23 17:02:40",
+  "update_time": "2026-11-23 19:43:05",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7507701210837524",
   "source_kind": "wiki",
@@ -63,8 +63,8 @@
     "rows_parsed": 8,
     "expected": null,
     "source_channel": "full-snapshot",
-    "snapshot_fetched_at": "2026-11-23 17:02:30",
-    "snapshot_age_h": 0.0,
+    "snapshot_fetched_at": "2026-11-23 19:42:44",
+    "snapshot_age_h": 0.01,
     "truncated": false,
     "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
   },
@@ -122,7 +122,7 @@
       "theme": "机器人轴承/湖北国资",
       "note": "主流题材核心（所属题材合计 10 家涨停）；换手 29.9%（心法优质区间）；封单 0.57 亿；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-19",
+      "first_selected": "2026-11-23",
       "trade_date": "2026-11-23"
     },
     {
@@ -170,7 +170,7 @@
       "theme": "高阶HDI/算力",
       "note": "主流题材核心（所属题材合计 42 家涨停）；换手 30.3%（心法优质区间）；量比 3.41（显著放量）；封单 1.02 亿（封板坚决）；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-19",
+      "first_selected": "2026-11-23",
       "trade_date": "2026-11-23"
     },
     {
