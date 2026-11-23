@@ -768,6 +768,10 @@ def walk_extra():
         #      （walk_raw + walk_extra）推不到 ⇒ CITIC 永不刷新。
         "data/CITIC_PE_THERMO.js",      # 中信证券 PE 极值温度计（含分位/极值判定）
         "data/CITIC_PE_BACKTEST.js",    # 中信证券 PE 分位分层历史回测
+        # 🆕 2026-11-23 主人令「全仓零调用方根治」：现金流质量榜（gen_cashflow_quality.py 直写
+        #   data/，不经 update_v8 raw→js 映射表）⇒ 按本函数约定登记，否则「清单不可得」降级路径
+        #   （walk_raw + walk_extra）推不到 ⇒ 永不刷新（同 CITIC_PE 登记先例）。
+        "data/CASHFLOW_QUALITY.js",     # A股现金流质量榜（gen_cashflow_quality.py 产出）
         # optimized_strategy.json 在 raw_data/，由 walk_raw() 按算法产物前缀自动排除（不推送，免覆盖）
     ]
     for rel in extra:
@@ -804,6 +808,9 @@ _EXTRA_FILES = (
     #   吐旧副本，最长撑到 reconcile workflow 跑（~15min 窗口）。
     "data/CITIC_PE_THERMO.js",
     "data/CITIC_PE_BACKTEST.js",
+    # 🆕 2026-11-23 现金流质量榜注册进 ?v 重写集（同 CITIC_PE 口径：不登记 ⇒ 推了新内容但
+    #   index.html 的 ?v 仍指旧哈希 ⇒ CDN/浏览器吐旧副本，最长撑到 reconcile ~15min 窗口）。
+    "data/CASHFLOW_QUALITY.js",
     # 🛡 2026-08-19 阿狸咪根治孤儿：data/MACRO.js 删除（前端 render 0 处引用 window.MACRO）—节省空间+Actions分钟
 )
 _RE_V = re.compile(r'([\'"])(data/[A-Za-z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
