@@ -1929,6 +1929,25 @@ def run_experiment_cards():
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_etf_pace.py，跳过")
 
+    # 🔧 2026-11-23 部署拦截事故根治：algorithms/track_resonance.py 是零调度孤儿（11-11 后无人跑），
+    #   raw_data/resonance_track.json 陈旧 9 个交易日 → 跨层一致性闸门拦部署（本轮 CI failure 根因）。
+    #   纯本地计算（lhb_history + kline_cache，~2s）。失败隔离。
+    reso_py = Path(__file__).resolve().parent / "algorithms" / "track_resonance.py"
+    if reso_py.exists():
+        print(f"[experiment] ▶ track_resonance.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(reso_py)],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                print(f"[experiment]   ✅ resonance_track 已重算")
+            else:
+                print(f"[experiment]   ⚠️ track_resonance 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ track_resonance 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 algorithms/track_resonance.py，跳过")
+
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
     #   停止调用 algo_backtest_compare.py 生成该死数据。
     # 🔵 2026-09-13 状态更新（阿狸咪的工程师，主人令「只要接入算法链的选股策略都要有回测」）：
