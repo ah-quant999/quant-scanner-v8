@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-11-23 13:11:01
+// 最后更新：2026-11-23 13:15:48
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-11-23 13:11:01",
+  "update_time": "2026-11-23 13:15:48",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -32,14 +32,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "AI算力",
       "start": "10/13",
-      "end": "11/23",
+      "end": "11/20",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 25,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 24,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 193,
+      "total": 185,
       "ongoing": true
     },
     {
@@ -78,20 +78,20 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 28,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 472,
+      "total": 469,
       "ongoing": true
     },
     {
       "sector": "消费电子",
       "start": "10/13",
-      "end": "11/23",
+      "end": "11/20",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 29,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 276,
+      "total": 269,
       "ongoing": true
     },
     {
@@ -130,7 +130,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 24,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 282,
+      "total": 274,
       "ongoing": true
     },
     {
@@ -175,27 +175,27 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "通信设备",
       "start": "11/11",
-      "end": "11/18",
+      "end": "11/23",
       "start_idx": 21,
-      "end_idx": 26,
-      "days": 6,
-      "hot_days": 4,
+      "end_idx": 29,
+      "days": 9,
+      "hot_days": 5,
       "peak": 6,
       "peak_date": "11/12",
-      "total": 20,
-      "ongoing": false
+      "total": 26,
+      "ongoing": true
     },
     {
       "sector": "半导体",
       "start": "11/20",
-      "end": "11/23",
+      "end": "11/20",
       "start_idx": 28,
-      "end_idx": 29,
-      "days": 2,
-      "hot_days": 2,
-      "peak": 10,
-      "peak_date": "11/23",
-      "total": 14,
+      "end_idx": 28,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 4,
+      "peak_date": "11/20",
+      "total": 4,
       "ongoing": true
     }
   ]
