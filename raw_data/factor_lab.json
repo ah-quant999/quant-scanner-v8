@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-24 01:08:12",
+  "update_time": "2026-11-24 05:14:55",
   "data_date": "2026-11-23",
   "meta": {
     "data_date": "2026-11-23",
@@ -1134,7 +1134,7 @@
     ]
   },
   "yield_rank": {
-    "update_time": "2026-11-24 01:08:12",
+    "update_time": "2026-11-24 05:14:55",
     "meta": {
       "cost_pct_roundtrip": 0.3,
       "entry": "信号日次一交易日开盘",
@@ -1506,7 +1506,7 @@
       {
         "code": "sh.688146",
         "name": "中船特气",
-        "n_klines": 801,
+        "n_klines": 800,
         "available": true,
         "yield_t5": 6.803,
         "win_t5": 58.2,
