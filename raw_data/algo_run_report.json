@@ -1,30 +1,13 @@
 {
-  "update_time": "2026-11-22 09:00:55",
-  "run_start": "2026-11-22 07:12:12",
-  "ok": 37,
-  "fail": 2,
+  "update_time": "2026-11-23 15:50:46",
+  "run_start": "2026-11-23 15:18:19",
+  "ok": 15,
+  "fail": 1,
   "failed_scripts": [
     {
-      "script": "refresh_kline_freshness.py",
-      "reason": "超时 >40min"
-    },
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "scripts/fetch_sector_leaders.py",
+      "reason": "退出码 1 | ::error title=v8-sector-leaders-no-data::SECTOR_LEADERS 构建返回空（SECTOR_RS 无 sectors 或全部板块均未产出）——本轮不写盘，卡片保持上一次成功日期；请检查上游 fetch_sector_rs 是否正常产出。"
     }
   ],
-  "skipped_by_time_gate": [
-    "fetch_fundamental_quality.py",
-    "fetch_stock_names.py",
-    "fetch_stock_quote_v8.py",
-    "fetch_sh_index_fib.py",
-    "fetch_inst_trade.py",
-    "fetch_sector_rs.py",
-    "fetch_lhb.py",
-    "fetch_orphan_suspension.py",
-    "fetch_orphan_market_alerts.py",
-    "fetch_orphan_nt_data.py",
-    "fetch_orphan_sector_fund_flow.py",
-    "fetch_weekend_run.py"
-  ]
+  "skipped_by_time_gate": []
 }
