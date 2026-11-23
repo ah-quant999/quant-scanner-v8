@@ -1,11 +1,22 @@
 {
   "version": "2.0",
-  "updated": "2026-11-23 21:12:31",
+  "updated": "2026-11-24 04:29:12",
   "sources": [
     "guanlan"
   ],
-  "total": 4,
+  "total": 5,
   "stocks": [
+    {
+      "name": "0388",
+      "code": "0388",
+      "full_code": "0388.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "高盛",
+      "rating": "观望",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
     {
       "name": "太阳能",
       "code": "000591",
