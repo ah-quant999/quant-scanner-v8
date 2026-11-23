@@ -205,7 +205,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=d83326a60b" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=5ebe5c26cb" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=10c69a3150" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=348f937bfb" defer></script>
@@ -1384,7 +1384,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_DAILY_MONITOR.js?v=b207dd2415" defer></script>
 <script src="data/TOP10_DAILY.js?v=7322d53873" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
-<script src="data/DO_T_SPACE.js?v=44d4a1d941" defer></script>
+<script src="data/DO_T_SPACE.js?v=41a83ec119" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=27e707ba6a" defer></script>
 <script src="data/WEEKEND_RUN.js?v=1f3ee267a0" defer></script>
@@ -1399,10 +1399,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EQBOND_ATTRACTION.js?v=4d7a97adb1" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=864a959464" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=f4b97f45c1" defer></script>
+<script src="data/RUNNER_STATUS.js?v=e1a158f56e" defer></script>
 <script src="data/HB_XIAOJIU.js?v=0b4749cfc0" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=e2c30ccbd0" defer></script>
-<script src="data/HEALTH_CHECK.js?v=695efd4bba" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=209c6a8ed0" defer></script>
+<script src="data/HEALTH_CHECK.js?v=0389b90ccb" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=fc9971b2d1" defer></script>
     <!-- 🌊 2026-11-22 主人令：康波周期观测卡（中国经济 × A股）数据源，gen_kondratiev.py 真实计算；2026-11-22 二次令迁至「观测平台>未来预测」第③层 -->
     <script src="data/KONDRATIEV.js?v=3f6bea8c42" defer></script>
@@ -2120,7 +2120,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/SENTIMENT_CYCLE.js?v=fc1897bdae" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=cac0a7ad59" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b59d8c5353" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=fc36315962" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=2e2b9aa811" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=85f5b13b2e" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
@@ -16887,7 +16887,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=b59d8c5353');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=fc36315962');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
