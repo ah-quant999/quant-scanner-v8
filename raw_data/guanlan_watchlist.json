@@ -1,11 +1,44 @@
 {
   "version": "2.0",
-  "updated": "2026-11-23 15:59:25",
+  "updated": "2026-11-23 16:10:48",
   "sources": [
     "guanlan"
   ],
-  "total": 48,
+  "total": 85,
   "stocks": [
+    {
+      "name": "通威股份",
+      "code": "600438",
+      "full_code": "sh600438",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "德意志银行",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "长江电力",
+      "code": "600900",
+      "full_code": "sh600900",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "德意志银行",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "隆基绿能",
+      "code": "601012",
+      "full_code": "sh601012",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "德意志银行",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
     {
       "name": "龙源电力",
       "code": "001289",
@@ -62,6 +95,50 @@
       "added_date": "2026-11-23"
     },
     {
+      "name": "中微公司",
+      "code": "688012",
+      "full_code": "sh688012",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根士丹利",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "安集科技",
+      "code": "688019",
+      "full_code": "sh688019",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "高盛",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "沐曦股份",
+      "code": "688802",
+      "full_code": "sh688802",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根士丹利",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "中芯国际",
+      "code": "688981",
+      "full_code": "sh688981",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
       "name": "北方华创",
       "code": "002371",
       "full_code": "sz002371",
@@ -80,6 +157,17 @@
       "market": "港股",
       "institution": "高盛",
       "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "寒武纪",
+      "code": "688256",
+      "full_code": "sh688256",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
       "source": "外资研投",
       "added_date": "2026-11-23"
     },
@@ -106,7 +194,7 @@
       "added_date": "2026-11-23"
     },
     {
-      "name": "河南平高电气",
+      "name": "平高电气",
       "code": "600312",
       "full_code": "600312.SH",
       "exchange": "SH",
@@ -139,11 +227,44 @@
       "added_date": "2026-11-23"
     },
     {
-      "name": "工商银行",
-      "code": "01398",
-      "full_code": "01398.HK",
-      "exchange": "HK",
-      "market": "港股",
+      "name": "浦发银行",
+      "code": "600000",
+      "full_code": "sh600000",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "华夏银行",
+      "code": "600015",
+      "full_code": "sh600015",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "招商银行",
+      "code": "600036",
+      "full_code": "sh600036",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "农业银行",
+      "code": "601288",
+      "full_code": "sh601288",
+      "exchange": "SH",
+      "market": "沪市",
       "institution": "摩根大通",
       "rating": "增持",
       "source": "外资研投",
@@ -151,12 +272,67 @@
     },
     {
       "name": "交通银行",
-      "code": "03328",
-      "full_code": "03328.HK",
-      "exchange": "HK",
-      "market": "港股",
+      "code": "601328",
+      "full_code": "sh601328",
+      "exchange": "SH",
+      "market": "沪市",
       "institution": "摩根大通",
       "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "工商银行",
+      "code": "601398",
+      "full_code": "sh601398",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "光大银行",
+      "code": "601818",
+      "full_code": "sh601818",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "建设银行",
+      "code": "601939",
+      "full_code": "sh601939",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "中国银行",
+      "code": "601988",
+      "full_code": "sh601988",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "中信银行",
+      "code": "601998",
+      "full_code": "sh601998",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
       "source": "外资研投",
       "added_date": "2026-11-23"
     },
@@ -183,6 +359,17 @@
       "added_date": "2026-11-23"
     },
     {
+      "name": "海光信息",
+      "code": "688041",
+      "full_code": "sh688041",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根士丹利",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
       "name": "华大九天",
       "code": "301269",
       "full_code": "sz301269",
@@ -205,12 +392,111 @@
       "added_date": "2026-11-23"
     },
     {
+      "name": "摩尔线程",
+      "code": "688795",
+      "full_code": "sh688795",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "华峰测控",
+      "code": "688200",
+      "full_code": "sh688200",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
       "name": "机器人",
       "code": "300024",
       "full_code": "sz300024",
       "exchange": "SZ",
       "market": "深市",
       "institution": "摩根士丹利",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "豫园股份",
+      "code": "600655",
+      "full_code": "sh600655",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "中国黄金",
+      "code": "600916",
+      "full_code": "sh600916",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "百合股份",
+      "code": "603102",
+      "full_code": "sh603102",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "技源集团",
+      "code": "603262",
+      "full_code": "sh603262",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "浙江自然",
+      "code": "605080",
+      "full_code": "sh605080",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "舒华体育",
+      "code": "605299",
+      "full_code": "sh605299",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "菜百股份",
+      "code": "605599",
+      "full_code": "sh605599",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
       "rating": "未评级",
       "source": "外资研投",
       "added_date": "2026-11-23"
@@ -359,6 +645,17 @@
       "added_date": "2026-11-23"
     },
     {
+      "name": "老凤祥",
+      "code": "600612",
+      "full_code": "sh600612",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
       "name": "潮宏基",
       "code": "002345",
       "full_code": "sz002345",
@@ -409,6 +706,116 @@
       "exchange": "SZ",
       "market": "深市",
       "institution": "摩根大通",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "晶丰明源",
+      "code": "688368",
+      "full_code": "sh688368",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "野村",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "北方稀土",
+      "code": "600111",
+      "full_code": "sh600111",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "生益科技",
+      "code": "600183",
+      "full_code": "sh600183",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "福耀玻璃",
+      "code": "600660",
+      "full_code": "sh600660",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "江苏银行",
+      "code": "600919",
+      "full_code": "sh600919",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "中国移动",
+      "code": "600941",
+      "full_code": "sh600941",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "中国神华",
+      "code": "601088",
+      "full_code": "sh601088",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "紫金矿业",
+      "code": "601899",
+      "full_code": "sh601899",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "东鹏饮料",
+      "code": "605499",
+      "full_code": "sh605499",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "百济神州",
+      "code": "688235",
+      "full_code": "sh688235",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "瑞银",
       "rating": "未评级",
       "source": "外资研投",
       "added_date": "2026-11-23"
@@ -469,17 +876,6 @@
       "added_date": "2026-11-23"
     },
     {
-      "name": "百济神州",
-      "code": "06160",
-      "full_code": "06160.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-23"
-    },
-    {
       "name": "腾讯控股",
       "code": "00700",
       "full_code": "00700.HK",
@@ -496,6 +892,17 @@
       "full_code": "00291.HK",
       "exchange": "HK",
       "market": "港股",
+      "institution": "瑞银",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-23"
+    },
+    {
+      "name": "大参林",
+      "code": "603233",
+      "full_code": "sh603233",
+      "exchange": "SH",
+      "market": "沪市",
       "institution": "瑞银",
       "rating": "未评级",
       "source": "外资研投",
