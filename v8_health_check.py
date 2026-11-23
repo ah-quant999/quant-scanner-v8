@@ -2500,7 +2500,9 @@ _LOW_FREQ_FILES = {
     #   由 v8_shareholder_change_fetch.yml 工作日 20:30 CST 产出，周末不跑、当日 20:30 前未产出
     #   属设计预期。此前无 CARD_DEFS 登记 ⇒ 落入 all_ 通用 24h/T+1 红线（当日 cap=4500min）
     #   把「周五产出→周一 20:30 前」的空窗误判 fail（当日实测 all_SHAREHOLDER_CHANGE = fail）。
-    #   进白名单 + 专属 4 天红线（容忍周末+当日批次未到），超 4 天仍未更报真故障。
+    #   进白名单 + 专属 3 天红线（2026-11-24 主人令收紧：日更卡只给 2~3 天容忍）。
+    #   口径：周五 20:30 盘后产出 → 周末不跑 → 周一 20:30 下次产出，间隔正好 72h=3 天；
+    #   故 3 天红线恰好覆盖「周五→周一」一个完整周末空窗，超 3 天仍未更即真故障，不再宽给 4 天。
     "SHAREHOLDER_CHANGE",
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
@@ -2646,7 +2648,7 @@ _LOW_FREQ_MAX_AGE = {
     "MAHORO_INSIGHTS": 7 * 24 * 60,    # 机构研究·AI解析（本机 cookie 拉取，云端无权限；小九离线即无法刷新）→ 7天容忍仅告警，超 7 天仍 fail 保留真故障可见性（2026-11-13 一劳永逸：原仅入白名单未给红线，致 CARD_DEFS 按 24h 误判 fail）
     "maharo_insights": 7 * 24 * 60,    # 同上；all_ 通用扫描以文件名小写 vid 命中，补小写键使白名单+红线对 all_maharo_insights 生效（原大小写不匹配→白名单失效→落通用 24h 红线 fail）
     "maharo_wm": 7 * 24 * 60,          # 机构研究·周/月解析种子库（本机 cookie 低频拉取，与 maharo_insights 同族）→ 7天容忍，超7天仍 fail（2026-11-16 一劳永逸）
-    "SHAREHOLDER_CHANGE": 4 * 24 * 60, # 股东增减持监控（v8_shareholder_change_fetch.yml 工作日20:30批，周末不跑）→ 4天红线容忍周末+当日批次未到，超4天报真故障（2026-11-16 一劳永逸）
+    "SHAREHOLDER_CHANGE": 3 * 24 * 60, # 股东增减持监控（工作日20:30批，周末不跑）→ 3天红线：周五盘后→周一盘后正好72h，超3天报真故障（2026-11-24 主人令收紧，原4天多宽给1天）
 }
 
 

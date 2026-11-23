@@ -95,11 +95,24 @@ jobs:
           if ($skip -eq 'true') {
             Write-Host "skip_trading_day_gate=true: force run"
           } else {
-            # 🛡 2026-11-23 根治断更：cron=UTC 工作日12:30，GitHub 常延迟8h到北京次日凌晨；
-            #    原用 runner 本地时间判周末 ⇒ 周五档落到北京周六被误 skip（11-21 实证）。
-            #    改用 UTC 判断调度归属日，与 cron 同 tz，延迟不会跨 UTC 日误判。
-            $dow = (Get-Date).ToUniversalTime().DayOfWeek.value__
-            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend(UTC), exit ok"; exit 0 }
+            # 🔴 铁律（2026-11-24 主人令）：一切以北京时间为准，禁止用 UTC 做业务时间判断。
+            #
+            # 时点口径：cron `30 12 * * 1-5` 虽按 GitHub 要求用 UTC 书写，但它精确对应
+            #   「北京时间工作日 20:30」（UTC 12:30 + 8h = 北京 20:30，同一天不跨日），
+            #   故 cron 的 1-5 就是北京工作日集合——周末闸判断的必须是这个「调度归属的北京工作日」。
+            #
+            # 断更根因（11-21 实证）：GitHub 常把周五档延迟到北京周六凌晨才执行，
+            #   若用「执行当下的北京时间(Get-Date)」或「UTC 时刻」判周末，都会把周五档误判为周末而 skip。
+            # 一劳永逸修法：把判断锚定到 cron 的调度归属日——
+            #   `Get-Date.ToUniversalTime().Date` 取触发日（GitHub 延迟不会跨 UTC 触发日），
+            #   .AddHours(20).AddMinutes(30) 还原成该日对应的北京 20:30 调度时刻，再判星期。
+            #   即：UTC 只用来取「触发日」这一个锚点，落点和判断口径全部是北京时间，绝不跨日误判。
+            $triggerDateUtc = (Get-Date).ToUniversalTime().Date
+            $bjSchedule = $triggerDateUtc.AddHours(20).AddMinutes(30)   # 调度归属日 → 北京时间 20:30
+            $dow = [int]$bjSchedule.DayOfWeek
+            $bjNow = (Get-Date).ToUniversalTime().AddHours(8)            # 当前北京时间（仅日志展示）
+            Write-Host ("[gate] 北京时间={0} | 调度归属北京工作日={1}" -f $bjNow.ToString('yyyy-MM-dd HH:mm'), $bjSchedule.ToString('yyyy-MM-dd HH:mm'))
+            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] 周末(调度归属的北京工作日), exit ok"; exit 0 }
           }
           cd $env:GITHUB_WORKSPACE
           python algorithms/fetch_shareholder_change.py --window 120
