@@ -11,6 +11,10 @@
 import os
 import urllib.request, json, re, subprocess, datetime, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，派发前统一查全组让位
+from v8_dispatch_guard import fetch_trio_busy
+
 # 当前 CST 时间
 cst = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
 dow = cst.weekday()            # 0=周一
@@ -351,6 +355,14 @@ def dispatch_cat(category, use_selfhosted=False):
       为告警留痕），与本仓「异常安全」惯例对齐 —— 探针脚本绝不让巡检自身变红。
     """
     import subprocess
+    # 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，组内排队 run 会被新 dispatch 顶杀。
+    #   派发前查全组（hosted/selfhosted/lemoncat 任一近期在跑/排队）⇒ 让位不派；
+    #   在跑的那轮很快会落数据，本轮放弃无害（看门狗 15min 后再评估）。
+    if fetch_trio_busy(os.environ.get("GH_TOKEN", ""), "ah-quant999/quant-scanner-v8",
+                       log=lambda m: print(f"[watchdog]{m}")):
+        audit("dispatch", path="selfhosted" if use_selfhosted else "cloud_main",
+              cat=category, ok=False, trigger="dispatch_guard_yield")
+        return
     if use_selfhosted:
         try:
             r = subprocess.run(

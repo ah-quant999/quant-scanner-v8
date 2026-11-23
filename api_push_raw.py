@@ -110,6 +110,38 @@ def _start_watchdog():
     threading.Thread(target=_wd, daemon=True).start()
 
 
+def _start_hard_deadline(t0):
+    """🔴 2026-11-23 死亡旋转根治（主人令「盘后根治清单」①）：总时长**硬截止**线程。
+
+    【软闸盲区实证】_SOFT_DEADLINE 检查在主线程 as_completed 循环里——
+      只有「某个 future 完成」时才轮到它跑。当全部 worker 同时卡在单请求
+      300s 超时 × BLOB_MAX_TRY=8 重试里（最坏单文件 906s×N），as_completed
+      长时间不返回 ⇒ 软闸永不触发 ⇒ 推送步一直占用并发组（11-23 13:54 卡 17min+
+      占死 intraday 组，后续 dispatch 把排队轮连环顶杀 = 死亡旋转，数据停 13:20）。
+    【修法】独立线程按挂钟硬判：超 PUSH_HARD_DEADLINE_SEC（默认 900s）⇒ os._exit(2)。
+      退出码非 0 → run 失败 → 并发组立即释放，下轮派发自动续推（幂等，与 9-17 设计一致）。
+      软闸 720s 仍先于硬闸生效（正常情况部分落地提交优先于硬杀）。
+    """
+    _hard = float(os.environ.get("PUSH_HARD_DEADLINE_SEC", "900"))
+    def _hd():
+        while True:
+            _time.sleep(15)
+            _el = _time.time() - t0
+            if _el > _hard:
+                print("=" * 78, flush=True)
+                print("⏱ 推送总耗时 %.0fs > 硬闸 %.0fs（软闸因全部 worker 卡在请求重试中未能生效）"
+                      % (_el, _hard))
+                print("   本进程立即退出（exit 2）：释放并发组，终结排队连环顶杀的死亡旋转。")
+                print("   已完成 blob 仍在 GitHub 侧；tree/commit 未建不影响 main，下轮续推。")
+                print("=" * 78, flush=True)
+                try:
+                    sys.stdout.flush()
+                except Exception:
+                    pass
+                os._exit(2)
+    threading.Thread(target=_hd, daemon=True).start()
+
+
 def api(method, path, data=None, timeout=300):
     url = API + path
     headers = {
@@ -1204,6 +1236,7 @@ def main():
     _SOFT_DEADLINE = float(os.environ.get("PUSH_SOFT_DEADLINE_SEC", "720"))
     _BLOB_MAX_TRY = 8
     _t0_push = _t.time()
+    _start_hard_deadline(_t0_push)   # 🔴 2026-11-23 死亡旋转根治：挂钟硬闸兜底软闸盲区
     new_entries = {}
     failed_paths = []
     unchanged = 0

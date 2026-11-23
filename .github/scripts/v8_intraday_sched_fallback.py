@@ -56,6 +56,14 @@ age_min = (datetime.datetime.utcnow() - latest).total_seconds() / 60.0
 if age_min <= 25:
     raise SystemExit(0)  # 最近班够新鲜，调度器活着
 
+# 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，组内排队 run 会被新 dispatch 顶杀。
+#   补派前查全组（hosted/selfhosted 任一近期在跑/排队）⇒ 让位不派（15min 后再评估）。
+import sys as _sys
+_sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from v8_dispatch_guard import fetch_trio_busy
+if fetch_trio_busy(tok, REPO, log=lambda m: print(f"[intraday-sched-fallback]{m}")):
+    raise SystemExit(0)  # 组忙碌：让位（本轮放弃，下轮看门狗再评估）
+
 # 漏触发实锤 → 补派
 try:
     req = urllib.request.Request(

@@ -13,6 +13,10 @@
 """
 import os, sys, time, json, datetime, urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，统一让位守卫（全组 dedupe）
+from v8_dispatch_guard import fetch_trio_busy, FETCH_TRIO
+
 TOK = os.environ["GITHUB_TOKEN"]
 REPO = os.environ["REPO"]
 ME = os.environ.get("GITHUB_RUN_ID", "")
@@ -73,6 +77,11 @@ def req(url, method="GET", payload=None):
 
 
 def dispatch(wf):
+    # 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，组内排队 run 会被新 dispatch 顶杀。
+    #   dispatch 前查全组（hosted/selfhosted/lemoncat 任一近期在跑/排队）⇒ 让位不派，
+    #   返回 False（本档不标 fired，20s 后重查；迟到超 SLOT_TOL_MIN 自弃）。
+    if wf in FETCH_TRIO and fetch_trio_busy(TOK, REPO, log=print):
+        return False
     try:
         st, _ = req(API + wf + "/dispatches", "POST", {"ref": "main"})
         return st == 204

@@ -414,8 +414,37 @@ jobs:
 
           if reason:
               emit(True, f"✅ 已有新鲜{reason}，本 run 幂等跳过抓取")
+              sys.exit(0)
           else:
               emit(False, f"无有效并发 run（本组 {my_cat}） ⇒ 继续抓取")
+              sys.exit(0)
+
+          # 🛡 2026-11-23 死亡旋转根治（盘后根治清单③）：intraday 档让位 cn 主力。
+          #   【病理】hosted（境外）intraday 轮与 selfhosted/lemoncat 共用并发组；
+          #     hosted 开跑后组被占，cn 各档 dispatch 全变 pending 并被后续 dispatch
+          #     连环顶杀（11-23 14:02-14:55 五轮实证）→ 数据停 13:20。
+          #   【修法】本组无同链并发时，再查 cn 两链：任一近期（<=35min）在跑/排队
+          #     ⇒ 本 hosted run 让位退出（组瞬时释放，cn 轮正常跑；下一档 hosted 再来）。
+          if my_cat == 'intraday':
+              _cn_busy = None
+              for _wf in ("v8_cn_fetch_cloud_selfhosted.yml", "v8_cn_fetch_intraday_lemoncat.yml"):
+                  try:
+                      _d = json.load(urllib.request.urlopen(urllib.request.Request(
+                          f"https://api.github.com/repos/{repo}/actions/workflows/{_wf}/runs?per_page=8",
+                          headers=hdr), timeout=20))
+                      for _r in _d.get('workflow_runs', []):
+                          if _r.get('status') not in ('in_progress', 'queued'):
+                              continue
+                          _st = _r.get('run_started_at') or _r.get('created_at') or ''
+                          try:
+                              _age = (now - datetime.datetime.fromisoformat(_st.replace('Z', '+00:00'))).total_seconds() / 60
+                          except Exception:
+                              _age = 0.0
+                          if _age < 35:
+                              emit(True, f"🛡 intraday 让位 cn 主力：{_wf}#{_r.get('id')} {_r.get('status')}（{_age:.0f} 分）在途 ⇒ 本 run 退出，组即刻释放")
+                              sys.exit(0)
+                  except Exception as e:
+                      print(f"  cn 在途探测失败（{_wf}）: {e} → 不让位，继续抓取")
           PY
 
       - name: "🛡 交易日历闸门（连续休市段跳过冗余抓取）"
