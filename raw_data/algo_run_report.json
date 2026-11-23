@@ -1,12 +1,24 @@
 {
-  "update_time": "2026-11-23 15:50:46",
-  "run_start": "2026-11-23 15:18:19",
-  "ok": 15,
-  "fail": 1,
+  "update_time": "2026-11-23 18:40:13",
+  "run_start": "2026-11-23 16:37:46",
+  "ok": 48,
+  "fail": 4,
   "failed_scripts": [
     {
-      "script": "scripts/fetch_sector_leaders.py",
-      "reason": "退出码 1 | ::error title=v8-sector-leaders-no-data::SECTOR_LEADERS 构建返回空（SECTOR_RS 无 sectors 或全部板块均未产出）——本轮不写盘，卡片保持上一次成功日期；请检查上游 fetch_sector_rs 是否正常产出。"
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout failed!"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+    },
+    {
+      "script": "factor_walkforward.py",
+      "reason": "退出码 1 | TypeError: bad operand type for unary -: 'NoneType'"
     }
   ],
   "skipped_by_time_gate": []

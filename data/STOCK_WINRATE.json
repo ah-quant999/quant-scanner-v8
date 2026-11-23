@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-22 08:02:53",
+ "update_time": "2026-11-23 17:37:28",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -92,14 +92,14 @@
      "avg_shrunk": -0.39
     },
     "3": {
-     "n": 14,
-     "win": 42.9,
-     "avg": 2.72,
-     "med": -2.29,
+     "n": 16,
+     "win": 37.5,
+     "avg": 1.51,
+     "med": -3.89,
      "best": 22.62,
      "worst": -14.42,
-     "win_shrunk": 45.8,
-     "avg_shrunk": 1.59
+     "win_shrunk": 42.3,
+     "avg_shrunk": 0.93
     },
     "5": {
      "n": 13,
@@ -134,6 +134,71 @@
    },
    "winrate_score": 35.97,
    "rank": 2
+  },
+  {
+   "code": "000657",
+   "name": "中钨高新",
+   "n_signals": 9,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-06-06",
+   "last_seen": "2026-11-20",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 8,
+     "win": 62.5,
+     "avg": 2.81,
+     "med": 2.76,
+     "best": 12.42,
+     "worst": -6.97,
+     "win_shrunk": 55.6,
+     "avg_shrunk": 1.25
+    },
+    "3": {
+     "n": 8,
+     "win": 50.0,
+     "avg": 5.57,
+     "med": 5.89,
+     "best": 25.4,
+     "worst": -13.32,
+     "win_shrunk": 50.0,
+     "avg_shrunk": 2.48
+    },
+    "5": {
+     "n": 6,
+     "win": 66.7,
+     "avg": 17.38,
+     "med": 30.35,
+     "best": 33.87,
+     "worst": -13.54,
+     "win_shrunk": 56.2,
+     "avg_shrunk": 6.52
+    },
+    "10": {
+     "n": 4,
+     "win": 100.0,
+     "avg": 51.98,
+     "med": 53.92,
+     "best": 55.2,
+     "worst": 44.89,
+     "win_shrunk": 64.3,
+     "avg_shrunk": 14.85
+    },
+    "20": {
+     "n": 4,
+     "win": 100.0,
+     "avg": 12.55,
+     "med": 13.22,
+     "best": 16.53,
+     "worst": 7.23,
+     "win_shrunk": 64.3,
+     "avg_shrunk": 3.59
+    }
+   },
+   "winrate_score": 30.4,
+   "rank": 3
   },
   {
    "code": "688347",
@@ -188,71 +253,6 @@
     }
    },
    "winrate_score": 29.86,
-   "rank": 3
-  },
-  {
-   "code": "000657",
-   "name": "中钨高新",
-   "n_signals": 9,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-06-06",
-   "last_seen": "2026-11-20",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 8,
-     "win": 62.5,
-     "avg": 2.81,
-     "med": 2.76,
-     "best": 12.42,
-     "worst": -6.97,
-     "win_shrunk": 55.6,
-     "avg_shrunk": 1.25
-    },
-    "3": {
-     "n": 7,
-     "win": 57.1,
-     "avg": 6.72,
-     "med": 14.24,
-     "best": 25.4,
-     "worst": -13.32,
-     "win_shrunk": 52.9,
-     "avg_shrunk": 2.77
-    },
-    "5": {
-     "n": 5,
-     "win": 80.0,
-     "avg": 22.5,
-     "med": 31.48,
-     "best": 33.87,
-     "worst": -13.54,
-     "win_shrunk": 60.0,
-     "avg_shrunk": 7.5
-    },
-    "10": {
-     "n": 4,
-     "win": 100.0,
-     "avg": 51.98,
-     "med": 53.92,
-     "best": 55.2,
-     "worst": 44.89,
-     "win_shrunk": 64.3,
-     "avg_shrunk": 14.85
-    },
-    "20": {
-     "n": 4,
-     "win": 100.0,
-     "avg": 12.55,
-     "med": 13.22,
-     "best": 16.53,
-     "worst": 7.23,
-     "win_shrunk": 64.3,
-     "avg_shrunk": 3.59
-    }
-   },
-   "winrate_score": 29.75,
    "rank": 4
   },
   {
@@ -583,61 +583,6 @@
    "rank": 9
   },
   {
-   "code": "688411",
-   "name": "海博思创",
-   "n_signals": 10,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-10-26",
-   "last_seen": "2026-11-20",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 9,
-     "win": 33.3,
-     "avg": -2.09,
-     "med": -3.48,
-     "best": 11.16,
-     "worst": -14.62,
-     "win_shrunk": 42.1,
-     "avg_shrunk": -0.99
-    },
-    "3": {
-     "n": 8,
-     "win": 37.5,
-     "avg": 1.02,
-     "med": -0.79,
-     "best": 28.06,
-     "worst": -17.93,
-     "win_shrunk": 44.4,
-     "avg_shrunk": 0.46
-    },
-    "5": {
-     "n": 6,
-     "win": 66.7,
-     "avg": 10.53,
-     "med": 17.9,
-     "best": 40.82,
-     "worst": -21.28,
-     "win_shrunk": 56.2,
-     "avg_shrunk": 3.95
-    },
-    "10": {
-     "n": 4,
-     "win": 100.0,
-     "avg": 28.13,
-     "med": 28.28,
-     "best": 29.9,
-     "worst": 26.04,
-     "win_shrunk": 64.3,
-     "avg_shrunk": 8.04
-    }
-   },
-   "winrate_score": 18.15,
-   "rank": 10
-  },
-  {
    "code": "300302",
    "name": "同有科技",
    "n_signals": 4,
@@ -700,7 +645,7 @@
     }
    },
    "winrate_score": 17.66,
-   "rank": 11
+   "rank": 10
   },
   {
    "code": "600118",
@@ -765,6 +710,61 @@
     }
    },
    "winrate_score": 15.27,
+   "rank": 11
+  },
+  {
+   "code": "688411",
+   "name": "海博思创",
+   "n_signals": 10,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-10-26",
+   "last_seen": "2026-11-20",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 9,
+     "win": 33.3,
+     "avg": -2.09,
+     "med": -3.48,
+     "best": 11.16,
+     "worst": -14.62,
+     "win_shrunk": 42.1,
+     "avg_shrunk": -0.99
+    },
+    "3": {
+     "n": 9,
+     "win": 33.3,
+     "avg": -1.4,
+     "med": -1.11,
+     "best": 28.06,
+     "worst": -20.76,
+     "win_shrunk": 42.1,
+     "avg_shrunk": -0.66
+    },
+    "5": {
+     "n": 7,
+     "win": 57.1,
+     "avg": 6.24,
+     "med": 11.86,
+     "best": 40.82,
+     "worst": -21.28,
+     "win_shrunk": 52.9,
+     "avg_shrunk": 2.57
+    },
+    "10": {
+     "n": 4,
+     "win": 100.0,
+     "avg": 28.13,
+     "med": 28.28,
+     "best": 29.9,
+     "worst": 26.04,
+     "win_shrunk": 64.3,
+     "avg_shrunk": 8.04
+    }
+   },
+   "winrate_score": 15.09,
    "rank": 12
   },
   {
@@ -1303,14 +1303,14 @@
      "avg_shrunk": -1.25
     },
     "3": {
-     "n": 32,
-     "win": 43.8,
-     "avg": -1.32,
+     "n": 33,
+     "win": 42.4,
+     "avg": -1.61,
      "med": -1.15,
      "best": 9.35,
      "worst": -12.29,
-     "win_shrunk": 45.2,
-     "avg_shrunk": -1.01
+     "win_shrunk": 44.2,
+     "avg_shrunk": -1.24
     },
     "5": {
      "n": 31,
@@ -1333,14 +1333,14 @@
      "avg_shrunk": 3.16
     },
     "20": {
-     "n": 24,
-     "win": 12.5,
-     "avg": -3.4,
+     "n": 30,
+     "win": 10.0,
+     "avg": -7.01,
      "med": -4.8,
      "best": 2.64,
-     "worst": -9.78,
-     "win_shrunk": 23.5,
-     "avg_shrunk": -2.4
+     "worst": -21.44,
+     "win_shrunk": 20.0,
+     "avg_shrunk": -5.25
     }
    },
    "winrate_score": 9.19,
@@ -1573,14 +1573,14 @@
      "avg_shrunk": -1.08
     },
     "5": {
-     "n": 7,
-     "win": 42.9,
-     "avg": 4.58,
-     "med": -0.08,
+     "n": 8,
+     "win": 37.5,
+     "avg": 3.34,
+     "med": -1.44,
      "best": 20.45,
      "worst": -15.35,
-     "win_shrunk": 47.1,
-     "avg_shrunk": 1.88
+     "win_shrunk": 44.4,
+     "avg_shrunk": 1.48
     },
     "10": {
      "n": 6,
@@ -1603,7 +1603,7 @@
      "avg_shrunk": -1.71
     }
    },
-   "winrate_score": 7.86,
+   "winrate_score": 6.89,
    "rank": 25
   },
   {
@@ -1693,14 +1693,14 @@
      "avg_shrunk": 1.21
     },
     "3": {
-     "n": 11,
-     "win": 54.5,
-     "avg": 0.69,
-     "med": 0.6,
+     "n": 12,
+     "win": 50.0,
+     "avg": 0.11,
+     "med": 0.1,
      "best": 7.5,
      "worst": -11.32,
-     "win_shrunk": 52.4,
-     "avg_shrunk": 0.36
+     "win_shrunk": 50.0,
+     "avg_shrunk": 0.06
     },
     "5": {
      "n": 10,
@@ -1735,71 +1735,6 @@
    },
    "winrate_score": 6.84,
    "rank": 27
-  },
-  {
-   "code": "002636",
-   "name": "金安国纪",
-   "n_signals": 25,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-07-22",
-   "last_seen": "2026-11-17",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 25,
-     "win": 36.0,
-     "avg": -1.81,
-     "med": -0.96,
-     "best": 20.1,
-     "worst": -14.88,
-     "win_shrunk": 40.0,
-     "avg_shrunk": -1.3
-    },
-    "3": {
-     "n": 24,
-     "win": 20.8,
-     "avg": -4.12,
-     "med": -6.14,
-     "best": 22.33,
-     "worst": -17.28,
-     "win_shrunk": 29.4,
-     "avg_shrunk": -2.91
-    },
-    "5": {
-     "n": 22,
-     "win": 40.9,
-     "avg": -2.11,
-     "med": -6.85,
-     "best": 31.1,
-     "worst": -27.86,
-     "win_shrunk": 43.8,
-     "avg_shrunk": -1.45
-    },
-    "10": {
-     "n": 21,
-     "win": 81.0,
-     "avg": 10.57,
-     "med": 12.99,
-     "best": 40.18,
-     "worst": -26.93,
-     "win_shrunk": 71.0,
-     "avg_shrunk": 7.16
-    },
-    "20": {
-     "n": 19,
-     "win": 78.9,
-     "avg": 9.11,
-     "med": 4.5,
-     "best": 48.76,
-     "worst": -25.05,
-     "win_shrunk": 69.0,
-     "avg_shrunk": 5.97
-    }
-   },
-   "winrate_score": 6.79,
-   "rank": 28
   },
   {
    "code": "688797",
@@ -1854,7 +1789,7 @@
     }
    },
    "winrate_score": 6.53,
-   "rank": 29
+   "rank": 28
   },
   {
    "code": "000066",
@@ -1919,7 +1854,7 @@
     }
    },
    "winrate_score": 6.43,
-   "rank": 30
+   "rank": 29
   },
   {
    "code": "688392",
@@ -1984,72 +1919,7 @@
     }
    },
    "winrate_score": 6.33,
-   "rank": 31
-  },
-  {
-   "code": "300001",
-   "name": "特锐德",
-   "n_signals": 15,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-07-25",
-   "last_seen": "2026-11-17",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 15,
-     "win": 53.3,
-     "avg": -0.67,
-     "med": 0.72,
-     "best": 4.07,
-     "worst": -6.4,
-     "win_shrunk": 52.0,
-     "avg_shrunk": -0.4
-    },
-    "3": {
-     "n": 14,
-     "win": 42.9,
-     "avg": -0.56,
-     "med": -0.92,
-     "best": 7.46,
-     "worst": -5.4,
-     "win_shrunk": 45.8,
-     "avg_shrunk": -0.33
-    },
-    "5": {
-     "n": 12,
-     "win": 66.7,
-     "avg": 0.42,
-     "med": 0.09,
-     "best": 7.24,
-     "worst": -7.97,
-     "win_shrunk": 59.1,
-     "avg_shrunk": 0.23
-    },
-    "10": {
-     "n": 9,
-     "win": 66.7,
-     "avg": 3.08,
-     "med": 3.55,
-     "best": 9.91,
-     "worst": -4.27,
-     "win_shrunk": 57.9,
-     "avg_shrunk": 1.46
-    },
-    "20": {
-     "n": 8,
-     "win": 62.5,
-     "avg": 1.73,
-     "med": 1.78,
-     "best": 7.9,
-     "worst": -4.18,
-     "win_shrunk": 55.6,
-     "avg_shrunk": 0.77
-    }
-   },
-   "winrate_score": 5.53,
-   "rank": 32
+   "rank": 30
   },
   {
    "code": "000776",
@@ -2083,14 +1953,14 @@
      "avg_shrunk": 0.77
     },
     "5": {
-     "n": 4,
-     "win": 75.0,
-     "avg": 5.47,
-     "med": 4.63,
+     "n": 5,
+     "win": 80.0,
+     "avg": 4.6,
+     "med": 1.11,
      "best": 16.34,
      "worst": -3.73,
-     "win_shrunk": 57.1,
-     "avg_shrunk": 1.56
+     "win_shrunk": 60.0,
+     "avg_shrunk": 1.53
     },
     "10": {
      "n": 3,
@@ -2113,73 +1983,73 @@
      "avg_shrunk": 1.63
     }
    },
-   "winrate_score": 4.9,
-   "rank": 33
+   "winrate_score": 5.88,
+   "rank": 31
   },
   {
-   "code": "300408",
-   "name": "三环集团",
-   "n_signals": 4,
+   "code": "002636",
+   "name": "金安国纪",
+   "n_signals": 25,
    "kinds": [
     "top10"
    ],
-   "first_seen": "2026-07-25",
-   "last_seen": "2026-11-13",
+   "first_seen": "2026-07-22",
+   "last_seen": "2026-11-17",
    "is_final": false,
    "horizons": {
     "1": {
-     "n": 4,
-     "win": 0.0,
-     "avg": -4.0,
-     "med": -2.59,
-     "best": -2.07,
-     "worst": -8.76,
-     "win_shrunk": 35.7,
-     "avg_shrunk": -1.14
+     "n": 25,
+     "win": 36.0,
+     "avg": -1.81,
+     "med": -0.96,
+     "best": 20.1,
+     "worst": -14.88,
+     "win_shrunk": 40.0,
+     "avg_shrunk": -1.3
     },
     "3": {
-     "n": 4,
-     "win": 75.0,
-     "avg": 0.34,
-     "med": 1.68,
-     "best": 2.28,
-     "worst": -4.27,
-     "win_shrunk": 57.1,
-     "avg_shrunk": 0.1
+     "n": 25,
+     "win": 24.0,
+     "avg": -3.94,
+     "med": -6.14,
+     "best": 22.33,
+     "worst": -17.28,
+     "win_shrunk": 31.4,
+     "avg_shrunk": -2.81
     },
     "5": {
-     "n": 3,
-     "win": 100.0,
-     "avg": 8.5,
-     "med": 10.76,
-     "best": 10.76,
-     "worst": 3.98,
-     "win_shrunk": 61.5,
-     "avg_shrunk": 1.96
+     "n": 23,
+     "win": 39.1,
+     "avg": -2.42,
+     "med": -6.85,
+     "best": 31.1,
+     "worst": -27.86,
+     "win_shrunk": 42.4,
+     "avg_shrunk": -1.69
     },
     "10": {
-     "n": 3,
-     "win": 66.7,
-     "avg": 11.54,
-     "med": 23.32,
-     "best": 23.32,
-     "worst": -12.03,
-     "win_shrunk": 53.8,
-     "avg_shrunk": 2.66
+     "n": 21,
+     "win": 81.0,
+     "avg": 10.57,
+     "med": 12.99,
+     "best": 40.18,
+     "worst": -26.93,
+     "win_shrunk": 71.0,
+     "avg_shrunk": 7.16
     },
     "20": {
-     "n": 2,
-     "win": 100.0,
-     "avg": 5.83,
-     "med": 5.83,
-     "best": 5.83,
-     "worst": 5.83,
-     "win_shrunk": 58.3,
-     "avg_shrunk": 0.97
+     "n": 21,
+     "win": 71.4,
+     "avg": 7.19,
+     "med": 4.5,
+     "best": 48.76,
+     "worst": -25.05,
+     "win_shrunk": 64.5,
+     "avg_shrunk": 4.87
     }
    },
-   "winrate_score": 4.8,
-   "rank": 34
+   "winrate_score": 5.14,
+   "rank": 32
   },
   {
    "code": "300033",
@@ -2234,18 +2104,18 @@
      "avg_shrunk": -0.23
     },
     "20": {
-     "n": 7,
-     "win": 85.7,
-     "avg": 4.46,
-     "med": 6.38,
+     "n": 8,
+     "win": 75.0,
+     "avg": 3.43,
+     "med": 6.01,
      "best": 7.73,
      "worst": -4.94,
-     "win_shrunk": 64.7,
-     "avg_shrunk": 1.83
+     "win_shrunk": 61.1,
+     "avg_shrunk": 1.52
     }
    },
    "winrate_score": 4.78,
-   "rank": 35
+   "rank": 33
   },
   {
    "code": "688200",
@@ -2300,7 +2170,72 @@
     }
    },
    "winrate_score": 4.71,
-   "rank": 36
+   "rank": 34
+  },
+  {
+   "code": "300408",
+   "name": "三环集团",
+   "n_signals": 4,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-07-25",
+   "last_seen": "2026-11-13",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 4,
+     "win": 0.0,
+     "avg": -4.0,
+     "med": -2.59,
+     "best": -2.07,
+     "worst": -8.76,
+     "win_shrunk": 35.7,
+     "avg_shrunk": -1.14
+    },
+    "3": {
+     "n": 4,
+     "win": 75.0,
+     "avg": 0.34,
+     "med": 1.68,
+     "best": 2.28,
+     "worst": -4.27,
+     "win_shrunk": 57.1,
+     "avg_shrunk": 0.1
+    },
+    "5": {
+     "n": 4,
+     "win": 75.0,
+     "avg": 5.0,
+     "med": 7.37,
+     "best": 10.76,
+     "worst": -5.51,
+     "win_shrunk": 57.1,
+     "avg_shrunk": 1.43
+    },
+    "10": {
+     "n": 3,
+     "win": 66.7,
+     "avg": 11.54,
+     "med": 23.32,
+     "best": 23.32,
+     "worst": -12.03,
+     "win_shrunk": 53.8,
+     "avg_shrunk": 2.66
+    },
+    "20": {
+     "n": 2,
+     "win": 100.0,
+     "avg": 5.83,
+     "med": 5.83,
+     "best": 5.83,
+     "worst": 5.83,
+     "win_shrunk": 58.3,
+     "avg_shrunk": 0.97
+    }
+   },
+   "winrate_score": 4.64,
+   "rank": 35
   },
   {
    "code": "002466",
@@ -2365,7 +2300,7 @@
     }
    },
    "winrate_score": 4.58,
-   "rank": 37
+   "rank": 36
   },
   {
    "code": "300613",
@@ -2419,18 +2354,18 @@
      "avg_shrunk": 1.19
     },
     "20": {
-     "n": 4,
-     "win": 75.0,
-     "avg": 17.79,
-     "med": 16.76,
+     "n": 7,
+     "win": 85.7,
+     "avg": 12.55,
+     "med": 5.56,
      "best": 39.79,
      "worst": -2.14,
-     "win_shrunk": 57.1,
-     "avg_shrunk": 5.08
+     "win_shrunk": 64.7,
+     "avg_shrunk": 5.17
     }
    },
    "winrate_score": 4.58,
-   "rank": 38
+   "rank": 37
   },
   {
    "code": "688147",
@@ -2485,6 +2420,71 @@
     }
    },
    "winrate_score": 4.49,
+   "rank": 38
+  },
+  {
+   "code": "300001",
+   "name": "特锐德",
+   "n_signals": 15,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-07-25",
+   "last_seen": "2026-11-17",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 15,
+     "win": 53.3,
+     "avg": -0.67,
+     "med": 0.72,
+     "best": 4.07,
+     "worst": -6.4,
+     "win_shrunk": 52.0,
+     "avg_shrunk": -0.4
+    },
+    "3": {
+     "n": 15,
+     "win": 40.0,
+     "avg": -0.81,
+     "med": -1.03,
+     "best": 7.46,
+     "worst": -5.4,
+     "win_shrunk": 44.0,
+     "avg_shrunk": -0.49
+    },
+    "5": {
+     "n": 13,
+     "win": 61.5,
+     "avg": 0.19,
+     "med": 0.09,
+     "best": 7.24,
+     "worst": -7.97,
+     "win_shrunk": 56.5,
+     "avg_shrunk": 0.11
+    },
+    "10": {
+     "n": 9,
+     "win": 66.7,
+     "avg": 3.08,
+     "med": 3.55,
+     "best": 9.91,
+     "worst": -4.27,
+     "win_shrunk": 57.9,
+     "avg_shrunk": 1.46
+    },
+    "20": {
+     "n": 8,
+     "win": 62.5,
+     "avg": 1.73,
+     "med": 1.78,
+     "best": 7.9,
+     "worst": -4.18,
+     "win_shrunk": 55.6,
+     "avg_shrunk": 0.77
+    }
+   },
+   "winrate_score": 4.42,
    "rank": 39
   },
   {
@@ -4091,14 +4091,14 @@
      "avg_shrunk": 1.35
     },
     "20": {
-     "n": 7,
-     "win": 42.9,
-     "avg": -0.51,
-     "med": -1.23,
+     "n": 10,
+     "win": 30.0,
+     "avg": -1.44,
+     "med": -2.08,
      "best": 2.99,
      "worst": -4.28,
-     "win_shrunk": 47.1,
-     "avg_shrunk": -0.21
+     "win_shrunk": 40.0,
+     "avg_shrunk": -0.72
     }
    },
    "winrate_score": 1.24,
@@ -4506,14 +4506,14 @@
      "avg_shrunk": 1.11
     },
     "20": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 12.36,
-     "med": 12.36,
+     "n": 2,
+     "win": 50.0,
+     "avg": 4.83,
+     "med": 4.83,
      "best": 12.36,
-     "worst": 12.36,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 1.12
+     "worst": -2.7,
+     "win_shrunk": 50.0,
+     "avg_shrunk": 0.81
     }
    },
    "winrate_score": 0.89,
@@ -5196,6 +5196,71 @@
    "rank": 82
   },
   {
+   "code": "002851",
+   "name": "麦格米特",
+   "n_signals": 4,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-08-21",
+   "last_seen": "2026-11-12",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 2,
+     "win": 50.0,
+     "avg": -1.99,
+     "med": -1.99,
+     "best": 0.62,
+     "worst": -4.61,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -0.33
+    },
+    "3": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 0.39,
+     "med": 0.39,
+     "best": 0.39,
+     "worst": 0.39,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.04
+    },
+    "5": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 2.71,
+     "med": 2.71,
+     "best": 2.71,
+     "worst": 2.71,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.25
+    },
+    "10": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 3.84,
+     "med": 3.84,
+     "best": 3.84,
+     "worst": 3.84,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.35
+    },
+    "20": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -1.86,
+     "med": -1.86,
+     "best": -1.86,
+     "worst": -1.86,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -0.17
+    }
+   },
+   "winrate_score": 0.5,
+   "rank": 83
+  },
+  {
    "code": "600173",
    "name": "卧龙新能",
    "n_signals": 1,
@@ -5248,7 +5313,7 @@
     }
    },
    "winrate_score": 0.48,
-   "rank": 83
+   "rank": 84
   },
   {
    "code": "300940",
@@ -5303,7 +5368,7 @@
     }
    },
    "winrate_score": 0.43,
-   "rank": 84
+   "rank": 85
   },
   {
    "code": "300972",
@@ -5368,7 +5433,7 @@
     }
    },
    "winrate_score": 0.43,
-   "rank": 85
+   "rank": 86
   },
   {
    "code": "600397",
@@ -5433,7 +5498,7 @@
     }
    },
    "winrate_score": 0.43,
-   "rank": 86
+   "rank": 87
   },
   {
    "code": "000333",
@@ -5498,7 +5563,7 @@
     }
    },
    "winrate_score": 0.41,
-   "rank": 87
+   "rank": 88
   },
   {
    "code": "603236",
@@ -5543,7 +5608,7 @@
     }
    },
    "winrate_score": 0.38,
-   "rank": 88
+   "rank": 89
   },
   {
    "code": "600406",
@@ -5608,7 +5673,7 @@
     }
    },
    "winrate_score": 0.34,
-   "rank": 89
+   "rank": 90
   },
   {
    "code": "601100",
@@ -5673,7 +5738,7 @@
     }
    },
    "winrate_score": 0.3,
-   "rank": 90
+   "rank": 91
   },
   {
    "code": "002141",
@@ -5738,7 +5803,7 @@
     }
    },
    "winrate_score": 0.27,
-   "rank": 91
+   "rank": 92
   },
   {
    "code": "002311",
@@ -5803,7 +5868,7 @@
     }
    },
    "winrate_score": 0.27,
-   "rank": 92
+   "rank": 93
   },
   {
    "code": "300133",
@@ -5869,7 +5934,7 @@
     }
    },
    "winrate_score": 0.27,
-   "rank": 93
+   "rank": 94
   },
   {
    "code": "603966",
@@ -5924,7 +5989,7 @@
     }
    },
    "winrate_score": 0.26,
-   "rank": 94
+   "rank": 95
   },
   {
    "code": "603829",
@@ -5979,7 +6044,7 @@
     }
    },
    "winrate_score": 0.22,
-   "rank": 95
+   "rank": 96
   },
   {
    "code": "300447",
@@ -6034,7 +6099,7 @@
     }
    },
    "winrate_score": 0.21,
-   "rank": 96
+   "rank": 97
   },
   {
    "code": "300657",
@@ -6099,7 +6164,7 @@
     }
    },
    "winrate_score": 0.2,
-   "rank": 97
+   "rank": 98
   },
   {
    "code": "002129",
@@ -6164,7 +6229,7 @@
     }
    },
    "winrate_score": 0.19,
-   "rank": 98
+   "rank": 99
   },
   {
    "code": "002409",
@@ -6229,7 +6294,7 @@
     }
    },
    "winrate_score": 0.17,
-   "rank": 99
+   "rank": 100
   },
   {
    "code": "300201",
@@ -6294,7 +6359,7 @@
     }
    },
    "winrate_score": 0.16,
-   "rank": 100
+   "rank": 101
   },
   {
    "code": "600026",
@@ -6359,7 +6424,32 @@
     }
    },
    "winrate_score": 0.16,
-   "rank": 101
+   "rank": 102
+  },
+  {
+   "code": "000063",
+   "name": "中兴通讯",
+   "n_signals": 2,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-11-19",
+   "last_seen": "2026-11-20",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -0.49,
+     "med": -0.49,
+     "best": -0.49,
+     "worst": -0.49,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -0.04
+    }
+   },
+   "winrate_score": 0.0,
+   "rank": 103
   },
   {
    "code": "002716",
@@ -6394,7 +6484,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 102
+   "rank": 104
   },
   {
    "code": "003010",
@@ -6429,7 +6519,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 103
+   "rank": 105
   },
   {
    "code": "300083",
@@ -6444,18 +6534,78 @@
    "is_final": true,
    "horizons": {
     "1": {
-     "n": 1,
+     "n": 2,
      "win": 0.0,
-     "avg": -8.39,
-     "med": -8.39,
-     "best": -8.39,
+     "avg": -4.45,
+     "med": -4.45,
+     "best": -0.52,
      "worst": -8.39,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -0.76
+     "win_shrunk": 41.7,
+     "avg_shrunk": -0.74
     }
    },
    "winrate_score": 0.0,
-   "rank": 104
+   "rank": 106
+  },
+  {
+   "code": "300570",
+   "name": "太辰光",
+   "n_signals": 1,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-11-09",
+   "last_seen": "2026-11-09",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 14.25,
+     "med": 14.25,
+     "best": 14.25,
+     "worst": 14.25,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 1.3
+    },
+    "3": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 3.89,
+     "med": 3.89,
+     "best": 3.89,
+     "worst": 3.89,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.35
+    }
+   },
+   "winrate_score": 0.0,
+   "rank": 107
+  },
+  {
+   "code": "300677",
+   "name": "英科医疗",
+   "n_signals": 1,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-11-19",
+   "last_seen": "2026-11-19",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -5.88,
+     "med": -5.88,
+     "best": -5.88,
+     "worst": -5.88,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -0.53
+    }
+   },
+   "winrate_score": 0.0,
+   "rank": 108
   },
   {
    "code": "300773",
@@ -6490,33 +6640,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 105
-  },
-  {
-   "code": "300790",
-   "name": "宇瞳光学",
-   "n_signals": 4,
-   "kinds": [
-    "final",
-    "top10"
-   ],
-   "first_seen": "2026-11-18",
-   "last_seen": "2026-11-20",
-   "is_final": true,
-   "horizons": {
-    "1": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -4.61,
-     "med": -4.61,
-     "best": -4.61,
-     "worst": -4.61,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -0.42
-    }
-   },
-   "winrate_score": 0.0,
-   "rank": 106
+   "rank": 109
   },
   {
    "code": "300852",
@@ -6541,7 +6665,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 107
+   "rank": 110
   },
   {
    "code": "300870",
@@ -6566,7 +6690,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 108
+   "rank": 111
   },
   {
    "code": "300900",
@@ -6592,32 +6716,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 109
-  },
-  {
-   "code": "300913",
-   "name": "兆龙互连",
-   "n_signals": 3,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-11-18",
-   "last_seen": "2026-11-20",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -7.91,
-     "med": -7.91,
-     "best": -7.91,
-     "worst": -7.91,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -0.72
-    }
-   },
-   "winrate_score": 0.0,
-   "rank": 110
+   "rank": 112
   },
   {
    "code": "301583",
@@ -6642,7 +6741,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 111
+   "rank": 113
   },
   {
    "code": "600460",
@@ -6667,7 +6766,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 112
+   "rank": 114
   },
   {
    "code": "600690",
@@ -6692,7 +6791,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 113
+   "rank": 115
   },
   {
    "code": "600999",
@@ -6718,7 +6817,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 114
+   "rank": 116
   },
   {
    "code": "601126",
@@ -6743,7 +6842,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 115
+   "rank": 117
   },
   {
    "code": "601211",
@@ -6769,7 +6868,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 116
+   "rank": 118
   },
   {
    "code": "601991",
@@ -6795,7 +6894,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 117
+   "rank": 119
   },
   {
    "code": "603078",
@@ -6820,7 +6919,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 118
+   "rank": 120
   },
   {
    "code": "603650",
@@ -6845,7 +6944,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 119
+   "rank": 121
   },
   {
    "code": "605358",
@@ -6870,7 +6969,7 @@
     }
    },
    "winrate_score": 0.0,
-   "rank": 120
+   "rank": 122
   },
   {
    "code": "000933",
@@ -6935,7 +7034,7 @@
     }
    },
    "winrate_score": -0.02,
-   "rank": 121
+   "rank": 123
   },
   {
    "code": "600893",
@@ -7000,7 +7099,7 @@
     }
    },
    "winrate_score": -0.02,
-   "rank": 122
+   "rank": 124
   },
   {
    "code": "688027",
@@ -7065,7 +7164,7 @@
     }
    },
    "winrate_score": -0.03,
-   "rank": 123
+   "rank": 125
   },
   {
    "code": "002594",
@@ -7130,73 +7229,7 @@
     }
    },
    "winrate_score": -0.04,
-   "rank": 124
-  },
-  {
-   "code": "001309",
-   "name": "德明利",
-   "n_signals": 12,
-   "kinds": [
-    "final",
-    "top10"
-   ],
-   "first_seen": "2026-10-16",
-   "last_seen": "2026-11-13",
-   "is_final": true,
-   "horizons": {
-    "1": {
-     "n": 12,
-     "win": 75.0,
-     "avg": 2.47,
-     "med": 5.73,
-     "best": 7.43,
-     "worst": -14.0,
-     "win_shrunk": 63.6,
-     "avg_shrunk": 1.35
-    },
-    "3": {
-     "n": 12,
-     "win": 58.3,
-     "avg": 4.43,
-     "med": 6.96,
-     "best": 17.14,
-     "worst": -14.67,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 2.42
-    },
-    "5": {
-     "n": 11,
-     "win": 63.6,
-     "avg": 1.5,
-     "med": 1.67,
-     "best": 16.83,
-     "worst": -18.06,
-     "win_shrunk": 57.1,
-     "avg_shrunk": 0.79
-    },
-    "10": {
-     "n": 8,
-     "win": 37.5,
-     "avg": -8.45,
-     "med": -11.8,
-     "best": 0.05,
-     "worst": -14.99,
-     "win_shrunk": 44.4,
-     "avg_shrunk": -3.75
-    },
-    "20": {
-     "n": 8,
-     "win": 0.0,
-     "avg": -17.26,
-     "med": -17.38,
-     "best": -14.02,
-     "worst": -22.36,
-     "win_shrunk": 27.8,
-     "avg_shrunk": -7.67
-    }
-   },
-   "winrate_score": -0.05,
-   "rank": 125
+   "rank": 126
   },
   {
    "code": "600150",
@@ -7261,7 +7294,7 @@
     }
    },
    "winrate_score": -0.05,
-   "rank": 126
+   "rank": 127
   },
   {
    "code": "003025",
@@ -7316,7 +7349,7 @@
     }
    },
    "winrate_score": -0.06,
-   "rank": 127
+   "rank": 128
   },
   {
    "code": "300882",
@@ -7371,7 +7404,7 @@
     }
    },
    "winrate_score": -0.07,
-   "rank": 128
+   "rank": 129
   },
   {
    "code": "300247",
@@ -7426,7 +7459,7 @@
     }
    },
    "winrate_score": -0.08,
-   "rank": 129
+   "rank": 130
   },
   {
    "code": "300671",
@@ -7491,7 +7524,7 @@
     }
    },
    "winrate_score": -0.08,
-   "rank": 130
+   "rank": 131
   },
   {
    "code": "600724",
@@ -7546,7 +7579,7 @@
     }
    },
    "winrate_score": -0.09,
-   "rank": 131
+   "rank": 132
   },
   {
    "code": "688596",
@@ -7611,7 +7644,7 @@
     }
    },
    "winrate_score": -0.1,
-   "rank": 132
+   "rank": 133
   },
   {
    "code": "300166",
@@ -7676,7 +7709,7 @@
     }
    },
    "winrate_score": -0.11,
-   "rank": 133
+   "rank": 134
   },
   {
    "code": "300496",
@@ -7741,7 +7774,72 @@
     }
    },
    "winrate_score": -0.14,
-   "rank": 134
+   "rank": 135
+  },
+  {
+   "code": "002938",
+   "name": "鹏鼎控股",
+   "n_signals": 3,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-10-12",
+   "last_seen": "2026-11-09",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 2,
+     "win": 50.0,
+     "avg": -0.99,
+     "med": -0.99,
+     "best": 6.78,
+     "worst": -8.77,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -0.17
+    },
+    "3": {
+     "n": 2,
+     "win": 50.0,
+     "avg": -0.79,
+     "med": -0.79,
+     "best": 1.53,
+     "worst": -3.1,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -0.13
+    },
+    "5": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 1.09,
+     "med": 1.09,
+     "best": 1.09,
+     "worst": 1.09,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.1
+    },
+    "10": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -10.35,
+     "med": -10.35,
+     "best": -10.35,
+     "worst": -10.35,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -0.94
+    },
+    "20": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -32.25,
+     "med": -32.25,
+     "best": -32.25,
+     "worst": -32.25,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -2.93
+    }
+   },
+   "winrate_score": -0.16,
+   "rank": 136
   },
   {
    "code": "600186",
@@ -7807,7 +7905,7 @@
     }
    },
    "winrate_score": -0.16,
-   "rank": 135
+   "rank": 137
   },
   {
    "code": "000021",
@@ -7872,7 +7970,7 @@
     }
    },
    "winrate_score": -0.17,
-   "rank": 136
+   "rank": 138
   },
   {
    "code": "300184",
@@ -7937,7 +8035,7 @@
     }
    },
    "winrate_score": -0.17,
-   "rank": 137
+   "rank": 139
   },
   {
    "code": "300402",
@@ -7992,7 +8090,7 @@
     }
    },
    "winrate_score": -0.17,
-   "rank": 138
+   "rank": 140
   },
   {
    "code": "688729",
@@ -8057,7 +8155,7 @@
     }
    },
    "winrate_score": -0.17,
-   "rank": 139
+   "rank": 141
   },
   {
    "code": "300433",
@@ -8122,7 +8220,7 @@
     }
    },
    "winrate_score": -0.18,
-   "rank": 140
+   "rank": 142
   },
   {
    "code": "300832",
@@ -8187,7 +8285,7 @@
     }
    },
    "winrate_score": -0.24,
-   "rank": 141
+   "rank": 143
   },
   {
    "code": "600019",
@@ -8252,7 +8350,7 @@
     }
    },
    "winrate_score": -0.24,
-   "rank": 142
+   "rank": 144
   },
   {
    "code": "002653",
@@ -8317,7 +8415,7 @@
     }
    },
    "winrate_score": -0.26,
-   "rank": 143
+   "rank": 145
   },
   {
    "code": "300024",
@@ -8382,7 +8480,7 @@
     }
    },
    "winrate_score": -0.26,
-   "rank": 144
+   "rank": 146
   },
   {
    "code": "002837",
@@ -8447,7 +8545,7 @@
     }
    },
    "winrate_score": -0.27,
-   "rank": 145
+   "rank": 147
   },
   {
    "code": "601398",
@@ -8512,7 +8610,7 @@
     }
    },
    "winrate_score": -0.27,
-   "rank": 146
+   "rank": 148
   },
   {
    "code": "300418",
@@ -8577,7 +8675,7 @@
     }
    },
    "winrate_score": -0.28,
-   "rank": 147
+   "rank": 149
   },
   {
    "code": "300149",
@@ -8642,7 +8740,7 @@
     }
    },
    "winrate_score": -0.34,
-   "rank": 148
+   "rank": 150
   },
   {
    "code": "600900",
@@ -8707,7 +8805,7 @@
     }
    },
    "winrate_score": -0.34,
-   "rank": 149
+   "rank": 151
   },
   {
    "code": "300979",
@@ -8772,7 +8870,7 @@
     }
    },
    "winrate_score": -0.35,
-   "rank": 150
+   "rank": 152
   },
   {
    "code": "601113",
@@ -8827,7 +8925,7 @@
     }
    },
    "winrate_score": -0.38,
-   "rank": 151
+   "rank": 153
   },
   {
    "code": "000688",
@@ -8882,7 +8980,7 @@
     }
    },
    "winrate_score": -0.39,
-   "rank": 152
+   "rank": 154
   },
   {
    "code": "000759",
@@ -8947,7 +9045,7 @@
     }
    },
    "winrate_score": -0.4,
-   "rank": 153
+   "rank": 155
   },
   {
    "code": "300384",
@@ -9002,7 +9100,7 @@
     }
    },
    "winrate_score": -0.41,
-   "rank": 154
+   "rank": 156
   },
   {
    "code": "600206",
@@ -9067,7 +9165,7 @@
     }
    },
    "winrate_score": -0.41,
-   "rank": 155
+   "rank": 157
   },
   {
    "code": "688777",
@@ -9132,7 +9230,7 @@
     }
    },
    "winrate_score": -0.41,
-   "rank": 156
+   "rank": 158
   },
   {
    "code": "600519",
@@ -9197,7 +9295,7 @@
     }
    },
    "winrate_score": -0.44,
-   "rank": 157
+   "rank": 159
   },
   {
    "code": "300725",
@@ -9262,7 +9360,7 @@
     }
    },
    "winrate_score": -0.45,
-   "rank": 158
+   "rank": 160
   },
   {
    "code": "002462",
@@ -9317,7 +9415,7 @@
     }
    },
    "winrate_score": -0.49,
-   "rank": 159
+   "rank": 161
   },
   {
    "code": "002616",
@@ -9372,7 +9470,7 @@
     }
    },
    "winrate_score": -0.49,
-   "rank": 160
+   "rank": 162
   },
   {
    "code": "600887",
@@ -9437,7 +9535,7 @@
     }
    },
    "winrate_score": -0.5,
-   "rank": 161
+   "rank": 163
   },
   {
    "code": "603228",
@@ -9502,7 +9600,7 @@
     }
    },
    "winrate_score": -0.5,
-   "rank": 162
+   "rank": 164
   },
   {
    "code": "300506",
@@ -9567,7 +9665,7 @@
     }
    },
    "winrate_score": -0.51,
-   "rank": 163
+   "rank": 165
   },
   {
    "code": "000100",
@@ -9632,7 +9730,7 @@
     }
    },
    "winrate_score": -0.55,
-   "rank": 164
+   "rank": 166
   },
   {
    "code": "002432",
@@ -9646,14 +9744,14 @@
    "is_final": false,
    "horizons": {
     "1": {
-     "n": 2,
+     "n": 3,
      "win": 0.0,
-     "avg": -7.49,
+     "avg": -7.85,
      "med": -7.49,
      "best": -7.49,
-     "worst": -7.49,
-     "win_shrunk": 41.7,
-     "avg_shrunk": -1.25
+     "worst": -8.58,
+     "win_shrunk": 38.5,
+     "avg_shrunk": -1.81
     },
     "3": {
      "n": 2,
@@ -9697,7 +9795,7 @@
     }
    },
    "winrate_score": -0.58,
-   "rank": 165
+   "rank": 167
   },
   {
    "code": "300140",
@@ -9752,7 +9850,7 @@
     }
    },
    "winrate_score": -0.61,
-   "rank": 166
+   "rank": 168
   },
   {
    "code": "688362",
@@ -9807,7 +9905,7 @@
     }
    },
    "winrate_score": -0.64,
-   "rank": 167
+   "rank": 169
   },
   {
    "code": "000651",
@@ -9872,7 +9970,7 @@
     }
    },
    "winrate_score": -0.67,
-   "rank": 168
+   "rank": 170
   },
   {
    "code": "002602",
@@ -9937,7 +10035,7 @@
     }
    },
    "winrate_score": -0.7,
-   "rank": 169
+   "rank": 171
   },
   {
    "code": "002472",
@@ -10002,7 +10100,7 @@
     }
    },
    "winrate_score": -0.71,
-   "rank": 170
+   "rank": 172
   },
   {
    "code": "601601",
@@ -10067,7 +10165,7 @@
     }
    },
    "winrate_score": -0.74,
-   "rank": 171
+   "rank": 173
   },
   {
    "code": "688388",
@@ -10132,7 +10230,7 @@
     }
    },
    "winrate_score": -0.74,
-   "rank": 172
+   "rank": 174
   },
   {
    "code": "300684",
@@ -10197,7 +10295,7 @@
     }
    },
    "winrate_score": -0.75,
-   "rank": 173
+   "rank": 175
   },
   {
    "code": "002850",
@@ -10262,7 +10360,7 @@
     }
    },
    "winrate_score": -0.76,
-   "rank": 174
+   "rank": 176
   },
   {
    "code": "688548",
@@ -10327,7 +10425,7 @@
     }
    },
    "winrate_score": -0.76,
-   "rank": 175
+   "rank": 177
   },
   {
    "code": "000599",
@@ -10382,7 +10480,7 @@
     }
    },
    "winrate_score": -0.81,
-   "rank": 176
+   "rank": 178
   },
   {
    "code": "001258",
@@ -10437,7 +10535,7 @@
     }
    },
    "winrate_score": -0.83,
-   "rank": 177
+   "rank": 179
   },
   {
    "code": "002139",
@@ -10502,7 +10600,7 @@
     }
    },
    "winrate_score": -0.83,
-   "rank": 178
+   "rank": 180
   },
   {
    "code": "000039",
@@ -10567,7 +10665,7 @@
     }
    },
    "winrate_score": -0.84,
-   "rank": 179
+   "rank": 181
   },
   {
    "code": "603629",
@@ -10632,7 +10730,7 @@
     }
    },
    "winrate_score": -0.85,
-   "rank": 180
+   "rank": 182
   },
   {
    "code": "688047",
@@ -10697,7 +10795,7 @@
     }
    },
    "winrate_score": -0.86,
-   "rank": 181
+   "rank": 183
   },
   {
    "code": "600660",
@@ -10762,7 +10860,7 @@
     }
    },
    "winrate_score": -0.89,
-   "rank": 182
+   "rank": 184
   },
   {
    "code": "300124",
@@ -10827,52 +10925,7 @@
     }
    },
    "winrate_score": -0.92,
-   "rank": 183
-  },
-  {
-   "code": "300570",
-   "name": "太辰光",
-   "n_signals": 1,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-11-09",
-   "last_seen": "2026-11-09",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 14.25,
-     "med": 14.25,
-     "best": 14.25,
-     "worst": 14.25,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 1.3
-    },
-    "3": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 3.89,
-     "med": 3.89,
-     "best": 3.89,
-     "worst": 3.89,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.35
-    },
-    "5": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -10.01,
-     "med": -10.01,
-     "best": -10.01,
-     "worst": -10.01,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -0.91
-    }
-   },
-   "winrate_score": -0.92,
-   "rank": 184
+   "rank": 185
   },
   {
    "code": "300363",
@@ -10937,7 +10990,7 @@
     }
    },
    "winrate_score": -0.93,
-   "rank": 185
+   "rank": 186
   },
   {
    "code": "600961",
@@ -10982,7 +11035,7 @@
     }
    },
    "winrate_score": -0.94,
-   "rank": 186
+   "rank": 187
   },
   {
    "code": "603290",
@@ -11047,7 +11100,7 @@
     }
    },
    "winrate_score": -0.96,
-   "rank": 187
+   "rank": 188
   },
   {
    "code": "000591",
@@ -11112,7 +11165,7 @@
     }
    },
    "winrate_score": -1.01,
-   "rank": 188
+   "rank": 189
   },
   {
    "code": "300378",
@@ -11174,51 +11227,6 @@
      "worst": -6.22,
      "win_shrunk": 45.5,
      "avg_shrunk": -0.57
-    }
-   },
-   "winrate_score": -1.01,
-   "rank": 189
-  },
-  {
-   "code": "301205",
-   "name": "联特科技",
-   "n_signals": 1,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-11-06",
-   "last_seen": "2026-11-06",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -0.49,
-     "med": -0.49,
-     "best": -0.49,
-     "worst": -0.49,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -0.04
-    },
-    "3": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 9.05,
-     "med": 9.05,
-     "best": 9.05,
-     "worst": 9.05,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.82
-    },
-    "5": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -11.13,
-     "med": -11.13,
-     "best": -11.13,
-     "worst": -11.13,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -1.01
     }
    },
    "winrate_score": -1.01,
@@ -11615,71 +11623,6 @@
    "rank": 196
   },
   {
-   "code": "000938",
-   "name": "紫光股份",
-   "n_signals": 7,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-07-20",
-   "last_seen": "2026-11-06",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 7,
-     "win": 42.9,
-     "avg": -0.59,
-     "med": -0.76,
-     "best": 18.8,
-     "worst": -18.07,
-     "win_shrunk": 47.1,
-     "avg_shrunk": -0.24
-    },
-    "3": {
-     "n": 7,
-     "win": 71.4,
-     "avg": -0.41,
-     "med": 3.43,
-     "best": 9.73,
-     "worst": -19.29,
-     "win_shrunk": 58.8,
-     "avg_shrunk": -0.17
-    },
-    "5": {
-     "n": 7,
-     "win": 57.1,
-     "avg": 0.43,
-     "med": 2.88,
-     "best": 9.73,
-     "worst": -14.52,
-     "win_shrunk": 52.9,
-     "avg_shrunk": 0.18
-    },
-    "10": {
-     "n": 6,
-     "win": 16.7,
-     "avg": -3.55,
-     "med": -7.73,
-     "best": 18.7,
-     "worst": -9.75,
-     "win_shrunk": 37.5,
-     "avg_shrunk": -1.33
-    },
-    "20": {
-     "n": 6,
-     "win": 33.3,
-     "avg": -6.36,
-     "med": -9.43,
-     "best": 12.66,
-     "worst": -20.92,
-     "win_shrunk": 43.8,
-     "avg_shrunk": -2.39
-    }
-   },
-   "winrate_score": -1.07,
-   "rank": 197
-  },
-  {
    "code": "688313",
    "name": "仕佳光子",
    "n_signals": 1,
@@ -11722,7 +11665,7 @@
     }
    },
    "winrate_score": -1.07,
-   "rank": 198
+   "rank": 197
   },
   {
    "code": "300558",
@@ -11787,7 +11730,7 @@
     }
    },
    "winrate_score": -1.08,
-   "rank": 199
+   "rank": 198
   },
   {
    "code": "688396",
@@ -11852,7 +11795,7 @@
     }
    },
    "winrate_score": -1.11,
-   "rank": 200
+   "rank": 199
   },
   {
    "code": "300661",
@@ -11917,7 +11860,7 @@
     }
    },
    "winrate_score": -1.12,
-   "rank": 201
+   "rank": 200
   },
   {
    "code": "300672",
@@ -11982,7 +11925,7 @@
     }
    },
    "winrate_score": -1.14,
-   "rank": 202
+   "rank": 201
   },
   {
    "code": "300782",
@@ -12047,7 +11990,7 @@
     }
    },
    "winrate_score": -1.18,
-   "rank": 203
+   "rank": 202
   },
   {
    "code": "300806",
@@ -12112,7 +12055,7 @@
     }
    },
    "winrate_score": -1.18,
-   "rank": 204
+   "rank": 203
   },
   {
    "code": "300346",
@@ -12177,7 +12120,7 @@
     }
    },
    "winrate_score": -1.19,
-   "rank": 205
+   "rank": 204
   },
   {
    "code": "300347",
@@ -12242,7 +12185,7 @@
     }
    },
    "winrate_score": -1.27,
-   "rank": 206
+   "rank": 205
   },
   {
    "code": "600095",
@@ -12287,7 +12230,7 @@
     }
    },
    "winrate_score": -1.29,
-   "rank": 207
+   "rank": 206
   },
   {
    "code": "002428",
@@ -12352,7 +12295,7 @@
     }
    },
    "winrate_score": -1.3,
-   "rank": 208
+   "rank": 207
   },
   {
    "code": "002532",
@@ -12417,7 +12360,7 @@
     }
    },
    "winrate_score": -1.31,
-   "rank": 209
+   "rank": 208
   },
   {
    "code": "301536",
@@ -12482,7 +12425,7 @@
     }
    },
    "winrate_score": -1.4,
-   "rank": 210
+   "rank": 209
   },
   {
    "code": "003040",
@@ -12547,7 +12490,7 @@
     }
    },
    "winrate_score": -1.43,
-   "rank": 211
+   "rank": 210
   },
   {
    "code": "300017",
@@ -12612,7 +12555,7 @@
     }
    },
    "winrate_score": -1.45,
-   "rank": 212
+   "rank": 211
   },
   {
    "code": "300077",
@@ -12677,7 +12620,7 @@
     }
    },
    "winrate_score": -1.47,
-   "rank": 213
+   "rank": 212
   },
   {
    "code": "600354",
@@ -12742,7 +12685,7 @@
     }
    },
    "winrate_score": -1.47,
-   "rank": 214
+   "rank": 213
   },
   {
    "code": "688222",
@@ -12807,7 +12750,7 @@
     }
    },
    "winrate_score": -1.48,
-   "rank": 215
+   "rank": 214
   },
   {
    "code": "688012",
@@ -12872,7 +12815,7 @@
     }
    },
    "winrate_score": -1.49,
-   "rank": 216
+   "rank": 215
   },
   {
    "code": "300364",
@@ -12937,7 +12880,7 @@
     }
    },
    "winrate_score": -1.5,
-   "rank": 217
+   "rank": 216
   },
   {
    "code": "688141",
@@ -13002,6 +12945,61 @@
     }
    },
    "winrate_score": -1.5,
+   "rank": 217
+  },
+  {
+   "code": "301205",
+   "name": "联特科技",
+   "n_signals": 1,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-11-06",
+   "last_seen": "2026-11-06",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -0.49,
+     "med": -0.49,
+     "best": -0.49,
+     "worst": -0.49,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -0.04
+    },
+    "3": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 9.05,
+     "med": 9.05,
+     "best": 9.05,
+     "worst": 9.05,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.82
+    },
+    "5": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -11.13,
+     "med": -11.13,
+     "best": -11.13,
+     "worst": -11.13,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -1.01
+    },
+    "10": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -16.06,
+     "med": -16.06,
+     "best": -16.06,
+     "worst": -16.06,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -1.46
+    }
+   },
+   "winrate_score": -1.52,
    "rank": 218
   },
   {
@@ -13691,51 +13689,6 @@
    "rank": 229
   },
   {
-   "code": "002436",
-   "name": "兴森科技",
-   "n_signals": 2,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-11-06",
-   "last_seen": "2026-11-09",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 2,
-     "win": 100.0,
-     "avg": 6.44,
-     "med": 6.44,
-     "best": 6.64,
-     "worst": 6.23,
-     "win_shrunk": 58.3,
-     "avg_shrunk": 1.07
-    },
-    "3": {
-     "n": 2,
-     "win": 50.0,
-     "avg": 5.23,
-     "med": 5.23,
-     "best": 13.6,
-     "worst": -3.14,
-     "win_shrunk": 50.0,
-     "avg_shrunk": 0.87
-    },
-    "5": {
-     "n": 2,
-     "win": 0.0,
-     "avg": -9.77,
-     "med": -9.77,
-     "best": -6.44,
-     "worst": -13.11,
-     "win_shrunk": 41.7,
-     "avg_shrunk": -1.63
-    }
-   },
-   "winrate_score": -1.84,
-   "rank": 230
-  },
-  {
    "code": "300442",
    "name": "润泽科技",
    "n_signals": 3,
@@ -13798,72 +13751,7 @@
     }
    },
    "winrate_score": -1.86,
-   "rank": 231
-  },
-  {
-   "code": "002938",
-   "name": "鹏鼎控股",
-   "n_signals": 3,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-10-12",
-   "last_seen": "2026-11-09",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 3,
-     "win": 66.7,
-     "avg": 1.23,
-     "med": 5.69,
-     "best": 6.78,
-     "worst": -8.77,
-     "win_shrunk": 53.8,
-     "avg_shrunk": 0.28
-    },
-    "3": {
-     "n": 3,
-     "win": 33.3,
-     "avg": -1.69,
-     "med": -3.1,
-     "best": 1.53,
-     "worst": -3.51,
-     "win_shrunk": 46.2,
-     "avg_shrunk": -0.39
-    },
-    "5": {
-     "n": 3,
-     "win": 66.7,
-     "avg": -3.66,
-     "med": 1.09,
-     "best": 2.58,
-     "worst": -14.64,
-     "win_shrunk": 53.8,
-     "avg_shrunk": -0.84
-    },
-    "10": {
-     "n": 2,
-     "win": 0.0,
-     "avg": -11.3,
-     "med": -11.3,
-     "best": -10.35,
-     "worst": -12.24,
-     "win_shrunk": 41.7,
-     "avg_shrunk": -1.88
-    },
-    "20": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -32.25,
-     "med": -32.25,
-     "best": -32.25,
-     "worst": -32.25,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -2.93
-    }
-   },
-   "winrate_score": -1.88,
-   "rank": 232
+   "rank": 230
   },
   {
    "code": "688122",
@@ -13908,7 +13796,7 @@
     }
    },
    "winrate_score": -1.94,
-   "rank": 233
+   "rank": 231
   },
   {
    "code": "688208",
@@ -13953,7 +13841,7 @@
     }
    },
    "winrate_score": -1.94,
-   "rank": 234
+   "rank": 232
   },
   {
    "code": "301358",
@@ -14018,7 +13906,62 @@
     }
    },
    "winrate_score": -1.99,
-   "rank": 235
+   "rank": 233
+  },
+  {
+   "code": "002436",
+   "name": "兴森科技",
+   "n_signals": 2,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-11-06",
+   "last_seen": "2026-11-09",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 2,
+     "win": 100.0,
+     "avg": 6.44,
+     "med": 6.44,
+     "best": 6.64,
+     "worst": 6.23,
+     "win_shrunk": 58.3,
+     "avg_shrunk": 1.07
+    },
+    "3": {
+     "n": 2,
+     "win": 50.0,
+     "avg": 5.23,
+     "med": 5.23,
+     "best": 13.6,
+     "worst": -3.14,
+     "win_shrunk": 50.0,
+     "avg_shrunk": 0.87
+    },
+    "5": {
+     "n": 2,
+     "win": 0.0,
+     "avg": -9.77,
+     "med": -9.77,
+     "best": -6.44,
+     "worst": -13.11,
+     "win_shrunk": 41.7,
+     "avg_shrunk": -1.63
+    },
+    "10": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -4.16,
+     "med": -4.16,
+     "best": -4.16,
+     "worst": -4.16,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -0.38
+    }
+   },
+   "winrate_score": -2.02,
+   "rank": 234
   },
   {
    "code": "300505",
@@ -14083,6 +14026,71 @@
     }
    },
    "winrate_score": -2.09,
+   "rank": 235
+  },
+  {
+   "code": "000938",
+   "name": "紫光股份",
+   "n_signals": 7,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-07-20",
+   "last_seen": "2026-11-06",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 7,
+     "win": 42.9,
+     "avg": -0.59,
+     "med": -0.76,
+     "best": 18.8,
+     "worst": -18.07,
+     "win_shrunk": 47.1,
+     "avg_shrunk": -0.24
+    },
+    "3": {
+     "n": 7,
+     "win": 71.4,
+     "avg": -0.41,
+     "med": 3.43,
+     "best": 9.73,
+     "worst": -19.29,
+     "win_shrunk": 58.8,
+     "avg_shrunk": -0.17
+    },
+    "5": {
+     "n": 7,
+     "win": 57.1,
+     "avg": 0.43,
+     "med": 2.88,
+     "best": 9.73,
+     "worst": -14.52,
+     "win_shrunk": 52.9,
+     "avg_shrunk": 0.18
+    },
+    "10": {
+     "n": 7,
+     "win": 14.3,
+     "avg": -4.42,
+     "med": -8.62,
+     "best": 18.7,
+     "worst": -9.75,
+     "win_shrunk": 35.3,
+     "avg_shrunk": -1.82
+    },
+    "20": {
+     "n": 6,
+     "win": 33.3,
+     "avg": -6.36,
+     "med": -9.43,
+     "best": 12.66,
+     "worst": -20.92,
+     "win_shrunk": 43.8,
+     "avg_shrunk": -2.39
+    }
+   },
+   "winrate_score": -2.1,
    "rank": 236
   },
   {
@@ -14771,68 +14779,69 @@
    "rank": 247
   },
   {
-   "code": "300458",
-   "name": "全志科技",
-   "n_signals": 4,
+   "code": "001309",
+   "name": "德明利",
+   "n_signals": 12,
    "kinds": [
+    "final",
     "top10"
    ],
-   "first_seen": "2026-07-26",
-   "last_seen": "2026-11-09",
-   "is_final": false,
+   "first_seen": "2026-10-16",
+   "last_seen": "2026-11-13",
+   "is_final": true,
    "horizons": {
     "1": {
-     "n": 4,
+     "n": 12,
      "win": 75.0,
-     "avg": 3.3,
-     "med": 4.29,
-     "best": 8.49,
-     "worst": -3.88,
-     "win_shrunk": 57.1,
-     "avg_shrunk": 0.94
+     "avg": 2.47,
+     "med": 5.73,
+     "best": 7.43,
+     "worst": -14.0,
+     "win_shrunk": 63.6,
+     "avg_shrunk": 1.35
     },
     "3": {
-     "n": 4,
-     "win": 75.0,
-     "avg": -2.26,
-     "med": 3.87,
-     "best": 5.48,
-     "worst": -22.25,
-     "win_shrunk": 57.1,
-     "avg_shrunk": -0.64
+     "n": 12,
+     "win": 58.3,
+     "avg": 4.43,
+     "med": 6.96,
+     "best": 17.14,
+     "worst": -14.67,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 2.42
     },
     "5": {
-     "n": 4,
-     "win": 50.0,
-     "avg": -4.38,
-     "med": 0.32,
-     "best": 3.23,
-     "worst": -21.39,
-     "win_shrunk": 50.0,
-     "avg_shrunk": -1.25
+     "n": 12,
+     "win": 58.3,
+     "avg": 0.6,
+     "med": 1.67,
+     "best": 16.83,
+     "worst": -18.06,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.33
     },
     "10": {
-     "n": 2,
-     "win": 50.0,
-     "avg": -4.09,
-     "med": -4.09,
-     "best": 8.75,
-     "worst": -16.93,
-     "win_shrunk": 50.0,
-     "avg_shrunk": -0.68
+     "n": 8,
+     "win": 37.5,
+     "avg": -8.45,
+     "med": -11.8,
+     "best": 0.05,
+     "worst": -14.99,
+     "win_shrunk": 44.4,
+     "avg_shrunk": -3.75
     },
     "20": {
-     "n": 2,
-     "win": 50.0,
-     "avg": -11.25,
-     "med": -11.25,
-     "best": 2.99,
-     "worst": -25.49,
-     "win_shrunk": 50.0,
-     "avg_shrunk": -1.88
+     "n": 8,
+     "win": 0.0,
+     "avg": -17.26,
+     "med": -17.38,
+     "best": -14.02,
+     "worst": -22.36,
+     "win_shrunk": 27.8,
+     "avg_shrunk": -7.67
     }
    },
-   "winrate_score": -2.73,
+   "winrate_score": -2.72,
    "rank": 248
   },
   {
@@ -15086,61 +15095,6 @@
    "rank": 252
   },
   {
-   "code": "301526",
-   "name": "国际复材",
-   "n_signals": 10,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-10-26",
-   "last_seen": "2026-11-13",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 10,
-     "win": 50.0,
-     "avg": -1.9,
-     "med": 0.3,
-     "best": 7.62,
-     "worst": -15.56,
-     "win_shrunk": 50.0,
-     "avg_shrunk": -0.95
-    },
-    "3": {
-     "n": 10,
-     "win": 50.0,
-     "avg": 1.3,
-     "med": -0.72,
-     "best": 17.19,
-     "worst": -15.01,
-     "win_shrunk": 50.0,
-     "avg_shrunk": 0.65
-    },
-    "5": {
-     "n": 9,
-     "win": 66.7,
-     "avg": -0.77,
-     "med": 3.17,
-     "best": 7.2,
-     "worst": -18.72,
-     "win_shrunk": 57.9,
-     "avg_shrunk": -0.37
-    },
-    "10": {
-     "n": 7,
-     "win": 28.6,
-     "avg": -3.68,
-     "med": -0.9,
-     "best": 3.35,
-     "worst": -10.34,
-     "win_shrunk": 41.2,
-     "avg_shrunk": -1.51
-    }
-   },
-   "winrate_score": -3.05,
-   "rank": 253
-  },
-  {
    "code": "000338",
    "name": "潍柴动力",
    "n_signals": 3,
@@ -15193,6 +15147,71 @@
     }
    },
    "winrate_score": -3.11,
+   "rank": 253
+  },
+  {
+   "code": "300458",
+   "name": "全志科技",
+   "n_signals": 4,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-07-26",
+   "last_seen": "2026-11-09",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 4,
+     "win": 75.0,
+     "avg": 3.3,
+     "med": 4.29,
+     "best": 8.49,
+     "worst": -3.88,
+     "win_shrunk": 57.1,
+     "avg_shrunk": 0.94
+    },
+    "3": {
+     "n": 4,
+     "win": 75.0,
+     "avg": -2.26,
+     "med": 3.87,
+     "best": 5.48,
+     "worst": -22.25,
+     "win_shrunk": 57.1,
+     "avg_shrunk": -0.64
+    },
+    "5": {
+     "n": 4,
+     "win": 50.0,
+     "avg": -4.38,
+     "med": 0.32,
+     "best": 3.23,
+     "worst": -21.39,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -1.25
+    },
+    "10": {
+     "n": 3,
+     "win": 33.3,
+     "avg": -4.62,
+     "med": -5.68,
+     "best": 8.75,
+     "worst": -16.93,
+     "win_shrunk": 46.2,
+     "avg_shrunk": -1.07
+    },
+    "20": {
+     "n": 2,
+     "win": 50.0,
+     "avg": -11.25,
+     "med": -11.25,
+     "best": 2.99,
+     "worst": -25.49,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -1.88
+    }
+   },
+   "winrate_score": -3.13,
    "rank": 254
   },
   {
@@ -15247,14 +15266,14 @@
      "avg_shrunk": -2.56
     },
     "20": {
-     "n": 1,
+     "n": 2,
      "win": 0.0,
-     "avg": -22.72,
-     "med": -22.72,
+     "avg": -28.42,
+     "med": -28.42,
      "best": -22.72,
-     "worst": -22.72,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -2.07
+     "worst": -34.12,
+     "win_shrunk": 41.7,
+     "avg_shrunk": -4.74
     }
    },
    "winrate_score": -3.13,
@@ -15749,14 +15768,14 @@
      "avg_shrunk": 1.18
     },
     "20": {
-     "n": 7,
-     "win": 42.9,
-     "avg": -1.25,
-     "med": -1.08,
+     "n": 8,
+     "win": 37.5,
+     "avg": -1.5,
+     "med": -2.2,
      "best": 1.74,
      "worst": -4.1,
-     "win_shrunk": 47.1,
-     "avg_shrunk": -0.51
+     "win_shrunk": 44.4,
+     "avg_shrunk": -0.67
     }
    },
    "winrate_score": -3.67,
@@ -17102,6 +17121,61 @@
    "rank": 284
   },
   {
+   "code": "301526",
+   "name": "国际复材",
+   "n_signals": 10,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-10-26",
+   "last_seen": "2026-11-13",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 10,
+     "win": 50.0,
+     "avg": -1.9,
+     "med": 0.3,
+     "best": 7.62,
+     "worst": -15.56,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -0.95
+    },
+    "3": {
+     "n": 10,
+     "win": 50.0,
+     "avg": 1.3,
+     "med": -0.72,
+     "best": 17.19,
+     "worst": -15.01,
+     "win_shrunk": 50.0,
+     "avg_shrunk": 0.65
+    },
+    "5": {
+     "n": 10,
+     "win": 60.0,
+     "avg": -1.22,
+     "med": 3.17,
+     "best": 7.2,
+     "worst": -18.72,
+     "win_shrunk": 55.0,
+     "avg_shrunk": -0.61
+    },
+    "10": {
+     "n": 8,
+     "win": 25.0,
+     "avg": -4.96,
+     "med": -5.62,
+     "best": 3.35,
+     "worst": -13.96,
+     "win_shrunk": 38.9,
+     "avg_shrunk": -2.21
+    }
+   },
+   "winrate_score": -6.11,
+   "rank": 285
+  },
+  {
    "code": "300750",
    "name": "宁德时代",
    "n_signals": 6,
@@ -17164,7 +17238,7 @@
     }
    },
    "winrate_score": -6.14,
-   "rank": 285
+   "rank": 286
   },
   {
    "code": "600030",
@@ -17230,7 +17304,7 @@
     }
    },
    "winrate_score": -6.22,
-   "rank": 286
+   "rank": 287
   },
   {
    "code": "300274",
@@ -17295,7 +17369,7 @@
     }
    },
    "winrate_score": -6.31,
-   "rank": 287
+   "rank": 288
   },
   {
    "code": "300567",
@@ -17360,7 +17434,7 @@
     }
    },
    "winrate_score": -6.34,
-   "rank": 288
+   "rank": 289
   },
   {
    "code": "688017",
@@ -17425,7 +17499,7 @@
     }
    },
    "winrate_score": -6.38,
-   "rank": 289
+   "rank": 290
   },
   {
    "code": "600111",
@@ -17490,7 +17564,7 @@
     }
    },
    "winrate_score": -6.44,
-   "rank": 290
+   "rank": 291
   },
   {
    "code": "300534",
@@ -17555,7 +17629,7 @@
     }
    },
    "winrate_score": -6.54,
-   "rank": 291
+   "rank": 292
   },
   {
    "code": "002155",
@@ -17611,7 +17685,7 @@
     }
    },
    "winrate_score": -6.57,
-   "rank": 292
+   "rank": 293
   },
   {
    "code": "000988",
@@ -17676,7 +17750,7 @@
     }
    },
    "winrate_score": -6.62,
-   "rank": 293
+   "rank": 294
   },
   {
    "code": "000807",
@@ -17742,7 +17816,7 @@
     }
    },
    "winrate_score": -6.77,
-   "rank": 294
+   "rank": 295
   },
   {
    "code": "300450",
@@ -17808,7 +17882,7 @@
     }
    },
    "winrate_score": -6.89,
-   "rank": 295
+   "rank": 296
   },
   {
    "code": "688041",
@@ -17873,7 +17947,7 @@
     }
    },
    "winrate_score": -6.97,
-   "rank": 296
+   "rank": 297
   },
   {
    "code": "300456",
@@ -17938,7 +18012,7 @@
     }
    },
    "winrate_score": -6.98,
-   "rank": 297
+   "rank": 298
   },
   {
    "code": "300821",
@@ -17994,71 +18068,6 @@
     }
    },
    "winrate_score": -7.11,
-   "rank": 298
-  },
-  {
-   "code": "300454",
-   "name": "深信服",
-   "n_signals": 5,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-09-04",
-   "last_seen": "2026-11-12",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 5,
-     "win": 0.0,
-     "avg": -3.35,
-     "med": -2.91,
-     "best": -1.27,
-     "worst": -5.4,
-     "win_shrunk": 33.3,
-     "avg_shrunk": -1.12
-    },
-    "3": {
-     "n": 5,
-     "win": 0.0,
-     "avg": -6.08,
-     "med": -6.63,
-     "best": -2.04,
-     "worst": -9.58,
-     "win_shrunk": 33.3,
-     "avg_shrunk": -2.03
-    },
-    "5": {
-     "n": 5,
-     "win": 20.0,
-     "avg": -8.36,
-     "med": -10.75,
-     "best": 1.88,
-     "worst": -12.97,
-     "win_shrunk": 40.0,
-     "avg_shrunk": -2.79
-    },
-    "10": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 8.72,
-     "med": 8.72,
-     "best": 8.72,
-     "worst": 8.72,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.79
-    },
-    "20": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 2.42,
-     "med": 2.42,
-     "best": 2.42,
-     "worst": 2.42,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.22
-    }
-   },
-   "winrate_score": -7.3,
    "rank": 299
   },
   {
@@ -18116,6 +18125,71 @@
    },
    "winrate_score": -7.32,
    "rank": 300
+  },
+  {
+   "code": "300454",
+   "name": "深信服",
+   "n_signals": 5,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-11-12",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 5,
+     "win": 0.0,
+     "avg": -3.35,
+     "med": -2.91,
+     "best": -1.27,
+     "worst": -5.4,
+     "win_shrunk": 33.3,
+     "avg_shrunk": -1.12
+    },
+    "3": {
+     "n": 5,
+     "win": 0.0,
+     "avg": -6.08,
+     "med": -6.63,
+     "best": -2.04,
+     "worst": -9.58,
+     "win_shrunk": 33.3,
+     "avg_shrunk": -2.03
+    },
+    "5": {
+     "n": 5,
+     "win": 20.0,
+     "avg": -8.36,
+     "med": -10.75,
+     "best": 1.88,
+     "worst": -12.97,
+     "win_shrunk": 40.0,
+     "avg_shrunk": -2.79
+    },
+    "10": {
+     "n": 2,
+     "win": 50.0,
+     "avg": -1.86,
+     "med": -1.86,
+     "best": 8.72,
+     "worst": -12.45,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -0.31
+    },
+    "20": {
+     "n": 1,
+     "win": 100.0,
+     "avg": 2.42,
+     "med": 2.42,
+     "best": 2.42,
+     "worst": 2.42,
+     "win_shrunk": 54.5,
+     "avg_shrunk": 0.22
+    }
+   },
+   "winrate_score": -7.7,
+   "rank": 301
   },
   {
    "code": "301047",
@@ -18180,7 +18254,7 @@
     }
    },
    "winrate_score": -7.87,
-   "rank": 301
+   "rank": 302
   },
   {
    "code": "603993",
@@ -18246,7 +18320,7 @@
     }
    },
    "winrate_score": -8.41,
-   "rank": 302
+   "rank": 303
   },
   {
    "code": "002353",
@@ -18300,18 +18374,18 @@
      "avg_shrunk": -1.41
     },
     "20": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 39.88,
-     "med": 39.88,
+     "n": 3,
+     "win": 33.3,
+     "avg": -4.41,
+     "med": -26.56,
      "best": 39.88,
-     "worst": 39.88,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 3.63
+     "worst": -26.56,
+     "win_shrunk": 46.2,
+     "avg_shrunk": -1.02
     }
    },
    "winrate_score": -8.5,
-   "rank": 303
+   "rank": 304
   },
   {
    "code": "688800",
@@ -18366,7 +18440,7 @@
     }
    },
    "winrate_score": -8.79,
-   "rank": 304
+   "rank": 305
   },
   {
    "code": "301396",
@@ -18431,7 +18505,7 @@
     }
    },
    "winrate_score": -8.88,
-   "rank": 305
+   "rank": 306
   },
   {
    "code": "300328",
@@ -18496,7 +18570,7 @@
     }
    },
    "winrate_score": -8.92,
-   "rank": 306
+   "rank": 307
   },
   {
    "code": "002084",
@@ -18551,7 +18625,7 @@
     }
    },
    "winrate_score": -9.15,
-   "rank": 307
+   "rank": 308
   },
   {
    "code": "000426",
@@ -18616,7 +18690,7 @@
     }
    },
    "winrate_score": -9.17,
-   "rank": 308
+   "rank": 309
   },
   {
    "code": "688072",
@@ -18681,7 +18755,7 @@
     }
    },
    "winrate_score": -9.37,
-   "rank": 309
+   "rank": 310
   },
   {
    "code": "600309",
@@ -18746,71 +18820,6 @@
     }
    },
    "winrate_score": -9.65,
-   "rank": 310
-  },
-  {
-   "code": "002851",
-   "name": "麦格米特",
-   "n_signals": 4,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-08-21",
-   "last_seen": "2026-11-12",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 4,
-     "win": 25.0,
-     "avg": -8.95,
-     "med": -8.77,
-     "best": 0.62,
-     "worst": -18.85,
-     "win_shrunk": 42.9,
-     "avg_shrunk": -2.56
-    },
-    "3": {
-     "n": 4,
-     "win": 50.0,
-     "avg": -12.11,
-     "med": -12.13,
-     "best": 3.11,
-     "worst": -27.3,
-     "win_shrunk": 50.0,
-     "avg_shrunk": -3.46
-    },
-    "5": {
-     "n": 4,
-     "win": 25.0,
-     "avg": -16.84,
-     "med": -21.24,
-     "best": 2.71,
-     "worst": -27.59,
-     "win_shrunk": 42.9,
-     "avg_shrunk": -4.81
-    },
-    "10": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 3.84,
-     "med": 3.84,
-     "best": 3.84,
-     "worst": 3.84,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.35
-    },
-    "20": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -1.86,
-     "med": -1.86,
-     "best": -1.86,
-     "worst": -1.86,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -0.17
-    }
-   },
-   "winrate_score": -9.8,
    "rank": 311
   },
   {
@@ -18866,14 +18875,14 @@
      "avg_shrunk": -2.87
     },
     "20": {
-     "n": 6,
+     "n": 5,
      "win": 0.0,
-     "avg": -14.55,
+     "avg": -13.32,
      "med": -12.85,
      "best": -12.75,
-     "worst": -20.72,
-     "win_shrunk": 31.2,
-     "avg_shrunk": -5.46
+     "worst": -15.4,
+     "win_shrunk": 33.3,
+     "avg_shrunk": -4.44
     }
    },
    "winrate_score": -9.98,
@@ -20100,71 +20109,6 @@
    "rank": 331
   },
   {
-   "code": "300757",
-   "name": "罗博特科",
-   "n_signals": 5,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-09-02",
-   "last_seen": "2026-11-12",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 5,
-     "win": 40.0,
-     "avg": -6.05,
-     "med": -2.69,
-     "best": 5.87,
-     "worst": -23.42,
-     "win_shrunk": 46.7,
-     "avg_shrunk": -2.02
-    },
-    "3": {
-     "n": 5,
-     "win": 40.0,
-     "avg": -10.24,
-     "med": -8.47,
-     "best": 9.18,
-     "worst": -30.44,
-     "win_shrunk": 46.7,
-     "avg_shrunk": -3.41
-    },
-    "5": {
-     "n": 5,
-     "win": 20.0,
-     "avg": -20.13,
-     "med": -27.34,
-     "best": 8.28,
-     "worst": -35.12,
-     "win_shrunk": 40.0,
-     "avg_shrunk": -6.71
-    },
-    "10": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 3.08,
-     "med": 3.08,
-     "best": 3.08,
-     "worst": 3.08,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.28
-    },
-    "20": {
-     "n": 1,
-     "win": 0.0,
-     "avg": -14.59,
-     "med": -14.59,
-     "best": -14.59,
-     "worst": -14.59,
-     "win_shrunk": 45.5,
-     "avg_shrunk": -1.33
-    }
-   },
-   "winrate_score": -17.25,
-   "rank": 332
-  },
-  {
    "code": "603186",
    "name": "华正新材",
    "n_signals": 10,
@@ -20228,7 +20172,7 @@
     }
    },
    "winrate_score": -17.45,
-   "rank": 333
+   "rank": 332
   },
   {
    "code": "688257",
@@ -20293,7 +20237,7 @@
     }
    },
    "winrate_score": -17.48,
-   "rank": 334
+   "rank": 333
   },
   {
    "code": "688400",
@@ -20358,6 +20302,71 @@
     }
    },
    "winrate_score": -17.65,
+   "rank": 334
+  },
+  {
+   "code": "300757",
+   "name": "罗博特科",
+   "n_signals": 5,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-09-02",
+   "last_seen": "2026-11-12",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 5,
+     "win": 40.0,
+     "avg": -6.05,
+     "med": -2.69,
+     "best": 5.87,
+     "worst": -23.42,
+     "win_shrunk": 46.7,
+     "avg_shrunk": -2.02
+    },
+    "3": {
+     "n": 5,
+     "win": 40.0,
+     "avg": -10.24,
+     "med": -8.47,
+     "best": 9.18,
+     "worst": -30.44,
+     "win_shrunk": 46.7,
+     "avg_shrunk": -3.41
+    },
+    "5": {
+     "n": 5,
+     "win": 20.0,
+     "avg": -20.13,
+     "med": -27.34,
+     "best": 8.28,
+     "worst": -35.12,
+     "win_shrunk": 40.0,
+     "avg_shrunk": -6.71
+    },
+    "10": {
+     "n": 2,
+     "win": 50.0,
+     "avg": -10.92,
+     "med": -10.92,
+     "best": 3.08,
+     "worst": -24.93,
+     "win_shrunk": 50.0,
+     "avg_shrunk": -1.82
+    },
+    "20": {
+     "n": 1,
+     "win": 0.0,
+     "avg": -14.59,
+     "med": -14.59,
+     "best": -14.59,
+     "worst": -14.59,
+     "win_shrunk": 45.5,
+     "avg_shrunk": -1.33
+    }
+   },
+   "winrate_score": -18.01,
    "rank": 335
   },
   {
@@ -21001,14 +21010,14 @@
      "avg_shrunk": -6.23
     },
     "20": {
-     "n": 1,
-     "win": 100.0,
-     "avg": 0.67,
-     "med": 0.67,
+     "n": 4,
+     "win": 25.0,
+     "avg": -33.42,
+     "med": -44.78,
      "best": 0.67,
-     "worst": 0.67,
-     "win_shrunk": 54.5,
-     "avg_shrunk": 0.06
+     "worst": -44.78,
+     "win_shrunk": 42.9,
+     "avg_shrunk": -9.55
     }
    },
    "winrate_score": -21.38,
@@ -22236,14 +22245,14 @@
      "avg_shrunk": -7.09
     },
     "20": {
-     "n": 9,
-     "win": 11.1,
-     "avg": -25.01,
-     "med": -38.89,
+     "n": 10,
+     "win": 10.0,
+     "avg": -25.55,
+     "med": -35.11,
      "best": 8.83,
      "worst": -40.1,
-     "win_shrunk": 31.6,
-     "avg_shrunk": -11.84
+     "win_shrunk": 30.0,
+     "avg_shrunk": -12.77
     }
    },
    "winrate_score": -32.36,
@@ -23179,55 +23188,55 @@
     "1": {
      "n": 31,
      "win": 38.7,
-     "avg": -1.36,
+     "avg": -1.37,
      "med": -0.91,
-     "best": 2.96,
-     "worst": -6.87,
+     "best": 2.98,
+     "worst": -6.93,
      "win_shrunk": 41.5,
      "avg_shrunk": -1.03
     },
     "3": {
      "n": 31,
      "win": 48.4,
-     "avg": -2.97,
-     "med": -5.62,
-     "best": 5.91,
-     "worst": -12.01,
+     "avg": -2.99,
+     "med": -5.65,
+     "best": 5.95,
+     "worst": -12.08,
      "win_shrunk": 48.8,
-     "avg_shrunk": -2.24
+     "avg_shrunk": -2.26
     },
     "5": {
      "n": 31,
      "win": 12.9,
-     "avg": -7.04,
-     "med": -9.14,
-     "best": 5.36,
-     "worst": -18.54,
+     "avg": -7.09,
+     "med": -9.2,
+     "best": 5.4,
+     "worst": -18.66,
      "win_shrunk": 22.0,
-     "avg_shrunk": -5.32
+     "avg_shrunk": -5.36
     },
     "10": {
      "n": 31,
      "win": 3.2,
-     "avg": -14.9,
-     "med": -12.16,
-     "best": 3.5,
-     "worst": -31.18,
+     "avg": -15.0,
+     "med": -12.24,
+     "best": 3.54,
+     "worst": -31.37,
      "win_shrunk": 14.6,
-     "avg_shrunk": -11.27
+     "avg_shrunk": -11.34
     },
     "20": {
      "n": 24,
      "win": 0.0,
-     "avg": -27.67,
-     "med": -29.85,
-     "best": -16.65,
-     "worst": -37.55,
+     "avg": -27.85,
+     "med": -30.04,
+     "best": -16.8,
+     "worst": -37.78,
      "win_shrunk": 14.7,
-     "avg_shrunk": -19.53
+     "avg_shrunk": -19.66
     }
    },
-   "winrate_score": -62.2,
+   "winrate_score": -62.58,
    "rank": 379
   },
   {
@@ -23602,27 +23611,27 @@
      "avg_shrunk": -7.55
     },
     "10": {
-     "n": 24,
-     "win": 8.3,
-     "avg": -19.09,
+     "n": 21,
+     "win": 9.5,
+     "avg": -19.41,
      "med": -24.88,
      "best": 15.63,
      "worst": -37.26,
-     "win_shrunk": 20.6,
-     "avg_shrunk": -13.48
+     "win_shrunk": 22.6,
+     "avg_shrunk": -13.15
     },
     "20": {
-     "n": 21,
-     "win": 14.3,
-     "avg": -31.71,
-     "med": -38.19,
+     "n": 11,
+     "win": 27.3,
+     "avg": -25.73,
+     "med": -38.28,
      "best": 12.36,
      "worst": -52.52,
-     "win_shrunk": 25.8,
-     "avg_shrunk": -21.48
+     "win_shrunk": 38.1,
+     "avg_shrunk": -13.48
     }
    },
-   "winrate_score": -78.29,
+   "winrate_score": -77.43,
    "rank": 385
   },
   {

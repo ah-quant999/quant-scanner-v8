@@ -1,11 +1,13 @@
 window.RISK_GUARD = {
-  "update_time": "2026-11-22 09:00:49",
-  "source": "PORTFOLIO(westock 练习赛组合) total_assets 真实累积 · 现有 1 点",
-  "has_equity": false,
-  "equity_points": 1,
-  "curve_range": "2026-11-20~2026-11-20",
+  "update_time": "2026-11-23 18:40:08",
+  "source": "PORTFOLIO(westock 练习赛组合) total_assets 真实累积 · 2026-11-20~2026-11-23 共 2 点",
+  "has_equity": true,
+  "equity_points": 2,
+  "curve_range": "2026-11-20~2026-11-23",
   "max_drawdown": 0.0,
-  "tier": "正常(真实净值累积中)",
+  "peak_idx": 0,
+  "trough_idx": 0,
+  "tier": "正常",
   "multiplier": 1.0,
   "thresholds": [
     {
@@ -30,5 +32,5 @@ window.RISK_GUARD = {
     }
   ],
   "data_degraded": false,
-  "note": "真实账户净值曲线累积中（<2 点），回撤闸暂不降杠杆 ×1.00；随 PORTFOLIO.js 逐日快照累积，曲线生长后自动真实生效。旧 RISK_GUARD_INPUT.json 假曲线已于 2026-11-21 根除。"
+  "note": "真实账户最大回撤 0.00%，触发「正常」档 ⇒ 仓位乘数 ×1.00。净值=练习赛组合 total_assets 逐日真实累积（当日快照已入账）。"
 };
