@@ -27,6 +27,12 @@ PY="$(command -v python3 || command -v python)"
 # ② 集成远端最新（best-effort，失败不阻断；--autostash 兼容本地脏树如 raw_data 运行时写入）
 git pull --rebase --autostash "$REPO_URL" main 2>/dev/null || true
 
+# ②½ push 前数据回滚否决（2026-11-23 一劳永逸·主人令「不要一直被覆盖」接线；best-effort）
+#    事故：落后基线工作区把 data/ raw_data/ 旧内容当新提交推上 main，盖回新鲜版
+#    （11-20/11-21/11-23 三次 stock_names/resonance_track 被盖回 11-11）。
+#    HEAD 上任何数据文件比远端旧 ⇒ 放弃本地旧版取远端新版，绝不带陈旧数据上线。
+"$PY" "$(dirname "$0")/v8_data_rollback_veto.py" "$REPO_URL" || true
+
 # ③ 推送
 if git push "$REPO_URL" "$TARGET"; then
   RC=0
