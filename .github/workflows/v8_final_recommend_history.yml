@@ -55,6 +55,8 @@ jobs:
             echo "无变化，跳过提交"
           else
             git commit -m "📜 最终推荐历史归档 nightly $(date +%F)"
-            git pull --rebase origin main || git pull --rebase --strategy-option=theirs origin main
+            # 🛡 2026-11-23：--autostash 兼容链内其他未暂存产物（实测 11-23 04:37 failure：
+            #   cannot pull with rebase: You have unstaged changes ⇒ 重试全空转）
+            git pull --rebase --autostash origin main || git pull --rebase --autostash --strategy-option=theirs origin main
             bash v8_git_push.sh origin main
           fi
