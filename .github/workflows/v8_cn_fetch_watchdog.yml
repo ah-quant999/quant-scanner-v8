@@ -85,3 +85,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/v8_intraday_sched_fallback.py
+      # 🔴 2026-11-23 主人令「这卡也断更了」一劳永逸根治：v8_sector_tech.yml 的 cron
+      #   自 11-20 起连续 3 天被 GitHub schedule 整段漏触发（workflow active 但 0 run），
+      #   板块技术研判卡停在 11-20。盘后 15:05 起随看门狗检查：SECTOR_TECH_JUDG 的
+      #   data_date≠今日即补派 v8_sector_tech（幂等生成+每小时整点档节流，只读探针不写数据）。
+      - name: 板块技术研判断更自愈（SECTOR_TECH_JUDG 陈旧即补派）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/v8_sector_tech_fallback.py
