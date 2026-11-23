@@ -95,8 +95,11 @@ jobs:
           if ($skip -eq 'true') {
             Write-Host "skip_trading_day_gate=true: force run"
           } else {
-            $dow = (Get-Date).DayOfWeek.value__
-            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend, exit ok"; exit 0 }
+            # 🛡 2026-11-23 根治断更：cron=UTC 工作日12:30，GitHub 常延迟8h到北京次日凌晨；
+            #    原用 runner 本地时间判周末 ⇒ 周五档落到北京周六被误 skip（11-21 实证）。
+            #    改用 UTC 判断调度归属日，与 cron 同 tz，延迟不会跨 UTC 日误判。
+            $dow = (Get-Date).ToUniversalTime().DayOfWeek.value__
+            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend(UTC), exit ok"; exit 0 }
           }
           cd $env:GITHUB_WORKSPACE
           python algorithms/fetch_shareholder_change.py --window 120
