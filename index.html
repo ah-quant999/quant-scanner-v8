@@ -157,8 +157,8 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=6a2acdb65a" defer></script>
 <script src="data/MARGIN_DATA.js?v=a1eadf2fe0" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=eddcb03956" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=9db0262419" defer></script>
-<script src="data/BOND_FUTURES.js?v=a72e1ed368" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=e6ad5285d1" defer></script>
+<script src="data/BOND_FUTURES.js?v=3e02fbe111" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=a36fb917d0" defer></script>
 <script src="data/IPO_DATA.js?v=675cd35229" defer></script>
     <script src="data/CRISIS_DATA.js?v=b7f88197fd" defer></script>
@@ -1354,7 +1354,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=4340870825" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=56d96e420f" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=8e1e9e71b2" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=bfd73e50b8" defer></script>
 <script src="data/VOLATILITY.js?v=80f9c0ff01" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=655225f3d3" defer></script>
@@ -1368,7 +1368,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/FINAL_RECOMMEND_DATA.js?v=b1efbb7aa7" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=e9efd7a887" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=9b25a91c9e" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=a2d249bdfa" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=3c67a6acab" defer></script>
-    <script src="data/NATIONAL_TEAM.js?v=53b2601abc" defer></script>
+    <script src="data/NATIONAL_TEAM.js?v=a61dbf55c4" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <!-- 🗑 2026-11-08 主人令：盘前预案卡整卡下线，对应数据注入一并移除 -->
     <script src="data/FACTOR_LAB_BACKTEST.js?v=00b86ca569" defer></script>
@@ -20597,7 +20597,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=f15ecb4283', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f5beb66a78', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f916a2c9ef', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=2463100c19', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
