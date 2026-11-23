@@ -1365,7 +1365,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=0bf6066682" defer></script>
 <script src="data/EXPERIMENT.js?v=476fc66858" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=8a93178595" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=6de99e6b8e" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=14549f9956" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
+<script src="data/FINAL_RECOMMEND_DATA.js?v=8a93178595" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=6de99e6b8e" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=f9090180c8" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=cf7d62e9ce" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=31948caf4b" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=2c2a667dee" defer></script>
@@ -1373,7 +1373,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🗑 2026-11-08 主人令：盘前预案卡整卡下线，对应数据注入一并移除 -->
     <script src="data/FACTOR_LAB_BACKTEST.js?v=54fcad7e17" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
-<script src="data/BACKTEST_ALL_ALGOS.js?v=8f44021105" defer></script>
+<script src="data/BACKTEST_ALL_ALGOS.js?v=94aaa7d41b" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
@@ -1415,8 +1415,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/VALUATION_PERCENTILE.js?v=76cc0b6c23" defer></script>
     <!-- 🛡 2026-11-21 主人令「哪些卡没更新·一劳永逸修复」：回撤闸/策略walk-forward 生成器已挂 E 批链尾，
          data/*.js 恢复真实日更（下方 defer 标签线上文件会覆盖内联冻结快照；内联仅作文件缺失时兜底） -->
-    <script src="data/RISK_GUARD.js?v=b85a778ce8" defer></script>
-    <script src="data/STRATEGY_WALKFORWARD.js?v=b7ff629e38" defer></script>
+    <script src="data/RISK_GUARD.js?v=c75635263f" defer></script>
+    <script src="data/STRATEGY_WALKFORWARD.js?v=56ecfc1e68" defer></script>
     <!-- 🔴 2026-10-26 主人令·风险闸（回撤/估值/行业）落地：回撤闸 + 策略级 walk-forward 数据【内联本页兜底】
          （2026-10-26~11-20 期间生成器未挂链，data/*.js 被 bot 重建清掉，故内联保活；11-21 起已挂链根治） -->
     <script>
