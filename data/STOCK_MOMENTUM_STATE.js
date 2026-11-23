@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-23 18:54",
- "generated": "2026-11-23 18:54",
+ "update_time": "2026-11-23 18:55",
+ "generated": "2026-11-23 18:55",
  "meta": {
-  "generated": "2026-11-23 18:54",
+  "generated": "2026-11-23 18:55",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12279,6 +12279,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301391",
+      "name": "卡莱特",
+      "change_pct": 12.519,
+      "price": 57.88,
+      "category": "突破"
+     },
+     {
       "code": "002328",
       "name": "新朋股份",
       "change_pct": 3.327,
@@ -12503,6 +12510,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "601689",
+      "name": "拓普集团",
+      "change_pct": 9.998,
+      "price": 52.92,
+      "category": "突破"
+     },
+     {
       "code": "603721",
       "name": "中广天择",
       "change_pct": 5.842,
@@ -12636,24 +12650,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "301636",
-      "name": "泽润新能",
-      "change_pct": 4.024,
-      "price": 33.09,
-      "category": "突破"
-     },
-     {
       "code": "301337",
       "name": "亚华电子",
       "change_pct": 4.352,
       "price": 21.1,
-      "category": "突破"
-     },
-     {
-      "code": "603926",
-      "name": "铁流股份",
-      "change_pct": 10.0,
-      "price": 14.85,
       "category": "突破"
      }
     ],
@@ -12698,6 +12698,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "云煤能源",
       "change_pct": 3.343,
       "price": 3.4,
+      "category": "加速"
+     },
+     {
+      "code": "301391",
+      "name": "卡莱特",
+      "change_pct": 12.519,
+      "price": 57.88,
       "category": "加速"
      },
      {
@@ -12913,6 +12920,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301391",
+      "name": "卡莱特",
+      "change_pct": 12.519,
+      "price": 57.88,
+      "category": "短线选股"
+     },
+     {
       "code": "002328",
       "name": "新朋股份",
       "change_pct": 3.327,
@@ -13137,6 +13151,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "601689",
+      "name": "拓普集团",
+      "change_pct": 9.998,
+      "price": 52.92,
+      "category": "短线选股"
+     },
+     {
       "code": "603721",
       "name": "中广天择",
       "change_pct": 5.842,
@@ -13270,24 +13291,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "301636",
-      "name": "泽润新能",
-      "change_pct": 4.024,
-      "price": 33.09,
-      "category": "短线选股"
-     },
-     {
       "code": "301337",
       "name": "亚华电子",
       "change_pct": 4.352,
       "price": 21.1,
-      "category": "短线选股"
-     },
-     {
-      "code": "603926",
-      "name": "铁流股份",
-      "change_pct": 10.0,
-      "price": 14.85,
       "category": "短线选股"
      }
     ],
@@ -13349,6 +13356,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "601689",
+      "name": "拓普集团",
+      "change_pct": 9.998,
+      "price": 52.92,
+      "category": "强势股"
+     },
+     {
       "code": "603721",
       "name": "中广天择",
       "change_pct": 5.842,
@@ -13482,24 +13496,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "301636",
-      "name": "泽润新能",
-      "change_pct": 4.024,
-      "price": 33.09,
-      "category": "强势股"
-     },
-     {
       "code": "301337",
       "name": "亚华电子",
       "change_pct": 4.352,
       "price": 21.1,
-      "category": "强势股"
-     },
-     {
-      "code": "603926",
-      "name": "铁流股份",
-      "change_pct": 10.0,
-      "price": 14.85,
       "category": "强势股"
      }
     ]
