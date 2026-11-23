@@ -132,7 +132,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=f05f7b8661" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=d30f85c4c4" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=d9d1525b69" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=005a306f76" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=f33eb82eea" defer></script>
     <script src="data/CRED_LEDGER.js?v=ed6577bd0d" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
@@ -157,8 +157,8 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=6a2acdb65a" defer></script>
 <script src="data/MARGIN_DATA.js?v=a1eadf2fe0" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=eddcb03956" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=234d1cb3dc" defer></script>
-<script src="data/BOND_FUTURES.js?v=9074e09130" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=9db0262419" defer></script>
+<script src="data/BOND_FUTURES.js?v=a72e1ed368" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=a36fb917d0" defer></script>
 <script src="data/IPO_DATA.js?v=675cd35229" defer></script>
     <script src="data/CRISIS_DATA.js?v=b7f88197fd" defer></script>
@@ -173,7 +173,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=c33e431d9e" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=0c31d0c068" defer></script>
-<script src="data/INVEST_AVOID.js?v=7ebf3436ae" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=2e2e2bf6a1" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=d51fb34e29" defer></script>
     <script src="data/KEY_NOTICES.js?v=37b9db67de" defer></script>
@@ -1396,7 +1396,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=328ebd9752" defer></script>
 <script src="data/CFFEX_POSITION.js?v=1db127f514" defer></script>
 <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（沪深300估值 vs 中债10Y） -->
-<script src="data/EQBOND_ATTRACTION.js?v=a1e024800d" defer></script>
+<script src="data/EQBOND_ATTRACTION.js?v=9a3990aa0a" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=0d9fd1cbff" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=f7cf4bb38a" defer></script>
@@ -1409,7 +1409,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 💰 2026-11-22 主人令：A股现金流质量榜数据源，gen_cashflow_quality.py 真实计算；放板块技术研判卡下方 -->
     <script src="data/CASHFLOW_QUALITY.js?v=a869963948" defer></script>
     <!-- 🔬 2026-11-23 主人令：分型×共振回测观测卡数据源，gen_fractal_confluence.py 2005→今真实回测；放暂未上架·观测类（现金流质量榜卡下方） -->
-    <script src="data/FRACTAL_CONFLUENCE.js?v=d90322b34e" defer></script>
+    <script src="data/FRACTAL_CONFLUENCE.js?v=df38d1d600" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=3e858c33d9" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=7f5399ee6d" defer></script>
@@ -20597,7 +20597,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=f15ecb4283', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=4ffcb235d4', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f5beb66a78', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=2463100c19', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
