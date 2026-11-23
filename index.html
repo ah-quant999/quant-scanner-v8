@@ -1416,7 +1416,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/CITIC_PE_THERMO.js?v=3e858c33d9" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=7f5399ee6d" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
-    <script src="data/VALUATION_PERCENTILE.js?v=129813c034" defer></script>
+    <script src="data/VALUATION_PERCENTILE.js?v=3478d98eef" defer></script>
     <!-- 🛡 2026-11-21 主人令「哪些卡没更新·一劳永逸修复」：回撤闸/策略walk-forward 生成器已挂 E 批链尾，
          data/*.js 恢复真实日更（下方 defer 标签线上文件会覆盖内联冻结快照；内联仅作文件缺失时兜底） -->
     <script src="data/RISK_GUARD.js?v=7010bfed27" defer></script>
@@ -2111,7 +2111,7 @@ window.STRATEGY_WALKFORWARD = {
     </script>
     <!-- 🔧 2026-09-30 23:0x CN runner2号机的工程师：补 INDEX_VALUE_FRAMEWORK 注入（建卡漏注入=恒 undefined
          ⇒ 卡上「最新价/门控/120日中枢/短长趋势」四列全为「—」，而线上文件本身有数据）。 -->
-    <script src="data/INDEX_VALUE_FRAMEWORK.js?v=d39f4df7f1" defer></script>
+    <script src="data/INDEX_VALUE_FRAMEWORK.js?v=6d693fed50" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <!-- 🆕 2026-09-19 主人令（CN runner2号机的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
