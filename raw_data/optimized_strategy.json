@@ -1,6 +1,6 @@
 {
-  "calc_time": "2026-11-23",
-  "update_time": "2026-11-23",
+  "calc_time": "2026-11-24",
+  "update_time": "2026-11-24",
   "method": "①持仓周期≤10d + ②≥3信号共振 + ③市场regime门控(grind/panic)",
   "backtest_sample": {
     "stocks_analyzed": 1080,
@@ -33,7 +33,7 @@
       "win_rate_pct": 49.0,
       "avg_return_pct": -0.03
     },
-    "total_signals": 95034
+    "total_signals": 94991
   },
   "config": {
     "enabled": true,
