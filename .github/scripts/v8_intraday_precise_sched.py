@@ -107,7 +107,11 @@ def main():
         phase = "relay"
         end = end_bj_in or "14:45"
     elif PHASE == "auto":
-        phase = "morning" if datetime.datetime.now(datetime.timezone.utc).hour <= 5 else "afternoon"
+        # 🔴 2026-11-23 订正：旧判据用 UTC hour<=5 → 12:55 CST(UTC 4:55) 午间兜底实例误判
+        #   morning(end=14:45)，13:02-14:45 覆盖缺角。改按北京时间判相：<12点=morning(14:45)，
+        #   ≥12点=afternoon(16:38)——12:55/13:10 午间兜底实例直接覆盖到收盘后。
+        _now_bj = datetime.datetime.now(BJ)
+        phase = "morning" if _now_bj.hour < 12 else "afternoon"
         end = ENDS[phase]
     else:
         phase = PHASE
