@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-24 06:17:14",
+ "generated": "2026-11-24 04:33:04",
  "window": "2026-06-10 ~ 2026-11-23",
  "criteria": "龙虎榜: inst_net>0 且 yz_net>0 且 (inst+yz)≥8000万; 转债剔除",
  "entry": "T+1 开盘买入, 单边成本0.15%, 净口径; 未成熟期限标 pending",
  "benchmark": "880003 平均股价(等权全A)·同成本口径",
- "n_signals": 406,
+ "n_signals": 407,
  "n_tracked": 372,
  "per_horizon": {
   "T+1": {
@@ -8883,10 +8883,10 @@
    "date": "2026-11-23",
    "code": "002242",
    "name": "九阳股份",
-   "pct": 10.0138,
+   "pct": 10.014,
    "inst_yi": 1.122,
-   "yz_yi": 0.867,
-   "sum_yi": 1.989,
+   "yz_yi": 0.66,
+   "sum_yi": 1.782,
    "entry": null,
    "status": "pending_t1"
   },
@@ -8898,6 +8898,17 @@
    "inst_yi": 0.683,
    "yz_yi": 0.569,
    "sum_yi": 1.252,
+   "entry": null,
+   "status": "pending_t1"
+  },
+  {
+   "date": "2026-11-23",
+   "code": "688836",
+   "name": "宇树科技",
+   "pct": 20.0,
+   "inst_yi": 1.255,
+   "yz_yi": 0.646,
+   "sum_yi": 1.901,
    "entry": null,
    "status": "pending_t1"
   }
