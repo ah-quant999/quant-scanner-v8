@@ -2504,6 +2504,11 @@ _LOW_FREQ_FILES = {
     #   口径：周五 20:30 盘后产出 → 周末不跑 → 周一 20:30 下次产出，间隔正好 72h=3 天；
     #   故 3 天红线恰好覆盖「周五→周一」一个完整周末空窗，超 3 天仍未更即真故障，不再宽给 4 天。
     "SHAREHOLDER_CHANGE",
+    # 🛡 2026-11-24 主人令「全部一劳永逸修复」：CASHFLOW_QUALITY（现金流质量榜·三季报累计值，
+    #   底层随季报披露刷新，非日更）+ KONDRATIEV（康波长波·每月10日18:00专链 v8_kondratiev_monthly.yml）。
+    #   二者此前无 CARD_DEFS 登记 ⇒ 落入 all_ 通用 27h 红线，季报/月更节拍必然超期误报 fail。
+    #   进白名单 + 专属低频红线（见 _LOW_FREQ_MAX_AGE），按真实节拍给足，超期仍报真故障。
+    "CASHFLOW_QUALITY", "KONDRATIEV",
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
@@ -2649,6 +2654,8 @@ _LOW_FREQ_MAX_AGE = {
     "maharo_insights": 7 * 24 * 60,    # 同上；all_ 通用扫描以文件名小写 vid 命中，补小写键使白名单+红线对 all_maharo_insights 生效（原大小写不匹配→白名单失效→落通用 24h 红线 fail）
     "maharo_wm": 7 * 24 * 60,          # 机构研究·周/月解析种子库（本机 cookie 低频拉取，与 maharo_insights 同族）→ 7天容忍，超7天仍 fail（2026-11-16 一劳永逸）
     "SHAREHOLDER_CHANGE": 3 * 24 * 60, # 股东增减持监控（工作日20:30批，周末不跑）→ 3天红线：周五盘后→周一盘后正好72h，超3天报真故障（2026-11-24 主人令收紧，原4天多宽给1天）
+    "CASHFLOW_QUALITY": 100 * 24 * 60,  # 现金流质量榜：底层随季报刷新（period=20260930三季报），季报间隔最长约90天+披露缓冲→100天红线（2026-11-24 一劳永逸）
+    "KONDRATIEV": 35 * 24 * 60,         # 康波长波：每月10日18:00专链月更（v8_kondratiev_monthly.yml），+5天缓冲跨节假日→35天红线（2026-11-24 一劳永逸）
 }
 
 
@@ -2713,14 +2720,32 @@ def check_all_data_files():
                 "message": f"{p.name} 缺失或解析失败（未被 CARD_DEFS 登记）",
             })
             continue
-        ts = data.get("update_time") or data.get("date") or data.get("generated") \
-            or data.get("generated_time") or data.get("generated_at") \
-            or data.get("lastUpdated") or data.get("updated") or data.get("updated_at") or "--"
-        if isinstance(ts, str) and ts == "--" and isinstance(data, dict):
-            # 2026-08-17 嵌套时间戳（meta.generated / data_date 等）
-            meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
-            ts = (meta.get("generated") or meta.get("update_time") or meta.get("updated")
-                  or data.get("data_date") or data.get("updated_at") or "--")
+        # 🛡 2026-11-24 主人令一劳永逸（"全部一劳永逸修复"）：时间戳取【所有语义字段中的最新值】，
+        #   不再固定优先级取第一个。根因实证：BACKTEST_EXPECTANCY 的 update_time=11-21 陈旧，
+        #   但真实生成时间在 meta.generated=11-24；PULLBACK_TRACK 的 update_time=11-22 陈旧，
+        #   真值在 last_update=11-23。旧逻辑因 update_time 存在（虽陈旧）就短路，后面的真值字段
+        #   永远读不到 ⇒ 4 张卡每晚误报 fail。
+        #   ⚠️ 刻意【不含】republish_time（构建/重部署时刻，非数据时间，前端明确不得当数据时间展示）。
+        #   候选字段全部是"数据语义"时间；取最新者 = 数据最后一次真实产出时刻。
+        if isinstance(data, dict):
+            _meta_ts = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+            _ts_candidates = [
+                data.get("update_time"), data.get("date"), data.get("generated"),
+                data.get("generated_time"), data.get("generated_at"),
+                data.get("lastUpdated"), data.get("updated"), data.get("updated_at"),
+                data.get("last_update"), data.get("calc_date"), data.get("data_date"),
+                _meta_ts.get("generated"), _meta_ts.get("update_time"), _meta_ts.get("updated"),
+            ]
+            _best_s, _best_dt = "--", None
+            for _c in _ts_candidates:
+                if not isinstance(_c, str) or _c in ("--", "N/A"):
+                    continue
+                _cdt = parse_time(_c)
+                if _cdt is not None and (_best_dt is None or _cdt > _best_dt):
+                    _best_s, _best_dt = _c, _cdt
+            ts = _best_s
+        else:
+            ts = "--"
         # 🛡 2026-11-17 主人令一劳永逸：maharo_wm 是 maharo_insights 的周/月派生镜像，
         #   本身无独立生产者；镜像时间戳可能滞后于源稿（11-15 建库继承 11-10 快照实证）。
         #   新鲜度改按「镜像与其权威源稿中较新者」判定：源稿当期周/月真身在 ⇒ 镜像陈旧不算真故障；
@@ -2982,7 +3007,12 @@ def check_raw_data():
     try:
         # 🛡 2026-08-27 主人令：排除运行时缓存目录（_rps_cache 550 + kline_cache 401 + _tdx_cache 170）
         #   这些是算法运行产生的行情缓存，本不应入库/计入仓库规模；否则一直触发 raw_volume fail 红灯。
-        _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache", "backtest_kline_cache"}
+        # 🛡 2026-11-24 主人令「全部一劳永逸修复」：补入 _wf_cache（603 只逐票日K缓存，
+        #   factor_walkforward/ff3 主链消费、刻意入仓，但属"仓库规模"统计应排除的逐票缓存，
+        #   与 kline_cache 同类）。原漏排导致 raw_data 计数 1101（=7339 tracked − 6238 kline_cache），
+        #   长期卡在 >1100 膨胀 WARN。补入后 1101−603=498 < 850，告警消除。
+        #   ⚠️ 仅从"膨胀指标"排除，不移出 git、不删数据（该缓存是主链核心数据源，双机交接明令保留）。
+        _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache", "backtest_kline_cache", "_wf_cache"}
         # 🛡 2026-09-23 一劳永逸（阿狸咪的工程师·口径纠正）：本检查的语义（见上）是
         #   「仓库规模临近 Git Trees 422 上限」⇒ 必须统计【已入库 tracked】文件。
         #   原按本地工作区 rglob 统计，会把 runner 未入库的运行时残渣一并计入 ⇒ 假 FAIL。
