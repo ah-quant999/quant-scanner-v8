@@ -2965,33 +2965,37 @@ window.STRATEGY_WALKFORWARD = {
     })();
     </script>
 
-    <!-- 指数快览（2026-08-30：实时数据补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>指数快览 · <span class="fresh" id="indexQuotesTime">—</span></h3>
-      <div id="indexQuotesBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-    </div>
+    <details class="v8-fold" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
+      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none">▸ 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11px;opacity:.7">（点开查看，默认收起）</span></summary>
+      <div style="padding:0 12px 6px">这些卡提供大盘环境背景，不直接给出买卖标的；方向判断请看下方的资金/板块/龙头卡。</div>
+          <!-- 指数快览（2026-08-30：实时数据补位） -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">📊</span>指数快览 · <span class="fresh" id="indexQuotesTime">—</span></h3>
+            <div id="indexQuotesBody" style="font-size:13px;color:var(--txt)">加载中…</div>
+          </div>
 
-    <!-- 亚太市场概览（2026-08-30：实时数据补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
-      <div id="overseasBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-    </div>
+          <!-- 亚太市场概览（2026-08-30：实时数据补位） -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
+            <div id="overseasBody" style="font-size:13px;color:var(--txt)">加载中…</div>
+          </div>
 
-    <!-- 期指主力合约 · 情绪方向（2026-08-31：移回实时数据页，盘中每30分刷新） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
-      <div id="futuresMainBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-      <div class="note note-insight">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
-    </div>
+          <!-- 期指主力合约 · 情绪方向（2026-08-31：移回实时数据页，盘中每30分刷新） -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
+            <div id="futuresMainBody" style="font-size:13px;color:var(--txt)">加载中…</div>
+            <div class="note note-insight">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
+          </div>
 
-    <!-- 🏦 国债期货 · 利率预期罗盘（2026-11-17 主人令「TL 要接入，结合给判断」；盘中每30分 cn runner） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏦</span>国债期货 · 利率预期罗盘 · <span class="fresh" id="bondFutTime">—</span></h3>
-      <div id="bondFutBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note note-insight">📌 国债期货 = 长端利率 / 避险情绪代理（TL=30年期）。价涨=收益率下行=宽松/避险预期升温 → 权益风险偏好趋于谨慎（股债跷跷板）。四品种 TL(30Y)/T(10Y)/TF(5Y)/TS(2Y) 用实时行情；长短端涨跌差看收益率曲线牛陡/熊平。仅宏观环境研判，不直接改选股排序。红涨绿跌。</div>
-    </div>
+          <!-- 🏦 国债期货 · 利率预期罗盘（2026-11-17 主人令「TL 要接入，结合给判断」；盘中每30分 cn runner） -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">🏦</span>国债期货 · 利率预期罗盘 · <span class="fresh" id="bondFutTime">—</span></h3>
+            <div id="bondFutBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+            <div class="note note-insight">📌 国债期货 = 长端利率 / 避险情绪代理（TL=30年期）。价涨=收益率下行=宽松/避险预期升温 → 权益风险偏好趋于谨慎（股债跷跷板）。四品种 TL(30Y)/T(10Y)/TF(5Y)/TS(2Y) 用实时行情；长短端涨跌差看收益率曲线牛陡/熊平。仅宏观环境研判，不直接改选股排序。红涨绿跌。</div>
+          </div>
+    </details>
 
-        <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
+    <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px"></div>
 
     <!-- 涨停热力矩阵（整行宽度）
@@ -3031,6 +3035,11 @@ window.STRATEGY_WALKFORWARD = {
       <h3><span class="ic">💰</span>ETF 盘中异动 · 主力净额分时 · <span class="fresh" id="phEtfTime">—</span></h3>
       <div id="etfAnalysis" class="limit-up-analysis" style="display:none;margin-bottom:12px"></div>
 
+      <!-- ⏱ 主人令：量能配速解析条置于「盘中异动·量能脉冲」块上方（结论→解释→明细顺序）。
+           数据链不变：gen_etf_pace.py 盘中每轮重算 data/ETF_PACE.js summary.text；
+           数据缺席整条隐藏，不冒充；_fillEtfPaceLine 按 id 渲染，不依赖 DOM 顺序。 -->
+      <div id="etfPaceLine" style="display:none;margin-bottom:12px"></div>
+
       <!-- Block 1: 盘中异动·量能脉冲 (顶, T+0) -->
       <div class="sf-block sf-block-hot">
         <div class="sf-block-title"><span class="sf-block-icon">⚡</span>盘中异动·量能脉冲 <span style="font-size:10px;color:var(--dim)">T+0·量比突增</span></div>
@@ -3059,11 +3068,6 @@ window.STRATEGY_WALKFORWARD = {
       <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
 
           </div>
-
-    <!-- ⏱ 2026-11-24 主人令：量能配速解析条由 AI速览移至「ETF 盘中异动·主力净额分时」卡下方
-         （数据链不变：gen_etf_pace.py 盘中每轮重算 data/ETF_PACE.js summary.text；
-          数据缺席整条隐藏，不冒充） -->
-    <div id="etfPaceLine" style="display:none;margin-bottom:16px"></div>
 
     <!-- 🚚 2026-11-18 主人令：商品涨价弹性榜自「📡 实时数据」迁回「🔒 已下架」顶部
          （容器 id="ceBody" / 时间戳 id="prCEFresh" 与渲染 _fillCommodityElasticity + 1s 自愈轮询不变，仅 DOM 位置移动。
@@ -3402,43 +3406,37 @@ function fmtSigned(v){
     </div>
 
 
-    <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
-      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
-    </div>
+    <details class="v8-fold" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
+      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none">▸ 🌡️ 大盘温度观测（IF持仓 · 市场宽度 · 股债性价比） <span style="font-size:11px;opacity:.7">（点开查看，默认收起）</span></summary>
+      <div style="padding:0 12px 6px">这些是市场温度计，判断环境冷热用，不指向具体标的。</div>
+          <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
+            <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
+            <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
+          </div>
 
-    <!-- 市场宽度：52周新高广度 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
-      <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
+          <!-- 市场宽度：52周新高广度 -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
+            <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
+          </div>
 
-    <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（同 IF 持仓/市场宽度卡风格） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
-      <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
-    </div>
+          <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（同 IF 持仓/市场宽度卡风格） -->
+          <div class="card" style="margin-bottom:16px">
+            <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
+            <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
+            <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
+          </div>
 
 
-    <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
-         ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
-         现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
+          <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
+               ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
+               现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
+    </details>
 
-    <!-- 解禁日历（2026-08-30：盘后数据页 · 未来 N 天解禁汇总） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔓</span>解禁日历 · <span class="fresh" id="restrictedCalendarTime">—</span></h3>
-      <div id="restrictedCalendarBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-    </div>
-
-    <!-- 业绩预告（2026-08-30：盘后数据页 · 财报季预告汇总） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>业绩预告 · <span class="fresh" id="forecastCalendarTime">—</span></h3>
-      <div id="forecastCalendarBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-    </div>
-
+<!-- [2026-11-24 精简] 盘后解禁日历卡已删: 今日事件区已有当日版, 避免重复. 渲染函数保留且有if(!$b)return保护 -->
+<!-- [2026-11-24 精简] 盘后业绩预告卡已删: 今日事件区已有当日版, 避免重复. 渲染函数保留且有if(!$b)return保护 -->
     
     <!-- 已下架：资金流时间轴（2026-08-16 主人令） -->
 
@@ -13407,6 +13405,26 @@ function drawUpDownChart(){
 
         const hasDataToday = lastTs && isToday(lastTs);
 
+        /* 🛡 主人令「一劳永逸·红叉与体检打架根治」：
+           病灶：本表用 hasDataToday=isToday(lastTs) 判 ✓/✗，只要数据是昨日就亮红叉；
+           而后端 v8_health_check.py 早已对日频/低频产物按「生产者节拍」判 ok/warn。
+           根治：以 HEALTH_CHECK 的 item.status 为权威判据 —— 后端已认可新鲜度(ok/warn/limited/info)
+           的卡，本表不再亮红叉；仅当后端判 fail 或查无此项时才走原有时间轴判定。
+           仅对「日频/低频产物」生效（freq 含 盘后/收盘后/每日/日频/每周 或 slots<=1），
+           盘中高频卡仍走原严格时间轴，保留 45min 敏感度。真 fail 一律仍红，不掩盖故障。 */
+        const _hcItems = (window.HEALTH_CHECK && window.HEALTH_CHECK.items) || [];
+        function _hcStatusOf(src){
+          if(!src) return null;
+          for(var _i=0;_i<_hcItems.length;_i++){
+            var _it=_hcItems[_i];
+            if(_it && (_it.id===src || _it.id==='all_'+src || _it.name===c.name)) return _it.status;
+          }
+          return null;
+        }
+        const _hcStatus = _hcStatusOf(String(c.source||'').split('/')[0].trim());
+        const _healthAccepts = _hcStatus && _hcStatus!=='fail';   // ok/warn/limited/info 均为后端已认可
+        const _isLowFreqCard = /(盘后|收盘后|每日|日频|每周|月频|延迟|挂链)/i.test(c.freq||'') || (c.slots||[]).length<=1;
+
         // 🛡 2026-08-20 一劳永逸：sourceMissing 卡（westock 持仓云端同步）数据未接入
         //   或数据非今日时，统一显示「待配置」灰槽而非 ❌红叉，避免同步断流/未接入时误导"全部漏跑"。
         const sourceMissing = c.sourceMissing === true && (!dataFound || !hasDataToday);
@@ -13501,6 +13519,13 @@ function drawUpDownChart(){
             if(!ok && todayFloorOk){
               ok = true;
             }
+          }
+
+          // 🛡 一劳永逸：后端体检已认可新鲜度的日频/低频卡，过去槽位不再亮红叉。
+          //   仅当 isPast 且本卡为低频且后端 status∈{ok,warn,limited,info} 时置 ok；
+          //   后端判 fail / 查无该项 → 不动，仍走原时间轴严格判定（真故障照常红叉，不掩盖）。
+          if(!ok && isPast && _isLowFreqCard && _healthAccepts){
+            ok = true;
           }
 
           // 非交易日市场类卡片 / 明确周末不更新卡片：未更新的过去槽位不标红叉，标「休」避免误导
@@ -14615,6 +14640,7 @@ window.showRestrictedItems = showRestrictedItems;
   /* ---- 12. 解禁日历（盘后数据页 · 未来 N 天） ---- */
   function renderRestrictedCalendar(d){
     const $b=$('restrictedCalendarBody'), $t=$('restrictedCalendarTime');
+    if(!$b) return; /* 精简后DOM已删, 函数保留防报错 */
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">解禁数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
     // 2026-08-31：盘后解禁日历 = 一行 4 列汇总胶囊；明细列表默认隐藏，点击胶囊展开下表
@@ -14682,6 +14708,7 @@ window.showRestrictedItems = showRestrictedItems;
   /* ---- 13. 业绩预告（盘后数据页 · 财报季汇总） ---- */
   function renderForecastCalendar(d){
     const $b=$('forecastCalendarBody'), $t=$('forecastCalendarTime');
+    if(!$b) return; /* 精简后DOM已删, 函数保留防报错 */
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
     // 2026-08-31 主人令：盘后业绩预告汇总胶囊从 4 列扩到 6 列（4 类型 + 总数 + 净增=预增−预减，金色汇总+红绿涨跌）。明细列表仍默认隐藏，点击胶囊展开下表
@@ -16700,7 +16727,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
          + (_noInd.length ? '<div style="background:#fbbf2412;border:1px solid #fbbf2438;border-radius:6px;padding:7px 10px;margin-bottom:11px;font-size:11px;color:#fbbf24">'
             + '⚠ 本期 '+_noInd.length+' 只行业字段缺失（'+_noInd.map(function(s){return s.name;}).join('、')+'）：「剔金融」闸对其<b>无法核验</b>，如实标注，不声称已剔除。</div>' : '');
 
-      // 表格
+      // 表格（主人令：默认只显示前三名，其余折叠）
       h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px">';
       h += '<thead><tr style="border-bottom:1px solid var(--border);color:'+DIM+';font-weight:600;text-align:left">'
          + '<th style="padding:6px 5px;width:26px">#</th>'
@@ -16711,7 +16738,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
          + '<th style="padding:6px 5px;text-align:right">营收增速</th>'
          + '<th style="padding:6px 5px">行业/市场</th>'
          + '</tr></thead><tbody>';
-      stocks.forEach(function(s,i){
+      var _rowHtml = function(s,i){
         var rankColor = i<3 ? AMB : DIM;
         var mktColor = s.market==='北交所' ? AMB : (s.market==='科创板'?'#c084fc':(s.market==='创业板'?'#41c9ff':DIM));
         h += '<tr style="border-bottom:1px solid var(--border)">'
@@ -16723,8 +16750,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
            + '<td style="padding:6px 5px;text-align:right;color:'+col(s.rev_growth)+'">'+sgn(s.rev_growth)+'%</td>'
            + '<td style="padding:6px 5px;color:'+DIM+'">'+s.industry+' <span style="color:'+mktColor+'">['+s.market+']</span></td>'
            + '</tr>';
-      });
+      };
+      stocks.slice(0,3).forEach(function(s,i){ h += _rowHtml(s,i); });
       h += '</tbody></table></div>';
+      if(stocks.length>3){
+        h += '<details class="v8-fold" style="margin-top:8px;border:1px solid var(--border2,#2d3743);border-radius:6px">'
+           + '<summary style="cursor:pointer;padding:7px 10px;font-size:11.5px;color:var(--dim);list-style:none;user-select:none">▸ 展开其余 '+(stocks.length-3)+' 只（共 '+stocks.length+' 只）</summary>'
+           + '<div style="padding:0 10px 8px"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px">'
+           + '<thead><tr style="border-bottom:1px solid var(--border);color:'+DIM+';font-weight:600;text-align:left">'
+           + '<th style="padding:6px 5px;width:26px">#</th><th style="padding:6px 5px">股票</th>'
+           + '<th style="padding:6px 5px;text-align:right">现金含量</th><th style="padding:6px 5px;text-align:right">每股现金流</th>'
+           + '<th style="padding:6px 5px;text-align:right">ROE</th><th style="padding:6px 5px;text-align:right">营收增速</th>'
+           + '<th style="padding:6px 5px">行业/市场</th></tr></thead><tbody>';
+        stocks.slice(3).forEach(function(s,i){ h += _rowHtml(s,i+3); });
+        h += '</tbody></table></div></div></details>';
+      }
 
       // 诚实边界（置底）
       h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">'
@@ -16901,10 +16941,22 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var GRN='#34d399', RED='#ef5350', AMB='#fbbf24', DIM='var(--dim)', CY='#41c9ff';
       var rb = D.random_baseline||{};
       var h = '';
-      // 口径 + 随机基线
-      h += '<div style="background:#41c9ff12;border:1px solid #41c9ff33;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.65;color:'+DIM+'">'
-         + '<b style="color:'+CY+'">口径</b>：底/顶分型 = 三根K线中间高/低点极端（第三根收盘确认，含1根滞后）。胜率=T+5上涨/下跌概率，均值=T+5/10/20 持有收益。'
-         + '<b style="color:'+AMB+'">随机基线</b>：任取 3000 个交易日 T+5 胜率 '+(rb.wr5||'—')+'% / 均值 '+(rb.m5!=null?'+'+rb.m5:rb.m5)+'% —— 分型变体若不超过基线即为无效。</div>';
+      // 主人令：当下判读移到卡名下方第一屏（先看当下状态/结论，再看口径与明细表）
+      var T = D.today||{};
+      var _volTxt = (T.vol_shrink===null||T.vol_shrink===undefined)?'量能—(盘中未满日不判)':(T.vol_shrink?'当日缩量':'当日非缩量');
+      var _liveTag = T.live?('<span style="color:'+RED+';font-weight:600">● 盘中实时 '+ (T.as_of||'') +'</span>'):'<span style="color:'+DIM+'">收盘定稿口径</span>';
+      h += '<div style="background:#fbbf2410;border:1px solid #fbbf2433;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.7;color:'+DIM+'">'
+         + '<b style="color:'+AMB+'">当下判读（'+T.date+'）</b>'+_liveTag+'：'+(T.above_ma60?'多头区(>MA60)':'空头区(<MA60)——裸底分型负期望区，触发只可观察')
+         + ' · KDJ J='+T.kdj_j+' · 距250日高点 '+T.dev250+'% · '+_volTxt
+         + ' · 最近底分型 '+T.last_bottom+' / 顶分型 '+T.last_top+'（均未叠加过滤，仅供定位）</div>';
+      h += '<div style="background:#34d39910;border:1px solid #34d39933;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.7;color:'+DIM+'">'
+         + '<b style="color:'+GRN+'">实测结论</b>：① 超卖过滤真有效——空头区底分型 + KDJ_J&lt;10 → 胜率 52.9%→60.6%，期望转正；② 多头区缩量回踩最佳（61.1%/+0.56%）；'
+         + '③ 反直觉——「急跌冰点」单独加在空头区反而更差（50.9%/-0.41%），「缩量」单独无效；④ 顶分型侧几乎全军覆没，仅「超买+放量+冲高」四重共振勉强达标（58.8%，n=17 小样本慎用）；'
+         + '⑤ 实战用法=分型只做「扳机+止损锚」（跌破分型低点认错），方向判断交给资金/超卖/位置共振。</div>';
+      // 口径 + 随机基线（主人令：白话化——先看卡能给你什么，再看术语）
+      h += '<div style="background:#41c9ff12;border:1px solid #41c9ff33;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.7;color:'+DIM+'">'
+         + '<b style="color:'+CY+';font-size:12.5px">这张卡干嘛用</b>：它<b>不荐股</b>，只回答一个问题——"看到抄底信号时，什么条件下才靠谱"。下面每行是一种条件组合的<b style="color:'+CY+'">历史胜率</b>，绿色=别碰，红色=可留意。仅作观测，不进选股。<br>'
+         + '<span style="font-size:11px">白话结论：光看K线信号≈抛硬币（约53%）；只有"超卖＋站上60日线"才升到约60%。术语 → 底/顶分型=三根K线的高低点转折（确认晚1根）；T+5胜率=信号后5天上涨概率；随机基线 '+(rb.wr5||'—')+'% 是及格线，低于它=无效。完整回测口径见逻辑详解页。</span></div>';
       var tbl = function(rows, kind, baseline){
         var col = function(r){
           if(r.wr5===null) return AMB;
@@ -16943,19 +16995,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       // 顶分型
       h += '<div style="font-size:12.5px;font-weight:700;color:'+RED+';margin:12px 0 6px">▲ 顶分型（逃顶触发器·胜率=下跌确认概率）</div>';
       h += tbl(D.top||[], 'top');
-      // 当下状态（2026-11-23 实时化：live=盘中实时bar合成；vol_shrink=null=盘中未满日不判量）
-      var T = D.today||{};
-      var _volTxt = (T.vol_shrink===null||T.vol_shrink===undefined)?'量能—(盘中未满日不判)':(T.vol_shrink?'当日缩量':'当日非缩量');
-      var _liveTag = T.live?('<span style="color:'+RED+';font-weight:600">● 盘中实时 '+ (T.as_of||'') +'</span>'):'<span style="color:'+DIM+'">收盘定稿口径</span>';
-      h += '<div style="background:#fbbf2410;border:1px solid #fbbf2433;border-radius:6px;padding:8px 11px;margin:12px 0;font-size:11.5px;line-height:1.7;color:'+DIM+'">'
-         + '<b style="color:'+AMB+'">当下判读（'+T.date+'）</b>'+_liveTag+'：'+(T.above_ma60?'多头区(>MA60)':'空头区(<MA60)——裸底分型负期望区，触发只可观察')
-         + ' · KDJ J='+T.kdj_j+' · 距250日高点 '+T.dev250+'% · '+_volTxt
-         + ' · 最近底分型 '+T.last_bottom+' / 顶分型 '+T.last_top+'（均未叠加过滤，仅供定位）</div>';
-      // 实测结论
-      h += '<div style="background:#34d39910;border:1px solid #34d39933;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.7;color:'+DIM+'">'
-         + '<b style="color:'+GRN+'">实测结论</b>：① 超卖过滤真有效——空头区底分型 + KDJ_J&lt;10 → 胜率 52.9%→60.6%，期望转正；② 多头区缩量回踩最佳（61.1%/+0.56%）；'
-         + '③ 反直觉——「急跌冰点」单独加在空头区反而更差（50.9%/-0.41%），「缩量」单独无效；④ 顶分型侧几乎全军覆没，仅「超买+放量+冲高」四重共振勉强达标（58.8%，n=17 小样本慎用）；'
-         + '⑤ 实战用法=分型只做「扳机+止损锚」（跌破分型低点认错），方向判断交给资金/超卖/位置共振。</div>';
       // 诚实边界
       h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">⚠ '+(D.missing_layers||'')+'。<br>📌 '+(D.boundary||'')+'。数据源与口径登记见逻辑详解页。</div>';
       body.innerHTML = h;
@@ -16980,10 +17019,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     try{
       var GRN='#34d399', RED='#ef5350', AMB='#fbbf24', DIM='var(--dim)';
       var h = '';
-      // 口径（脱敏：具体参数不上面，完整口径见逻辑详解页）
-      h += '<div style="background:#fbbf2410;border:1px solid #fbbf2433;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11.5px;line-height:1.65;color:'+DIM+'">'
-         + '<b style="color:'+AMB+'">信号口径</b>：价格创阶段新高而量能显著萎缩（量价背离 &#183; 缩量新高）。'
-         + '<b style="color:'+AMB+'">含义</b>：拉升缺资金接力，历史上信号后 20 日平均跑输基线约 3 个百分点 —— 是「见顶预警灯」，不是卖出指令。完整参数与回测口径见逻辑详解页。</div>';
+      // 口径（主人令：白话化——这是排雷器不是买入榜）
+      h += '<div style="background:#fbbf2410;border:1px solid #fbbf2433;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.7;color:'+DIM+'">'
+         + '<b style="color:'+AMB+';font-size:12.5px">这张卡干嘛用</b>：它是<b style="color:'+AMB+'">排雷器，不是买入榜</b>——列出"股价创新高、成交量反而缩小"的票。意思是涨得虚、后面容易回落，<b>看到就别追高</b>。它不参与选股评分，只提醒风险。<br>'
+         + '<span style="font-size:11px">为什么：这种"缩量新高"历史上信号后20天平均跑输大盘约3个百分点，是见顶预警灯、不是卖出指令。表格里"信号=今日"是刚触发，"量比"越小背离越重。完整参数与回测口径见逻辑详解页。</span></div>';
       // 命中区
       var hits = D.hits||[];
       h += '<div style="font-size:12.5px;font-weight:700;margin:4px 0 6px;color:'+(hits.length?AMB:GRN)+'">'
@@ -17837,6 +17876,7 @@ window.__renderComprehensiveSynthesis = function(){
       +   '<span style="font-size:13.5px;font-weight:800;color:'+_mvc+'">&#128269; 全站综合解析 · 15源加权合成</span>'
       +   '<span style="font-size:11px;color:var(--dim)">有效源 '+(MV.signals.filter(function(s){return s.available;})).length+'/'+MV.signals.length+' · 综合分 '+MV.score_norm.toFixed(2)+'</span>'
       + '</div>'
+      + '<div style="font-size:12px;line-height:1.6;color:var(--sub);margin-bottom:5px">这张卡只回答一个问题：<b style="color:'+_mvc+'">现在该重仓还是轻仓</b>。下面"多方/空方"是各路信号在投票，结论看"综合姿态"那一行。它<b>不告诉你买哪个板块</b>——找主线请往下看板块龙头卡。</div>'
       + '<div style="font-size:12.5px;line-height:1.8;color:var(--txt)">'
       + (Array.isArray(MV.narrative_lines) && MV.narrative_lines.length
         ? MV.narrative_lines.map(function(l){ return '<div style="margin-bottom:4px">&#128204; '+esc(l)+'</div>'; }).join('')
