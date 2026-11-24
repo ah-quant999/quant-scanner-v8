@@ -1,66 +1,5 @@
 [
  {
-  "date": "2026-08-23",
-  "time": "22:46:11",
-  "overall": "warn",
-  "summary": {
-   "ok": 108,
-   "warn": 8,
-   "fail": 1,
-   "total": 117
-  },
-  "warn_items": [
-   {
-    "id": "dom_taskScheduleBody",
-    "name": "DOM #taskScheduleBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttBackBody",
-    "name": "DOM #ttBackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttThrBody",
-    "name": "DOM #ttThrBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttSvlBody",
-    "name": "DOM #ttSvlBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttTrackBody",
-    "name": "DOM #ttTrackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsAdvBody",
-    "name": "DOM #stcrdsAdvBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsEliteBody",
-    "name": "DOM #stcrdsEliteBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_healthCheckBody",
-    "name": "DOM #healthCheckBody",
-    "message": "静态占位符(JS渲染)"
-   }
-  ],
-  "fail_items": [
-   {
-    "id": "dom_phMacroBody",
-    "name": "DOM #phMacroBody",
-    "message": "未找到元素"
-   }
-  ],
-  "tz": "Asia/Shanghai"
- },
- {
   "date": "2026-08-24",
   "time": "23:07:56",
   "overall": "fail",
@@ -4106,6 +4045,34 @@
     "id": "DO_NOT_DELETE",
     "name": "防误删清单",
     "message": "更新于 11-16 04:03；超过阈值 10080 分钟"
+   }
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "time": "09:49:26",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 140,
+   "warn": 0,
+   "fail": 2,
+   "limited": 0,
+   "info": 1,
+   "other": 0,
+   "total": 143
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "SECTOR_FUND_FLOW",
+    "name": "板块资金流向",
+    "message": "更新于 今日 08:39；超过阈值 45 分钟"
+   },
+   {
+    "id": "CONCEPT_RANKING",
+    "name": "概念排名",
+    "message": "更新于 昨日 16:07；超过阈值 45 分钟"
    }
   ]
  }
