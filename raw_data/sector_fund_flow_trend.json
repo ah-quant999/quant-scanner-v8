@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-24 16:53",
+  "update_time": "2026-11-24 19:22",
   "data_type": "real",
   "summary": {
     "in_count": 9,
@@ -504,7 +504,7 @@
       "net_10d": -15.53,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -30.76,
+      "net_60d": -30.75,
       "net_60d_days": 60,
       "source": "东财日K",
       "consecutive_days": 1,
@@ -883,7 +883,7 @@
       "net": 44.62,
       "net_5d": 152.72,
       "net_20d": -119.43,
-      "net_60d": -470.78,
+      "net_60d": -470.79,
       "type": "行业",
       "consecutive_days": 5,
       "trend": "in",
@@ -1079,6 +1079,36 @@
       "net_60d_days": 60
     },
     {
+      "name": "消费电子零部件及组装",
+      "net": 27.84,
+      "net_5d": 4.89,
+      "net_20d": -24.02,
+      "net_60d": -128.53,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_5d_days": 5,
+      "net_10d": 48.14,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
+      "name": "消费电子",
+      "net": 27.72,
+      "net_5d": 4.81,
+      "net_20d": -22.79,
+      "net_60d": -103.46,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_5d_days": 5,
+      "net_10d": 47.85,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 60
+    },
+    {
       "name": "大基金持股",
       "net": 11.52,
       "net_5d": 42.94,
@@ -1103,35 +1133,6 @@
       "net_5d_days": 5,
       "net_10d": 43.15,
       "net_10d_days": 10
-    },
-    {
-      "name": "集成电路制造",
-      "net": 4.67,
-      "net_5d": 25.3,
-      "net_20d": 33.72,
-      "net_60d": 65.1,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 37.65,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 60
-    },
-    {
-      "name": "宁组合",
-      "net": 13.58,
-      "net_5d": 23.05,
-      "net_20d": -24.46,
-      "net_60d": null,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 37.38,
-      "net_10d_days": 10,
-      "net_20d_days": 20
     }
   ],
   "trend_20d": [

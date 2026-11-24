@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-11-24 17:10:48",
-  "run_start": "2026-11-24 16:33:42",
-  "ok": 16,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-11-24 20:18:01",
+  "run_start": "2026-11-24 17:46:43",
+  "ok": 50,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "factor_walkforward.py",
+      "reason": "退出码 1 | TypeError: bad operand type for unary -: 'NoneType'"
+    }
+  ],
   "skipped_by_time_gate": []
 }
