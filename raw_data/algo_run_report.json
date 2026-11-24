@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-11-24 09:01:36",
-  "run_start": "2026-11-24 08:34:01",
-  "ok": 13,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
-    },
-    {
-      "script": "factor_walkforward.py",
-      "reason": "退出码 1 | TypeError: bad operand type for unary -: 'NoneType'"
-    }
-  ],
+  "update_time": "2026-11-24 17:10:48",
+  "run_start": "2026-11-24 16:33:42",
+  "ok": 16,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
