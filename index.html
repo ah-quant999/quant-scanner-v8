@@ -128,7 +128,7 @@ window.__domReadyFns=[];
 
     <script src="data/ETF_INTRADAY_HEAT.js?v=2b1c833b9d" defer></script>
     <!-- 🆕 2026-11-23 主人拍板：ETF 量能配速+局部异动灯（gen_etf_pace.py，盘中链重算；口径见逻辑详解页） -->
-    <script src="data/ETF_PACE.js?v=7105976ee3" defer></script>
+    <script src="data/ETF_PACE.js?v=743ddb5f1e" defer></script>
     <!-- 🆕 2026-11-24 主人拍板：市场攻防档位·五信号合成（gen_market_regime.py，实验卡链重算；口径见逻辑详解页）。
          ⚠️ 命名=MARKET_TACTIC：MARKET_REGIME 已被利率板块推荐框架占用（gen_invest_avoid.py），勿撞。 -->
     <script src="data/MARKET_TACTIC.js?v=8a544bdc20" defer></script>
@@ -154,7 +154,7 @@ window.__domReadyFns=[];
     <script src="data/MACRO_BRIEF.js?v=44b587c8ae" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=18bfb85fff" defer></script>
-<script src="data/LHB_DATA.js?v=be345b601e" defer></script>
+<script src="data/LHB_DATA.js?v=c057c31075" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
@@ -165,7 +165,7 @@ window.__domReadyFns=[];
 <script src="data/MARGIN_DATA.js?v=95c7f67da6" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=fb15f25a5f" defer></script>
 <script src="data/FUTURES_REALTIME.js?v=4f054a4d4f" defer></script>
-<script src="data/BOND_FUTURES.js?v=2d9890acb4" defer></script>
+<script src="data/BOND_FUTURES.js?v=a2e1cb3555" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=fbc370dda8" defer></script>
 <script src="data/IPO_DATA.js?v=0bc361d409" defer></script>
     <script src="data/CRISIS_DATA.js?v=b59d21cc2c" defer></script>
@@ -180,7 +180,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=4f95fadd0f" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=bc1dff48b2" defer></script>
-<script src="data/INVEST_AVOID.js?v=031aabde16" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=10f45a0927" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=172b055a13" defer></script>
     <script src="data/KEY_NOTICES.js?v=05bf84d226" defer></script>
@@ -194,9 +194,9 @@ window.__domReadyFns=[];
          一个 404 + 一条 Console 报错。其消费方 renderMahoroCard() 现读
          window.MAHORO_INSIGHTS（下一行的独立文件，云端重生成不会覆盖），
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
-    <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261123） -->
+    <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261124） -->
     <!-- 🔴 2026-10-03 CN runner2号机更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
-    <script src="data/maharo_insights.js?v=3717222435" defer></script>
+    <script src="data/maharo_insights.js?v=20261124" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -1387,7 +1387,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=5a836b98ce" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
-<script src="data/ETF_PULSE.js?v=a7b9e1ab1c" defer></script>
+<script src="data/ETF_PULSE.js?v=98ffbf4a8b" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=43086236e3" defer></script>
 <script src="data/TOP10_DAILY.js?v=03ab193cde" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
@@ -2955,18 +2955,6 @@ window.STRATEGY_WALKFORWARD = {
           h+='</div>';
         }
 
-        /* 🆕 2026-11-24 主人令「配速榜压成一条人话解析放 AI 速览，撤大卡」：
-           量能配速一条解读（gen_etf_pace.py 盘中每轮重算 summary.text，主题聚类人话总结）；
-           原明细大卡已退役，口径/阈值仍在逻辑详解页；数据缺席时不渲染，不冒充。 */
-        var _ep = window.ETF_PACE || null;
-        if(_ep && _ep.summary && _ep.summary.text){
-          var _epT = (_ep.update_time||'').slice(11,16);
-          h += '<div style="margin-top:8px;padding:8px 12px;background:rgba(65,201,255,0.07);border:1px solid rgba(65,201,255,0.30);border-radius:8px;font-size:12.5px;line-height:1.75;color:var(--txt)">'
-            + '<span style="color:#41c9ff;font-weight:700">&#9201; 量能配速解析</span>'
-            + '<span style="font-size:10px;color:var(--dim);margin-left:6px">T+0 盘中每轮重算'+(_epT?' · 更新 '+_epT:'')+'</span><br>'
-            + esc(_ep.summary.text) + '</div>';
-        }
-
         contentEl.innerHTML=h;
       }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', renderAiSummary);
@@ -3046,10 +3034,13 @@ window.STRATEGY_WALKFORWARD = {
         <div id="etfPulseBlock"><div class="ipo-empty">加载中…</div></div>
       </div>
 
-      <!-- 🔴 2026-11-24 主人令「配速榜压成一条人话解析放 AI 速览，撤大卡」：
-           原「量能配速·局部异动灯」sf-block 大卡退役（明细行不适合 AI 速览定位），
-           改为 AI速览卡内一条 summary.text 解析（renderAiSummary 内注入，读 window.ETF_PACE）。
-           数据链不变：gen_etf_pace.py 盘中每轮重算 data/ETF_PACE.js；口径详情仍登记逻辑详解页。 -->
+      <!-- 🆕 2026-11-23 主人拍板：量能配速 + 局部异动灯（window.ETF_PACE，data/ETF_PACE.js，
+           生成器盘中链每轮重算；口径详情见逻辑详解页。回答两问：① 今日量能相对历史同时刻
+           超前还是落后 ② 最近 15 分钟哪个窗口开始放量） -->
+      <div class="sf-block">
+        <div class="sf-block-title"><span class="sf-block-icon">⏱</span>量能配速 · 局部异动灯 <span style="font-size:10px;color:var(--dim)">T+0·热度榜同池</span></div>
+        <div id="etfPaceBlock"><div class="ipo-empty">配速数据加载中…</div></div>
+      </div>
 
       <!-- 🚚 2026-09-15 主人令：原 Block 2「资金热度·净申赎」（T-1 非实时）迁出至「盘后数据」页「日监控·主力净流入」卡下方——
             容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat" 与 renderEtfHeatByCategory() 不变，仅 DOM 位置移动。 -->
@@ -11874,6 +11865,74 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     if(pulse.update_time) setBadge('phEtfTime','盘中','短线',pulse.update_time);
   }
 
+  /* ---- 5.6 ETF 量能配速 + 局部异动灯（2026-11-23 主人拍板"做"） ----
+     数据 window.ETF_PACE（scripts/gen_etf_pace.py，盘中链每轮重算）。
+     卡面只给定性解读，具体阈值/窗口参数留在逻辑详解页（13:00 脱敏令口径一致）。 */
+  function renderEtfPace(p){
+    var el=document.getElementById('etfPaceBlock');
+    if(!el) return;
+    if(!p||!p.items||!Object.keys(p.items).length){
+      el.innerHTML='<div class="ipo-empty">⏳ 配速数据尚未生成（盘中链每轮自动重算）</div>';
+      return;
+    }
+    var UP='var(--up)', DOWN='var(--down)', DIM='var(--dim)', SUB='var(--sub)';
+    var rows=[];
+    Object.keys(p.items).forEach(function(c){ var v=p.items[c]; v.code=c; rows.push(v); });
+    var order={hot:0,normal:1,cool:2,new:3};
+    rows.sort(function(a,b){
+      return (order[a.state]!==undefined?order[a.state]:9)-(order[b.state]!==undefined?order[b.state]:9)
+        || ((b.pace||0)-(a.pace||0));
+    });
+    var s=p.summary||{};
+    // 解读行（定性，不写阈值数字——参数在逻辑详解页）
+    var interp='<div style="font-size:10.5px;color:var(--sub);line-height:1.6;margin-bottom:8px">'
+      +'配速比 = 今日累计成交 ÷ 近20个交易日同一时刻均累计成交：<span style="color:'+UP+'">超前放量</span>（拉升有资金接力）/ <span style="color:'+DOWN+'">缩量观望</span>（冲高缺接力）。'
+      +'灯 = 最近15分钟成交在近20日同一时刻窗口中的放量分位，越靠前越异常，<span style="color:'+UP+'">红</span>/<span style="color:'+DOWN+'">绿</span>标该窗口涨跌方向。盘中每轮自动重算。</div>';
+    var half=Math.ceil(rows.length/2), two=rows.length>8;
+    function rowHTML(v){
+      var chg=v.chg;
+      var chgTxt=(chg===undefined||chg===null)?'':'<span style="color:'+(chg>=0?UP:DOWN)+';font-size:10.5px;width:52px;text-align:right;white-space:nowrap">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</span>';
+      var paceTxt,paceCol;
+      if(v.state==='hot'){ paceCol=UP; paceTxt=Number(v.pace).toFixed(2); }
+      else if(v.state==='cool'){ paceCol=DOWN; paceTxt=Number(v.pace).toFixed(2); }
+      else if(v.state==='normal'){ paceCol=SUB; paceTxt=Number(v.pace).toFixed(2); }
+      else { paceCol=DIM; paceTxt='基线中'; }
+      var mark='';
+      if(v.state==='hot') mark='<span style="color:'+UP+';font-size:9px;margin-left:3px">放量</span>';
+      else if(v.state==='cool') mark='<span style="color:'+DOWN+';font-size:9px;margin-left:3px">缩量</span>';
+      else if(v.state==='new') mark='<span style="color:'+DIM+';font-size:9px;margin-left:3px">次新'+(v.n_days||'?')+'天</span>';
+      // 局部异动灯
+      var light;
+      if((v.win_pct||0)>=(p.light_pctl||90)){
+        var lc=v.win_dir>0?UP:(v.win_dir<0?DOWN:SUB);
+        light='<span style="color:'+lc+';font-weight:700">●</span><span style="font-size:9.5px;color:'+SUB+'">'+v.win_pct+'</span>';
+      } else {
+        light='<span style="color:var(--border)">·</span>';
+      }
+      var nameHtml='<div style="width:112px;line-height:1.3;min-width:0">'
+        +'<div style="font-size:11px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+v.name+'">'+v.name+mark+'</div>'
+        +'<div style="font-size:9.5px;color:var(--dim)">'+v.code+'</div></div>';
+      return '<div style="display:flex;align-items:center;gap:5px;padding:2.5px 0;border-bottom:1px solid var(--border);min-width:0">'
+        + nameHtml + chgTxt
+        + '<span style="width:40px;text-align:right;font-size:11px;color:'+paceCol+';font-weight:600">'+paceTxt+'</span>'
+        + '<span style="width:44px;text-align:right">'+light+'</span>'
+        + '</div>';
+    }
+    function colHTML(list){
+      return '<div style="flex:1;min-width:0;padding:0 6px">'+list.map(rowHTML).join('')+'</div>';
+    }
+    var head='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);padding:0 8px 4px">'
+      +'<span>'+p.universe.total+' 只热度榜同池 · 放量 <b style="color:'+UP+'">'+(s.hot||0)+'</b> / 缩量 <b style="color:'+DOWN+'">'+(s.cool||0)+'</b> / 异动灯 <b style="color:var(--gold)">'+(s.light||0)+'</b></span>'
+      +'<span>'+p.update_time+'</span></div>';
+    var grid;
+    if(two){
+      grid='<div style="display:flex;gap:4px">'+colHTML(rows.slice(0,half))+colHTML(rows.slice(half))+'</div>';
+    } else {
+      grid=colHTML(rows);
+    }
+    el.innerHTML=head+interp+grid;
+  }
+  window.renderEtfPace=renderEtfPace;
 
   function renderEtfDaily(daily){
     var el=document.getElementById('etfDailyBlock');
@@ -14689,8 +14748,9 @@ window.showRestrictedItems = showRestrictedItems;
 
     // 1) ETF 盘中异动·主力净额分时 + 盘后页「日监控·主力净流入」「资金热度·净申赎」（2026-09-15 主人令迁入）—— 直接用已注入的 window 变量
     safe(renderEtfPulse, window.ETF_PULSE || {});
-    safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});
+    safe(renderEtfPace, window.ETF_PACE || {});   // 🆕 2026-11-23 主人拍板：量能配速+局部异动灯
     safe(renderEtfHeatByCategory, window.ETF_NET_SUBSCRIPTION || {});
+    safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});
     safe(renderEtfAnalysis, window.ETF_PULSE || {}, window.ETF_INTRADAY_HEAT || {}, window.ETF_DAILY_MONITOR || {});
 
     // 2) 板块资金三合一
