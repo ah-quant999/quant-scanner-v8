@@ -1,5 +1,5 @@
 window.STRATEGY_WALKFORWARD = {
-  "update_time": "2026-11-24 23:26:09",
+  "update_time": "2026-11-25 01:59:46",
   "source": "raw_data/history/final_recommend_*.json（54 个每日快照）",
   "method": "因子清账 + 胜率加权 组合的【样本外选股稳定性】walk-forward（非收益率 OOS，历史快照无已实现盈亏）",
   "is_ratio": 0.7,
@@ -345,7 +345,7 @@ window.STRATEGY_WALKFORWARD = {
       "max_industry_pct": 56.7
     },
     {
-      "date": "20261124",
+      "date": "20261125",
       "overlap_ratio": 0.25,
       "industry_hhi": 0.5889,
       "max_industry_pct": 63.3
@@ -830,7 +830,7 @@ window.STRATEGY_WALKFORWARD = {
       "avg_final_score": 4.53
     },
     {
-      "date": "20261124",
+      "date": "20261125",
       "n": 2,
       "overlap": 0,
       "overlap_ratio": 0.0,

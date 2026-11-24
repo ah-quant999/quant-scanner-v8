@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-24 22:25:45",
+ "update_time": "2026-11-25 01:05:57",
  "engine": "algorithms/stock_forward_alpha.py",
  "purpose": "个股级未来收益预测分（同信号组合内分高下），generate_top10 alpha_term 消费",
  "methodology": "Alpha = Σ w_k·rank_z(feature_k)；w_k = IS 段(前60%调仓点)逐点截面 Spearman IC 均值(含符号)，OOS 段绝不重拟合；latest_scores 取最新交易日截面(2026-11-19 主人令修正，原误用最后回测调仓点滞后约hold+2日)。特征=rev5/rev20/vol60/h52/amt60/vol_conf/dviol60（纯OHLCV，避开W2禁入动量家族）。验证完全复用 factor_walkforward 引擎：次日开盘进场、往返成本0.20%、五分层、全池等权基准、IS/OOS 60/40；判据 IR_OOS>0.3 且连续5年内≥4年Top层跑赢基准>55%（硬门槛不放宽）；verdict 回退按 HOLDS 固定次序取首个 PASS（不挑最优）。",
@@ -20,20 +20,20 @@
  "years_total": 2,
  "spread_oos_pct": -0.2764,
  "weights_is": {
-  "rev5": 0.023737,
-  "rev20": -0.011731,
-  "vol60": -0.01823,
-  "h52": 0.011413,
-  "amt60": -0.035647,
-  "vol_conf": 0.022986,
-  "dviol60": -0.035182
+  "rev5": 0.02358,
+  "rev20": -0.011842,
+  "vol60": -0.018055,
+  "h52": 0.011321,
+  "amt60": -0.035302,
+  "vol_conf": 0.022995,
+  "dviol60": -0.034798
  },
  "criteria": "IR_OOS > 0.3 且 连续 5 年窗口内 ≥4 年 Top 层跑赢同期全池等权基准的调仓点占比 > 55%",
  "per_hold": {
   "5": {
    "verdict": "FAIL",
    "ir_oos": -1.808,
-   "ir_is": -1.872,
+   "ir_is": -1.854,
    "spread_oos_pct": -2.0251,
    "years_beat_gt55": 0,
    "years_total": 2,
@@ -43,7 +43,7 @@
   "10": {
    "verdict": "FAIL",
    "ir_oos": -0.154,
-   "ir_is": -2.154,
+   "ir_is": -2.149,
    "spread_oos_pct": -0.2764,
    "years_beat_gt55": 0,
    "years_total": 2,
@@ -53,7 +53,7 @@
   "20": {
    "verdict": "FAIL",
    "ir_oos": -0.207,
-   "ir_is": -2.577,
+   "ir_is": -2.571,
    "spread_oos_pct": -0.4684,
    "years_beat_gt55": 0,
    "years_total": 2,

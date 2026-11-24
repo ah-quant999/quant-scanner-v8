@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-24 21:17:58",
+  "update_time": "2026-11-25 00:05:29",
   "total": 1494,
   "grade_summary": {
     "A": 32,
@@ -1856,13 +1856,7 @@
       "revenue_growth": 20.738400000000002,
       "reason": "ROE差(1.6%) | 营收高增(20.7%)",
       "cfo_to_asset": 0.47,
-      "cf_queried": true,
-      "news": {
-        "score": 8,
-        "tags": [
-          "回购"
-        ]
-      }
+      "cf_queried": true
     },
     "sh_600482": {
       "score": 30,
@@ -2191,9 +2185,10 @@
       "cfo_to_asset": -0.83,
       "cf_queried": true,
       "news": {
-        "score": -15,
+        "score": -20,
         "tags": [
-          "中报续亏"
+          "中报续亏",
+          "诉讼"
         ]
       }
     },
@@ -2760,13 +2755,7 @@
       "revenue_growth": 22.3102,
       "reason": "ROE差(1.6%) | 营收高增(22.3%)",
       "cfo_to_asset": 0.71,
-      "cf_queried": true,
-      "news": {
-        "score": 8,
-        "tags": [
-          "中标"
-        ]
-      }
+      "cf_queried": true
     },
     "sh_601077": {
       "score": 30,
@@ -3410,7 +3399,13 @@
       "revenue_growth": 17.7401,
       "reason": "ROE差(4.3%) | 营收增长(17.7%)",
       "cfo_to_asset": -0.44,
-      "cf_queried": true
+      "cf_queried": true,
+      "news": {
+        "score": 8,
+        "tags": [
+          "回购"
+        ]
+      }
     },
     "sh_603028": {
       "score": 30,
@@ -3782,9 +3777,10 @@
       "cfo_to_asset": 0.55,
       "cf_queried": true,
       "news": {
-        "score": 5,
+        "score": 13,
         "tags": [
-          "中报略增"
+          "中报略增",
+          "回购"
         ]
       }
     },
@@ -4729,13 +4725,7 @@
       "revenue_growth": 38.7492,
       "reason": "ROE偏低(8.1%) | 营收高增(38.7%)",
       "cfo_to_asset": 1.74,
-      "cf_queried": true,
-      "news": {
-        "score": 8,
-        "tags": [
-          "回购"
-        ]
-      }
+      "cf_queried": true
     },
     "sh_688026": {
       "score": 25,
@@ -6352,9 +6342,10 @@
       "reason": "ROE一般(12.9%) | 营收高增(23.2%)",
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "三季报预增"
+          "三季报预增",
+          "回购"
         ]
       }
     },
@@ -6446,13 +6437,7 @@
       "revenue_growth": 20.6824,
       "reason": "ROE偏低(8.5%) | 营收高增(20.7%)",
       "cfo_to_asset": 7.71,
-      "cf_queried": true,
-      "news": {
-        "score": 8,
-        "tags": [
-          "回购"
-        ]
-      }
+      "cf_queried": true
     },
     "sh_688403": {
       "score": 25,
@@ -7135,9 +7120,10 @@
       "cfo_to_asset": 1.25,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "三季报扭亏"
+          "三季报扭亏",
+          "回购"
         ]
       }
     },
@@ -7995,7 +7981,13 @@
       "revenue_growth": 148.655,
       "reason": "ROE差(4.4%) | 营收高增(148.7%)",
       "cfo_to_asset": -1.09,
-      "cf_queried": true
+      "cf_queried": true,
+      "news": {
+        "score": 8,
+        "tags": [
+          "中标"
+        ]
+      }
     },
     "sz_000039": {
       "score": 30,
@@ -11066,9 +11058,10 @@
       "cfo_to_asset": 0.9,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 10,
         "tags": [
-          "中报扭亏"
+          "中报扭亏",
+          "诉讼"
         ]
       }
     },
@@ -12634,13 +12627,7 @@
       "revenue_growth": 23.6673,
       "reason": "ROE一般(10.5%) | 营收高增(23.7%)",
       "cfo_to_asset": 5.92,
-      "cf_queried": true,
-      "news": {
-        "score": 8,
-        "tags": [
-          "回购"
-        ]
-      }
+      "cf_queried": true
     },
     "sz_300479": {
       "score": 25,

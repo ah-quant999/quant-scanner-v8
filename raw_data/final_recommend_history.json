@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-24 23:28:55",
-  "update_time": "2026-11-24 23:28:55",
+  "generated": "2026-11-25 01:57:57",
+  "update_time": "2026-11-25 01:57:57",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -2064,16 +2064,16 @@
     },
     "2026-11-24": {
       "date": "2026-11-24",
-      "update_time": "2026-11-24 23:21:09",
-      "file": "final_recommend_20261124.json",
+      "update_time": "2026-11-25 01:55:26",
+      "file": "final_recommend_20261125.json",
       "degraded": false,
       "top3": [
         {
           "rank": 1,
           "code": "600999",
           "name": "招商证券",
-          "close": 15.6,
-          "close_date": "2026-11-24",
+          "close": null,
+          "close_date": null,
           "final_score": 4.5,
           "resonance": 1,
           "sources": [
@@ -2084,8 +2084,8 @@
           "rank": 2,
           "code": "601211",
           "name": "国泰海通",
-          "close": 16.43,
-          "close_date": "2026-11-24",
+          "close": null,
+          "close_date": null,
           "final_score": 4.5,
           "resonance": 1,
           "sources": [
