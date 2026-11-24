@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-24 20:55",
- "generated": "2026-11-24 20:55",
+ "update_time": "2026-11-24 21:49",
+ "generated": "2026-11-24 21:49",
  "meta": {
-  "generated": "2026-11-24 20:55",
+  "generated": "2026-11-24 21:49",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12902,6 +12902,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301413",
+      "name": "安培龙",
+      "change_pct": 19.997,
+      "price": 89.71,
+      "category": "突破"
+     },
+     {
       "code": "002988",
       "name": "豪美新材",
       "change_pct": 6.554,
@@ -12972,24 +12979,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "300940",
+      "name": "南极光",
+      "change_pct": 8.263,
+      "price": 14.15,
+      "category": "突破"
+     },
+     {
       "code": "603051",
       "name": "鹿山新材",
       "change_pct": 5.263,
       "price": 22.0,
-      "category": "突破"
-     },
-     {
-      "code": "600698",
-      "name": "湖南天雁",
-      "change_pct": 3.633,
-      "price": 5.99,
-      "category": "突破"
-     },
-     {
-      "code": "301281",
-      "name": "科源制药",
-      "change_pct": 4.118,
-      "price": 33.12,
       "category": "突破"
      }
     ],
@@ -13006,6 +13006,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "澳洋健康",
       "change_pct": 5.263,
       "price": 5.4,
+      "category": "加速"
+     },
+     {
+      "code": "301413",
+      "name": "安培龙",
+      "change_pct": 19.997,
+      "price": 89.71,
       "category": "加速"
      },
      {
@@ -13081,6 +13088,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301413",
+      "name": "安培龙",
+      "change_pct": 19.997,
+      "price": 89.71,
+      "category": "短线选股"
+     },
+     {
       "code": "002988",
       "name": "豪美新材",
       "change_pct": 6.554,
@@ -13151,24 +13165,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300940",
+      "name": "南极光",
+      "change_pct": 8.263,
+      "price": 14.15,
+      "category": "短线选股"
+     },
+     {
       "code": "603051",
       "name": "鹿山新材",
       "change_pct": 5.263,
       "price": 22.0,
-      "category": "短线选股"
-     },
-     {
-      "code": "600698",
-      "name": "湖南天雁",
-      "change_pct": 3.633,
-      "price": 5.99,
-      "category": "短线选股"
-     },
-     {
-      "code": "301281",
-      "name": "科源制药",
-      "change_pct": 4.118,
-      "price": 33.12,
       "category": "短线选股"
      }
     ],
@@ -13188,24 +13195,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "300940",
+      "name": "南极光",
+      "change_pct": 8.263,
+      "price": 14.15,
+      "category": "强势股"
+     },
+     {
       "code": "603051",
       "name": "鹿山新材",
       "change_pct": 5.263,
       "price": 22.0,
-      "category": "强势股"
-     },
-     {
-      "code": "600698",
-      "name": "湖南天雁",
-      "change_pct": 3.633,
-      "price": 5.99,
-      "category": "强势股"
-     },
-     {
-      "code": "301281",
-      "name": "科源制药",
-      "change_pct": 4.118,
-      "price": 33.12,
       "category": "强势股"
      }
     ]
