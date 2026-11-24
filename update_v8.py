@@ -1929,6 +1929,52 @@ def run_experiment_cards():
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_etf_pace.py，跳过")
 
+    # 🆕 2026-11-24 主人拍板"方案B"：市场攻防档位·五信号合成（data/MARKET_TACTIC.js ← gen_market_regime.py）：
+    #   ⚠️ 命名 MARKET_TACTIC：data/MARKET_REGIME.js 是利率板块推荐框架（gen_invest_avoid.py 产出回读）勿撞。
+    #   方法论=趋势跟随/波动率目标仓位（融合 A1 模拟盘判断方法：防守降档、进攻升档）。
+    #   五路信号（趋势/广度/涨停情绪/ETF量能/板块资金）各 -1/0/+1 + 危机雷达开关 → 攻0.95/观0.50/守0.30。
+    #   纯读现有数据零新增抓取 ~0.1s；必须在 gen_etf_pace 之后跑（读当日量能）。卡内子块挂 AI速览行尾。失败隔离。
+    regime_py = Path(__file__).resolve().parent / "scripts" / "gen_market_regime.py"
+    if regime_py.exists():
+        print(f"[experiment] ▶ gen_market_regime.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(regime_py)],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines()
+                        if l.strip() and "Deprecation" not in l][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ gen_market_regime 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ gen_market_regime 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/gen_market_regime.py，跳过")
+
+    # 🔍 2026-11-24 主人拍板「全套合成分析」：全站综合解析·15源加权合成（data/MARKET_VERDICT.js ← gen_market_verdict.py）：
+    #   命名 MARKET_VERDICT 已核未占用（MARKET_REGIME 撞名事故后的纪律：新 window 变量先 grep index.html 注入区）。
+    #   12 源读上游产物（TACTIC/ETF_PACE/JUDGMENT/INVEST_AVOID/EQBOND/BOND_FUTURES 等）+3 源读 raw_data，
+    #   加权合成（危机一票否决）+ 交叉矛盾检测 + 边际变化（自建 raw_data/market_verdict_history.json）
+    #   + 自然语言叙事。必须在本文件 gen_market_regime 之后跑（复用其 TACTIC 产物）。前端=综合研判卡顶「全站综合解析」块。失败隔离。
+    verdict_py = Path(__file__).resolve().parent / "scripts" / "gen_market_verdict.py"
+    if verdict_py.exists():
+        print(f"[experiment] ▶ gen_market_verdict.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(verdict_py)],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines()
+                        if l.strip() and "Deprecation" not in l][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ gen_market_verdict 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ gen_market_verdict 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/gen_market_verdict.py，跳过")
+
     # 🔧 2026-11-23 部署拦截事故根治：algorithms/track_resonance.py 是零调度孤儿（11-11 后无人跑），
     #   raw_data/resonance_track.json 陈旧 9 个交易日 → 跨层一致性闸门拦部署（本轮 CI failure 根因）。
     #   纯本地计算（lhb_history + kline_cache，~2s）。失败隔离。

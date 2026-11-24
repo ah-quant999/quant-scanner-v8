@@ -21,7 +21,6 @@
 import json, os, re, sys, datetime, threading
 
 OUT = "data/ETF_PACE.js"
-RAW_OUT = "raw_data/etf_pace.json"   # 2026-11-24 主人令：供 AI速览读取（盘中实时，同源同真值）
 HEAT = "raw_data/etf_intraday_heat.json"
 SLOTS_PER_DAY = 48          # 09:35..11:30 + 13:05..15:00
 BASE_DAYS = 20              # 基线窗口
@@ -231,10 +230,6 @@ def main():
         f.write("// ETF_PACE · 配速比+局部异动灯 · gen_etf_pace.py\n")
         f.write("// 口径详情见 logic.html 登记条目\n")
         f.write("window.ETF_PACE = " + json.dumps(out, ensure_ascii=False) + ";\n")
-    # 2026-11-24 主人令：同源 raw json 供 AI速览 detect_etf_pace_anomaly 读取
-    #   （前端 data/*.js 与 raw_data/*.json 两个消费端口径必须一致，禁止各读各的）
-    with open(RAW_OUT, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False, indent=1)
     print(f"ETF_PACE: {len(results)}/{len(items)} ok | 放量{n_hot} 缩量{n_cool} 异动灯{n_light} | errs={len(errs)}")
 
 
