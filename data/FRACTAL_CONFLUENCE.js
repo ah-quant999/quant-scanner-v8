@@ -1,14 +1,14 @@
 window.FRACTAL_CONFLUENCE = {
- "update_time": "2026-11-24 17:30:33",
+ "update_time": "2026-11-24 17:37:13",
  "sample": {
   "start": "2005-01-04",
-  "end": "2026-11-23",
-  "days": 5315
+  "end": "2026-11-24",
+  "days": 5316
  },
  "random_baseline": {
   "n": 3000,
-  "wr5": 53.9,
-  "m5": 0.17
+  "wr5": 53.7,
+  "m5": 0.19
  },
  "source": "新浪/东财双路日K + 东财push2delay实时bar合成",
  "missing_layers": "L1主力资金（东财板块历史仅120天）、L5 regime（现行产物无历史）无法纳入历史回测【MISSING】；本回测覆盖 L2位置/L3量能/L4情绪冰点 三层可验证部分",
@@ -168,7 +168,7 @@ window.FRACTAL_CONFLUENCE = {
   "dev250": -16.68,
   "vol_shrink": true,
   "live": true,
-  "as_of": "17:30",
+  "as_of": "17:37",
   "last_bottom": "2026-11-23",
   "last_top": "2026-11-12"
  },
