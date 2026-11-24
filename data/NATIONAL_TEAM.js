@@ -1,7 +1,7 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-23",
-  "update_time": "2026-11-24 16:39:19",
-  "source_time": "2026-11-24 16:04:15",
+  "update_time": "2026-11-24 16:48:36",
+  "source_time": "2026-11-24 16:48:31",
   "score": 55.3,
   "verdict": "偏活跃",
   "verdict_color": "#f59e0b",
@@ -44,7 +44,7 @@ window.NATIONAL_TEAM = {
       "ready": true,
       "value": 1.19,
       "unit": "×",
-      "detail": "易方达创业板ETF 当日成交 152.8 亿 = 20日均 1.19×（非下跌日·放量不判护盘），覆盖 6/6 只",
+      "detail": "易方达创业板ETF 当日成交 152.8 亿 = 20日均 1.19×（非下跌日·放量不判护盘），覆盖 3/6 只",
       "status": "🟡中性"
     }
   ],
