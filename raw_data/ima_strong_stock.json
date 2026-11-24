@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-11-24 03:32:20",
+  "update_time": "2026-11-24 17:02:16",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7507701210837524",
   "source_kind": "wiki",
   "detail_channel": "full-snapshot",
-  "source_title": "短线情绪选股 2026-11-23",
+  "source_title": "短线情绪选股 2026-11-24",
   "source_updated_at": "",
-  "data_date": "2026-11-23",
-  "stale_days": 1,
+  "data_date": "2026-11-24",
+  "stale_days": 0,
   "source_stale": false,
   "snapshot_expired": false,
   "snapshot_meta_mismatch": false,
@@ -17,43 +17,43 @@
   "themes_top": [
     [
       "人形机器人",
-      39
-    ],
-    [
-      "汽车零部件",
-      9
+      11
     ],
     [
       "“羊”字辈",
-      7
+      4
     ],
     [
-      "AI短剧",
-      6
+      "汽车零部件",
+      3
     ],
     [
-      "机器人零部件",
-      5
+      "机器人",
+      3
+    ],
+    [
+      "撤销风险警示",
+      2
+    ],
+    [
+      "AI玩具",
+      2
+    ],
+    [
+      "国企改革",
+      2
     ],
     [
       "商业航天",
-      5
+      2
     ],
     [
-      "三季报增长",
-      5
+      "液冷服务器",
+      2
     ],
     [
-      "具身智能",
-      4
-    ],
-    [
-      "精密减速器",
-      4
-    ],
-    [
-      "回购",
-      4
+      "机器人结构件",
+      2
     ]
   ],
   "summary": {
@@ -63,13 +63,13 @@
     "rows_parsed": 8,
     "expected": null,
     "source_channel": "full-snapshot",
-    "snapshot_fetched_at": "2026-11-23 19:42:44",
-    "snapshot_age_h": 7.83,
+    "snapshot_fetched_at": "2026-11-24 17:02:09",
+    "snapshot_age_h": 0.0,
     "truncated": false,
     "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
   },
   "detail_complete": true,
-  "wiki_latest": "短线情绪选股 2026-11-23",
+  "wiki_latest": "短线情绪选股 2026-11-24",
   "parse_health": {
     "total": 8,
     "no_score": 0,
@@ -78,132 +78,132 @@
   },
   "stocks": [
     {
-      "rank": 4,
-      "code": "688286",
-      "market": "SH",
-      "name": "敏芯股份",
-      "score": 78,
-      "turnover_pct": 17.6,
-      "vol_ratio": 1.59,
-      "mktcap_yi": 41.9,
-      "seal_yi": 0.43,
-      "theme": "人形机器人/六维力传感器",
-      "note": "主流题材核心（所属题材合计 43 家涨停）；换手 17.6%（尚可）；量比 1.59（温和放量）；封单 0.43 亿；非一字板，可参与",
-      "_parse_missing": [],
-      "first_selected": "2026-11-23",
-      "trade_date": "2026-11-23"
-    },
-    {
-      "rank": 5,
-      "code": "300007",
-      "market": "SZ",
-      "name": "汉威科技",
-      "score": 78,
-      "turnover_pct": 11.8,
-      "vol_ratio": 1.65,
-      "mktcap_yi": 103.4,
-      "seal_yi": 0.3,
-      "theme": "人形机器人/柔性触觉",
-      "note": "主流题材核心（所属题材合计 41 家涨停）；换手 11.8%（尚可）；量比 1.65（温和放量）；封单 0.30 亿；非一字板，可参与",
-      "_parse_missing": [],
-      "first_selected": "2026-11-23",
-      "trade_date": "2026-11-23"
-    },
-    {
-      "rank": 6,
-      "code": "000678",
-      "market": "SZ",
-      "name": "襄阳轴承",
-      "score": 76,
-      "turnover_pct": 29.9,
-      "vol_ratio": 1.13,
-      "mktcap_yi": 85.9,
-      "seal_yi": 0.57,
-      "theme": "机器人轴承/湖北国资",
-      "note": "主流题材核心（所属题材合计 10 家涨停）；换手 29.9%（心法优质区间）；封单 0.57 亿；非一字板，可参与",
-      "_parse_missing": [],
-      "first_selected": "2026-11-23",
-      "trade_date": "2026-11-23"
-    },
-    {
-      "rank": 7,
-      "code": "002696",
-      "market": "SZ",
-      "name": "百洋股份",
-      "score": 76,
-      "turnover_pct": 22.2,
-      "vol_ratio": 1.28,
-      "mktcap_yi": 24.5,
-      "seal_yi": 0.66,
-      "theme": "“羊”字辈/水产加工",
-      "note": "主流题材核心（所属题材合计 10 家涨停）；换手 22.2%（心法优质区间）；封单 0.66 亿；非一字板，可参与",
-      "_parse_missing": [],
-      "first_selected": "2026-10-15",
-      "trade_date": "2026-11-23"
-    },
-    {
-      "rank": 8,
-      "code": "300721",
-      "market": "SZ",
-      "name": "怡达股份",
-      "score": 73,
-      "turnover_pct": 26.4,
-      "vol_ratio": 1.5,
-      "mktcap_yi": 28.9,
-      "seal_yi": 0.55,
-      "theme": "湿电子化学品/光刻胶",
-      "note": "题材有跟随（合计 4 家）；换手 26.4%（心法优质区间）；量比 1.50（温和放量）；封单 0.55 亿；非一字板，可参与",
-      "_parse_missing": [],
-      "first_selected": "2026-11-23",
-      "trade_date": "2026-11-23"
-    },
-    {
       "rank": 1,
-      "code": "002579",
+      "code": "301413",
       "market": "SZ",
-      "name": "中京电子",
-      "score": 100,
-      "turnover_pct": 30.3,
-      "vol_ratio": 3.41,
-      "mktcap_yi": 85.9,
-      "seal_yi": 1.02,
-      "theme": "高阶HDI/算力",
-      "note": "主流题材核心（所属题材合计 42 家涨停）；换手 30.3%（心法优质区间）；量比 3.41（显著放量）；封单 1.02 亿（封板坚决）；非一字板，可参与",
+      "name": "安培龙",
+      "score": 82,
+      "turnover_pct": 24.1,
+      "vol_ratio": 1.65,
+      "mktcap_yi": 68.5,
+      "seal_yi": 0.04,
+      "theme": "人形机器人/力传感器",
+      "note": "主流题材核心（所属题材合计 13 家涨停）；换手 24.1%（心法优质区间）；量比 1.65（温和放量）；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-11-23",
-      "trade_date": "2026-11-23"
+      "first_selected": "2026-11-24",
+      "trade_date": "2026-11-24"
     },
     {
       "rank": 2,
-      "code": "688836",
+      "code": "600261",
       "market": "SH",
-      "name": "宇树科技",
-      "score": 92,
-      "turnover_pct": 24.0,
-      "vol_ratio": 1.56,
-      "mktcap_yi": 213.0,
-      "seal_yi": 2.4,
-      "theme": "人形机器人/物理AI",
-      "note": "主流题材核心（所属题材合计 45 家涨停）；换手 24.0%（心法优质区间）；量比 1.56（温和放量）；封单 2.40 亿（封板坚决）；非一字板，可参与",
+      "name": "阳光照明",
+      "score": 76,
+      "turnover_pct": 25.0,
+      "vol_ratio": 1.21,
+      "mktcap_yi": 64.8,
+      "seal_yi": 0.38,
+      "theme": "商业航天/激光通信",
+      "note": "主流题材核心（所属题材合计 8 家涨停）；换手 25.0%（心法优质区间）；封单 0.38 亿；非一字板，可参与",
       "_parse_missing": [],
-      "first_selected": "2026-10-23",
-      "trade_date": "2026-11-23"
+      "first_selected": "2026-11-17",
+      "trade_date": "2026-11-24"
     },
     {
       "rank": 3,
+      "code": "600715",
+      "market": "SH",
+      "name": "文投控股",
+      "score": 73,
+      "turnover_pct": 32.8,
+      "vol_ratio": 1.8,
+      "mktcap_yi": 89.9,
+      "seal_yi": 0.38,
+      "theme": "AI漫剧/剧集发行",
+      "note": "题材有跟随（合计 3 家）；换手 32.8%（心法优质区间）；量比 1.80（温和放量）；封单 0.38 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-11-02",
+      "trade_date": "2026-11-24"
+    },
+    {
+      "rank": 4,
+      "code": "300539",
+      "market": "SZ",
+      "name": "横河精密",
+      "score": 67,
+      "turnover_pct": 23.3,
+      "vol_ratio": 1.75,
+      "mktcap_yi": 49.3,
+      "seal_yi": 0.21,
+      "theme": "机器人/减速器",
+      "note": "题材有跟随（合计 5 家）；换手 23.3%（心法优质区间）；量比 1.75（温和放量）；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-11-24",
+      "trade_date": "2026-11-24"
+    },
+    {
+      "rank": 5,
+      "code": "002611",
+      "market": "SZ",
+      "name": "东方精工",
+      "score": 65,
+      "turnover_pct": 8.9,
+      "vol_ratio": 3.41,
+      "mktcap_yi": 134.2,
+      "seal_yi": 0.22,
+      "theme": "人形机器人/机器人数据训练",
+      "note": "主流题材核心（所属题材合计 13 家涨停）；量比 3.41（显著放量）；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-11-24",
+      "trade_date": "2026-11-24"
+    },
+    {
+      "rank": 6,
+      "code": "002685",
+      "market": "SZ",
+      "name": "华东重机",
+      "score": 63,
+      "turnover_pct": 49.1,
+      "vol_ratio": 2.12,
+      "mktcap_yi": 90.2,
+      "seal_yi": 0.83,
+      "theme": "GPU芯片/港口装卸设备",
+      "note": "题材有跟随（合计 3 家）；换手 49.1%（尚可）；量比 2.12（温和放量）；封单 0.83 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-11-13",
+      "trade_date": "2026-11-24"
+    },
+    {
+      "rank": 7,
       "code": "002086",
       "market": "SZ",
       "name": "东方海洋",
-      "score": 80,
-      "turnover_pct": 26.6,
-      "vol_ratio": 0.84,
-      "mktcap_yi": 65.3,
-      "seal_yi": 1.3,
+      "score": 61,
+      "turnover_pct": 35.2,
+      "vol_ratio": 1.16,
+      "mktcap_yi": 71.8,
+      "seal_yi": 0.77,
       "theme": "海洋养殖/大健康",
-      "note": "主流题材核心（所属题材合计 10 家涨停）；换手 26.6%（心法优质区间）；封单 1.30 亿（封板坚决）；非一字板，可参与",
+      "note": "题材有跟随（合计 7 家）；换手 35.2%（心法优质区间）；封单 0.77 亿；非一字板，可参与",
       "_parse_missing": [],
       "first_selected": "2026-10-21",
-      "trade_date": "2026-11-23"
+      "trade_date": "2026-11-24"
+    },
+    {
+      "rank": 8,
+      "code": "603662",
+      "market": "SH",
+      "name": "柯力传感",
+      "score": 57,
+      "turnover_pct": 5.9,
+      "vol_ratio": 1.9,
+      "mktcap_yi": 148.9,
+      "seal_yi": 0.12,
+      "theme": "六维力传感器/人形机器人",
+      "note": "主流题材核心（所属题材合计 14 家涨停）；量比 1.90（温和放量）；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-11-24",
+      "trade_date": "2026-11-24"
     }
   ],
   "kb": {
