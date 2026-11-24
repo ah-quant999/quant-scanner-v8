@@ -136,8 +136,13 @@ jobs:
             #    （数据正在产出），10:22 档守卫没查 selfhosted → 误判无在途 → 派云端 → 同组
             #    把正在写 main 的 selfhosted 顶掉（当日云端 9 连杀 + selfhosted 被顶 1 次，
             #    盘中数据全靠 12min 超时兜底续命）。扩为双链在途探测，任一在途即让位。
+            # 🔴 2026-11-24 12:05 小九（主人令「你到底修了没」盘中断档三连根因之三·守卫漏 hosted）：
+            #    在途探测只查 cloud+selfhosted，不查 hosted 兜底链 —— 11-24 实测 11:03 hosted
+            #    全量档跑到 update_v8 步（差一步推送），调度器照样派发 → 同组「1 running+1 pending」
+            #    挤压 → hosted 11:33 被砍在最后一步，AI_MARKET_BRIEF 断档至 11:52 才手工直推补上。
+            #    扩为三链在途探测（cloud/selfhosted/hosted），任一在途即让位。
             INFLIGHT_TS=""; INFLIGHT_ID=""; INFLIGHT_ST=""
-            for WFCHK in v8_cn_fetch_cloud_selfhosted.yml v8_cn_fetch_cloud.yml; do
+            for WFCHK in v8_cn_fetch_cloud_selfhosted.yml v8_cn_fetch_cloud.yml v8_cn_fetch_cloud_hosted.yml; do
               for ST in in_progress queued pending; do
                 curl -sS -o /tmp/q.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/$WFCHK/runs?status=$ST&per_page=1" 2>/dev/null
                 T=$(grep -o '"created_at":"[^"]*"' /tmp/q.json 2>/dev/null | head -1 | cut -d'"' -f4)
