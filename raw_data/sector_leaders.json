@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-24 16:45",
-  "republish_time": "2026-11-24 17:38:07",
+  "update_time": "2026-11-24 17:55",
+  "republish_time": "2026-11-24 20:54:47",
   "data_date": "2026-11-23",
   "rule_ver": 2,
   "top_n": 5,
@@ -8,7 +8,7 @@
   "phase": "主升+启动",
   "sector_count": 0,
   "sectors": [],
-  "fr_count": 12,
+  "fr_count": 11,
   "fr_sectors": [
     {
       "name": "保险",
@@ -52,6 +52,49 @@
         }
       ],
       "match": "norm"
+    },
+    {
+      "name": "元件",
+      "bk": "BK0459",
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "002579",
+          "name": "中京电子",
+          "price": 16.2,
+          "chg": 9.98,
+          "main_net": null
+        },
+        {
+          "code": "002199",
+          "name": "东晶电子",
+          "price": 11.4,
+          "chg": 9.62,
+          "main_net": null
+        },
+        {
+          "code": "300903",
+          "name": "科翔股份",
+          "price": 64.65,
+          "chg": 9.43,
+          "main_net": null
+        },
+        {
+          "code": "603175",
+          "name": "超颖电子",
+          "price": 95.45,
+          "chg": 6.86,
+          "main_net": null
+        },
+        {
+          "code": "300476",
+          "name": "胜宏科技",
+          "price": 122.32,
+          "chg": 6.27,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     },
     {
       "name": "公路铁路运输",
@@ -269,90 +312,47 @@
       "match": "ths"
     },
     {
-      "name": "煤炭开采加工",
-      "bk": null,
-      "cons_count": 20,
+      "name": "电子化学品",
+      "bk": "BK1039",
+      "cons_count": 35,
       "leaders": [
         {
-          "code": "601898",
-          "name": "中煤能源",
-          "price": 13.38,
-          "chg": 0.53,
+          "code": "603078",
+          "name": "江化微",
+          "price": 27.34,
+          "chg": 6.92,
           "main_net": null
         },
         {
-          "code": "601918",
-          "name": "新集能源",
-          "price": 9.3,
-          "chg": 0.11,
+          "code": "300684",
+          "name": "中石科技",
+          "price": 51.63,
+          "chg": 6.1,
           "main_net": null
         },
         {
-          "code": "601088",
-          "name": "中国神华",
-          "price": 50.91,
-          "chg": -0.24,
+          "code": "603931",
+          "name": "格林达",
+          "price": 30.75,
+          "chg": 6.0,
           "main_net": null
         },
         {
-          "code": "600408",
-          "name": "安泰集团",
-          "price": 3.71,
-          "chg": -0.54,
+          "code": "688019",
+          "name": "安集科技",
+          "price": 217.79,
+          "chg": 5.25,
           "main_net": null
         },
         {
-          "code": "601101",
-          "name": "昊华能源",
-          "price": 10.19,
-          "chg": -0.78,
+          "code": "300537",
+          "name": "广信材料",
+          "price": 20.0,
+          "chg": 4.93,
           "main_net": null
         }
       ],
-      "match": "ths"
-    },
-    {
-      "name": "电力",
-      "bk": "BK0428",
-      "cons_count": 100,
-      "leaders": [
-        {
-          "code": "603105",
-          "name": "芯能科技",
-          "price": 6.91,
-          "chg": 2.83,
-          "main_net": null
-        },
-        {
-          "code": "601985",
-          "name": "中国核电",
-          "price": 10.05,
-          "chg": 2.76,
-          "main_net": null
-        },
-        {
-          "code": "301046",
-          "name": "能辉科技",
-          "price": 22.97,
-          "chg": 2.41,
-          "main_net": null
-        },
-        {
-          "code": "600167",
-          "name": "联美控股",
-          "price": 4.9,
-          "chg": 1.45,
-          "main_net": null
-        },
-        {
-          "code": "002480",
-          "name": "新筑股份",
-          "price": 4.73,
-          "chg": 1.28,
-          "main_net": null
-        }
-      ],
-      "match": "exact"
+      "match": "norm"
     },
     {
       "name": "证券",
@@ -435,49 +435,6 @@
           "name": "山东黄金",
           "price": 22.75,
           "chg": -3.6,
-          "main_net": null
-        }
-      ],
-      "match": "exact"
-    },
-    {
-      "name": "钢铁",
-      "bk": "BK0479",
-      "cons_count": 46,
-      "leaders": [
-        {
-          "code": "002318",
-          "name": "久立特材",
-          "price": 16.56,
-          "chg": 2.22,
-          "main_net": null
-        },
-        {
-          "code": "603995",
-          "name": "甬金股份",
-          "price": 19.56,
-          "chg": 1.66,
-          "main_net": null
-        },
-        {
-          "code": "002443",
-          "name": "金洲管道",
-          "price": 8.99,
-          "chg": 1.35,
-          "main_net": null
-        },
-        {
-          "code": "000717",
-          "name": "中南股份",
-          "price": 1.84,
-          "chg": 1.1,
-          "main_net": null
-        },
-        {
-          "code": "000708",
-          "name": "中信特钢",
-          "price": 12.6,
-          "chg": 0.0,
           "main_net": null
         }
       ],
