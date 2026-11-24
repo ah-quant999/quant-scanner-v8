@@ -1,14 +1,14 @@
 {
- "generated": "2026-11-25 07:07:43",
- "window": "2026-06-10 ~ 2026-11-24",
+ "generated": "2026-11-25 05:17:37",
+ "window": "2026-06-10 ~ 2026-11-20",
  "criteria": "龙虎榜: inst_net>0 且 yz_net>0 且 (inst+yz)≥8000万; 转债剔除",
  "entry": "T+1 开盘买入, 单边成本0.15%, 净口径; 未成熟期限标 pending",
  "benchmark": "880003 平均股价(等权全A)·同成本口径",
- "n_signals": 408,
- "n_tracked": 374,
+ "n_signals": 404,
+ "n_tracked": 372,
  "per_horizon": {
   "T+1": {
-   "mature": 374,
+   "mature": 372,
    "pending": 0,
    "win%": 46.8,
    "avg%": 0.02,
@@ -22,7 +22,7 @@
   },
   "T+5": {
    "mature": 364,
-   "pending": 10,
+   "pending": 8,
    "win%": 41.8,
    "avg%": -2.67,
    "med%": -2.17,
@@ -35,7 +35,7 @@
   },
   "T+10": {
    "mature": 347,
-   "pending": 27,
+   "pending": 25,
    "win%": 34.6,
    "avg%": -6.21,
    "med%": -6.46,
@@ -48,7 +48,7 @@
   },
   "T+20": {
    "mature": 317,
-   "pending": 57,
+   "pending": 55,
    "win%": 19.6,
    "avg%": -15.08,
    "med%": -15.73,
@@ -61,7 +61,7 @@
   },
   "T+30": {
    "mature": 288,
-   "pending": 86,
+   "pending": 84,
    "win%": 15.3,
    "avg%": -18.76,
    "med%": -20.73,
@@ -74,7 +74,7 @@
   },
   "T+60": {
    "mature": 164,
-   "pending": 210,
+   "pending": 208,
    "win%": 7.9,
    "avg%": -25.1,
    "med%": -28.53,
@@ -87,7 +87,7 @@
   },
   "T+90": {
    "mature": 71,
-   "pending": 303,
+   "pending": 301,
    "win%": 2.8,
    "avg%": -38.16,
    "med%": -42.21,
@@ -96,21 +96,21 @@
   },
   "T+120": {
    "mature": 0,
-   "pending": 374,
+   "pending": 372,
    "win%": null,
    "avg%": null,
    "med%": null
   },
   "T+180": {
    "mature": 0,
-   "pending": 374,
+   "pending": 372,
    "win%": null,
    "avg%": null,
    "med%": null
   },
   "T+250": {
    "mature": 0,
-   "pending": 374,
+   "pending": 372,
    "win%": null,
    "avg%": null,
    "med%": null
@@ -175,19 +175,19 @@
   },
   "金额0.8~2亿": {
    "label": "合计净买0.8~2亿",
-   "n": 200,
+   "n": 198,
    "T+1": {
-    "mature": 200,
+    "mature": 198,
     "pending": 0,
     "win%": 47.5,
-    "avg%": -0.05,
+    "avg%": -0.06,
     "med%": -0.49,
     "best%": 21.9,
     "worst%": -15.9
    },
    "T+5": {
     "mature": 192,
-    "pending": 8,
+    "pending": 6,
     "win%": 42.2,
     "avg%": -2.3,
     "med%": -1.57,
@@ -196,7 +196,7 @@
    },
    "T+10": {
     "mature": 179,
-    "pending": 21,
+    "pending": 19,
     "win%": 35.2,
     "avg%": -5.62,
     "med%": -5.82,
@@ -205,7 +205,7 @@
    },
    "T+30": {
     "mature": 135,
-    "pending": 65,
+    "pending": 63,
     "win%": 17.8,
     "avg%": -17.1,
     "med%": -18.47,
@@ -214,7 +214,7 @@
    },
    "T+90": {
     "mature": 22,
-    "pending": 178,
+    "pending": 176,
     "win%": 4.5,
     "avg%": -33.47,
     "med%": -38.54,
@@ -223,7 +223,7 @@
    },
    "T+250": {
     "mature": 0,
-    "pending": 200,
+    "pending": 198,
     "win%": null,
     "avg%": null,
     "med%": null
@@ -231,19 +231,19 @@
   },
   "首次共振": {
    "label": "首次共振",
-   "n": 284,
+   "n": 283,
    "T+1": {
-    "mature": 284,
+    "mature": 283,
     "pending": 0,
-    "win%": 45.1,
+    "win%": 44.9,
     "avg%": -0.24,
-    "med%": -0.69,
+    "med%": -0.78,
     "best%": 21.9,
     "worst%": -18.9
    },
    "T+5": {
     "mature": 277,
-    "pending": 7,
+    "pending": 6,
     "win%": 42.6,
     "avg%": -2.09,
     "med%": -2.08,
@@ -252,7 +252,7 @@
    },
    "T+10": {
     "mature": 266,
-    "pending": 18,
+    "pending": 17,
     "win%": 34.2,
     "avg%": -5.6,
     "med%": -5.71,
@@ -261,7 +261,7 @@
    },
    "T+30": {
     "mature": 229,
-    "pending": 55,
+    "pending": 54,
     "win%": 16.2,
     "avg%": -18.38,
     "med%": -21.08,
@@ -270,7 +270,7 @@
    },
    "T+90": {
     "mature": 62,
-    "pending": 222,
+    "pending": 221,
     "win%": 3.2,
     "avg%": -37.65,
     "med%": -42.03,
@@ -279,7 +279,7 @@
    },
    "T+250": {
     "mature": 0,
-    "pending": 284,
+    "pending": 283,
     "win%": null,
     "avg%": null,
     "med%": null
@@ -287,19 +287,19 @@
   },
   "重复共振": {
    "label": "重复共振",
-   "n": 90,
+   "n": 89,
    "T+1": {
-    "mature": 90,
+    "mature": 89,
     "pending": 0,
-    "win%": 52.2,
-    "avg%": 0.83,
-    "med%": 0.54,
+    "win%": 52.8,
+    "avg%": 0.85,
+    "med%": 0.57,
     "best%": 18.4,
     "worst%": -13.7
    },
    "T+5": {
     "mature": 87,
-    "pending": 3,
+    "pending": 2,
     "win%": 39.1,
     "avg%": -4.54,
     "med%": -3.31,
@@ -308,7 +308,7 @@
    },
    "T+10": {
     "mature": 81,
-    "pending": 9,
+    "pending": 8,
     "win%": 35.8,
     "avg%": -8.2,
     "med%": -10.1,
@@ -317,7 +317,7 @@
    },
    "T+30": {
     "mature": 59,
-    "pending": 31,
+    "pending": 30,
     "win%": 11.9,
     "avg%": -20.23,
     "med%": -20.54,
@@ -326,7 +326,7 @@
    },
    "T+90": {
     "mature": 9,
-    "pending": 81,
+    "pending": 80,
     "win%": 0.0,
     "avg%": -41.71,
     "med%": -42.65,
@@ -335,7 +335,7 @@
    },
    "T+250": {
     "mature": 0,
-    "pending": 90,
+    "pending": 89,
     "win%": null,
     "avg%": null,
     "med%": null
@@ -2289,7 +2289,7 @@
    "sum_yi": 3.037,
    "entry": 23.701,
    "gap": 0.0,
-   "max_fwd": 99,
+   "max_fwd": 98,
    "r1": 3.06,
    "r5": -7.36,
    "r10": -20.11,
@@ -7558,7 +7558,7 @@
    "sum_yi": 4.129,
    "entry": 3.3,
    "gap": -0.6,
-   "max_fwd": 41,
+   "max_fwd": 40,
    "r1": 10.46,
    "r5": 12.27,
    "r10": 14.09,
@@ -8876,72 +8876,6 @@
    "inst_yi": 0.987,
    "yz_yi": 0.119,
    "sum_yi": 1.106,
-   "entry": null,
-   "status": "pending_t1"
-  },
-  {
-   "date": "2026-11-23",
-   "code": "002242",
-   "name": "九阳股份",
-   "pct": 10.014,
-   "inst_yi": 1.122,
-   "yz_yi": 0.66,
-   "sum_yi": 1.782,
-   "entry": 34.3,
-   "gap": 7.66,
-   "max_fwd": 1,
-   "r1": 2.04,
-   "r5": null,
-   "r10": null,
-   "r20": null,
-   "r30": null,
-   "r60": null,
-   "r90": null,
-   "r120": null,
-   "r180": null,
-   "r250": null
-  },
-  {
-   "date": "2026-11-23",
-   "code": "300829",
-   "name": "金丹科技",
-   "pct": 20.0,
-   "inst_yi": 0.683,
-   "yz_yi": 0.569,
-   "sum_yi": 1.252,
-   "entry": null,
-   "status": "pending_t1"
-  },
-  {
-   "date": "2026-11-23",
-   "code": "688836",
-   "name": "宇树科技",
-   "pct": 20.0,
-   "inst_yi": 1.255,
-   "yz_yi": 0.646,
-   "sum_yi": 1.901,
-   "entry": 726.0,
-   "gap": 2.54,
-   "max_fwd": 1,
-   "r1": -1.25,
-   "r5": null,
-   "r10": null,
-   "r20": null,
-   "r30": null,
-   "r60": null,
-   "r90": null,
-   "r120": null,
-   "r180": null,
-   "r250": null
-  },
-  {
-   "date": "2026-11-24",
-   "code": "301261",
-   "name": "恒工精密",
-   "pct": 14.0264,
-   "inst_yi": 1.03,
-   "yz_yi": 0.023,
-   "sum_yi": 1.053,
    "entry": null,
    "status": "pending_t1"
   }
