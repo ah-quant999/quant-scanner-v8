@@ -1,0 +1,17 @@
+{
+ "records": [
+  {
+   "date": "2026-11-24",
+   "stance": "watch",
+   "score_norm": 0.156,
+   "crisis": 35.6,
+   "zt": 81,
+   "zt_ratio": 0.74,
+   "sh_net5": -913.5,
+   "tactic_score": 1,
+   "pace_hot": 17,
+   "pace_cool": 2,
+   "res_win": 41.8
+  }
+ ]
+}
