@@ -403,6 +403,55 @@ def _narrative(stance, sigs, conflicts, margins, prev_stance):
     return head + mid + tail + stance_txt + watch_txt, lines
 
 
+# ─────────────────────────── 结构化风险位 ───────────────────────────
+# 📍 2026-11-24 主人拍板（雪球敲入带锚点）·按「研判层零成本」轻量落地：
+#    静态锚点写进研判生成器（v8 硬编码表先例如日历），不动数据链、不加 fetcher。
+#    定位纪律：只做解析参考，不投票、不改档位判定——档位仍由 v8 自身量价+资金数据说话
+#    （口径松绑令：参考不封口）。
+#    机制（公开共识）：跌破雪球敲入线 → 券商对冲盘（IC 空单+卖成分股）机械性加压，
+#    下行自我加速（反射性）。点位=券商金工测算转述口径（主人微信截图，未核研报原文），
+#    故 caliber 如实标注可信度。
+#    数据源：raw_data/volatility.json（baostock 日K·盘前 05:30 更新=最近一交易日收盘；
+#    该文件 git 内随链更新，云端 checkout 自带，零新增抓取）。缺失 ⇒ 本条不产出，不冒充。
+SNOWBALL_BAND_1 = (5600.0, 5800.0)   # 第一档：近期新发雪球敲入线集中区
+SNOWBALL_BAND_2 = (5300.0, 5400.0)   # 第二档：更深一层集中敲入带
+
+
+def _risk_anchor():
+    """中证1000 × 雪球敲入带定位。返回 None=数据缺席（调用方跳过本条，不冒充）。"""
+    d = _load("raw_data/volatility.json") or _load_js_obj("data/VOLATILITY.js", "VOLATILITY")
+    if not d:
+        return None
+    csi = next((x for x in (d.get("indices") or []) if x.get("code") == "000852"), None)
+    if not csi or csi.get("close") is None:
+        return None
+    close = float(csi["close"])
+    lo1, hi1 = SNOWBALL_BAND_1
+    lo2, hi2 = SNOWBALL_BAND_2
+    if close < lo2:
+        pos = "第二档敲入带（5300-5400）下方"
+        risk = "对冲加压已穿越两档敲入带，需防连环敲入后的对冲踩踏；反弹至 5300-5400 带或遇解盘抛压"
+    elif close <= hi2:
+        pos = "第二档雪球集中敲入带（5300-5400）内"
+        risk = "更深层集中敲入区，下行风险显著放大"
+    elif close < lo1:
+        pos = "两档敲入带之间（5400-5600）"
+        risk = "下方 5600=第一档敲入带下沿警戒线，跌破则下行风险机械性放大"
+    elif close <= hi1:
+        pct = (close - lo1) / lo1 * 100
+        pos = f"第一档雪球集中敲入带（5600-5800）内、距下沿 +{pct:.1f}%"
+        risk = "跌破 5600 将触发券商对冲盘机械性加压、下行风险明显放大——此处破位与否，是「派发嫌疑」要不要升级为真下行风险的关键独立判据"
+    else:
+        pct = (close - hi1) / hi1 * 100
+        pos = f"第一档敲入带上沿（5800）上方 +{pct:.1f}%"
+        risk = "雪球敲入压力暂不构成压制；若回落进 5600-5800 带内需转入警戒"
+    return dict(code="000852", name="中证1000", close=close,
+                data_update=str(d.get("update_date") or d.get("update_time") or ""),
+                band1=list(SNOWBALL_BAND_1), band2=list(SNOWBALL_BAND_2),
+                position=pos, risk_note=risk,
+                caliber="静态锚点：雪球敲入集中带（券商金工测算·转述口径，未核研报原文）；盘前更新=最近收盘，盘中击穿以实时行情为准；压力位参考，不投票、不改档位判定")
+
+
 # ─────────────────────────── 主流程 ───────────────────────────
 
 def main():
@@ -469,6 +518,14 @@ def main():
     conflicts = _conflicts(sigs, stance)
     narrative, narrative_lines = _narrative(stance, sigs, conflicts, margins, prev_stance)
 
+    # 📍 结构化风险位（2026-11-24 主人拍板）：只进解析行（AI速览同步），不参与投票/档位。
+    anchor = _risk_anchor()
+    if anchor:
+        _aline = (f"📍 结构化风险位：中证1000 最近收盘 {anchor['close']:.0f}（{anchor['data_update']} 盘前更新）"
+                  f"{anchor['position']}——{anchor['risk_note']}。")
+        narrative_lines.append(_aline)
+        narrative += _aline
+
     out = dict(
         update_time=bj_now().strftime("%Y-%m-%d %H:%M:%S"),
         data_date=today,
@@ -485,6 +542,7 @@ def main():
             key=lambda s: s["vote"] * s["weight"])[:3]]),
         conflicts=conflicts,
         margins=margins or [],
+        risk_anchor=anchor,
         prev_stance=prev_stance,
         narrative=narrative,
         narrative_lines=narrative_lines,
