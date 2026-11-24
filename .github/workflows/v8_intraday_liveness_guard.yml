@@ -15,7 +15,8 @@ name: "🩺 盘中链路存活监控"
 
 on:
   # UTC 01:00-07:30 = CST 09:00-15:30，工作日盘中每 30 分；收盘后不再需要（数据定稿）
-  schedule:
+  schedule:  # 2026-11-24 10:15 触改重注册：今晨 schedule 档零投递（注册丢失复发）=> 触改强制重新注册。
+
     - cron: '*/30 1-7 * * 1-5'
   workflow_dispatch:
 
@@ -47,12 +48,15 @@ jobs:
           # 数近90分 success run（jq，避免 python 缩进打架）
           # 🛡 2026-11-19 小九：curl 瞬断会被 set -eo pipefail 直接判死（14:45/14:51 两连败实证，
           #   当时两链实际都活着 lemoncat 13:36 success 距 75min<90）—— 加 --retry 3 容错瞬时网络错。
+          # 🔧 2026-11-24 小九：GitHub API created_at 格式变更（出现毫秒 ".SSS" 与 "+00:00" 结尾），
+          #   旧写法 sub("Z";"+00:00") 后 fromdateiso8601 解析崩 → jq 报错 → step exit 5（09:32/09:36/10:02
+          #   三连 failure 实证，守护自 11-24 起全灭非真 stall）。改写：先去毫秒、再剥时区尾、strptime+mktime(UTC)。
           CNT_SLOT=$(curl -sS --retry 3 --retry-delay 3 --retry-all-errors -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/workflows/354533319/runs?per_page=30&status=success" \
-            | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("Z";"+00:00") | fromdateiso8601))/60 <= 90)] | length')
+            | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("\\.[0-9]+";"") | sub("(Z|\\+00:00)$";"") | strptime("%Y-%m-%dT%H:%M:%S") | mktime))/60 <= 90)] | length')
           CNT_CLOUD=$(curl -sS --retry 3 --retry-delay 3 --retry-all-errors -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/workflows/327687211/runs?per_page=30&status=success" \
-            | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("Z";"+00:00") | fromdateiso8601))/60 <= 90)] | length')
+            | jq '[.workflow_runs[]? | select(((now|floor) - (.created_at | sub("\\.[0-9]+";"") | sub("(Z|\\+00:00)$";"") | strptime("%Y-%m-%dT%H:%M:%S") | mktime))/60 <= 90)] | length')
           echo "intraday_slot 近90分 success=$CNT_SLOT ; cn_fetch_cloud 近90分 success=$CNT_CLOUD"
           if [ "$CNT_SLOT" = "0" ] && [ "$CNT_CLOUD" = "0" ]; then
             echo "state=stall" >> "$GITHUB_OUTPUT"

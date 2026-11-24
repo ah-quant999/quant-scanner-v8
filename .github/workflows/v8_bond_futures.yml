@@ -5,7 +5,8 @@ name: "🏦 v8 国债期货利率罗盘 refresh (cn)"
 
 on:
   workflow_dispatch:
-  schedule:
+  schedule:  # 2026-11-24 10:15 触改重注册：今晨 schedule 档零投递（注册丢失复发）=> 触改强制重新注册。
+
     - cron: '0 1-8 * * 1-5'
     - cron: '30 1-8 * * 1-5'
     # 🛡 2026-11-23 兜底档（错峰追加，主人令「加 schedule 兜底」）：主档 '0/30 1-8' 历史上多次

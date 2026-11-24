@@ -23,7 +23,8 @@
 name: "🔑 v8 凭证到期巡检 (cn runner)"
 
 on:
-  schedule:
+  schedule:  # 2026-11-24 10:15 触改重注册：今晨 schedule 档零投递（注册丢失复发）=> 触改强制重新注册。
+
     - cron: '10 1 * * *'   # 每日 09:10 CST（全周；凭证与交易日无关）
   workflow_dispatch: {}
 
