@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-24 08:29:19",
+ "update_time": "2026-11-24 09:26:00",
  "data_date": "2026-11-24",
  "slots_per_day": 48,
  "base_days": 20,
@@ -13,249 +13,306 @@
  },
  "summary": {
   "hot": 0,
-  "cool": 0,
+  "cool": 19,
   "light": 0
  },
  "items": {
-  "159206": {
-   "name": "卫星ETF永赢",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159915": {
-   "name": "创业板ETF易方达",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "562500": {
-   "name": "机器人ETF华夏",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159971": {
-   "name": "创业板ETF富国",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159205": {
-   "name": "创业板ETF东财",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159992": {
-   "name": "创新药ETF银华",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159570": {
-   "name": "港股通创新药ETF汇添富",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "511990": {
-   "name": "华宝添益ETF",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159326": {
-   "name": "电网设备ETF华夏",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "159977": {
-   "name": "创业板ETF天弘",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
   "159583": {
+   "pace": 0.21,
+   "done": 1,
+   "today_amt": 0.11,
+   "base_amt": 0.54,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
    "name": "通信ETF富国",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "518850": {
-   "name": "黄金ETF华夏",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "518880": {
-   "name": "黄金ETF华安",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
-  },
-  "515880": {
-   "name": "通信ETF国泰",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
+   "src": "sina"
   },
   "513120": {
-   "name": "港股创新药ETF广发",
-   "state": "new",
-   "pace": null,
+   "pace": 0.1,
+   "done": 1,
+   "today_amt": 0.52,
+   "base_amt": 5.07,
+   "amount_basis": "amount",
+   "state": "cool",
    "win_pct": null,
-   "src": "sina",
-   "n_days": 22
+   "name": "港股创新药ETF广发",
+   "src": "sina"
   },
   "159952": {
+   "pace": 0.3,
+   "done": 1,
+   "today_amt": 0.43,
+   "base_amt": 1.45,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
    "name": "创业板ETF广发",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
+   "src": "sina"
   },
-  "159949": {
-   "name": "创业板50ETF华安",
-   "state": "new",
-   "pace": null,
+  "518880": {
+   "pace": 0.05,
+   "done": 1,
+   "today_amt": 0.15,
+   "base_amt": 2.87,
+   "amount_basis": "amount",
+   "state": "cool",
    "win_pct": null,
-   "src": "sina",
-   "n_days": 22
+   "name": "黄金ETF华安",
+   "src": "sina"
+  },
+  "159259": {
+   "pace": 0.45,
+   "done": 1,
+   "today_amt": 0.21,
+   "base_amt": 0.45,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "成长ETF易方达",
+   "src": "sina"
+  },
+  "159326": {
+   "pace": 0.11,
+   "done": 1,
+   "today_amt": 0.03,
+   "base_amt": 0.27,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "电网设备ETF华夏",
+   "src": "sina"
+  },
+  "159570": {
+   "pace": 0.06,
+   "done": 1,
+   "today_amt": 0.06,
+   "base_amt": 1.15,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "港股通创新药ETF汇添富",
+   "src": "sina"
   },
   "159217": {
+   "pace": 0.04,
+   "done": 1,
+   "today_amt": 0.01,
+   "base_amt": 0.24,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
    "name": "港股通创新药ETF工银",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "sina",
-   "n_days": 22
+   "src": "sina"
   },
-  "158902": {
-   "name": "红利智选主动ETF大成",
-   "state": "new",
-   "pace": null,
+  "511990": {
+   "pace": 0.69,
+   "done": 1,
+   "today_amt": 7.68,
+   "base_amt": 11.13,
+   "amount_basis": "amount",
+   "state": "cool",
    "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
+   "name": "华宝添益ETF",
+   "src": "sina"
   },
-  "581050": {
-   "name": "N品质均衡主动ETF易方达",
-   "state": "new",
-   "pace": null,
+  "159992": {
+   "pace": 0.05,
+   "done": 1,
+   "today_amt": 0.02,
+   "base_amt": 0.48,
+   "amount_basis": "amount",
+   "state": "cool",
    "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
+   "name": "创新药ETF银华",
+   "src": "sina"
+  },
+  "562500": {
+   "pace": 0.32,
+   "done": 1,
+   "today_amt": 0.19,
+   "base_amt": 0.6,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "机器人ETF华夏",
+   "src": "sina"
+  },
+  "159915": {
+   "pace": 0.55,
+   "done": 1,
+   "today_amt": 6.71,
+   "base_amt": 12.17,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "创业板ETF易方达",
+   "src": "sina"
+  },
+  "159977": {
+   "pace": 0.48,
+   "done": 1,
+   "today_amt": 0.2,
+   "base_amt": 0.41,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "创业板ETF天弘",
+   "src": "sina"
+  },
+  "159205": {
+   "pace": 0.34,
+   "done": 1,
+   "today_amt": 0.13,
+   "base_amt": 0.39,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "创业板ETF东财",
+   "src": "sina"
+  },
+  "159949": {
+   "pace": 0.35,
+   "done": 1,
+   "today_amt": 0.83,
+   "base_amt": 2.37,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "创业板50ETF华安",
+   "src": "sina"
+  },
+  "159971": {
+   "pace": 0.37,
+   "done": 1,
+   "today_amt": 0.1,
+   "base_amt": 0.26,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "创业板ETF富国",
+   "src": "sina"
+  },
+  "518850": {
+   "pace": 0.05,
+   "done": 1,
+   "today_amt": 0.02,
+   "base_amt": 0.5,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "黄金ETF华夏",
+   "src": "sina"
   },
   "158900": {
    "name": "均衡主动ETF南方",
    "state": "new",
    "pace": null,
    "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
-  },
-  "158903": {
-   "name": "价值主动ETF鹏华",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
-  },
-  "158907": {
-   "name": "鑫汇均衡主动ETF国泰",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
-  },
-  "581060": {
-   "name": "N景气均衡主动ETF永赢",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
+   "src": "sina",
+   "n_days": 2
   },
   "581090": {
    "name": "N价值精选主动ETF华泰柏瑞",
    "state": "new",
    "pace": null,
    "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
-  },
-  "581080": {
-   "name": "N价值主动ETF招商",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
-  },
-  "158909": {
-   "name": "均衡优选主动ETF建信",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
-  },
-  "581010": {
-   "name": "N均衡智选主动ETF汇添富",
-   "state": "new",
-   "pace": null,
-   "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
+   "src": "sina",
+   "n_days": 2
   },
   "581070": {
    "name": "N红利主动ETF平安",
    "state": "new",
    "pace": null,
    "win_pct": null,
-   "src": "eastmoney",
-   "n_days": 1
+   "src": "sina",
+   "n_days": 2
   },
-  "159259": {
-   "name": "成长ETF易方达",
+  "581010": {
+   "name": "N均衡智选主动ETF汇添富",
    "state": "new",
    "pace": null,
    "win_pct": null,
    "src": "sina",
-   "n_days": 22
+   "n_days": 2
+  },
+  "581080": {
+   "name": "N价值主动ETF招商",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
+  },
+  "158902": {
+   "name": "红利智选主动ETF大成",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
+  },
+  "158907": {
+   "name": "鑫汇均衡主动ETF国泰",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
+  },
+  "515880": {
+   "pace": 0.49,
+   "done": 1,
+   "today_amt": 1.45,
+   "base_amt": 2.99,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "通信ETF国泰",
+   "src": "sina"
+  },
+  "159206": {
+   "pace": 0.12,
+   "done": 1,
+   "today_amt": 0.05,
+   "base_amt": 0.43,
+   "amount_basis": "amount",
+   "state": "cool",
+   "win_pct": null,
+   "name": "卫星ETF永赢",
+   "src": "sina"
+  },
+  "581050": {
+   "name": "N品质均衡主动ETF易方达",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
+  },
+  "158909": {
+   "name": "均衡优选主动ETF建信",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
+  },
+  "158903": {
+   "name": "价值主动ETF鹏华",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
+  },
+  "581060": {
+   "name": "N景气均衡主动ETF永赢",
+   "state": "new",
+   "pace": null,
+   "win_pct": null,
+   "src": "sina",
+   "n_days": 2
   }
  },
  "errors": [],
