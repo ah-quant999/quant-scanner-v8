@@ -27,7 +27,7 @@ name: "📋 v8 盘前预案生成器 (cn runner)"
 
 on:
   schedule:
-    # 🔁 2026-11-23 触改重注册：11-20 12:22 后本链零运行（GitHub schedule 注册丢失老病复发，同 us_hk_map 11-21 同款）⇒ 触改本行强制重新注册 schedule。
+    # 🔁 2026-11-24 触改重注册：11-23 12:03 后本链 11-24 07:50 零投递（GitHub schedule 注册丢失第 5 次复发，同 us_hk_map/cashflow/metadata 同款病）⇒ 触改本行强制重新注册 schedule。
     - cron: '50 23 * * 0-4'   # 北京 07:50 工作日（UTC 前一日 23:50；0-4=UTC周日~周四=北京周一~周五）
   workflow_dispatch:
 
@@ -119,16 +119,11 @@ jobs:
         id: gen
         shell: powershell
         run: |
-          # 🔴 铁律 2026-11-24：一切以北京时间为准；禁止用 runner 本地时间或 UTC 判业务周末。
-          # cron '50 23 * * 0-4'(UTC) = 北京【次日】07:50（UTC 周日晚~周四晚 → 北京周一~周五早）。
-          # 跨日调度特殊点：直接取「北京当下」(UTC+8) 判星期 —— UTC 23:50 +8h 自然跨到北京次日 07:50，
-          #   $bjNow.Date 就是调度归属的北京工作日；无论 GitHub 延迟到 UTC 次日凌晨几点，+8h 后仍是北京同一天，
-          #   不会像 20:30 档那样被推过零点误判。这是本卡唯一正确的北京时间锚点（勿改成 UTC触发日+1，跨零点会错算）。
-          $bjNow = (Get-Date).ToUniversalTime().AddHours(8)
-          $dow = [int]$bjNow.DayOfWeek
-          $bjSchedule = $bjNow.Date.AddHours(7).AddMinutes(50)   # 展示用：调度归属北京工作日的 07:50
-          Write-Host ("[gate] 北京时间={0} | 调度归属北京工作日={1}" -f $bjNow.ToString('yyyy-MM-dd HH:mm'), $bjSchedule.ToString('yyyy-MM-dd HH:mm'))
-          if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] 周末(调度归属的北京工作日), exit ok"; exit 0 }
+          # [ascii] weekend gate only - holiday triggers are harmless no-ops (same stance
+          #   as v8_cn_fetch_cloud_selfhosted: the card would just carry the last
+          #   trading day's data, honestly labeled by its data_date line).
+          $dow = (Get-Date).DayOfWeek.value__
+          if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend, exit ok"; exit 0 }
           cd $env:GITHUB_WORKSPACE
           python v8/gen_morning_plan.py
           if ($LASTEXITCODE -ne 0) {
