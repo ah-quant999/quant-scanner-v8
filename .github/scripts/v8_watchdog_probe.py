@@ -195,7 +195,12 @@ def cancel_stuck_cloud_runs():
             "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=20", headers=hdr)
         j = json.loads(urllib.request.urlopen(rq, timeout=20).read())
         in_postclose = (15 * 60 + 30) <= hhmm <= (20 * 60 + 30)
-        exec_limit = 70 if in_postclose else 25
+        # 🛡 2026-11-24 14:50 小九（主人令「保障个啥了」盘中速览断档根因之四）：
+        #   25 分阈值会误杀合法长跑——11-24 实测 hosted 全量盘中档 11:03 起跑 30 分钟整
+        #   被砍在 update_v8 最后一步（AI_MARKET_BRIEF 断档），且 run_started_at 在
+        #   并发组排队场景下不排除等槽时间 ⇒ 真实执行 7-17 分也可能 wall>25。
+        #   放宽到 40 分（job timeout 60 内留 20 分余量），真僵尸仍兜得住。
+        exec_limit = 70 if in_postclose else 40
         now_utc = datetime.datetime.utcnow()
         for x in j.get("workflow_runs", []):
             stt = x.get("status")
