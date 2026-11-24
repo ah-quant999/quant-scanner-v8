@@ -15958,6 +15958,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
               try{ window._fillUsHkMap(); }catch(e){}
             } else if(window.__uhkRetryN > 30){
               clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
+              /* 📋 2026-11-24 主人令：轮询超时不再静默隐藏 */
+              window._v8ShowDataWaiting('usHkMapCard','usHkMapBody',
+                '<div style="font-size:12.5px;color:#fbbf24;line-height:1.8;padding:4px 2px">&#x26A0;&#xFE0F; 隔夜美股&#8594;A/港股映射数据本轮暂缺，下轮盘前（08:25）自动生成后本卡列出；不编造数据。</div>');
             }
           }, 600);
         }
@@ -16112,6 +16115,17 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   // 🗑️ 2026-10-28 主人令：_fillDajijin 渲染函数随「大基金 增减持监控」卡一并删除（死代码清理；数据源 DAJIJIN_REDUCTION 仍由投资避雷针消费，v8_dajijin_fetch 定时任务保留）。
 
 
+  /* 📋 2026-11-24 主人令：观测卡「无数据不再整卡隐藏」——照常显示卡面 + 如实展示真实状态（缺数据说明/真实统计），不编造数据。
+     旧范式（无数据→display:none→轮询超时静默消失）废除；自愈轮询保留（覆盖 defer 加载窗口），超时后转「数据暂缺」明示。 */
+  window._v8ShowDataWaiting = function(cardId, bodyId, msgHtml){
+    try{
+      var _c = document.getElementById(cardId), _b = document.getElementById(bodyId);
+      if(!_c || !_b) return;
+      _b.innerHTML = msgHtml;
+      _c.style.display = 'block';
+    }catch(e){ /* 显示兜底失败不阻塞主链 */ }
+  };
+
   window._fillSectorLeaders = function(){
     /* ═══ 🎯 2026-09-19 主人令·单一真源重写（旧版见 git 历史）═══
        旧版直接从 window.SECTOR_LEADERS 读板块清单与 phase/pct_5d/pct_20d ⇒ 与「板块资金趋势」卡
@@ -16139,6 +16153,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
               try{ window._fillSectorLeaders(); }catch(e){}
             } else if(window.__slRetryN > 30){
               clearInterval(window.__slRetryTimer); window.__slRetryTimer = null; window.__slRetryN = 0;
+              /* 📋 2026-11-24 主人令：轮询超时不再静默隐藏——卡常显 + 如实说明数据暂缺 */
+              window._v8ShowDataWaiting('sectorLeadersCard','sectorLeadersBody',
+                '<div style="font-size:12.5px;color:#fbbf24;line-height:1.8;padding:4px 2px">&#x26A0;&#xFE0F; 板块周期数据（SECTOR_RS）本轮暂缺，无法判定主升/启动。生成器下轮自动补跑后本卡自动列出；不编造数据。</div>');
             }
           }, 600);
         }
@@ -16167,7 +16184,20 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           in_dict: !!hit
         });
       });
-      if(!rows.length) return;
+      if(!rows.length){
+        /* 📋 2026-11-24 主人令：0 个主升/启动也照常显示——如实给全市场板块周期统计，不隐藏、不编造 */
+        var _cnt = {'主升':0,'启动':0,'退潮':0,'底部':0,'震荡':0};
+        rsSecs.forEach(function(s3){ if(s3 && s3.name){ var _p3 = window.__phaseOfSec(s3); if(_cnt[_p3] != null) _cnt[_p3]++; } });
+        var _fb0 = document.getElementById('prLeadersFresh');
+        if(_fb0){ if(typeof _uBadge === 'function'){ try{ _fb0.innerHTML = _uBadge('auto','盘后',(rs && rs.update_time) || ''); }catch(eX){ _fb0.textContent = (rs && rs.update_time) || '—'; } } else { _fb0.textContent = (rs && rs.update_time) || '—'; } }
+        window._v8ShowDataWaiting('sectorLeadersCard','sectorLeadersBody',
+          '<div style="font-size:12.5px;color:var(--sub);line-height:1.9;padding:4px 2px">'
+          + '当前<b style="color:#ff5252">无主升/启动板块</b>——全市场 ' + rsSecs.length + ' 个板块周期分布：'
+          + '主升 <b style="color:#ff5252">' + _cnt['主升'] + '</b> &#183; 启动 <b style="color:#f59e0b">' + _cnt['启动'] + '</b> &#183; 退潮 ' + _cnt['退潮'] + ' &#183; 底部 ' + _cnt['底部'] + ' &#183; 震荡 ' + _cnt['震荡']
+          + '。判定规则：主升=5日&gt;3%且20日&gt;5%；启动=5日&gt;1.5%且20日&gt;-8%（数据 ' + ((rs && rs.update_time) || '—') + '）。'
+          + '市场整体处于退潮/震荡期时本卡如实显示 0，出现主升/启动板块后自动列出龙头。</div>');
+        return;
+      }
       var po = {'主升': 0, '启动': 1};
       rows.sort(function(a, c){ return (po[a.phase] - po[c.phase]) || (c.pct_5d - a.pct_5d); });
       var nUp = 0, nLaunch = 0;
@@ -16301,6 +16331,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
               try{ window._fillFrLeaders(); }catch(e){}
             } else if(window.__frlRetryN > 30){
               clearInterval(window.__frlRetryTimer); window.__frlRetryTimer = null; window.__frlRetryN = 0;
+              /* 📋 2026-11-24 主人令：轮询超时不再静默隐藏 */
+              window._v8ShowDataWaiting('frLeadersCard','frLeadersBody',
+                '<div style="font-size:12.5px;color:#fbbf24;line-height:1.8;padding:4px 2px">&#x26A0;&#xFE0F; 最终推荐强势板块名单本轮暂缺（数据源未产出或为空），产出后本卡自动列出龙头股；不编造数据。</div>');
             }
           }, 600);
         }
@@ -16324,7 +16357,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           in_dict: !!hit
         });
       });
-      if(!rows.length) return;
+      if(!rows.length){
+        /* 📋 2026-11-24 主人令：空名单也照常显示——如实说明，不隐藏、不编造 */
+        window._v8ShowDataWaiting('frLeadersCard','frLeadersBody',
+          '<div style="font-size:12.5px;color:var(--sub);line-height:1.8;padding:4px 2px">本轮最终推荐<b style="color:#ffd024">无强势板块名单</b>（strong_sectors 为空），按「宁缺毋滥」本轮无候选——名单产出后本卡自动列出各板块龙头股。</div>');
+        return;
+      }
       var fb = document.getElementById('frLeadersFresh');
       if(fb){
         var ts = (fr && fr.update_time) || '';
@@ -16490,6 +16528,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
                 try{ window._fillSectorYearFlow(); }catch(e){}
               } else if(window.__syfRetryN > 30){
                 clearInterval(window.__syfRetryTimer); window.__syfRetryTimer = null; window.__syfRetryN = 0;
+                /* 📋 2026-11-24 主人令：轮询超时不再静默隐藏 */
+                window._v8ShowDataWaiting('sectorYearFlowCard','sectorYearFlowBody',
+                  '<div style="font-size:12.5px;color:#fbbf24;line-height:1.8;padding:4px 2px">&#x26A0;&#xFE0F; 板块年度资金流数据本轮暂缺，生成器下轮补跑后自动列出；不编造数据。</div>');
               }
             }, 600);
           }
@@ -16522,7 +16563,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
               var _d = window.ETF_FLOW_OBS;
               var _a = _d && ((_d.active_source === 'kimi' && _d.kimi && _d.kimi.stats) || (_d.active_source === 'backup' && _d.backup && _d.backup.stats));
               if(_a){ clearInterval(window.__efoRetryTimer); window.__efoRetryTimer = null; window.__efoRetryN = 0; try{ window._fillEtfFlowObs(); }catch(e){} }
-              else if(window.__efoRetryN > 30){ clearInterval(window.__efoRetryTimer); window.__efoRetryTimer = null; window.__efoRetryN = 0; }
+              else if(window.__efoRetryN > 30){ clearInterval(window.__efoRetryTimer); window.__efoRetryTimer = null; window.__efoRetryN = 0; /* 📋 2026-11-24 主人令：超时不再静默隐藏 */ window._v8ShowDataWaiting('etfFlowObsCard','etfFlowObsBody',
+                '<div style="font-size:12.5px;color:#fbbf24;line-height:1.8;padding:4px 2px">&#x26A0;&#xFE0F; ETF资金流观测数据本轮暂缺，生成器下轮补跑后自动列出；不编造数据。</div>'); }
             }, 600);
           }
           return;
