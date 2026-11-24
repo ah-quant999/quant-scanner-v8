@@ -1,5 +1,5 @@
 window.STRATEGY_WALKFORWARD = {
-  "update_time": "2026-11-25 01:59:46",
+  "update_time": "2026-11-25 04:49:28",
   "source": "raw_data/history/final_recommend_*.json（54 个每日快照）",
   "method": "因子清账 + 胜率加权 组合的【样本外选股稳定性】walk-forward（非收益率 OOS，历史快照无已实现盈亏）",
   "is_ratio": 0.7,
