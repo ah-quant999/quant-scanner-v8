@@ -393,7 +393,14 @@ def _narrative(stance, sigs, conflicts, margins, prev_stance):
     }[stance]
     if prev_stance and prev_stance != stance:
         tail += f"档位较昨日从「{ {'attack':'攻','watch':'观','defense':'守'}.get(prev_stance, prev_stance)}」调至「{S['label']}」。"
-    return head + mid + tail + stance_txt + watch_txt
+    # 🔴 2026-11-24 主人令「解析不要挤一行，一条一行」：narrative_lines 逐条分行输出，
+    #   ⚠️/💡 矛盾句不进 lines（前端 conflicts 区已逐行渲染，避免重复）；narrative 保持整串兼容旧前端。
+    lines = [head]
+    if tail:
+        lines.append(tail)
+    lines.append(stance_txt)
+    lines.append(watch_txt)
+    return head + mid + tail + stance_txt + watch_txt, lines
 
 
 # ─────────────────────────── 主流程 ───────────────────────────
@@ -460,7 +467,7 @@ def main():
     _hist_append(rec)
 
     conflicts = _conflicts(sigs, stance)
-    narrative = _narrative(stance, sigs, conflicts, margins, prev_stance)
+    narrative, narrative_lines = _narrative(stance, sigs, conflicts, margins, prev_stance)
 
     out = dict(
         update_time=bj_now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -480,6 +487,7 @@ def main():
         margins=margins or [],
         prev_stance=prev_stance,
         narrative=narrative,
+        narrative_lines=narrative_lines,
         signals=[dict(name=s["name"], vote=s["vote"], weight=s["weight"],
                       available=s["available"], txt=s["txt"])
                  for s in sigs.values()],
