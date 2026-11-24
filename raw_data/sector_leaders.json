@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-24 04:26",
-  "republish_time": "2026-11-24 07:26:23",
+  "update_time": "2026-11-24 06:22",
+  "republish_time": "2026-11-24 08:30:53",
   "data_date": "2026-11-23",
   "rule_ver": 2,
   "top_n": 5,
@@ -20,35 +20,35 @@
           "name": "新华保险",
           "price": 50.93,
           "chg": 0.75,
-          "main_net": null
+          "main_net": -35517705.0
         },
         {
           "code": "601319",
           "name": "中国人保",
           "price": 7.12,
           "chg": -0.7,
-          "main_net": null
+          "main_net": -74164303.0
         },
         {
           "code": "601628",
           "name": "中国人寿",
           "price": 34.64,
           "chg": -2.26,
-          "main_net": null
+          "main_net": 33442391.0
         },
         {
           "code": "601318",
           "name": "中国平安",
           "price": 53.7,
           "chg": -3.17,
-          "main_net": null
+          "main_net": 81952896.0
         },
         {
           "code": "601601",
           "name": "中国太保",
           "price": 31.92,
           "chg": -3.21,
-          "main_net": null
+          "main_net": 141080397.0
         }
       ],
       "match": "norm"
@@ -63,35 +63,35 @@
           "name": "龙江交通",
           "price": 4.61,
           "chg": 10.02,
-          "main_net": null
+          "main_net": 362289631.0
         },
         {
           "code": "001317",
           "name": "三羊马",
           "price": 37.09,
           "chg": 8.55,
-          "main_net": null
+          "main_net": 4048331.0
         },
         {
           "code": "600611",
           "name": "大众交通",
           "price": 3.76,
           "chg": 3.87,
-          "main_net": null
+          "main_net": 11318379.0
         },
         {
           "code": "600650",
           "name": "锦江在线",
           "price": 9.62,
           "chg": 2.89,
-          "main_net": null
+          "main_net": 104932.0
         },
         {
           "code": "600834",
           "name": "申通地铁",
           "price": 6.97,
           "chg": 2.2,
-          "main_net": null
+          "main_net": -1588105.0
         }
       ],
       "match": "alias:exact"
@@ -99,42 +99,42 @@
     {
       "name": "小金属",
       "bk": "BK1027",
-      "cons_count": 25,
+      "cons_count": 27,
       "leaders": [
         {
           "code": "000657",
           "name": "中钨高新",
           "price": 34.93,
           "chg": 6.3,
-          "main_net": null
+          "main_net": 42904101.0
         },
         {
           "code": "000831",
           "name": "中国稀土",
           "price": 38.76,
           "chg": 5.73,
-          "main_net": null
+          "main_net": 63964211.0
         },
         {
           "code": "600281",
           "name": "华阳新材",
           "price": 4.01,
           "chg": 5.53,
-          "main_net": null
+          "main_net": 5686985.0
         },
         {
           "code": "000962",
           "name": "东方钽业",
           "price": 31.28,
           "chg": 5.07,
-          "main_net": null
+          "main_net": 6661833.0
         },
         {
           "code": "002182",
           "name": "宝武镁业",
           "price": 9.14,
           "chg": 4.58,
-          "main_net": null
+          "main_net": -2206330.0
         }
       ],
       "match": "exact"
@@ -149,35 +149,35 @@
           "name": "中信海直",
           "price": 10.86,
           "chg": 2.36,
-          "main_net": null
+          "main_net": -4963060.0
         },
         {
           "code": "600115",
           "name": "中国东航",
           "price": 3.48,
           "chg": 1.16,
-          "main_net": null
+          "main_net": 35986069.0
         },
         {
           "code": "600897",
           "name": "厦门空港",
           "price": 13.56,
           "chg": 0.89,
-          "main_net": null
+          "main_net": 1006087.0
         },
         {
           "code": "603885",
           "name": "吉祥航空",
           "price": 10.53,
           "chg": 0.86,
-          "main_net": null
+          "main_net": -10888704.0
         },
         {
           "code": "002928",
           "name": "华夏航空",
           "price": 6.61,
           "chg": 0.76,
-          "main_net": null
+          "main_net": -3151142.0
         }
       ],
       "match": "alias:exact"
