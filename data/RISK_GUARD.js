@@ -1,5 +1,5 @@
 window.RISK_GUARD = {
-  "update_time": "2026-11-24 08:01:40",
+  "update_time": "2026-11-24 09:01:31",
   "source": "PORTFOLIO(westock 练习赛组合) total_assets 真实累积 · 2026-11-20~2026-11-23 共 2 点",
   "has_equity": true,
   "equity_points": 2,
