@@ -1,0 +1,33 @@
+--- a/.github/workflows/v8_cn_fetch_cloud.yml
++++ b/.github/workflows/v8_cn_fetch_cloud.yml
+@@ -638,6 +638,30 @@
+             exit 1
+           fi
+ 
++      # 🐲 2026-09-19 阿狸咪的工程师：板块龙头股字典随「板块相对强度」同轮生成
++      #   （主人令「主升/启动 板块·龙头股 要跟着 板块资金趋势 变动而变动，对应清楚」）
++      #   ① 品类门与 soft_6（🔄 板块相对强度重算，跑 algorithms/fetch_sector_rs.py）
++      #      严格一致（同为 category == 'post_close'）⇒ 两卡同轮生成，不会各自错拍。
++      #   ② 位置刻意放在 update_v8 之后（data/SECTOR_RS.js 已是本轮新值）+ soft_14 推送 data 之前
++      #      ⇒ 本步产出的 data/SECTOR_LEADERS.js 会被 soft_14 的 `git status --porcelain data/`
++      #        自动纳入 PUSH_FILES 一并推送，**无需新增推送逻辑**。
++      #   ③ 上游：scripts/fetch_sector_leaders.py（读 data/SECTOR_RS.js 判主升/启动，
++      #      再抓东财板块成分股取当日涨幅前 5；人工别名表覆盖「塑料制品/橡胶制品/汽车服务及其他」）。
++      - name: "🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）"
++        id: soft_13b
++        if: steps.cat.outputs.category == 'post_close'
++        continue-on-error: true
++        shell: bash
++        run: |
++          python scripts/fetch_sector_leaders.py
++
++          # 🔴 与其它 soft_* 步同规：不阻断 job，但失败必须显式告警（防静默失败）
++          _v8_rc=$?
++          if [ "$_v8_rc" != "0" ]; then
++            echo "::error title=v8-softfail:soft_13b(exit=$_v8_rc)::🐲 板块龙头股字典生成软失败（退出码 $_v8_rc）。前端「主升/启动 板块·龙头股」卡将沿用上轮龙头股列表 —— 板块清单与涨跌幅不受影响（与「板块资金趋势」卡同源 SECTOR_RS）。"
++            exit 1
++          fi
++
+       # 🛡 2026-08-27 主人令（盘中更新全断根因修复）：update_v8 重建的 data/*.js 之前从不推送，
+       #   依赖外部 build（workflow_run）推送；而 build 并发组被僵尸 run 占死 → data 永不更新。
+       #   自闭环：重建后立即推送 data 变更（PUSH_FILES 来源驱动增量），不依赖外部 build。

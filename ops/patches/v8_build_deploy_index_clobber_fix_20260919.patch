@@ -1,0 +1,66 @@
+--- a/.github/workflows/v8_build_deploy.yml
++++ b/.github/workflows/v8_build_deploy.yml
+@@ -285,13 +285,24 @@
+             #   **旧 index.html 被盖回新版本**，随后 git add index.html + push 因 fast-forward
+             #   而成功 ⇒ 静默覆盖他人前端改动。这正是「改好又被盖回旧版」的机制之一。
+             #   改为**仅在确有未提交改动时**才备份/恢复：原保护意图不变，覆盖漏洞消除。
+-            if ! git diff --quiet -- index.html; then
+-              cp index.html /tmp/index.html.manual
+-              git reset --hard FETCH_HEAD
+-              cp /tmp/index.html.manual index.html
+-            else
+-              git reset --hard FETCH_HEAD
+-            fi
++            # 🔴🔴 2026-09-19 阿狸咪的工程师（第三次复发后根因修复）：
++            #   原「备份 → reset → 盖回」的意图是保护**人工未提交**的 index.html 改动。
++            #   但该前提在 CI 里不成立，且会造成静默覆盖：
++            #     · 本步之前已由 guard_v6_memo.py / 选择构建 / update_v8.py 改过 index.html
++            #       ⇒ `git diff --quiet -- index.html` 为假 ⇒ 走 then 分支；
++            #     · 备份到的却是 **checkout 时刻（陈旧）** 的内容；
++            #     · 若本 run 自触发到此刻期间远端有新 push，FETCH_HEAD 前进
++            #       ⇒ reset 拿到新内容、随后又被**陈旧备份盖回**；
++            #     · 下一句 git commit 的 parent 已是最新远端，push 天然 fast-forward
++            #       ⇒ **无冲突、无告警地静默覆盖他人前端改动**。
++            #   实证（三次）：09-18 21:42 `149d5a2a30`、09-19 07:22 `df63f016d1`、
++            #     以及 09-19 07:24 `2acd970321` 由另一趟 run 恢复（同一窗口内互相打架）。
++            #   判据铁证：`df63f016d1` 的 index.html 内 `var BUILD = "8164d8f62"`（= 被覆盖
++            #     那笔提交的 sha，说明 HEAD 已是新提交），但正文无该提交的新增块
++            #     ⇒ 证明磁盘上的文件不是 FETCH_HEAD 那份。
++            #   ⇒ 删除备份/盖回。CI 里人工前端改动一定是**已提交**的，reset 不会丢；
++            #     而脚本生成的改动（?v / v6 戳 / BUILD）在 reset 之后都会重跑。
++            git reset --hard FETCH_HEAD
+             # 同步 cn runner 单独推送的 5 个 extra 文件（update_v8.py 不重建这些），
+             #   确保 ?v 计算基于线上真实最新内容。
+             git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
+@@ -426,13 +437,24 @@
+             # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
+             # 🛡🛡 2026-09-16 一劳永逸（阿狸咪的工程师）·同上：重试路径存在同一覆盖源，
+             #   改为仅在确有未提交改动时才备份/恢复（原因见上方主路径注释）。
+-            if ! git diff --quiet -- index.html; then
+-              cp index.html /tmp/index.html.manual
+-              git reset --hard FETCH_HEAD
+-              cp /tmp/index.html.manual index.html
+-            else
+-              git reset --hard FETCH_HEAD
+-            fi
++            # 🔴🔴 2026-09-19 阿狸咪的工程师（第三次复发后根因修复）：
++            #   原「备份 → reset → 盖回」的意图是保护**人工未提交**的 index.html 改动。
++            #   但该前提在 CI 里不成立，且会造成静默覆盖：
++            #     · 本步之前已由 guard_v6_memo.py / 选择构建 / update_v8.py 改过 index.html
++            #       ⇒ `git diff --quiet -- index.html` 为假 ⇒ 走 then 分支；
++            #     · 备份到的却是 **checkout 时刻（陈旧）** 的内容；
++            #     · 若本 run 自触发到此刻期间远端有新 push，FETCH_HEAD 前进
++            #       ⇒ reset 拿到新内容、随后又被**陈旧备份盖回**；
++            #     · 下一句 git commit 的 parent 已是最新远端，push 天然 fast-forward
++            #       ⇒ **无冲突、无告警地静默覆盖他人前端改动**。
++            #   实证（三次）：09-18 21:42 `149d5a2a30`、09-19 07:22 `df63f016d1`、
++            #     以及 09-19 07:24 `2acd970321` 由另一趟 run 恢复（同一窗口内互相打架）。
++            #   判据铁证：`df63f016d1` 的 index.html 内 `var BUILD = "8164d8f62"`（= 被覆盖
++            #     那笔提交的 sha，说明 HEAD 已是新提交），但正文无该提交的新增块
++            #     ⇒ 证明磁盘上的文件不是 FETCH_HEAD 那份。
++            #   ⇒ 删除备份/盖回。CI 里人工前端改动一定是**已提交**的，reset 不会丢；
++            #     而脚本生成的改动（?v / v6 戳 / BUILD）在 reset 之后都会重跑。
++            git reset --hard FETCH_HEAD
+             git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
+             # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
+             #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
