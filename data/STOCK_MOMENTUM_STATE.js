@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-24 23:42",
- "generated": "2026-11-24 23:42",
+ "update_time": "2026-11-25 00:54",
+ "generated": "2026-11-25 00:54",
  "meta": {
-  "generated": "2026-11-24 23:42",
+  "generated": "2026-11-25 00:54",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 31,
+  "total_days": 32,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -12885,6 +12885,335 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-11-24",
+   "categories": {
+    "突破": [
+     {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 10.0,
+      "price": 10.56,
+      "category": "突破"
+     },
+     {
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 5.263,
+      "price": 5.4,
+      "category": "突破"
+     },
+     {
+      "code": "301413",
+      "name": "安培龙",
+      "change_pct": 19.997,
+      "price": 89.71,
+      "category": "突破"
+     },
+     {
+      "code": "002988",
+      "name": "豪美新材",
+      "change_pct": 6.554,
+      "price": 27.15,
+      "category": "突破"
+     },
+     {
+      "code": "002870",
+      "name": "香山股份",
+      "change_pct": 4.142,
+      "price": 32.18,
+      "category": "突破"
+     },
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 11.994,
+      "price": 14.1,
+      "category": "突破"
+     },
+     {
+      "code": "300943",
+      "name": "春晖智控",
+      "change_pct": 4.379,
+      "price": 20.5,
+      "category": "突破"
+     },
+     {
+      "code": "002011",
+      "name": "盾安环境",
+      "change_pct": 4.692,
+      "price": 11.38,
+      "category": "突破"
+     },
+     {
+      "code": "605168",
+      "name": "三人行",
+      "change_pct": 3.777,
+      "price": 35.99,
+      "category": "突破"
+     },
+     {
+      "code": "002306",
+      "name": "ST云网",
+      "change_pct": 3.937,
+      "price": 1.32,
+      "category": "突破"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 4.251,
+      "price": 21.58,
+      "category": "突破"
+     },
+     {
+      "code": "301252",
+      "name": "同星科技",
+      "change_pct": 20.0,
+      "price": 42.48,
+      "category": "突破"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 7.0,
+      "price": 27.36,
+      "category": "突破"
+     },
+     {
+      "code": "300940",
+      "name": "南极光",
+      "change_pct": 8.263,
+      "price": 14.15,
+      "category": "突破"
+     },
+     {
+      "code": "603051",
+      "name": "鹿山新材",
+      "change_pct": 5.263,
+      "price": 22.0,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 10.0,
+      "price": 10.56,
+      "category": "加速"
+     },
+     {
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 5.263,
+      "price": 5.4,
+      "category": "加速"
+     },
+     {
+      "code": "301413",
+      "name": "安培龙",
+      "change_pct": 19.997,
+      "price": 89.71,
+      "category": "加速"
+     },
+     {
+      "code": "002988",
+      "name": "豪美新材",
+      "change_pct": 6.554,
+      "price": 27.15,
+      "category": "加速"
+     },
+     {
+      "code": "002870",
+      "name": "香山股份",
+      "change_pct": 4.142,
+      "price": 32.18,
+      "category": "加速"
+     },
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 11.994,
+      "price": 14.1,
+      "category": "加速"
+     },
+     {
+      "code": "300943",
+      "name": "春晖智控",
+      "change_pct": 4.379,
+      "price": 20.5,
+      "category": "加速"
+     },
+     {
+      "code": "002011",
+      "name": "盾安环境",
+      "change_pct": 4.692,
+      "price": 11.38,
+      "category": "加速"
+     },
+     {
+      "code": "605168",
+      "name": "三人行",
+      "change_pct": 3.777,
+      "price": 35.99,
+      "category": "加速"
+     },
+     {
+      "code": "002306",
+      "name": "ST云网",
+      "change_pct": 3.937,
+      "price": 1.32,
+      "category": "加速"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 4.251,
+      "price": 21.58,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 10.0,
+      "price": 10.56,
+      "category": "短线选股"
+     },
+     {
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 5.263,
+      "price": 5.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "301413",
+      "name": "安培龙",
+      "change_pct": 19.997,
+      "price": 89.71,
+      "category": "短线选股"
+     },
+     {
+      "code": "002988",
+      "name": "豪美新材",
+      "change_pct": 6.554,
+      "price": 27.15,
+      "category": "短线选股"
+     },
+     {
+      "code": "002870",
+      "name": "香山股份",
+      "change_pct": 4.142,
+      "price": 32.18,
+      "category": "短线选股"
+     },
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 11.994,
+      "price": 14.1,
+      "category": "短线选股"
+     },
+     {
+      "code": "300943",
+      "name": "春晖智控",
+      "change_pct": 4.379,
+      "price": 20.5,
+      "category": "短线选股"
+     },
+     {
+      "code": "002011",
+      "name": "盾安环境",
+      "change_pct": 4.692,
+      "price": 11.38,
+      "category": "短线选股"
+     },
+     {
+      "code": "605168",
+      "name": "三人行",
+      "change_pct": 3.777,
+      "price": 35.99,
+      "category": "短线选股"
+     },
+     {
+      "code": "002306",
+      "name": "ST云网",
+      "change_pct": 3.937,
+      "price": 1.32,
+      "category": "短线选股"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 4.251,
+      "price": 21.58,
+      "category": "短线选股"
+     },
+     {
+      "code": "301252",
+      "name": "同星科技",
+      "change_pct": 20.0,
+      "price": 42.48,
+      "category": "短线选股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 7.0,
+      "price": 27.36,
+      "category": "短线选股"
+     },
+     {
+      "code": "300940",
+      "name": "南极光",
+      "change_pct": 8.263,
+      "price": 14.15,
+      "category": "短线选股"
+     },
+     {
+      "code": "603051",
+      "name": "鹿山新材",
+      "change_pct": 5.263,
+      "price": 22.0,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "301252",
+      "name": "同星科技",
+      "change_pct": 20.0,
+      "price": 42.48,
+      "category": "强势股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 7.0,
+      "price": 27.36,
+      "category": "强势股"
+     },
+     {
+      "code": "300940",
+      "name": "南极光",
+      "change_pct": 8.263,
+      "price": 14.15,
+      "category": "强势股"
+     },
+     {
+      "code": "603051",
+      "name": "鹿山新材",
+      "change_pct": 5.263,
+      "price": 22.0,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-25",
    "categories": {
     "突破": [
      {
