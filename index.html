@@ -128,7 +128,7 @@ window.__domReadyFns=[];
 
     <script src="data/ETF_INTRADAY_HEAT.js?v=2b1c833b9d" defer></script>
     <!-- 🆕 2026-11-23 主人拍板：ETF 量能配速+局部异动灯（gen_etf_pace.py，盘中链重算；口径见逻辑详解页） -->
-    <script src="data/ETF_PACE.js?v=743ddb5f1e" defer></script>
+    <script src="data/ETF_PACE.js?v=7105976ee3" defer></script>
     <!-- 🆕 2026-11-24 主人拍板：市场攻防档位·五信号合成（gen_market_regime.py，实验卡链重算；口径见逻辑详解页）。
          ⚠️ 命名=MARKET_TACTIC：MARKET_REGIME 已被利率板块推荐框架占用（gen_invest_avoid.py），勿撞。 -->
     <script src="data/MARKET_TACTIC.js?v=8a544bdc20" defer></script>
@@ -154,18 +154,18 @@ window.__domReadyFns=[];
     <script src="data/MACRO_BRIEF.js?v=44b587c8ae" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=18bfb85fff" defer></script>
-<script src="data/LHB_DATA.js?v=c057c31075" defer></script>
+<script src="data/LHB_DATA.js?v=be345b601e" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=c626328009" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=5fff77e304" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=dc7f8da6ce" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=9f0773e9ab" defer></script>
 <script src="data/MARGIN_DATA.js?v=95c7f67da6" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=fb15f25a5f" defer></script>
 <script src="data/FUTURES_REALTIME.js?v=4f054a4d4f" defer></script>
-<script src="data/BOND_FUTURES.js?v=a2e1cb3555" defer></script>
+<script src="data/BOND_FUTURES.js?v=2d9890acb4" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=fbc370dda8" defer></script>
 <script src="data/IPO_DATA.js?v=0bc361d409" defer></script>
     <script src="data/CRISIS_DATA.js?v=b59d21cc2c" defer></script>
@@ -180,7 +180,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=4f95fadd0f" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=bc1dff48b2" defer></script>
-<script src="data/INVEST_AVOID.js?v=10f45a0927" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=031aabde16" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=172b055a13" defer></script>
     <script src="data/KEY_NOTICES.js?v=05bf84d226" defer></script>
@@ -196,7 +196,7 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261124） -->
     <!-- 🔴 2026-10-03 CN runner2号机更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
-    <script src="data/maharo_insights.js?v=20261124" defer></script>
+    <script src="data/maharo_insights.js?v=3717222435" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -1387,7 +1387,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=5a836b98ce" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
-<script src="data/ETF_PULSE.js?v=98ffbf4a8b" defer></script>
+<script src="data/ETF_PULSE.js?v=a7b9e1ab1c" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=43086236e3" defer></script>
 <script src="data/TOP10_DAILY.js?v=03ab193cde" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
