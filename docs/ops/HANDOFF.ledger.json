@@ -1,5 +1,5 @@
 {
- "max_next_id_seq": 188,
+ "max_next_id_seq": 189,
  "ids": [
   "cred-ledger-js-build-race-deleted-1115",
   "akshare-unpinned-runner-api-removal-1114",
@@ -87,9 +87,10 @@
   "futures-basis-source-push-whitelist-1116",
   "v8-ai-brief-etf-dedup-judgment-1117",
   "intraday-precise-sched-align-block-1119",
-  "eqbond-intraday-docregress-block-1119"
+  "eqbond-intraday-docregress-block-1119",
+  "build-audit-404-backtest-cards-1124"
  ],
- "updated": "2026-11-20 04:31",
+ "updated": "2026-11-24 20:19",
  "generated_by": "阿狸咪的工程师",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -101,6 +102,7 @@
   "audit-intraday-stall-1108": "38cf44e043eef568",
   "autorefresh-hardreload-1020": "7b7bbe59829f46d5",
   "avgprice-source-switch-caliber-gap-0928": "03c4e1d0b2639c46",
+  "build-audit-404-backtest-cards-1124": "13105cddd31e2d2a",
   "build-deploy-blocked-by-crosslayer-stale-guard-0929": "9ddb6f02f28b089d",
   "build-deploy-emergency-name-fix-1116": "da79ee407724d8de",
   "build-deploy-retry-loses-race-under-churn": "9135e061026ab4f8",

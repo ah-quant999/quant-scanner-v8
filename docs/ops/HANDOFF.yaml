@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 188
+  next_id_seq: 189
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: cred-ledger-js-build-race-deleted-1115
@@ -4055,4 +4055,35 @@ items:
       站上 index.html/logic.full.html 能检索到 v8_eqbond_attraction 与
       v8_intraday_precise_sched；数据链产物继续鲜活。
     updated: "2026-11-20 04:35"
+    updated_by: 阿狸咪的工程师
+  - id: build-audit-404-backtest-cards-1124
+    owner: 小九的工程师（任务A/B 实现方）
+    priority: P0
+    status: blocked
+    created: 2026-11-24
+    title: 任务A/B回测卡前端落仓但生成器/产物双缺位 ⇒ [6/8] 404断链门禁 16h+ 阻断全部真实 build
+    note: >-
+      登记方：阿狸咪的工程师（11-24 夜巡 19:30-20:20 CST，主人外出期自主处置）。
+      现象：build_deploy 自 11-24 15:03 CST 首红起所有 failure 全死于 Pre-deploy audit
+      [6/8] HTML 数据引用（临时克隆远端 tip 84dccf2 复跑实证：唯一红项即 [6/8]，其余 14 项全绿）。
+      404 两文件 = data/CASHFLOW_QUALITY_BACKTEST.js 与 data/SHAREHOLDER_INCREASE_BACKTEST.js
+      （主人打包令·任务A/B 回测卡，11-23 10:00）；contents API commits?path= 两文件 0 提交、
+      全仓 grep 仅 index.html 8 处提及、生成器 gen_cashflow_quality_backtest.py /
+      gen_shareholder_increase_backtest.py 均不在仓 ⇒ 断链恒真。
+      时间线：最后 build job 真跑成功 = 11-24 03:45 CST（run 45252145470@db4b957887e）；
+      06:55/14:55 UTC success 轮 build job 均 skipped（盘中设计）勿当绿；此后 16h+ 真实 build
+      全阻断，11-24 盘后「构建 data/*.js→回写 main→Pages 发布」一体链路未执行。
+      复发定性：同日 11:54/12:10 CST 曾有一轮 [6/8] 404（同两文件）被收敛、13:43-14:55 转绿
+      ⇒ 同族 bug 二次复发。影响面：主站 200/1.47MB 完整，cn_fetch/algo 链直推 main 产物鲜活
+      （experiment 18:08 / algo ok=16 fail=0 / stock_names 9694），用户端暂无感；两卡前端显示
+      「数据未注入…如实留空不编造」诚实空态。处置边界：未补产物（禁占位壳铁律）、未摘引用
+      （回撤主人打包令功能须实现方拍板 + index.html 被缓存戳生成器分钟级重写防踩踏）、
+      未重试派发（业务层禁重试）。修复二选一：A=落码两个 gen_* 生成器+产物落仓（推荐）；
+      B=任务暂缓则同一提交同步摘除两处 script src 与渲染段（勿只摘一半）。
+      详见 docs/ops/handover/2026-11-24_2008_阿狸咪给小九_build门禁404断链二次复发挂账_任务AB生成器缺位.md
+    note_to: 小九(lemoncat-cn)
+    verify_how: >-
+      修复后最新 build_deploy 轮 build job 真跑全绿（勿看 run 结论）且 [6/8] EXIT 0；
+      临时克隆 tip 复跑 pre_deploy_audit.py EXIT=0；数据链产物继续鲜活。
+    updated: "2026-11-24 20:19"
     updated_by: 阿狸咪的工程师
