@@ -214,13 +214,60 @@ def main():
     n_hot = sum(1 for v in results.values() if v["state"] == "hot")
     n_cool = sum(1 for v in results.values() if v["state"] == "cool")
     n_light = sum(1 for v in results.values() if (v.get("win_pct") or 0) > LIGHT_PCTL)
+
+    # 🆕 2026-11-24 主人令「配速榜压成一条人话解析放 AI 速览，撤大卡」：
+    #   主题词聚类（科创/AI/芯片/新能源…）+ 一句话总结，写进 summary.text。
+    #   明细行退役，口径阈值仍在逻辑详解页；数据驱动、无硬编码结论。
+    THEMES = [
+        ("科创·创投", ("科创", "创投", "科技")),
+        ("人工智能", ("人工智能", "智能", "机器人", "算法")),
+        ("芯片·半导体", ("芯片", "半导体", "集成电路")),
+        ("算力·云通信", ("算力", "云计算", "大数据", "通信", "5G", "数字经济")),
+        ("新能源", ("新能源", "光伏", "电池", "绿色", "碳中和", "储能", "锂电")),
+        ("医药", ("医药", "医疗", "生物", "创新药")),
+        ("金融", ("证券", "银行", "金融", "保险", "期货")),
+        ("军工", ("军工", "国防")),
+        ("消费", ("消费", "食品", "酒", "旅游", "家电")),
+        ("有色·周期", ("有色", "黄金", "铜", "稀土", "钢铁", "煤炭")),
+        ("宽基", ("300", "500", "1000", "A50", "双创", "上证", "价值", "成长", "红利")),
+    ]
+
+    def _theme(nm):
+        for t, kws in THEMES:
+            for kw in kws:
+                if kw in nm:
+                    return t
+        return "其他"
+
+    from collections import Counter
+    hot_l = [(v.get("name") or "?", float(v["pace"])) for v in results.values() if v["state"] == "hot"]
+    cool_l = [(v.get("name") or "?", float(v["pace"])) for v in results.values() if v["state"] == "cool"]
+    hot_th = Counter(_theme(n) for n, _ in hot_l)
+    cool_th = Counter(_theme(n) for n, _ in cool_l)
+    top_hot = "、".join(t for t, _ in hot_th.most_common(3)) or "—"
+    top_cool = "、".join(t for t, _ in cool_th.most_common(2)) or "—"
+    _mx = max((p for _, p in hot_l), default=0.0)
+    _mn = min((p for _, p in cool_l), default=0.0)
+    if n_light > 0:
+        _pulse = f"异动灯 {n_light} 个=15 分钟窗口有脉冲突袭"
+    else:
+        _pulse = "无异动灯=平推型集体进场、非脉冲突袭"
+    _domin = hot_th.most_common(1)[0][1] * 2 >= max(1, len(hot_l)) if hot_th else False
+    _lead = f"今日量能「{top_hot.split('、')[0]}」一边倒——" if _domin else "今日量能结构："
+    pace_text = (
+        _lead
+        + f"放量 {len(hot_l)} 只集中在「{top_hot}」（最高配速 {_mx:.2f} 倍）"
+        + (f"；缩量 {len(cool_l)} 只集中在「{top_cool}」（最低 {_mn:.2f}）" if cool_l else "")
+        + f"；{_pulse}。"
+    )
+
     out = dict(
         update_time=bj_now().strftime("%Y-%m-%d %H:%M:%S"),
         data_date=today, slots_per_day=SLOTS_PER_DAY, base_days=BASE_DAYS,
         win_bars=WIN_BARS, pace_hot=PACE_HOT, pace_cool=PACE_COOL,
         light_pctl=LIGHT_PCTL,
         universe=dict(total=len(items), ok=len(results)),
-        summary=dict(hot=n_hot, cool=n_cool, light=n_light),
+        summary=dict(hot=n_hot, cool=n_cool, light=n_light, text=pace_text),
         items=results,
         errors=errs[:10],
         note="配速比与异动灯口径见逻辑详解页；信号为观测参考，非交易指令",
