@@ -1,10 +1,10 @@
 {
   "version": "2.0",
-  "updated": "2026-11-24 16:51:05",
+  "updated": "2026-11-24 18:31:05",
   "sources": [
     "guanlan"
   ],
-  "total": 28,
+  "total": 27,
   "stocks": [
     {
       "name": "摩尔线程",
@@ -40,7 +40,7 @@
       "added_date": "2026-11-24"
     },
     {
-      "name": "0100",
+      "name": "MINIMAX-W",
       "code": "0100",
       "full_code": "0100.HK",
       "exchange": "HK",
@@ -142,17 +142,6 @@
       "name": "天数智芯",
       "code": "09903",
       "full_code": "09903.HK",
-      "exchange": "HK",
-      "market": "港股",
-      "institution": "摩根大通",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-24"
-    },
-    {
-      "name": "美团",
-      "code": "03690",
-      "full_code": "03690.HK",
       "exchange": "HK",
       "market": "港股",
       "institution": "摩根大通",
@@ -282,7 +271,7 @@
       "added_date": "2026-11-24"
     },
     {
-      "name": "0388",
+      "name": "香港交易所",
       "code": "0388",
       "full_code": "0388.HK",
       "exchange": "HK",
