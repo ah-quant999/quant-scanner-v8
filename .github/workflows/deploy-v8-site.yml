@@ -201,11 +201,43 @@ jobs:
 
 
 
+      # 🔴 2026-11-24 根治「artifact 上传成功后 deploy-pages 查元数据 Found 0 artifacts 连败」：
+      #   deploy-pages@v4 上传完立刻调 API 查 artifact 元数据，GHA 元数据可见性延迟即报
+      #   「No artifacts named github-pages were found」⇒ 当日 09:31 起连败 19 次、主站冻结约 1 小时
+      #   （git 里数据已到 10:02，线上停在 09:31 版）。修法：部署前轮询确认 artifact 可见（最多 90s）。
+      - name: Wait for artifact visibility (metadata race guard)
+
+        shell: bash
+
+        env:
+
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+
+        run: |
+
+          for i in $(seq 1 18); do
+
+            N=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" --jq '[.artifacts[] | select(.name=="github-pages")] | length' 2>/dev/null || echo 0)
+
+            echo "check#$i github-pages artifacts=$N"
+
+            [ "$N" -ge 1 ] && exit 0
+
+            sleep 5
+
+          done
+
+          echo "::warning::artifact 90s 仍未可见，继续尝试部署"
+
+
+
       - name: Deploy to GitHub Pages
 
         id: deploy
 
         uses: actions/deploy-pages@v4
+
+        continue-on-error: true
 
         with:
 
@@ -214,6 +246,30 @@ jobs:
           #   GITHUB_TOKEN 属 installation 级限流（1500/h 全仓工作流共享），盘中高峰被耗尽后
 
           #   状态轮询 403 ⇒ 部署实际已发布却被判 failure。改用 V8_GH_TOKEN（用户级 5000/h 独立配额）。
+
+          token: ${{ secrets.V8_GH_TOKEN }}
+
+
+
+      # 🔴 2026-11-24 第二重：首轮部署失败（元数据竞态/瞬时 403）时，歇 25s 再补一枪。
+
+      - name: Backoff before retry
+
+        if: steps.deploy.outcome == 'failure'
+
+        shell: bash
+
+        run: sleep 25
+
+      - name: Deploy to GitHub Pages (retry)
+
+        id: deploy_retry
+
+        if: steps.deploy.outcome == 'failure'
+
+        uses: actions/deploy-pages@v4
+
+        with:
 
           token: ${{ secrets.V8_GH_TOKEN }}
 
