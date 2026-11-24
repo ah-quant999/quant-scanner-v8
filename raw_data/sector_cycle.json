@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-24 08:18:28",
+  "update_time": "2026-11-24 09:47:23",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,15 +17,15 @@
     {
       "sector": "AI算力",
       "start": "10/14",
-      "end": "11/20",
+      "end": "11/24",
       "start_idx": 0,
-      "end_idx": 27,
-      "days": 28,
-      "hot_days": 23,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 24,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 173,
-      "ongoing": false
+      "total": 181,
+      "ongoing": true
     },
     {
       "sector": "其他",
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 123,
       "peak_date": "10/14",
-      "total": 1551,
+      "total": 1552,
       "ongoing": true
     },
     {
@@ -63,7 +63,7 @@
       "hot_days": 25,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 284,
+      "total": 291,
       "ongoing": true
     },
     {
@@ -76,21 +76,21 @@
       "hot_days": 28,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 460,
+      "total": 465,
       "ongoing": true
     },
     {
       "sector": "消费电子",
       "start": "10/14",
-      "end": "11/20",
+      "end": "11/24",
       "start_idx": 0,
-      "end_idx": 27,
-      "days": 28,
-      "hot_days": 28,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 29,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 263,
-      "ongoing": false
+      "total": 271,
+      "ongoing": true
     },
     {
       "sector": "电力",
@@ -147,14 +147,14 @@
     {
       "sector": "通信设备",
       "start": "11/11",
-      "end": "11/24",
+      "end": "11/23",
       "start_idx": 20,
-      "end_idx": 29,
-      "days": 10,
-      "hot_days": 6,
+      "end_idx": 28,
+      "days": 9,
+      "hot_days": 5,
       "peak": 6,
       "peak_date": "11/12",
-      "total": 29,
+      "total": 26,
       "ongoing": true
     },
     {
