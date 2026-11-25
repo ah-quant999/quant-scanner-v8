@@ -139,7 +139,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=902b601980" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=dfa79e7923" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=f86ea111d5" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4e838c1e84" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=f33eb82eea" defer></script>
     <script src="data/CRED_LEDGER.js?v=131bbac7fa" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
@@ -164,8 +164,8 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=8cf4e41028" defer></script>
 <script src="data/MARGIN_DATA.js?v=19bce68427" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=fa8ab56594" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=9272d53280" defer></script>
-<script src="data/BOND_FUTURES.js?v=5ff7b81895" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=c3673cbf78" defer></script>
+<script src="data/BOND_FUTURES.js?v=c1cb3adbbd" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=11c1bf9bf7" defer></script>
 <script src="data/IPO_DATA.js?v=55b067f540" defer></script>
     <script src="data/CRISIS_DATA.js?v=e30bb8cc28" defer></script>
@@ -180,7 +180,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=56505677ef" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=32a576540a" defer></script>
-<script src="data/INVEST_AVOID.js?v=0e902eaed5" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=4a338c2c47" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=e613dc5871" defer></script>
     <script src="data/KEY_NOTICES.js?v=30ebfbfb1d" defer></script>
@@ -20944,7 +20944,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=93b5f3d1e3', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8ff409b915', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8f17604882', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=7781cddeec', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
