@@ -3406,34 +3406,31 @@ function fmtSigned(v){
     </div>
 
 
-    <details class="v8-fold" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
-      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none">▸ 🌡️ 大盘温度观测（IF持仓 · 市场宽度 · 股债性价比） <span style="font-size:11px;opacity:.7">（点开查看，默认收起）</span></summary>
-      <div style="padding:0 12px 6px">这些是市场温度计，判断环境冷热用，不指向具体标的。</div>
-          <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
-          <div class="card" style="margin-bottom:16px">
-            <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
-            <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
-            <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
-          </div>
+    <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
+      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
+      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
+    </div>
 
-          <!-- 市场宽度：52周新高广度 -->
-          <div class="card" style="margin-bottom:16px">
-            <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
-            <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
-          </div>
+    <!-- 市场宽度：52周新高广度 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
+      <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
 
-          <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（同 IF 持仓/市场宽度卡风格） -->
-          <div class="card" style="margin-bottom:16px">
-            <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
-            <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
-            <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
-          </div>
+    <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（同 IF 持仓/市场宽度卡风格） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
+      <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
+      <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
+    </div>
 
 
-          <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
-               ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
-               现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
-    </details>
+    <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
+         ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
+         现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
+
 
 <!-- [2026-11-24 精简] 盘后解禁日历卡已删: 今日事件区已有当日版, 避免重复. 渲染函数保留且有if(!$b)return保护 -->
 <!-- [2026-11-24 精简] 盘后业绩预告卡已删: 今日事件区已有当日版, 避免重复. 渲染函数保留且有if(!$b)return保护 -->
