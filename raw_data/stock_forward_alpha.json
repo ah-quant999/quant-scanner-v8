@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-25 06:17:44",
+ "update_time": "2026-11-25 08:06:40",
  "engine": "algorithms/stock_forward_alpha.py",
  "purpose": "个股级未来收益预测分（同信号组合内分高下），generate_top10 alpha_term 消费",
  "methodology": "Alpha = Σ w_k·rank_z(feature_k)；w_k = IS 段(前60%调仓点)逐点截面 Spearman IC 均值(含符号)，OOS 段绝不重拟合；latest_scores 取最新交易日截面(2026-11-19 主人令修正，原误用最后回测调仓点滞后约hold+2日)。特征=rev5/rev20/vol60/h52/amt60/vol_conf/dviol60（纯OHLCV，避开W2禁入动量家族）。验证完全复用 factor_walkforward 引擎：次日开盘进场、往返成本0.20%、五分层、全池等权基准、IS/OOS 60/40；判据 IR_OOS>0.3 且连续5年内≥4年Top层跑赢基准>55%（硬门槛不放宽）；verdict 回退按 HOLDS 固定次序取首个 PASS（不挑最优）。",

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-25 06:15:05",
+    "generated": "2026-11-25 08:04:00",
     "method": "walk-forward / out-of-sample, shrinkage_k=10",
     "horizons": [
       3,
