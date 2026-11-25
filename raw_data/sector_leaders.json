@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-25 23:24",
-  "republish_time": "2026-11-26 04:45:33",
+  "update_time": "2026-11-26 02:58",
+  "republish_time": "2026-11-26 05:12:39",
   "data_date": "2026-11-25",
   "rule_ver": 2,
   "top_n": 5,
@@ -149,35 +149,35 @@
           "name": "*ST福成",
           "price": 1.97,
           "chg": 7.07,
-          "main_net": 1789259.0
+          "main_net": null
         },
         {
           "code": "002321",
           "name": "华英农业",
           "price": 1.78,
           "chg": 1.14,
-          "main_net": -447285.0
+          "main_net": null
         },
         {
           "code": "002124",
           "name": "天邦食品",
           "price": 2.17,
           "chg": 0.46,
-          "main_net": -1028368.0
+          "main_net": null
         },
         {
           "code": "300498",
           "name": "温氏股份",
           "price": 17.36,
           "chg": -0.34,
-          "main_net": 36562170.0
+          "main_net": null
         },
         {
           "code": "000735",
           "name": "罗 牛 山",
           "price": 4.68,
           "chg": -1.68,
-          "main_net": -9421210.0
+          "main_net": null
         }
       ],
       "match": "exact"
