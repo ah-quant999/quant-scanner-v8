@@ -181,6 +181,13 @@ MUST_HAVE_CRON = {
     #   · v8_sector_tech（cron 交易日 16:00，cn runner，产 data/SECTOR_TECH_JUDG.js）
     "v8_bond_futures": "国债期货利率罗盘(TL30Y·cn盘中30分)",
     "v8_sector_tech": "板块技术研判(申万一级31·L4分级·cn盘后16:00)",
+    # 2026-11-25 小九补登记（三天停更事故一劳永逸②·建链当轮双登记教训再犯即收口）：
+    #   🔁 回测产物周度再生链（cron 每周六 09:00 CST = UTC 01:00，[self-hosted, cn]，
+    #   持久化浅克隆跑 gen_cashflow_quality_backtest.py + gen_shareholder_increase_backtest.py，
+    #   产 data/CASHFLOW_QUALITY_BACKTEST.js / SHAREHOLDER_INCREASE_BACKTEST.js）。
+    #   此前两生成器孤儿化 ⇒ index 引用线上 404 ⇒ pre_deploy_audit [6/8] 连红
+    #   11-24 12:53 起 58 笔、全站部署冻结约 20h（含 11-25 全部早盘）。
+    "v8_backtest_weekly": "回测产物周度再生(现金流质量+股东增持·cn每周六09:00)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
