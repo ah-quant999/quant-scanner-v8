@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-26 03:50:33",
+  "update_time": "2026-11-26 06:15:54",
   "data_date": "2026-11-25",
   "meta": {
     "data_date": "2026-11-25",
@@ -1134,7 +1134,7 @@
     ]
   },
   "yield_rank": {
-    "update_time": "2026-11-26 03:50:33",
+    "update_time": "2026-11-26 06:15:54",
     "meta": {
       "cost_pct_roundtrip": 0.3,
       "entry": "信号日次一交易日开盘",

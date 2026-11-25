@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-26 04:46:40",
+ "update_time": "2026-11-26 07:14:04",
  "data_day": "2026-11-26",
  "bench_note": "基准超额口径：extra.bench_avg_return = 各卡信号区间∩基准覆盖区间的全市场等权基准均收益（gen_market_bench.py，与策略同入场/出场/成本口径）；前端以 avg_return − bench 求差；区间覆盖不满时附 bench_from/bench_to 供核查。",
  "chain_kind": "trading",

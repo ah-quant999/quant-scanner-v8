@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-26 02:58",
-  "republish_time": "2026-11-26 05:12:39",
+  "update_time": "2026-11-26 03:10",
+  "republish_time": "2026-11-26 07:12:50",
   "data_date": "2026-11-25",
   "rule_ver": 2,
   "top_n": 5,
@@ -16,16 +16,16 @@
       "cons_count": 64,
       "leaders": [
         {
-          "code": "002864",
-          "name": "盘龙药业",
-          "price": 19.86,
+          "code": "002275",
+          "name": "桂林三金",
+          "price": 13.82,
           "chg": 10.03,
           "main_net": null
         },
         {
-          "code": "002275",
-          "name": "桂林三金",
-          "price": 13.82,
+          "code": "002864",
+          "name": "盘龙药业",
+          "price": 19.86,
           "chg": 10.03,
           "main_net": null
         },

@@ -1,1 +1,64 @@
-{"update_time":"2026-11-26 06:01:04","summary":"上证指数跌2.03%，涨停51只、跌停0只。情绪积极。","indices":[{"name":"上证指数","pct":-2.03},{"name":"深证成指","pct":-3.24},{"name":"创业板指","pct":-4.19},{"name":"科创50","pct":-5.12},{"name":"恒生指数","pct":-1.14},{"name":"恒生科技指数","pct":-2.56},{"name":"韩国KOSPI","pct":-6.16},{"name":"日经225","pct":-0.9}],"us_indices":[{"name":"道琼斯","price":50182.95,"pct":0.33},{"name":"纳斯达克","price":23585.8,"pct":-0.62},{"name":"标普500","price":7182.78,"pct":-0.25}],"top_sectors":[],"bottom_sectors":[],"mood":{"up":578,"down":4645,"flat":70,"limit_up":51,"limit_down":0}}
+{
+  "update_time": "2026-11-26 06:39:53",
+  "summary": "上证指数跌2.03%，涨停51只、跌停0只。情绪积极。",
+  "indices": [
+    {
+      "name": "上证指数",
+      "pct": -2.03
+    },
+    {
+      "name": "深证成指",
+      "pct": -3.24
+    },
+    {
+      "name": "创业板指",
+      "pct": -4.19
+    },
+    {
+      "name": "科创50",
+      "pct": -5.12
+    },
+    {
+      "name": "恒生指数",
+      "pct": -1.14
+    },
+    {
+      "name": "恒生科技指数",
+      "pct": -2.56
+    },
+    {
+      "name": "韩国KOSPI",
+      "pct": -6.16
+    },
+    {
+      "name": "日经225",
+      "pct": -0.9
+    }
+  ],
+  "us_indices": [
+    {
+      "name": "道琼斯",
+      "price": 50182.95,
+      "pct": 0.33
+    },
+    {
+      "name": "纳斯达克",
+      "price": 23585.8,
+      "pct": -0.62
+    },
+    {
+      "name": "标普500",
+      "price": 7182.78,
+      "pct": -0.25
+    }
+  ],
+  "top_sectors": [],
+  "bottom_sectors": [],
+  "mood": {
+    "up": 578,
+    "down": 4645,
+    "flat": 70,
+    "limit_up": 51,
+    "limit_down": 0
+  }
+}
