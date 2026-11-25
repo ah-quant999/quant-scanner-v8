@@ -1,11 +1,11 @@
 {
- "update_time": "2026-11-26 00:21:10",
+ "update_time": "2026-11-26 03:53:34",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w] × conf(n_h)；h∈{5:(6.0,0.15),10:(2.0,0.1)}；conf(n)=max(0.15,min(1,n/12)) 小样本可信度折扣（2026-11-01 防小样本霸榜）；2026-11-18 主人令收益率再平衡：T+5均益唯一主项、T+10慢变量减权、胜率腿减半(占比≤8%)",
-  "n_signals": 2404,
+  "n_signals": 2406,
   "n_stocks": 393,
   "signal_date_range": [
    "2026-06-06",
@@ -6626,7 +6626,7 @@
   {
    "code": "600999",
    "name": "招商证券",
-   "n_signals": 10,
+   "n_signals": 11,
    "kinds": [
     "final",
     "top10"
@@ -6687,7 +6687,7 @@
   {
    "code": "601211",
    "name": "国泰海通",
-   "n_signals": 10,
+   "n_signals": 11,
    "kinds": [
     "final",
     "top10"
