@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-25 23:04",
- "generated": "2026-11-25 23:04",
+ "update_time": "2026-11-26 00:00",
+ "generated": "2026-11-26 00:00",
  "meta": {
-  "generated": "2026-11-25 23:04",
+  "generated": "2026-11-26 00:00",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 32,
+  "total_days": 33,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -14159,6 +14159,188 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-11-25",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.995,
+      "price": 20.03,
+      "category": "突破"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 8.078,
+      "price": 18.73,
+      "category": "突破"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 20.0,
+      "price": 5.1,
+      "category": "突破"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 10.409,
+      "price": 2.97,
+      "category": "突破"
+     },
+     {
+      "code": "600809",
+      "name": "山西汾酒",
+      "change_pct": 3.744,
+      "price": 133.0,
+      "category": "突破"
+     },
+     {
+      "code": "000702",
+      "name": "正虹科技",
+      "change_pct": 9.91,
+      "price": 4.88,
+      "category": "突破"
+     },
+     {
+      "code": "603926",
+      "name": "铁流股份",
+      "change_pct": 9.976,
+      "price": 17.97,
+      "category": "突破"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 10.11,
+      "price": 5.01,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.995,
+      "price": 20.03,
+      "category": "加速"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 8.078,
+      "price": 18.73,
+      "category": "加速"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 20.0,
+      "price": 5.1,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.995,
+      "price": 20.03,
+      "category": "短线选股"
+     },
+     {
+      "code": "002771",
+      "name": "真视通",
+      "change_pct": 8.078,
+      "price": 18.73,
+      "category": "短线选股"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 20.0,
+      "price": 5.1,
+      "category": "短线选股"
+     },
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 10.409,
+      "price": 2.97,
+      "category": "短线选股"
+     },
+     {
+      "code": "600809",
+      "name": "山西汾酒",
+      "change_pct": 3.744,
+      "price": 133.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "000702",
+      "name": "正虹科技",
+      "change_pct": 9.91,
+      "price": 4.88,
+      "category": "短线选股"
+     },
+     {
+      "code": "603926",
+      "name": "铁流股份",
+      "change_pct": 9.976,
+      "price": 17.97,
+      "category": "短线选股"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 10.11,
+      "price": 5.01,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "300237",
+      "name": "美晨科技",
+      "change_pct": 10.409,
+      "price": 2.97,
+      "category": "强势股"
+     },
+     {
+      "code": "600809",
+      "name": "山西汾酒",
+      "change_pct": 3.744,
+      "price": 133.0,
+      "category": "强势股"
+     },
+     {
+      "code": "000702",
+      "name": "正虹科技",
+      "change_pct": 9.91,
+      "price": 4.88,
+      "category": "强势股"
+     },
+     {
+      "code": "603926",
+      "name": "铁流股份",
+      "change_pct": 9.976,
+      "price": 17.97,
+      "category": "强势股"
+     },
+     {
+      "code": "002548",
+      "name": "金新农",
+      "change_pct": 10.11,
+      "price": 5.01,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-11-26",
    "categories": {
     "突破": [
      {
