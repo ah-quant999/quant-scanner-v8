@@ -104,9 +104,6 @@ VAR_TO_RAW = {
     # 2026-09-18：880003 主口径（真 MA + 历史回填）。本函数自写合并结果，
     # 但登记项必须存在，否则 run() 的状态记录与 save() 的兜底路径会静默失效。
     "AVG_PRICE_880003": "avg_price_data.json",  # 2026-08-31 修复：f_avg_price 已加入 tasks，必须对应 raw_data/avg_price_data.json，否则 save() 因 fname=None 直接返回，数据永不被写入
-    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
-    #   本表必须登记：否则 save() 取不到 fname 会直接 return，raw 永不落盘。
-    "SECTOR_YEAR_FLOW": "sector_year_flow.json",
     # 🏛 2026-11-05 主人令「找可靠新数据源」：宽基ETF放量异动（国家队护盘指纹·D 路源）。
     #   本表必须登记：否则 save() 取不到 fname 会直接 return，raw 永不落盘。
     "BROAD_ETF_VOLUME": "broad_etf_volume.json",
@@ -207,9 +204,6 @@ CATEGORY_MAP = {
     #   档位扩为 "premarket,intraday,post_close"，让 selfhosted（小九 cn）08:25 盘前 /
     #   17:20 盘后两班常规兜底档必跑本源；云端境外轮失败仍为软失败不阻断（既有语义）。
     "AVG_PRICE_880003": "premarket,intraday,post_close",
-    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。同源 push2his fflow daykline
-    #   ⇒ 与 AVG_PRICE_880003 同属 cn-IP 硬约束，挂 post_close（selfhosted 17:20 常规班覆盖）。
-    "SECTOR_YEAR_FLOW": "post_close",
     # 🏛 2026-11-05：宽基ETF放量异动（国家队 D 路源）—— push2his 日K（6 只头部宽基ETF + 上证指数），
     #   与 AVG_PRICE_880003 同属 cn-IP 硬约束，挂 post_close（selfhosted 17:20 常规班拿当日全天
     #   定稿成交额；云端境外轮失败为软失败不阻断，同既有语义）。消费方 v8/gen_national_team.py
@@ -6146,117 +6140,6 @@ def main(category=None, only=None):
               (out["ratio_etf"], out["ratio_max"], down_day, len(rows)))
         return out
 
-    def f_sector_year_flow():
-        """🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
-        口径：东财行业板块（clist m:90+t:2）逐日主力净流入官方历史
-              （push2his fflow daykline，f51=日期 f52=主力净流入额·元）按自然年累加 ——
-              历史段为官方披露数据回填，非自算估算（主人 10-17 授权回填·要求真实）。
-        产出：raw_data/sector_year_flow.json → data/SECTOR_YEAR_FLOW.js
-              sectors=[{code,name,cur,prev,days,last_date}]，cur/prev 单位亿元。
-        幂等：当日已产出 → 跳过（防同日多轮重复 90+ 请求，同 us_hk_map 预算闸门语义）。
-        防护：失败板块 >30% → 不覆盖既有文件（宁缺勿错，同 save() 空壳防护铁律）。
-        执行位：post_close（cn-IP 硬约束源，selfhosted 小九 17:20 常规班覆盖；云端境外轮软失败）。
-        """
-        _today = now_cst().date()
-        out_path = RAW_DIR / "sector_year_flow.json"
-        # ① 幂等闸门：今日已产出 → 跳过
-        if out_path.exists():
-            try:
-                _prev = json.loads(out_path.read_text(encoding="utf-8") or "{}")
-                if str(_prev.get("update_time", ""))[:10] == _today.isoformat():
-                    # 🔴 2026-11-23 一劳永逸（真根因）：旧闸只比「日期」⇒ 早晨 09:31 的半成品
-                    #   会让 15:45/16:20 盘后专链整日 skip，卡面永远停在早盘值并在盘后被判
-                    #   「数据中断」（主人 11-23 截图实证 update_time=11-20 09:31）。
-                    #   现在必须同时满足「同日 + 已过 15:00 盘后定稿」才跳过；早盘旧档强制重抓。
-                    _pt = datetime.strptime(_prev["update_time"], "%Y-%m-%d %H:%M:%S")
-                    if _pt.hour >= 15:
-                        print("  [sector_year_flow] 今日盘后已产出 → 跳过重抓（幂等闸门）")
-                        return None
-                    print(f"  [sector_year_flow] 今日仅有早盘旧档 {_prev['update_time']}（<15:00）→ 强制重抓盘后定稿")
-            except Exception:
-                pass
-        cur_year, prev_year = _today.year, _today.year - 1
-        # ② 行业板块清单（clist 换 host 重试，复用公共层）
-        rows = _em_clean_rows(em_clist("m:90+t:2", "f12,f14", fid="f12",
-                                       pz=500, po="0", pn=1, timeout=20) or [])
-        boards = []
-        for r in rows:
-            _c = str(r.get("f12") or "")
-            _n = str(r.get("f14") or "")
-            if _c.startswith("BK") and _n:
-                boards.append((_c, _n))
-        if len(boards) < 30:
-            print(f"  ⚠️ [sector_year_flow] 行业板块清单仅 {len(boards)} 个（<30）→ 放弃本轮不覆盖")
-            return None
-        # ③ 逐板块拉日度主力净流入历史，按年累加（每板块最多 2 轮补抓）
-        _EMU = 1e8  # 元 → 亿元
-        sectors, fails = [], 0
-        _cy, _py = str(cur_year), str(prev_year)
-        for code, name in boards:
-            recs = None
-            for _att in range(2):
-                try:
-                    d = _em_get_with_retry(
-                        "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
-                        params={"secid": f"90.{code}", "klt": "101", "lmt": "560",
-                                "fields1": "f1,f2,f3,f7", "fields2": "f51,f52",
-                                "ut": "b2884a393a59ad64002292a3e90d46a5"},
-                        headers=_EM_HEADERS, timeout=20, label=f"syf_{code}",
-                        max_attempts=3)
-                    kl = ((d.get("data") or {}).get("klines")) or []
-                    if kl:
-                        recs = kl
-                        break
-                except Exception as _e:
-                    if _att == 1:
-                        print(f"  ⚠️ [sector_year_flow] {name}({code}) 拉取失败: {_e}")
-            if not recs:
-                fails += 1
-                continue
-            acc = {_cy: 0.0, _py: 0.0}
-            days_n = {_cy: 0, _py: 0}
-            _cy_series = []  # 2026-10-19 主人令：保留今年日度序列 → 顺算近5/20日增量
-            last_date = ""
-            for ln in recs:
-                p = ln.split(",")
-                if len(p) < 2:
-                    continue
-                _y = p[0][:4]
-                if _y not in acc:
-                    continue
-                try:
-                    _v = float(p[1])
-                except ValueError:
-                    continue
-                acc[_y] += _v
-                days_n[_y] += 1
-                last_date = p[0]
-                if _y == _cy:
-                    _cy_series.append(_v)
-            if days_n[_cy] == 0:
-                fails += 1
-                continue
-            # 近5日/近20日净流入（滚动增量窗）：治「只看总数、增减无感」
-            _d5 = round(sum(_cy_series[-5:]) / _EMU, 2) if len(_cy_series) >= 5 else None
-            _d20 = round(sum(_cy_series[-20:]) / _EMU, 2) if len(_cy_series) >= 20 else None
-            sectors.append({"code": code, "name": name,
-                            "cur": round(acc[_cy] / _EMU, 2),
-                            "prev": round(acc[_py] / _EMU, 2),
-                            "d5": _d5, "d20": _d20,
-                            "days": days_n[_cy], "last_date": last_date})
-        if not sectors or fails / max(1, len(boards)) > 0.3:
-            print(f"  ⚠️ [sector_year_flow] 成功 {len(sectors)}/{len(boards)}"
-                  f"（空/失败率超 30%）→ 不覆盖既有文件（宁缺勿错）")
-            return None
-        sectors.sort(key=lambda s: s["cur"], reverse=True)
-        print(f"  [sector_year_flow] 板块 {len(sectors)}/{len(boards)} 成功，"
-              f"{cur_year} 净流入榜首: {sectors[0]['name']} {sectors[0]['cur']}亿")
-        return {"year": cur_year, "prev_year": prev_year,
-                "source": "东方财富行业板块逐日主力净流入官方历史按年累加(自建累积表·历史回填)",
-                "total": len(boards), "fail_count": fails,
-                "data_date": sectors and max(s["last_date"] for s in sectors),
-                "sectors": sectors}
-
     def f_avg_price():
         """全A等权平均股价：通过 em_clist(push2delay) 取全市场个股最新价/涨跌幅，
         算等权均价 + 等权涨跌幅，并记录历史算 20/60 日水位。
@@ -6694,7 +6577,6 @@ def main(category=None, only=None):
         ("EXPERIMENT", f_experiment),
         ("ETF_NET_SUBSCRIPTION", f_etf_net_subscription),  # 2026-09-11 主人 P1：真实份额申赎（上交所日环比）
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
-        ("SECTOR_YEAR_FLOW", f_sector_year_flow),  # 🛠 2026-10-19 补注册：三表登记齐但漏本表⇒任务永不执行(149行注释警告的假修复同族)；并启 近5/20日增量列(主人10-19令)
         ("BROAD_ETF_VOLUME", f_broad_etf_volume),  # 🏛 2026-11-05 主人令：宽基ETF放量异动（国家队 D 路源）——三表登记齐（本行+产物表+档位表），漏一即静默不跑（10-19 假修复同族教训）
         ("AVG_PRICE_DATA", f_avg_price),
         ("AVG_PRICE_880003", f_avg_price_880003),
@@ -6769,9 +6651,6 @@ def main(category=None, only=None):
         _probs.append(f"未登记 CATEGORY_MAP ⇒ 永不进 target_vars、永不执行: {_no_cat}")
     if _no_raw:
         _probs.append(f"未登记 VAR_TO_RAW ⇒ save() 直接 return、raw 永不落盘: {_no_raw}")
-    # 🔴 2026-10-19 反向自检补盲（阿狸咪·主人令一劳永逸）：原自检只查正向(tasks→两表)，
-    #   反向(两表已登记但 tasks 未注册)没查 ⇒ SECTOR_YEAR_FLOW 当日实锤：定义+三表齐、
-    #   自检照样「通过」，任务却永不执行(孤儿假修复同族)。
     _EXTERNAL_PRODUCERS = {"SECTOR_FUND_FLOW_INTRADAY"}  # 白名单：intraday_snapshot.py 快照专链自产，不经 tasks
     _no_task = sorted((set(CATEGORY_MAP.keys()) | set(VAR_TO_RAW.keys())) - _wf_set - _EXTERNAL_PRODUCERS)
     if _no_task:

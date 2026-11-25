@@ -173,8 +173,6 @@ DATA_SOURCES = {
     #   （今日实测：11:13 新鲜 -> cn_fetch 后回退 09:58，主站个股行情断档）。移除后 cn_fetch 不再重建它，
     #   refresh 工作流为唯一写入方，根因消除。其余卡仍由本映射正常重建。
     "avg_price_data.json":         "AVG_PRICE_DATA",
-    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）
-    "sector_year_flow.json":       "SECTOR_YEAR_FLOW",
     # 🔴 2026-10-18 主人令「完全下架」：唯一信号源四量终极已下架，gen_algo_track.py 同批摘链删除
     #   ⇒ ALGO_TRACK 映射随摘（raw_data/algo_track.json 删除；防夜间构建从冻结 raw 复活幽灵文件）。
     # "algo_track.json":              "ALGO_TRACK",
@@ -428,9 +426,6 @@ CATEGORY_MAP = {
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
     #   映射为 intraday 使 update_v8 在盘中也刷新 AVG_PRICE_DATA.js（数据源单点，无双写冲突）。
     "AVG_PRICE_DATA": "intraday,post_close",
-    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。cn-IP 硬约束源，
-    #   仅 post_close 档授权重建（与 AVG_PRICE_880003 同源 push2his）。
-    "SECTOR_YEAR_FLOW": "post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     # 🔴 2026-10-18 主人令「完全下架」：唯一信号源四量已下架、gen_algo_track 已摘链删除 ⇒ 随摘。
     # "ALGO_TRACK": "post_close",

@@ -535,7 +535,7 @@ jobs:
             #   与 10-09 WAVE_ELLIOTT 同款竞态。ima 五件套全部纳入取回白名单。
             # 🛡 一劳永逸（根治「直推文件被 build 回退」同族全系 bug·2026-10-30）：
             #   本 build 期间被他链/他机新推到 origin/main 的 data/*.js，在 add 前自动回捞到最新，
-            #   无需再逐个补白名单（WAVE/IMA/CITIC_PE/SECTOR_YEAR_FLOW/BACKTEST_*/… 全覆盖）。
+            #   无需再逐个补白名单。
             #   机理：build 启动时 checkout 的是快照，git add data/ 全量暂存会把 mid-run 直推覆盖回旧版；
             #   改为 diff 当前 HEAD 与 origin/main，仅回捞期间被新推的 data 文件（未来新直推卡零配置生效）。
             git fetch origin main
