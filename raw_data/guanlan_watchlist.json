@@ -1,11 +1,22 @@
 {
   "version": "2.0",
-  "updated": "2026-11-25 17:10:02",
+  "updated": "2026-11-26 03:14:04",
   "sources": [
     "guanlan"
   ],
-  "total": 8,
+  "total": 3,
   "stocks": [
+    {
+      "name": "中芯国际",
+      "code": "688981",
+      "full_code": "sh688981",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根士丹利",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-25"
+    },
     {
       "name": "中国船舶",
       "code": "600150",
@@ -25,72 +36,6 @@
       "market": "深市",
       "institution": "野村",
       "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-25"
-    },
-    {
-      "name": "杰瑞股份",
-      "code": "002353",
-      "full_code": "002353.SZ",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "摩根大通",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-25"
-    },
-    {
-      "name": "中国广核",
-      "code": "003816",
-      "full_code": "sz003816",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "未知机构",
-      "rating": "增持",
-      "source": "外资研投",
-      "added_date": "2026-11-25"
-    },
-    {
-      "name": "机器人",
-      "code": "300024",
-      "full_code": "sz300024",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "摩根士丹利",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-25"
-    },
-    {
-      "name": "国电南瑞",
-      "code": "600406",
-      "full_code": "sh600406",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "高盛",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-25"
-    },
-    {
-      "name": "思源电气",
-      "code": "002028",
-      "full_code": "sz002028",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "高盛",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-25"
-    },
-    {
-      "name": "华明装备",
-      "code": "002270",
-      "full_code": "sz002270",
-      "exchange": "SZ",
-      "market": "深市",
-      "institution": "高盛",
-      "rating": "未评级",
       "source": "外资研投",
       "added_date": "2026-11-25"
     }
