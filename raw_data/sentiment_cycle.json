@@ -1,42 +1,42 @@
 {
-  "update_time": "2026-11-25 10:06:46",
+  "update_time": "2026-11-25 18:43:19",
   "data_date": "2026-11-25",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "高潮",
   "color": "#f59e0b",
-  "score": 75.0,
-  "delta_pct": 0.0,
+  "score": 64.0,
+  "delta_pct": -20.0,
   "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
   "metrics": {
-    "total_up": 55,
+    "total_up": 44,
     "max_ladder": 4,
-    "high_ladder_count": 5,
+    "high_ladder_count": 7,
     "sectors_count": 10
   },
   "ladder_dist": {
-    "1": 25,
-    "2": 25,
-    "3": 4,
-    "4": 1
+    "1": 33,
+    "2": 4,
+    "3": 5,
+    "4": 2
   },
   "leaders": [
     {
-      "code": "002579",
-      "name": "中京电子",
+      "code": "002548",
+      "name": "金新农",
       "lbc": 4,
-      "chg": 9.98
+      "chg": 10.11
     },
     {
       "code": "603960",
       "name": "克来机电",
-      "lbc": 3,
-      "chg": 10.02
+      "lbc": 4,
+      "chg": 9.99
     },
     {
-      "code": "605018",
-      "name": "长华集团",
+      "code": "002122",
+      "name": "汇洲智能",
       "lbc": 3,
-      "chg": 10.01
+      "chg": 10.12
     }
   ],
   "prev_total": 55,

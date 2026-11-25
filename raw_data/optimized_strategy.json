@@ -3,37 +3,37 @@
   "update_time": "2026-11-25",
   "method": "①持仓周期≤10d + ②≥3信号共振 + ③市场regime门控(grind/panic)",
   "backtest_sample": {
-    "stocks_analyzed": 1088,
-    "gold_pool_size": 1088,
+    "stocks_analyzed": 1096,
+    "gold_pool_size": 1096,
     "survivor_bias_warning": true,
     "entry_caliber_ver": 3,
-    "signal_window": "2022-01-07~2026-11-20"
+    "signal_window": "2023-07-27~2026-11-23"
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 28043,
+    "total_signals": 27328,
     "periods": {
       "T+5": {
-        "win_rate_pct": 48.6,
-        "avg_return_pct": 0.01
+        "win_rate_pct": 49.0,
+        "avg_return_pct": 0.02
       },
       "T+10": {
-        "win_rate_pct": 49.5,
-        "avg_return_pct": 0.26
+        "win_rate_pct": 49.2,
+        "avg_return_pct": 0.23
       }
     },
     "data_ok": true
   },
   "baseline_ge3": {
     "T+5": {
-      "win_rate_pct": 47.1,
-      "avg_return_pct": -0.26
+      "win_rate_pct": 47.4,
+      "avg_return_pct": -0.25
     },
     "T+10": {
-      "win_rate_pct": 48.7,
+      "win_rate_pct": 48.8,
       "avg_return_pct": -0.11
     },
-    "total_signals": 77460
+    "total_signals": 73051
   },
   "config": {
     "enabled": true,
@@ -68,7 +68,7 @@
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
   },
   "current_regime": {
-    "date": "2026-11-24",
+    "date": "2026-11-25",
     "regime": "grind",
     "open_position": true,
     "ok": true,
