@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-25 02:49",
-  "republish_time": "2026-11-25 05:20:24",
+  "update_time": "2026-11-25 03:40",
+  "republish_time": "2026-11-25 09:00:16",
   "data_date": "2026-11-24",
   "rule_ver": 2,
   "top_n": 5,
@@ -12,7 +12,7 @@
   "fr_sectors": [
     {
       "name": "保险",
-      "bk": "BK0474",
+      "bk": "BK1358",
       "cons_count": 5,
       "leaders": [
         {
@@ -51,7 +51,7 @@
           "main_net": null
         }
       ],
-      "match": "norm"
+      "match": "ths"
     },
     {
       "name": "元件",
@@ -270,9 +270,16 @@
     },
     {
       "name": "电子化学品",
-      "bk": "BK1039",
-      "cons_count": 35,
+      "bk": "BK1332",
+      "cons_count": 20,
       "leaders": [
+        {
+          "code": "301716",
+          "name": "鸿富诚",
+          "price": 317.0,
+          "chg": 10.13,
+          "main_net": null
+        },
         {
           "code": "603078",
           "name": "江化微",
@@ -300,21 +307,14 @@
           "price": 217.79,
           "chg": 5.25,
           "main_net": null
-        },
-        {
-          "code": "300537",
-          "name": "广信材料",
-          "price": 20.0,
-          "chg": 4.93,
-          "main_net": null
         }
       ],
-      "match": "norm"
+      "match": "ths"
     },
     {
       "name": "电机",
-      "bk": "BK1030",
-      "cons_count": 25,
+      "bk": "BK1307",
+      "cons_count": 20,
       "leaders": [
         {
           "code": "603728",
@@ -352,7 +352,7 @@
           "main_net": null
         }
       ],
-      "match": "norm"
+      "match": "ths"
     },
     {
       "name": "自动化设备",
@@ -399,8 +399,8 @@
     },
     {
       "name": "证券",
-      "bk": "BK0473",
-      "cons_count": 48,
+      "bk": "BK1366",
+      "cons_count": 20,
       "leaders": [
         {
           "code": "002945",
@@ -438,7 +438,7 @@
           "main_net": null
         }
       ],
-      "match": "norm"
+      "match": "ths"
     },
     {
       "name": "贵金属",
