@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-25 05:35:42",
+  "update_time": "2026-11-25 09:34:57",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 24,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 185,
+      "total": 179,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 83,
       "peak_date": "11/04",
-      "total": 1468,
+      "total": 1455,
       "ongoing": true
     },
     {
@@ -76,7 +76,7 @@
       "hot_days": 29,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 276,
+      "total": 274,
       "ongoing": true
     },
     {
@@ -115,7 +115,7 @@
       "hot_days": 25,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 299,
+      "total": 291,
       "ongoing": true
     },
     {
@@ -134,14 +134,14 @@
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "11/25",
+      "end": "11/24",
       "start_idx": 8,
-      "end_idx": 29,
-      "days": 22,
-      "hot_days": 20,
+      "end_idx": 28,
+      "days": 21,
+      "hot_days": 19,
       "peak": 18,
       "peak_date": "11/17",
-      "total": 129,
+      "total": 126,
       "ongoing": true
     },
     {
