@@ -1,0 +1,20 @@
+{
+  "_readme": "主人功能锚点登记册（nolost_guard 每轮巡检远端 index.html）。主人明确要过的功能，其 DOM/JS 标记一旦从线上 index.html 消失，守卫立即写 high 级告警到 NOLOST_LOG.jsonl，杜绝『无命令静默回滚』。要合法删除某功能，必须先从本册移除该锚点并写明 owner 命令来源，否则守卫持续告警。",
+  "_rule": "回滚只有两种合法来源：①主人明确下令（登记 owner+date+命令原文）②生成器/算法按设计重算（不登记锚点）。除此之外一切 index.html 功能标记消失 = 无命令回滚 = 必须告警。",
+  "updated": "2026-11-26 00:10 CST",
+  "updated_by": "阿狸咪夜班（主人令 2026-11-25『回滚没我的命令就是错误，一劳永逸修复』）",
+  "target": "index.html",
+  "anchors": [
+    {"id": "three_cards_if", "label": "盘后三卡·IF会员持仓择时", "needle": "IF会员持仓择时", "owner": "主人令 2026-11-25 恢复三卡默认显示（commit 6dfc933）"},
+    {"id": "three_cards_breadth", "label": "盘后三卡·市场宽度·新高家数", "needle": "市场宽度 · 新高家数", "owner": "主人令 2026-11-25 恢复三卡默认显示（commit 6dfc933）"},
+    {"id": "three_cards_eqbond", "label": "盘后三卡·股债性价比·温度计", "needle": "股债性价比 · 温度计", "owner": "主人令 2026-11-25 恢复三卡默认显示（commit 6dfc933）"},
+    {"id": "ui_defense_red", "label": "攻防档位·守档危险红", "needle": "_mr.regime==='defense'", "owner": "主人令 2026-11-25『守应该是红色』（commit 05d50ff）"},
+    {"id": "ui_shinc_bt", "label": "增持榜回测·迁回测跟踪页", "needle": "[bt] shIncBt", "owner": "主人令 2026-11-25『放到回测跟踪底部』（commit 05d50ff）"},
+    {"id": "ui_pullback_plain", "label": "回调池对比·顶部人话解析", "needle": "这张卡给你什么信息（人话）", "owner": "主人令 2026-11-25『人话解析写顶部』（commit 05d50ff）"},
+    {"id": "ui_pattern_plain", "label": "分型×共振·白话结论", "needle": "光看 K 线", "owner": "主人令 2026-11-25『白字说人话』（commit 05d50ff）"},
+    {"id": "redcross_rootfix", "label": "运维红叉·低频卡根治逻辑", "needle": "if(!ok && isPast && _isLowFreqCard && _healthAccepts)", "owner": "主人令 2026-11-25『一劳永逸修复』（commit 05d50ff/90baca1）"},
+    {"id": "cashflow_bt", "label": "现金流质量榜回测卡", "needle": "现金流质量榜", "owner": "主人令 2026-11-25『实测解析白字人话』（commit 05d50ff）"},
+    {"id": "final_recommend", "label": "最终推荐数据源", "needle": "FINAL_RECOMMEND_DATA", "owner": "主人长期核心功能"},
+    {"id": "etf_pace", "label": "ETF量能配速条", "needle": "etfPaceLine", "owner": "主人令 2026-11-25『这卡放上方』（commit 05d50ff）"}
+  ]
+}

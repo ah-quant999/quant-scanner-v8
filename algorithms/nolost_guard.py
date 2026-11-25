@@ -61,6 +61,13 @@ STATE_PATH = os.path.join(ROOT, ".nolost_state.json")
 # 判据只能靠它：本地文件未必推过，不能拿本地当参照（否则 252 个本机私有文件全被误判"丢失"）。
 BASELINE_PATH = os.path.join(ROOT, ".nolost_remote_baseline.json")
 IGNORE_PATH = os.path.join(ROOT, "docs", "ops", "NOLOST_IGNORE.json")
+# 🛡 2026-11-26 主人令「回滚没我的命令就是错误，一劳永逸修复」：功能锚点登记册。
+#   既有 nolost_guard 只按「路径」保护（index.html 整体在册），无法识别「基于最新 tip 的
+#   合法新提交里夹带的功能删除」（如 e147 整卡退役）——路径没丢，守卫不报警，形成盲区。
+#   本册登记主人明确要过的功能标记（DOM/JS needle），每轮巡检拉远端 index.html 逐条核对，
+#   任一 needle 消失即判「无命令回滚」→ high 告警写入 NOLOST_LOG，让删除无法静默发生。
+#   合法删除必须先从本册移除该锚点并写明 owner 命令来源，否则守卫持续告警。
+ANCHORS_PATH = os.path.join(ROOT, "docs", "ops", "FEATURE_ANCHORS.json")
 
 # ── 受保护范围 ────────────────────────────────────────────────────────────────
 # 只保护「人手写、bot 不重算」的源文件。data/raw_data 是构建产物，天然每日重算，不在保护范围
@@ -463,11 +470,56 @@ def _heal_from_baseline(lost, base, note=""):
     return [], False
 
 
+def check_feature_anchors(manifest=None):
+    """🛡 主人令 2026-11-26：核对远端 index.html 的功能锚点是否还在。
+
+    返回 {"checked": n, "missing": [{id,label,needle,owner}], "error": str|None}。
+    - 只读远端 blob，不改任何文件、不自动回滚（避免误伤有令迭代）。
+    - 锚点缺失只写 high 告警日志，供双机/巡检/主人核对命令来源。
+    - 登记册不存在或解析失败 → 返回 error，不阻断既有路径守卫。
+    """
+    out = {"checked": 0, "missing": [], "error": None}
+    try:
+        with open(ANCHORS_PATH, encoding="utf-8") as f:
+            cfg = json.load(f)
+        anchors = cfg.get("anchors") or []
+        target = cfg.get("target") or "index.html"
+        if not anchors:
+            out["error"] = "anchors empty"
+            return out
+        man = manifest or remote_manifest()
+        sha = man.get(target)
+        if not sha:
+            out["error"] = f"target {target} not in remote manifest"
+            return out
+        html = blob_text(sha).decode("utf-8", errors="replace")
+        out["checked"] = len(anchors)
+        for a in anchors:
+            needle = a.get("needle") or ""
+            if needle and needle not in html:
+                out["missing"].append({
+                    "id": a.get("id"), "label": a.get("label"),
+                    "needle": needle, "owner": a.get("owner"),
+                })
+        return out
+    except Exception as e:
+        out["error"] = f"{e.__class__.__name__}: {e}"
+        return out
+
+
 def cycle():
     real_machine = os.environ.get("NOLOST_CI") != "1"
     snap = snapshot_local() if real_machine else 0
     ck = check()
     lost = ck["silently_clobbered"]
+    # 🛡 功能锚点巡检（与路径守卫并行，互不干扰）
+    fa = check_feature_anchors()
+    if fa["error"]:
+        log_event({"kind": "feature_anchor_error", "severity": "low", "error": fa["error"]})
+    elif fa["missing"]:
+        log_event({"kind": "feature_anchor_missing", "severity": "high",
+                   "checked": fa["checked"], "missing": fa["missing"],
+                   "hint": "线上 index.html 主人功能标记消失；若为有令删除请更新 FEATURE_ANCHORS.json 移除该锚点并写明 owner，否则视为无命令回滚"})
     healed = []
     if lost:
         base = load_baseline()
@@ -481,7 +533,8 @@ def cycle():
     # 云端 CI 不写 UNPUBLISHED（它 checkout 是干净的，写了会冲掉真机的未发布账本）
     unp_count = write_unpublished()["count"] if real_machine else -1
     out = {"at": ts(), "snapshot_new": snap, "clobbered": lost,
-           "healed": healed, "unpublished": unp_count}
+           "healed": healed, "unpublished": unp_count,
+           "feature_anchors": {"checked": fa["checked"], "missing_n": len(fa["missing"])}}
     log_event({"kind": "cycle", **out})
     return out
 
@@ -490,6 +543,8 @@ def main(argv):
     cmd = argv[1] if len(argv) > 1 else "check"
     if cmd == "check":
         print(json.dumps(check(), ensure_ascii=False, indent=2))
+    elif cmd == "anchors":
+        print(json.dumps(check_feature_anchors(), ensure_ascii=False, indent=2))
     elif cmd == "seed":
         n = save_baseline(remote_manifest())
         print(json.dumps({"ok": True, "baseline_files": n, "path": BASELINE_PATH}, ensure_ascii=False))
