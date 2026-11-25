@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-11-25 12:22:08",
+  "check_time": "2026-11-25 12:50:28",
   "last_trade_close": "2026-11-24 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -16,13 +16,15 @@
     }
   ],
   "frozen_stale": [],
-  "no_update_time": [],
+  "no_update_time": [
+    "PORTFOLIO"
+  ],
   "summary": {
     "total_checked": 45,
     "core_stale": 0,
     "warn_stale": 2,
     "frozen_stale": 0,
-    "no_timestamp": 0
+    "no_timestamp": 1
   },
   "category_map": {
     "V8_CAL": "premarket,post_close",
