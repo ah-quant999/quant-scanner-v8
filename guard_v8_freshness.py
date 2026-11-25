@@ -271,9 +271,16 @@ WARN_SOURCES = {
     #   使其进入「已知陈旧源」清单、由盲区捕获块兜底一致性校验，不再漏报。
     "PORTFOLIO": 24 * 30,        # 持仓组合（周/事件节奏，非每日刷新）
     "maharo_insights": 24 * 10,  # 高手洞察（周/事件节奏）
-    "SECTOR_YEAR_FLOW": 72,      # 板块年度资金流（季度级）
+    # 🗑 2026-11-25 主人确认：板块年度主力净流入卡整卡退役（小九 commit e147e0c4），
+    #   产物 data/SECTOR_YEAR_FLOW.js 随卡删除。原 WARN_SOURCES 登记未同步 ⇒ 每轮巡检
+    #   恒报「文件缺失」黄灯，并经运维告警链发断更邮件（主人 11-26 实收）。现移入退役
+    #   清单；若日后有意恢复，须主人明令并同时恢复此处登记，杜绝「删了还报警」。
     "HUIJIN_ETF_DRILL": 24 * 14, # 汇金 ETF 演练（前端零引用，长阈值仅捕真冻结）
 }
+
+# 🗑 主人明令退役的数据源：不参与新鲜度巡检 / 盲区捕获 / 邮件告警。
+#   新增退役项只改这一处；退役时须同批清掉 CORE/WARN/FROZEN/ALGO 四表登记。
+RETIRED_SOURCES = {"SECTOR_YEAR_FLOW"}
 
 # 🛡 2026-08-20 主人令·一劳永逸：策略回测（统一）卡片依赖选股算法产出，
 # 必须纳入 CORE 并由 v8_algo_cloud 自动补跑。旧版在 WARN 仅告警不自愈，
@@ -843,7 +850,7 @@ def main():
     _blind = []
     for _p in sorted(DATA_DIR.glob("*.js")):
         _var = _p.stem
-        if _var in _MONITORED or _var in _STATIC_WHITELIST or _var in _SKIP_EXACT:
+        if _var in RETIRED_SOURCES or _var in _MONITORED or _var in _STATIC_WHITELIST or _var in _SKIP_EXACT:
             continue
         if _var.startswith(_SKIP_PREFIX):
             continue
@@ -856,6 +863,17 @@ def main():
     if _blind:
         warn_stale += _blind
         print(f"  [盲区捕获] 新增 {len(_blind)} 个未监控但陈旧的源：{', '.join(v for v, _ in _blind)}")
+
+    # 🛡 退役源兜底：任何路径漏网的退役项一律剔除，杜绝「卡已删、邮件还在报断更」复发。
+    def _drop_retired(items):
+        return [x for x in items if (x[0] if isinstance(x, tuple) else x) not in RETIRED_SOURCES]
+
+    core_stale = _drop_retired(core_stale)
+    warn_stale = _drop_retired(warn_stale)
+    frozen_stale = _drop_retired(frozen_stale)
+    core_notime = _drop_retired(core_notime)
+    warn_notime = _drop_retired(warn_notime)
+    frozen_notime = _drop_retired(frozen_notime)
 
     def _with_cat(items):
         def _cat(var):

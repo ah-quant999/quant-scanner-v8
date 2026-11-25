@@ -204,7 +204,7 @@ CARD_DEFS = [
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：FACTOR_LAB 唯一 UI =「🏆 最终推荐」页 🧪因子实验室 tab
     #   （因子定位卡/每日因子计算/当日计分榜，2026-09-20 主人令已从策略回测页整体移除回测卡）。
     #   page 迁"最终推荐"，阈值走盘后元组（该页已显式加入），有效阈值仍 = def_max(1440)，逐字节同值。
-    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
+    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time", "data_date"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：FOUR_VOLUME_BACKTEST 唯一 UI = 选股策略页四量终极子页
     #   回测表（fvBackBody）。page 迁"选股策略"（与该页既有项同一阈值分支，逐字节同值）。
     # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架（T+5 胜率 33.71%/均益 -1.68% n=89 跑输基准，
@@ -2295,6 +2295,36 @@ def check_data_cards():
             continue
         age_min = (now_cst() - dt).total_seconds() / 60
         status = "ok" if age_min <= max_age else "fail"
+
+        # 🛡 2026-11-26 主人令「因子卡住这么重要的怎么现在才发现」：上游数据日单独守。
+        #   旧口径只判 update_time 年龄，而 FACTOR_LAB 被登记为 net_dep 低频源（本机
+        #   baostock 遭风控黑名单，须小九中国IP链产出），长阈值 + 无关链刷新时间戳会
+        #   掩盖「data_date 冻结在两天前」的静默停更（11-24→11-25 实证）。现增加内容
+        #   数据日判据：最近交易日收盘后，data_date 落后 ≥1 个交易日即 fail；周末/节
+        #   假日按「当前日期 > 最近交易日」判，不会在数据源本就不产出的窗口误报。
+        if source_id == "FACTOR_LAB" and data.get("data_date"):
+            try:
+                _fqd = datetime.strptime(str(data["data_date"])[:10], "%Y-%m-%d").date()
+                _ref_close = last_trade_day_close(now_cst()).date()
+                _n8 = now_cst()
+                if _n8.date() > _ref_close:
+                    _lag = 0
+                    _probe = _ref_close
+                    while _fqd < _probe and _lag < 8:
+                        _probe -= timedelta(days=1)
+                        while not _is_trading_day(_probe):
+                            _probe -= timedelta(days=1)
+                        _lag += 1
+                    if _lag >= 1:
+                        _emit(d, {
+                            "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                            "status": "fail", "last_update": str(ts), "age_min": round(age_min, 1),
+                            "message": (f"因子实验室数据日 {_fqd} 落后最近交易日 {_ref_close} 达 {_lag} 个交易日"
+                                        f"（刷新时间 {fmt_rel_time(ts)}）→ 上游因子链疑似停更，非仅看时间戳"),
+                        })
+                        continue
+            except Exception:
+                pass
 
         # 🛡 2026-11-09 主人令「全部一劳永逸修复」：intraday 类交易日收盘后「盘中档缺失」收紧判红——
         #   根因（DO_T_SPACE 实证，主人 22:15 截图「做T空间还是今早7点的」）：盘中每30分链 13 档
