@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-25 19:33",
- "generated": "2026-11-25 19:33",
+ "update_time": "2026-11-25 19:46",
+ "generated": "2026-11-25 19:46",
  "meta": {
-  "generated": "2026-11-25 19:33",
+  "generated": "2026-11-25 19:46",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 32,
   "days_with_consensus": 0,
@@ -14171,29 +14171,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002771",
       "name": "真视通",
-      "change_pct": 8.078,
-      "price": 18.73,
+      "change_pct": 7.559,
+      "price": 18.64,
       "category": "突破"
      },
      {
       "code": "300290",
       "name": "ST荣科",
-      "change_pct": 20.0,
-      "price": 5.1,
+      "change_pct": 17.882,
+      "price": 5.01,
       "category": "突破"
      },
      {
       "code": "300237",
       "name": "美晨科技",
-      "change_pct": 10.409,
-      "price": 2.97,
-      "category": "突破"
-     },
-     {
-      "code": "600809",
-      "name": "山西汾酒",
-      "change_pct": 3.744,
-      "price": 133.0,
+      "change_pct": 12.639,
+      "price": 3.03,
       "category": "突破"
      },
      {
@@ -14208,13 +14201,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "铁流股份",
       "change_pct": 9.976,
       "price": 17.97,
-      "category": "突破"
-     },
-     {
-      "code": "002548",
-      "name": "金新农",
-      "change_pct": 10.11,
-      "price": 5.01,
       "category": "突破"
      }
     ],
@@ -14229,15 +14215,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002771",
       "name": "真视通",
-      "change_pct": 8.078,
-      "price": 18.73,
+      "change_pct": 7.559,
+      "price": 18.64,
       "category": "加速"
      },
      {
       "code": "300290",
       "name": "ST荣科",
-      "change_pct": 20.0,
-      "price": 5.1,
+      "change_pct": 17.882,
+      "price": 5.01,
       "category": "加速"
      }
     ],
@@ -14252,29 +14238,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002771",
       "name": "真视通",
-      "change_pct": 8.078,
-      "price": 18.73,
+      "change_pct": 7.559,
+      "price": 18.64,
       "category": "短线选股"
      },
      {
       "code": "300290",
       "name": "ST荣科",
-      "change_pct": 20.0,
-      "price": 5.1,
+      "change_pct": 17.882,
+      "price": 5.01,
       "category": "短线选股"
      },
      {
       "code": "300237",
       "name": "美晨科技",
-      "change_pct": 10.409,
-      "price": 2.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "600809",
-      "name": "山西汾酒",
-      "change_pct": 3.744,
-      "price": 133.0,
+      "change_pct": 12.639,
+      "price": 3.03,
       "category": "短线选股"
      },
      {
@@ -14289,13 +14268,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "铁流股份",
       "change_pct": 9.976,
       "price": 17.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "002548",
-      "name": "金新农",
-      "change_pct": 10.11,
-      "price": 5.01,
       "category": "短线选股"
      }
     ],
@@ -14303,15 +14275,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300237",
       "name": "美晨科技",
-      "change_pct": 10.409,
-      "price": 2.97,
-      "category": "强势股"
-     },
-     {
-      "code": "600809",
-      "name": "山西汾酒",
-      "change_pct": 3.744,
-      "price": 133.0,
+      "change_pct": 12.639,
+      "price": 3.03,
       "category": "强势股"
      },
      {
@@ -14326,13 +14291,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "铁流股份",
       "change_pct": 9.976,
       "price": 17.97,
-      "category": "强势股"
-     },
-     {
-      "code": "002548",
-      "name": "金新农",
-      "change_pct": 10.11,
-      "price": 5.01,
       "category": "强势股"
      }
     ]
