@@ -1,7 +1,7 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-25",
-  "update_time": "2026-11-26 00:21:32",
-  "source_time": "2026-11-26 00:21:25",
+  "update_time": "2026-11-26 00:31:51",
+  "source_time": "2026-11-26 00:31:47",
   "score": 65.7,
   "verdict": "偏活跃",
   "verdict_color": "#f59e0b",
@@ -44,7 +44,7 @@ window.NATIONAL_TEAM = {
       "ready": true,
       "value": 1.92,
       "unit": "×",
-      "detail": "华夏上证50ETF 当日成交 73.0 亿 = 20日均 1.92×（非下跌日·放量不判护盘），覆盖 5/6 只",
+      "detail": "华夏上证50ETF 当日成交 73.0 亿 = 20日均 1.92×（非下跌日·放量不判护盘），覆盖 4/6 只",
       "status": "🟡中性"
     }
   ],
