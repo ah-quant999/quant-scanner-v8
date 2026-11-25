@@ -1,6 +1,6 @@
 window.LHB_DATA = {
   "date": "20261125",
-  "update_time": "2026-11-25 20:55:14",
+  "update_time": "2026-11-25 21:58:12",
   "stocks": [
     {
       "code": "002242",
