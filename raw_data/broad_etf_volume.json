@@ -1,1 +1,12 @@
-{"update_time":"2026-11-26 02:07:09","data_date":"2026-11-25","down_day":true,"index_chg_pct":-2.03,"index_date":"2026-11-25","ratio_max":5.842,"ratio_etf":"沪深300ETF华夏(510330)","amount_max_yi":125.75,"base20_max_yi":21.53,"ok_count":6,"etfs":[{"code":"510300","name":"沪深300ETF华泰柏瑞","date":"2026-11-25","amount_yi":79.12,"base20_yi":82.5,"ratio":0.959},{"code":"510050","name":"上证50ETF华夏","date":"2026-11-25","amount_yi":72.96,"base20_yi":38.34,"ratio":1.903},{"code":"510330","name":"沪深300ETF华夏","date":"2026-11-25","amount_yi":125.75,"base20_yi":21.53,"ratio":5.842},{"code":"510310","name":"沪深300ETF易方达","date":"2026-11-25","amount_yi":95.45,"base20_yi":22.58,"ratio":4.227},{"code":"159919","name":"沪深300ETF嘉实","date":"2026-11-25","amount_yi":7.92,"base20_yi":35.06,"ratio":0.226},{"code":"588000","name":"科创50ETF华夏","date":"2026-11-25","amount_yi":98.78,"base20_yi":122.82,"ratio":0.804}]}
+{
+  "data_date": "2026-11-25",
+  "update_time": "2026-11-26 03:00:44",
+  "ratio_max": 1.918,
+  "ratio_etf": "华夏上证50ETF",
+  "amount_max_yi": 72.96,
+  "down_day": true,
+  "index_chg_pct": -2.03,
+  "ok_count": 6,
+  "source": "东方财富 push2his K线（6只头部宽基ETF 当日成交额/前20日均额）",
+  "note": "下跌日放量计护盘分；非下跌日中性50。D 路为护盘公开指纹，详见 gen_national_team.py 文档头。"
+}
