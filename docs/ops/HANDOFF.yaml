@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-19 23:41"
+  updated: "2026-11-25 16:45"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 189
+  next_id_seq: 190
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: cred-ledger-js-build-race-deleted-1115
@@ -146,7 +146,8 @@ items:
   - id: jinzuan-track-cron-audit-block-1109
     owner: 小九（双登记+文档源落码）+ 阿狸咪（盯 Gate 恢复）
     priority: P0
-    status: doing
+    status: pending-verify
+    verified_at: "2026-11-25 16:45"
     created: 2026-11-09
     title: 金钻跟踪 v8_jinzuan_track 新增 cron 未双登记 ⇒ Pre-deploy audit [4/8] 阻断 build_deploy
     note: >
@@ -165,7 +166,7 @@ items:
       ① v8_jinzuan_track 登入 MUST_HAVE_CRON 且文档源双登记后，build_deploy 下一轮 Pre-deploy audit [4/8] 转绿；
       ② 核 run head_sha ≥ 登记提交 sha（防旧代码判绿）；
       ③ 逻辑详解页按第四方铁律同变更集更新（真源 sections 对应段 + logic_page_sync.py build）。
-    updated: "2026-11-09 07:50"
+    updated: "2026-11-25 16:45"
     updated_by: 阿狸咪的工程师
   - id: logic-page-section-protocol-1026
     owner: shared（阿狸咪的工程师落码 · 小九接入）
@@ -4059,7 +4060,8 @@ items:
   - id: build-audit-404-backtest-cards-1124
     owner: 小九的工程师（任务A/B 实现方）
     priority: P0
-    status: blocked
+    status: pending-verify
+    verified_at: "2026-11-25 16:45"
     created: 2026-11-24
     title: 任务A/B回测卡前端落仓但生成器/产物双缺位 ⇒ [6/8] 404断链门禁 16h+ 阻断全部真实 build
     note: >-
@@ -4081,9 +4083,37 @@ items:
       未重试派发（业务层禁重试）。修复二选一：A=落码两个 gen_* 生成器+产物落仓（推荐）；
       B=任务暂缓则同一提交同步摘除两处 script src 与渲染段（勿只摘一半）。
       详见 docs/ops/handover/2026-11-24_2008_阿狸咪给小九_build门禁404断链二次复发挂账_任务AB生成器缺位.md
+      2026-11-25 16:45 跟进（阿狸咪）：门禁侧已由小九收敛——11-25 04:32/04:33Z 双登记提交 0741094044+57b1d7712c，
+      run 45548180637（head 39f6698273）build job 真跑 15 项全绿；d9a70275b5 落仓两份真实产物（非占位壳）。
+      部署层新阻断另立 item crosslayer-deploy-block-1125；本项转 pending-verify。
     note_to: 小九(lemoncat-cn)
     verify_how: >-
       修复后最新 build_deploy 轮 build job 真跑全绿（勿看 run 结论）且 [6/8] EXIT 0；
       临时克隆 tip 复跑 pre_deploy_audit.py EXIT=0；数据链产物继续鲜活。
-    updated: "2026-11-24 20:19"
+    updated: "2026-11-25 16:45"
+    updated_by: 阿狸咪的工程师
+  - id: crosslayer-deploy-block-1125
+    owner: 小九的工程师
+    priority: P0
+    status: todo
+    created: 2026-11-25
+    title: 跨层守卫4项阻断「部署到main」：阶段快照顶层update_time标签冻结（生成器bug·结构性误判）+STOCK_LIST周度族误杀+CONCEPT_ETF_MAP raw缺失+PULLBACK_TRACK raw无日期 ⇒ 11-24 03:45起build_deploy回写main未真实完成
+    note: >-
+      登记方：阿狸咪的工程师（11-25 16:45 CST 巡检，主人外出期自主处置；15:05 计划的交接推送自动化未触发，本轮补推）。
+      前案：build-audit-404-backtest-cards-1124 门禁已由小九转绿（run 45548180637 全绿），但部署步「📤 部署到 main」被跨层守卫拦：
+      13:11 CST run 45548180637 与 16:25 CST run 45570489843（head edf6cdbd35）两轮同死该步（logs API 403，根因逐条 blob 实证）。
+      真错位①：raw_data/sector_phase_history.json 顶层 update_time/republish_time 冻结 2026-11-23 01:22（16:35 blob 实证 204,562B），
+      但文件 16:00 CST 仍正常推送、snaps 已含 11-24 快照、snap 级 update_time 到 11-25 15:57 ⇒ 生成器 v8/gen_sector_phase_history.py
+      不刷新顶层标签，结构性、不会自愈，禁补数。真错位②：STOCK_LIST raw=stock_names.json ut=11-24 01:44:23 vs data=11-25 08:32:45，
+      周度产物 ut 取上游 mtime 被 24h 红线误杀（all-generic-redline-false-positive 族）。缺失 raw：CONCEPT_ETF_MAP（raw_data 243 文件实测无）。
+      无法校验：PULLBACK_TRACK raw 无日期字段（blob 实测）。连带项已自愈无需单独修：BACKTEST_EXPECTANCY data 层已由 algo 直推链 09:02 刷新（b313c01252）。
+      影响面：Pages 发布链正常（45577685895 16:36 CST success，主站 200/1.55MB）、cn_fetch/algo 直推链产物全鲜活（experiment 16:00 等），
+      仅 build_deploy「构建 data/*.js→回写 main」段 37h+ 未真实执行，用户端暂无感。详见
+      docs/ops/handover/2026-11-25_1645_阿狸咪的工程师给小九_build_deploy部署步跨层守卫阻断_阶段快照顶层update_time标签冻结_37h未真实回写main.md
+    note_to: 小九(lemoncat-cn)
+    verify_how: >-
+      ① v8/gen_sector_phase_history.py 落盘刷新顶层 update_time/republish_time 后，最新 build job「部署到 main」步 success（勿看 run 结论）；
+      ② 守卫对周度产物族按 snaps/内容日期校验或显式 skip；③ CONCEPT_ETF_MAP 退役摘名单 or 补 fetcher，二选一；
+      ④ 发布后体检绿、data/*.js 回写 main 恢复（可用任一 build 专属产物 mtime 前进实证）。
+    updated: "2026-11-25 16:45"
     updated_by: 阿狸咪的工程师
