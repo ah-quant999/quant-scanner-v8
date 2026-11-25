@@ -1,1 +1,1 @@
-window.NORTH_FUND = {"stopped":true,"note":"港交所 2024-05 后停止披露北向 top_buy，无实时数据","update_time":"2026-11-26 02:12:55","republish_time":"2026-11-26 02:19:18"};
+window.NORTH_FUND = {"stopped":true,"note":"港交所 2024-05 后停止披露北向 top_buy，无实时数据","update_time":"2026-11-26 03:03:38","republish_time":"2026-11-26 03:16:42"};
