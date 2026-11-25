@@ -1,0 +1,134 @@
+# 🔁 v8 回测产物周度再生（cn runner·中国IP硬依赖）
+# ============================================================================
+# 背景（2026-11-25 三天停更事故根治之一，主人令「一劳永逸」）：
+#   index.html 的「现金流质量榜回测表」「股东增持回测表」引用
+#   data/CASHFLOW_QUALITY_BACKTEST.js 与 data/SHAREHOLDER_INCREASE_BACKTEST.js，
+#   但两个生成器（algorithms/gen_cashflow_quality_backtest.py /
+#   algorithms/gen_shareholder_increase_backtest.py）**从未接入任何自动化链**
+#   ⇒ 产物仅 11-23 一次手工运行 → 线上 404 → pre_deploy_audit [6/8] 门禁
+#   从 11-24 12:53 起连败 58 笔、全站部署冻结约 20 小时（含 11-25 全部早盘）。
+#   11-25 10:09 已手工补推产物解阻断；本 workflow 把生成器正式接入自动化链，
+#   保证产物**每周再生、永不 404、内容常新**。
+#
+# 为什么 runs-on: [self-hosted, cn]：
+#   生成器经 requests 调 datacenter-web.eastmoney.com（东财数据中心），
+#   与 fetch_shareholder_change / fetch_dajijin_reduction 同源，历史实证该域名
+#   链路均锁定 cn runner（中国 IP）。
+#
+# 为什么用持久化 git 浅克隆而非 API 逐 blob 同步：
+#   生成器依赖 raw_data/kline_cache/（6241 个个股K线 json，仓内每日维护）。
+#   self-hosted 实证 actions/checkout 拉不到 CDN、API 全量同步会打爆
+#   secondary rate limit（见 v8_stock_quote_refresh.yml 头注）。
+#   而 cn runner 所在网络对 github.com git 协议全天可用（2026-11-25 实证）。
+#   首周 clone 一次（depth 1，含 kline_cache ≈ 数十 MB），后续每周
+#   fetch + ff-only 快进，秒级完成。克隆目录为一次性工作副本
+#   （E:/v8data/backtest_ws/repo），与真身仓 E:/qs_workspaces/quant-scanner-v8
+#   完全隔离，绝不触碰真身工作树。
+#
+# 产物与推送：raw_data/*backtest.json + data/CASHFLOW_QUALITY_BACKTEST.js +
+#   data/SHAREHOLDER_INCREASE_BACKTEST.js，推送 main 后显式唤起
+#   deploy-v8-site.yml（同 v8_build_deploy 的 Pages 发布路径）。
+#
+# 无变更即静默退出（零输出零动作，积分节流纪律）。
+# ============================================================================
+
+name: "🔁 v8 回测产物周度再生(cn)"
+
+on:
+  schedule:
+    # 每周六 09:00 CST（UTC 周六 01:00）。周末盘后定稿数据最全，且不与盘中链抢窗。
+    - cron: '0 1 * * 6'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "true=忽略无变更静默退出，强制跑生成器"
+        required: false
+
+# 推 main + 唤起 deploy workflow 需要的权限
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: v8-backtest-weekly
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: "📥 准备持久化浅克隆（首周 clone / 之后 ff 快进）"
+        timeout-minutes: 15
+        run: |
+          set -e
+          WS=/e/v8data/backtest_ws
+          REPO=$WS/repo
+          mkdir -p "$WS"
+          if [ ! -d "$REPO/.git" ]; then
+            echo "首次运行：depth-1 克隆（含 kline_cache）"
+            git clone --depth 1 --single-branch --branch main \
+              "https://x-access-token:${GITHUB_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" \
+              "$REPO" 2>&1 | tail -3
+          else
+            cd "$REPO"
+            git fetch --depth 1 origin main 2>&1 | tail -2
+            git reset --hard FETCH_HEAD 2>&1 | tail -1
+            git clean -fdq data/ raw_data/ algorithms/ 2>/dev/null || true
+          fi
+          cd "$REPO"
+          echo "基线: $(git rev-parse --short HEAD) | kline_cache 文件数: $(ls raw_data/kline_cache | wc -l)"
+
+      - name: "🧪 跑两个回测生成器"
+        id: gen
+        timeout-minutes: 12
+        run: |
+          set -e
+          cd /e/v8data/backtest_ws/repo
+          PY=/c/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+          echo "== gen_cashflow_quality_backtest =="
+          "$PY" algorithms/gen_cashflow_quality_backtest.py 2>&1 | tail -8
+          echo "== gen_shareholder_increase_backtest =="
+          "$PY" algorithms/gen_shareholder_increase_backtest.py 2>&1 | tail -8
+          for f in data/CASHFLOW_QUALITY_BACKTEST.js data/SHAREHOLDER_INCREASE_BACKTEST.js; do
+            test -s "$f" || { echo "❌ 产物缺失: $f"; exit 1; }
+            echo "✅ $f ($(wc -c < "$f") B)"
+          done
+
+      - name: "📤 有变更则提交推送 + 唤起 Pages 发布（无变更静默退出）"
+        timeout-minutes: 8
+        run: |
+          set -e
+          cd /e/v8data/backtest_ws/repo
+          FORCE="${{ github.event.inputs.force }}"
+          git config user.email "bot@ah-quant999.local"
+          git config user.name "v8-backtest-bot"
+          git add data/CASHFLOW_QUALITY_BACKTEST.js data/SHAREHOLDER_INCREASE_BACKTEST.js \
+                  raw_data/cashflow_quality_backtest.json raw_data/shareholder_increase_backtest.json 2>/dev/null || true
+          if [ -z "$(git diff --cached --name-only)" ] && [ "$FORCE" != "true" ]; then
+            echo "产物无变化，静默退出"
+            exit 0
+          fi
+          git commit -m "v8 backtest: 周度回测产物再生 $(date '+%Y-%m-%d %H:%M')" 2>&1 | tail -2
+          OK=0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main 2>&1 | tail -1 || true
+            if git push origin HEAD:main 2>&1 | tail -2; then OK=1; break; fi
+            echo "推送重试 #$i"; sleep 20
+          done
+          [ "$OK" = "1" ] || { echo "❌ 推送 5 轮全失败"; exit 1; }
+          echo "已推送，唤起 deploy-v8-site"
+          curl -sS -m 30 -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/deploy-v8-site.yml/dispatches" \
+            -d '{"ref":"main"}' && echo "✅ deploy 已唤起"
