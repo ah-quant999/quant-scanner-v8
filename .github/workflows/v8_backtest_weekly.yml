@@ -67,26 +67,46 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: "📥 准备持久化浅克隆（首周 clone / 之后 ff 快进）"
-        timeout-minutes: 15
+      - name: "📥 准备持久化工作树（现成树 → clone → API 最小拉取，三重降级）"
+        timeout-minutes: 20
         run: |
           set -e
           WS=/e/v8data/backtest_ws
           REPO=$WS/repo
           mkdir -p "$WS"
-          if [ ! -d "$REPO/.git" ]; then
-            echo "首次运行：depth-1 克隆（含 kline_cache）"
-            git clone --depth 1 --single-branch --branch main \
-              "https://x-access-token:${GITHUB_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" \
-              "$REPO" 2>&1 | tail -3
-          else
+          OK=0
+          # 通道①：复用现成工作树（首跑失败后最常见——目录已建但状态残缺）
+          if [ -d "$REPO/.git" ]; then
             cd "$REPO"
-            git fetch --depth 1 origin main 2>&1 | tail -2
-            git reset --hard FETCH_HEAD 2>&1 | tail -1
-            git clean -fdq data/ raw_data/ algorithms/ 2>/dev/null || true
+            if git fetch --depth 1 origin main 2>&1 | tail -2 && git reset --hard FETCH_HEAD 2>&1 | tail -1; then
+              git clean -fdq data/ raw_data/ algorithms/ 2>/dev/null || true
+              OK=1; echo "✅ 通道① 复用现成工作树"
+            fi
+          fi
+          # 通道②：全新 depth-1 clone（放宽低速限制，避免国内网络抖动被 git 默认 30s 低速杀掉）
+          if [ "$OK" != "1" ]; then
+            rm -rf "$REPO" 2>/dev/null || true
+            echo "通道②：depth-1 克隆（含 kline_cache）"
+            if git -c http.lowSpeedLimit=0 -c http.lowSpeedTime=999999 clone --depth 1 --single-branch --branch main \
+                 "https://x-access-token:${GITHUB_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" \
+                 "$REPO" 2>&1 | tail -5; then OK=1; echo "✅ 通道② clone 成功"; fi
+          fi
+          # 通道③：clone 仍失败 → 用 API 拉取生成器+产物最小集合，跳过 git（保底不永久停摆）
+          if [ "$OK" != "1" ]; then
+            echo "⚠️ git 两通道均失败，启用通道③ API 最小拉取"
+            mkdir -p "$REPO/algorithms" "$REPO/data" "$REPO/raw_data/kline_cache"
+            for f in algorithms/gen_cashflow_quality_backtest.py algorithms/gen_shareholder_increase_backtest.py \
+                     algorithms/common_kline.py; do
+              curl -fsSL -m 60 -H "Authorization: Bearer $GITHUB_TOKEN" \
+                "https://raw.githubusercontent.com/ah-quant999/quant-scanner-v8/main/$f" -o "$REPO/$f" || true
+            done
+            test -s "$REPO/algorithms/gen_cashflow_quality_backtest.py" || { echo "❌ 三通道全失败"; exit 1; }
+            echo "✅ 通道③ API 最小拉取（仅生成器，产物推送步骤需相应跳过 git）"
+            echo "API_ONLY=1" >> "$GITHUB_ENV"
           fi
           cd "$REPO"
-          echo "基线: $(git rev-parse --short HEAD) | kline_cache 文件数: $(ls raw_data/kline_cache | wc -l)"
+          if [ -d .git ]; then echo "基线: $(git rev-parse --short HEAD)"; fi
+          echo "kline_cache 文件数: $(ls raw_data/kline_cache 2>/dev/null | wc -l)"
 
       - name: "🧪 跑两个回测生成器"
         id: gen
@@ -95,6 +115,9 @@ jobs:
           set -e
           cd /e/v8data/backtest_ws/repo
           PY=/c/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+          [ -x "$PY" ] || PY=/c/Users/HH20210606/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+          [ -x "$PY" ] || PY=$(command -v python || command -v python3)
+          echo "Python: $PY"
           echo "== gen_cashflow_quality_backtest =="
           "$PY" algorithms/gen_cashflow_quality_backtest.py 2>&1 | tail -8
           echo "== gen_shareholder_increase_backtest =="
@@ -110,6 +133,11 @@ jobs:
           set -e
           cd /e/v8data/backtest_ws/repo
           FORCE="${{ github.event.inputs.force }}"
+          if [ -n "$API_ONLY" ]; then
+            echo "⚠️ API_ONLY 模式：产物已由生成器重建于本地，但无 git 工作树可推送；"
+            echo "   保留本轮产物供下次工作树恢复后推送，避免误报成功。"
+            exit 0
+          fi
           git config user.email "bot@ah-quant999.local"
           git config user.name "v8-backtest-bot"
           git add data/CASHFLOW_QUALITY_BACKTEST.js data/SHAREHOLDER_INCREASE_BACKTEST.js \

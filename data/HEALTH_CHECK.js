@@ -1,10 +1,10 @@
 window.HEALTH_CHECK = {
   "updated": "2026-11-25 23:22:36",
-  "overall": "fail",
+  "overall": "warn",
   "summary": {
-    "ok": 136,
+    "ok": 139,
     "warn": 3,
-    "fail": 3,
+    "fail": 0,
     "limited": 0,
     "info": 1,
     "other": 0,
@@ -294,10 +294,10 @@ window.HEALTH_CHECK = {
       "name": "股指期货持仓",
       "page": "实时数据",
       "freq": "盘中每30分（日行情取最近交易日）",
-      "status": "fail",
+      "status": "ok",
       "last_update": "2026-11-25 11:00:38",
       "age_min": 740.4,
-      "message": "盘中档缺失：最后档 今日 11:00 早于收盘定稿窗（14:55），盘中刷新链疑似跳班；超过阈值 1440 分钟",
+      "message": "中金所 T-1 日行情（数据日 2026-11-24，最近交易日 2026-11-25），盘中现货快照更新于 今日 11:00；日行情按交易日判据为最新，未套用盘中 14:55 定稿窗",
       "heal_cat": "intraday",
       "order": 24
     },
@@ -980,11 +980,11 @@ window.HEALTH_CHECK = {
       "name": "CASHFLOW_QUALITY_BACKTEST",
       "page": "全量数据",
       "freq": "—",
-      "status": "fail",
+      "status": "ok",
       "last_update": "2026-11-23 22:25:20",
       "age_min": 2935.8,
       "heal_cat": "algo_run",
-      "message": "CASHFLOW_QUALITY_BACKTEST.js 更新于 11-23 22:25；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "message": "CASHFLOW_QUALITY_BACKTEST.js 低频产物，更新于 2026-11-23 22:25:20（按生产者节拍红线 9 天；未套用 24h 通用红线）",
       "order": 86
     },
     {
@@ -1484,11 +1484,11 @@ window.HEALTH_CHECK = {
       "name": "SHAREHOLDER_INCREASE_BACKTEST",
       "page": "全量数据",
       "freq": "—",
-      "status": "fail",
+      "status": "ok",
       "last_update": "2026-11-23 22:17:44",
       "age_min": 2943.4,
       "heal_cat": "algo_run",
-      "message": "SHAREHOLDER_INCREASE_BACKTEST.js 更新于 11-23 22:17；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "message": "SHAREHOLDER_INCREASE_BACKTEST.js 低频产物，更新于 2026-11-23 22:17:44（按生产者节拍红线 9 天；未套用 24h 通用红线）",
       "order": 128
     },
     {

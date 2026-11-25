@@ -237,7 +237,7 @@ CARD_DEFS = [
     #   ⇒ **不需要回测**。原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST 两条登记已删除
     #   （连同 algorithms/backtest_pools.py 与两条产物）。池子本身产出的新鲜度，仍由下面
     #   「候选池 / 金股池」（page=盘后数据，heal_cat=algo_run）两条负责 —— 那才是它们该被考核的。
-    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
+    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday", "t1_daily_quote": True},  # 🛡 2026-11-25 主人令一劳永逸：数据是中金所 T-1 日行情(note 明写「最近交易日」)，另带盘中现货快照；通用 intraday「14:55 定稿窗」判据对日行情错配，改用 t1_daily_quote 数据日判据（见 check_data_cards 分支）。真落后交易日仍 fail，不掩盖停更。  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：危机雷达卡壳已删（只删卡壳不删源），现役 UI =
     #   共振日历页综合信号灯（sec-rc 读 CRISIS_DATA）+ CRDS 有效性判据 + 每日洞察。
     #   page 迁"共振日历"（该页已加入盘后阈值元组，有效阈值仍 = def_max(360)，逐字节同值）。
@@ -2309,6 +2309,45 @@ def check_data_cards():
             try:
                 _n9 = now_cst()
                 _after_close = _n9.hour > 15 or (_n9.hour == 15 and _n9.minute >= 30)
+                # 🛡 2026-11-25 一劳永逸：T-1 日行情卡（CFFEX_HOLDINGS）用内容数据日判新鲜度。
+                #   该产物 note 明写「中金所股指期货日行情（最近交易日 YYYYMMDD）」，盘中链每 30 分
+                #   刷新时间戳+现货快照，但日行情本体天然停在最近交易日。套「14:55 定稿窗」会把
+                #   健康的 T-1 日行情误报为「盘中断链」。改判据：items[].date 落后最近交易日 >1 个
+                #   交易日才 fail（真停更仍暴露）；时间戳自身仍走 max_age 正常判龄。
+                if d.get("t1_daily_quote"):
+                    _items = data.get("items") or []
+                    _qd = None
+                    if _items:
+                        _raw = str(_items[0].get("date") or "")
+                        try:
+                            _qd = datetime.strptime(_raw[:8], "%Y%m%d").date()
+                        except Exception:
+                            pass
+                    if _qd is not None:
+                        _ref_close = last_trade_day_close(_n9).date()
+                        _lag = 0
+                        _probe = _ref_close
+                        while _qd < _probe and _lag < 8:
+                            _probe -= timedelta(days=1)
+                            while not _is_trading_day(_probe):
+                                _probe -= timedelta(days=1)
+                            _lag += 1
+                        if _lag >= 2:
+                            _emit(d, {
+                                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                                "status": "fail", "last_update": str(ts), "age_min": round(age_min, 1),
+                                "message": (f"日行情数据日 {_qd} 落后最近交易日 {_ref_close} 达 {_lag} 个交易日"
+                                            f"（刷新时间 {fmt_rel_time(ts)}），中金所日行情链疑似停更"),
+                            })
+                            continue
+                        _emit(d, {
+                            "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                            "status": "ok", "last_update": str(ts), "age_min": round(age_min, 1),
+                            "message": (f"中金所 T-1 日行情（数据日 {_qd}，最近交易日 {_ref_close}），"
+                                        f"盘中现货快照更新于 {fmt_rel_time(ts)}；日行情按交易日判据为最新，"
+                                        f"未套用盘中 14:55 定稿窗"),
+                        })
+                        continue
                 if _after_close and _is_trading_day(_n9.date()) and dt < _n9.replace(hour=14, minute=55, second=0, microsecond=0):
                     # 今日档（盘中链跳班）与跨日旧档统一按「最后档早于收盘定稿窗」判缺失
                     status = "fail"
@@ -2502,6 +2541,12 @@ _LOW_FREQ_FILES = {
     #   二者此前无 CARD_DEFS 登记 ⇒ 落入 all_ 通用 27h 红线，季报/月更节拍必然超期误报 fail。
     #   进白名单 + 专属低频红线（见 _LOW_FREQ_MAX_AGE），按真实节拍给足，超期仍报真故障。
     "CASHFLOW_QUALITY", "KONDRATIEV",
+    # 🛡 2026-11-25 主人令「一劳永逸」：CASHFLOW_QUALITY_BACKTEST / SHAREHOLDER_INCREASE_BACKTEST
+    #   由 v8_backtest_weekly.yml 每周六 09:00 CST 产出（cn runner 中国IP，依赖东财数据中心+kline_cache）。
+    #   此前未登记 ⇒ 落入 all_ 通用 1440min 红线，周更产物每个交易日被误报 fail
+    #   （11-25 诊断面板 3 项失败中 2 项即此根因）。进白名单 + 专属 9 天红线（见 _LOW_FREQ_MAX_AGE），
+    #   按真实节拍判龄，超 9 天仍 fail 保留真故障可见性（周更链真停摆时照报）。
+    "CASHFLOW_QUALITY_BACKTEST", "SHAREHOLDER_INCREASE_BACKTEST",
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
@@ -2649,6 +2694,8 @@ _LOW_FREQ_MAX_AGE = {
     "SHAREHOLDER_CHANGE": 3 * 24 * 60, # 股东增减持监控（工作日20:30批，周末不跑）→ 3天红线：周五盘后→周一盘后正好72h，超3天报真故障（2026-11-24 主人令收紧，原4天多宽给1天）
     "CASHFLOW_QUALITY": 100 * 24 * 60,  # 现金流质量榜：底层随季报刷新（period=20260930三季报），季报间隔最长约90天+披露缓冲→100天红线（2026-11-24 一劳永逸）
     "KONDRATIEV": 35 * 24 * 60,         # 康波长波：每月10日18:00专链月更（v8_kondratiev_monthly.yml），+5天缓冲跨节假日→35天红线（2026-11-24 一劳永逸）
+    "CASHFLOW_QUALITY_BACKTEST": 9 * 24 * 60,     # 现金流质量榜回测：v8_backtest_weekly.yml 每周六09:00产出，7天节拍+2天缓冲=9天红线（2026-11-25 一劳永逸，超期仍 fail）
+    "SHAREHOLDER_INCREASE_BACKTEST": 9 * 24 * 60,  # 股东增持榜回测：同周更链，9天红线（2026-11-25 一劳永逸，超期仍 fail）
 }
 
 
@@ -2900,9 +2947,10 @@ def check_all_data_files():
                         "status": "fail", "last_update": rel, "age_min": round(_age_lf, 1),
                         "heal_cat": vid_heal,
                         "message": (f"{p.name} 更新于 {rel}；超过低频红线 {int(_lfa)} 分钟"
-                                    f"（{_lfa // 1440} 天，按生产者节拍：算法链周度批次）"
-                                    f" —— 请检查周末批是否执行"
-                                    f"（run_algorithms.py weekend stage / v8_weekend_light.yml）"),
+                                    f"（{_lfa // 1440} 天，按生产者节拍）"
+                                    + (f" —— 请检查回测周更链是否执行（v8_backtest_weekly.yml·每周六09:00）"
+                                       if vid in ("CASHFLOW_QUALITY_BACKTEST", "SHAREHOLDER_INCREASE_BACKTEST")
+                                       else f" —— 请检查周末批是否执行（run_algorithms.py weekend stage / v8_weekend_light.yml）")),
                     })
                     continue
                 results.append({
