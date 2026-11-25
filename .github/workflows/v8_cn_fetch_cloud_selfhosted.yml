@@ -65,7 +65,7 @@ concurrency:
   #   ⚠️ 矩阵化枚举铁律（本仓唯一「跨文件共用组名」即本族，已全量 grep 核验）：
   #     grep -rn "v8-cn-fetch-cloud" --include=*.yml .github/workflows/
   #   改本族任一并发组名，必须把 cloud / hosted / selfhosted 三份**逐项勾选**，禁只改一处。
-  group: v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}
+  group: v8-cn-fetch-cloud-v2-${{ github.event.inputs.category || 'scheduled' }}  # v2 2026-11-25 结构性换组(幽灵排队逃逸): 旧组队列头有 10-19/10-08 幽灵 queued run(API cancel 409 不可清) 新 run 永不启动被顶杀; 按仓内结构性变更铁律整体换新组, 家族互斥语义不变(cloud/hosted/selfhosted 三份同步改名)
   cancel-in-progress: false
 
 jobs:

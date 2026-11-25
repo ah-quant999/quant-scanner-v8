@@ -109,7 +109,7 @@ concurrency:
   #   【为何不用 `docs/ops/**` 那种前缀匹配】并发组名必须**精确**，
   #     表达式在 workflow 解析期求值，`inputs.category` 为空（schedule/cron 触发）时
   #     回落到 `scheduled` —— 三条 cron（盘前/盘后/周末）时间窗本就错开，共享一组无碍。
-  group: v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}
+  group: v8-cn-fetch-cloud-v2-${{ github.event.inputs.category || 'scheduled' }}  # v2 2026-11-25 结构性换组(幽灵排队逃逸): 旧组队列头有 10-19/10-08 幽灵 queued run(API cancel 409 不可清) 新 run 永不启动被顶杀; 按仓内结构性变更铁律整体换新组, 家族互斥语义不变(cloud/hosted/selfhosted 三份同步改名)
   # 2026-08-24 修复(#1 取消风暴根治)：改为 false，新派发不再杀掉正在写
   # 共振/快照文件的 run，从根上杜绝「自伤顶掉」——此前 cancel-in-progress:true
   # 频繁把正在写 triple_consensus.json / lhb_history.json / sector_fund_flow 的 run 杀掉，
