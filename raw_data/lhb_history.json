@@ -190403,6 +190403,7 @@
     "pure": []
   },
   "2026-11-25": {
-    "trading": false
+    "trading": true,
+    "pure": []
   }
 }
