@@ -30,8 +30,13 @@
 #   午休（11:30-13:00）也跑，但脚本守卫 09:25-16:05 会写（用上次新鲜数据填旧点，
 #   保曲线连续，无害）。
 #
-# 🛡 并发安全：独立 concurrency group（v8-intraday-snapshot, cancel-in-progress:true），
-#   与 v8-cn-fetch-cloud 组隔离，互不取消；高频秒级完成，cancel 不会丢（上一次已跑完）。
+# 🛡 并发安全（2026-11-25 主人令一劳永逸重构）：独立 concurrency group v8-intraday-snapshot，
+#   与 v8-cn-fetch-cloud 组隔离。本链有 3 个触发源（cron 每10分 + workflow_run 跟 fetch 完成 + dispatch），
+#   旧 cancel-in-progress:true + 默认 queue:single（1 running + 1 pending）会互顶：
+#   实测 11-25 全天只剩 4 档（10:22/10:53/14:11/15:00，应约12档）—— 排队档被新 run 顶杀。
+#   根治：cancel-in-progress:false 保护在写 run + queue:max 允许最多100个 pending 逐个执行，不再互顶。
+#   （GitHub 官方文档：queue:max 不能与 cancel-in-progress:true 同用，否则 workflow 校验失败。）
+#   与今晚已推的 v8_cn_fetch_cloud.yml 修法对齐，彻底断绝「同族漏改」。
 #   推送仅限 2 个快照文件（data/SECTOR_FUND_FLOW_INTRADAY.js + raw_data/sector_fund_flow_intraday.json），
 #   与 fetch job 的 soft_10 全量推送文件不重叠 → rebase 无冲突，fast-forward 安全。
 name: "📈 板块资金日内快照(独立高频·根治上午空白)"
@@ -67,7 +72,9 @@ permissions:
 
 concurrency:
   group: v8-intraday-snapshot
-  cancel-in-progress: true
+  # 2026-11-25 一劳永逸：排队而非互杀（三触发源下 cancel:true 顶杀档位，实测全天仅4档）
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   snapshot:
