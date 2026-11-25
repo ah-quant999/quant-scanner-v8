@@ -1,81 +1,5 @@
 [
  {
-  "date": "2026-08-25",
-  "time": "23:12:19",
-  "overall": "warn",
-  "summary": {
-   "ok": 104,
-   "warn": 10,
-   "fail": 2,
-   "total": 116
-  },
-  "warn_items": [
-   {
-    "id": "raw_volume",
-    "name": "raw_data 文件数",
-    "message": "raw_data 共 880 个文件（>850），接近规模上限"
-   },
-   {
-    "id": "dom_taskScheduleBody",
-    "name": "DOM #taskScheduleBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttBackBody",
-    "name": "DOM #ttBackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttThrBody",
-    "name": "DOM #ttThrBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttSvlBody",
-    "name": "DOM #ttSvlBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttTrackBody",
-    "name": "DOM #ttTrackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsAdvBody",
-    "name": "DOM #stcrdsAdvBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsEliteBody",
-    "name": "DOM #stcrdsEliteBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_healthCheckBody",
-    "name": "DOM #healthCheckBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "all_SECTOR_RECOMMENDATION",
-    "name": "SECTOR_RECOMMENDATION",
-    "message": "SECTOR_RECOMMENDATION.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
-   }
-  ],
-  "fail_items": [
-   {
-    "id": "local_sync",
-    "name": "本地与 origin/main 同步",
-    "message": "本地 2718b39 / origin/main 14e5868 落后；其中 raw_data/ 子树有 1 个文件待同步（数据卡陈旧二级根因）"
-   },
-   {
-    "id": "dom_phMacroBody",
-    "name": "DOM #phMacroBody",
-    "message": "未找到元素"
-   }
-  ],
-  "tz": "Asia/Shanghai"
- },
- {
   "date": "2026-08-26",
   "time": "23:57:50",
   "overall": "fail",
@@ -4013,6 +3937,29 @@
    "info": 1,
    "other": 0,
    "total": 145
+  },
+  "warn_items": [
+   {
+    "id": "STOCK_STOP_DATA",
+    "name": "精确止损止盈",
+    "message": "更新于 11-23 20:56"
+   }
+  ],
+  "fail_items": []
+ },
+ {
+  "date": "2026-11-26",
+  "time": "07:13:09",
+  "tz": "Asia/Shanghai",
+  "overall": "ok",
+  "summary": {
+   "ok": 145,
+   "warn": 1,
+   "fail": 0,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 146
   },
   "warn_items": [
    {
