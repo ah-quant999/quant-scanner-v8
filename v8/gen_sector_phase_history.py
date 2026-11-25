@@ -74,6 +74,15 @@ def main():
     history["version"] = 1
     history["rule_ver"] = PHASE_RULE_VER
     history["snaps"] = snaps
+    # 🛡 2026-11-25 小九的工程师（治本 crosslayer-deploy-block-1125）：
+    #   落盘必须同步刷新顶层 update_time / republish_time。原实现沿用旧档陈值
+    #   ⇒ raw 顶层标签冻结（线上实证停 2026-11-23 01:22 不动），而 data/*.js 每次重建
+    #   经 update_v8._write_js「保留较新者」取到更近时刻 ⇒ v8_verify_layer_parity.py
+    #   判「data 比 raw 新 = 真错位」恒阻断 build_deploy「部署到 main」，结构性、不会自愈。
+    #   修复后 raw 顶层标签 = 本次写入时刻（本脚本 now_str 为 ZoneInfo CST，无时区漂移），
+    #   data 重建取同一语义戳 ⇒ 两层恒对齐。
+    history["update_time"] = now_str
+    history["republish_time"] = datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S")
     # 跨机器行尾统一 LF（见 fetch_sector_rs 注释：Windows CRLF 会造 4840 行假 diff）
     with open(PHASE_HISTORY_PATH, "w", encoding="utf-8", newline="\n") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)

@@ -142,6 +142,15 @@ def _save_phase_snapshot(sectors, update_time_str, data_date_str):
     history["version"] = 1
     history["rule_ver"] = PHASE_RULE_VER
     history["snaps"] = snaps
+    # 🛡 2026-11-25 小九的工程师（治本 crosslayer-deploy-block-1125，与
+    #   v8/gen_sector_phase_history.py 同步修，杜绝同型 bug 二次出现）：
+    #   本函数原本从不刷新顶层 update_time / republish_time ⇒ raw 顶层标签冻在
+    #   最后一次全量写入（线上实证停 2026-11-23 01:22）⇒ v8_verify_layer_parity.py
+    #   判「data 比 raw 新 = 真错位」永久阻断 build_deploy「部署到 main」。
+    #   现同步刷新：沿用快照语义时刻 update_time_str（本链在 ubuntu UTC 与 cn Windows
+    #   CST 双机轮流跑，故意不引入新的 now() 免时区漂移），data 重建取同一戳 ⇒ 恒对齐。
+    history["update_time"] = update_time_str
+    history["republish_time"] = update_time_str if len(update_time_str) > 16 else update_time_str + ":00"
     try:
         # 🔴🔴 2026-09-19（阿狸咪的工程师）：**必须显式 newline='\n'**。
         #   本文件由两条链在**两台不同 OS** 的机器上轮流写：
