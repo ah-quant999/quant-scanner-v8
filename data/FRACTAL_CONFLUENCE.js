@@ -1,14 +1,14 @@
 window.FRACTAL_CONFLUENCE = {
- "update_time": "2026-11-25 17:18:05",
+ "update_time": "2026-11-25 17:33:58",
  "sample": {
   "start": "2005-01-04",
-  "end": "2026-11-24",
-  "days": 5316
+  "end": "2026-11-25",
+  "days": 5317
  },
  "random_baseline": {
   "n": 3000,
   "wr5": 53.7,
-  "m5": 0.19
+  "m5": 0.18
  },
  "source": "新浪/东财双路日K + 东财push2delay实时bar合成",
  "missing_layers": "L1主力资金（东财板块历史仅120天）、L5 regime（现行产物无历史）无法纳入历史回测【MISSING】；本回测覆盖 L2位置/L3量能/L4情绪冰点 三层可验证部分",
@@ -16,7 +16,7 @@ window.FRACTAL_CONFLUENCE = {
   {
    "name": "裸底分型（基线）",
    "note": "无过滤",
-   "n": 1240,
+   "n": 1241,
    "wr5": 53.3,
    "m5": 0.03,
    "m10": 0.2,
@@ -25,11 +25,11 @@ window.FRACTAL_CONFLUENCE = {
   {
    "name": "空头区(<MA60)",
    "note": "L2位置",
-   "n": 593,
-   "wr5": 52.8,
+   "n": 594,
+   "wr5": 52.9,
    "m5": -0.24,
    "m10": -0.21,
-   "m20": -0.12
+   "m20": -0.13
   },
   {
    "name": "多头区(>MA60)",
@@ -61,11 +61,11 @@ window.FRACTAL_CONFLUENCE = {
   {
    "name": "空头区+近10日急跌≤-1.5%",
    "note": "L2位置+L4冰点",
-   "n": 406,
-   "wr5": 50.7,
+   "n": 407,
+   "wr5": 50.9,
    "m5": -0.42,
    "m10": -0.52,
-   "m20": -0.57
+   "m20": -0.59
   },
   {
    "name": "空头区+超卖+急跌冰点",
@@ -99,11 +99,11 @@ window.FRACTAL_CONFLUENCE = {
   {
    "name": "裸顶分型（基线）",
    "note": "无过滤",
-   "n": 1190,
+   "n": 1191,
    "wr5": 48.4,
    "m5": 0.1,
    "m10": 0.28,
-   "m20": 0.62
+   "m20": 0.61
   },
   {
    "name": "多头区(>MA60)逃顶",
@@ -168,7 +168,7 @@ window.FRACTAL_CONFLUENCE = {
   "dev250": -18.37,
   "vol_shrink": true,
   "live": true,
-  "as_of": "17:18",
+  "as_of": "17:33",
   "last_bottom": "2026-11-23",
   "last_top": "2026-11-24"
  },
