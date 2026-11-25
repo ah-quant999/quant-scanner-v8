@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-25 19:00:50",
-  "generated": "2026-11-25 19:00:50",
+  "update_time": "2026-11-26 01:37:45",
+  "generated": "2026-11-26 01:37:45",
   "period_start": "2026-11-16",
   "period_end": "2026-11-22",
   "stats": {
@@ -16,43 +16,43 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-11-25 15:53:56",
-      "size_kb": 24.7
+      "update_time": "2026-11-25 19:00:49",
+      "size_kb": 43.2
     },
     {
       "file": "top10_daily.json",
       "label": "TOP10推荐池",
       "status": "ok",
-      "update_time": "2026-11-25 17:55:04",
-      "size_kb": 38.7
+      "update_time": "2026-11-25 00:25:18",
+      "size_kb": 38.8
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-11-25 16:57",
-      "size_kb": 107.9
+      "update_time": "2026-11-25 23:24",
+      "size_kb": 108.3
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-11-25 04:44:38",
-      "size_kb": 33.2
+      "update_time": "2026-11-25 19:01:56",
+      "size_kb": 35.2
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-11-25 17:49:28",
-      "size_kb": 3618.3
+      "update_time": "2026-11-26 00:20:58",
+      "size_kb": 3618.8
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-11-25 08:06:20",
-      "size_kb": 583.7
+      "update_time": "2026-11-25 17:49:30",
+      "size_kb": 568.3
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"

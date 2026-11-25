@@ -1,19 +1,19 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-11-26 00:04:28",
+  "update_time": "2026-11-26 01:37:51",
   "crisis_score": 35.6,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
   "total_candidates": 26,
   "top_n": 2,
-  "data_degraded": true,
+  "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-25 08:04:00",
+    "source": "backtest_expectancy@2026-11-26 00:18:47",
     "degraded": false,
     "effective": {
-      "jinzuan": -0.389,
-      "chan": 0.328,
-      "trend": 0.531,
-      "jigou": 0.611
+      "jinzuan": -0.383,
+      "chan": 0.334,
+      "trend": 0.537,
+      "jigou": 0.617
     },
     "hardcoded_default": {
       "jinzuan": -0.522,
@@ -34,12 +34,12 @@ window.FINAL_RECOMMEND_DATA = {
       "jigou": false
     },
     "loaded": {
-      "generated": "2026-11-25 08:04:00",
+      "generated": "2026-11-26 00:18:47",
       "hit": 4,
-      "n_snapshots": 116,
+      "n_snapshots": 117,
       "date_range": [
         "2026-06-06",
-        "2026-11-24"
+        "2026-11-25"
       ]
     },
     "alpha_select": {
@@ -47,7 +47,7 @@ window.FINAL_RECOMMEND_DATA = {
       "skipped_no_positive_edge": 0
     }
   },
-  "degrade_note": "⚠️ 数据降级：因子实验室（FACTOR_LAB.js）未达数据日（实际 data_date=2026-11-24） ⇒ 方案B 因子融合整体跳过。本结果为「降级放行」产物 —— 排序与信号有效，但上述环节未达最新口径。请对照产物内 factor_chain / signal_edge 元数据判断适用范围。",
+  "degrade_note": null,
   "market_regime": {
     "date": "2026-11-25",
     "regime": "grind",
@@ -58,8 +58,8 @@ window.FINAL_RECOMMEND_DATA = {
   },
   "index_trend_gate": {
     "triggered": true,
-    "close": 3538.95,
-    "ma20": 3628.61,
+    "close": 3476.47,
+    "ma20": 3613.37,
     "note": "上证收盘<MA20且MA20向下 → 防守模式：推票减半（2026-11-21 主人令·该状态历史回测推票 T+20 -23%~-27.7%）"
   },
   "ima_intake": {
@@ -72,23 +72,23 @@ window.FINAL_RECOMMEND_DATA = {
   "price_source": {
     "date": "2026-11-25",
     "source": "STOCK_QUOTE",
-    "covered": 26,
+    "covered": 25,
     "total": 26,
     "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"
   },
   "strong_sectors": [
+    "中药",
     "保险",
     "元件",
+    "养殖业",
+    "农产品加工",
     "小金属",
     "机场航运",
     "港口航运",
-    "电子化学品",
-    "电机",
-    "自动化设备",
     "证券",
     "贵金属",
-    "通信服务",
-    "银行"
+    "银行",
+    "食品加工制造"
   ],
   "stocks": [
     {
@@ -98,11 +98,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "sh",
       "board": "主板",
       "horizon": "中长线",
-      "close": 15.21,
+      "close": 15.18,
       "close_date": "2026-11-25",
       "close_source": "STOCK_QUOTE",
       "close_verified": true,
-      "pct_chg": -2.5,
+      "pct_chg": -2.69,
       "limit_up": false,
       "limit_up_note": null,
       "stop_loss": 14.2,
@@ -115,17 +115,17 @@ window.FINAL_RECOMMEND_DATA = {
         "因子榜"
       ],
       "source_scores": {
-        "因子榜": 4.5
+        "因子榜": 4.4
       },
       "resonance": 1,
-      "strength": 4.5,
+      "strength": 4.4,
       "sector_score": 0.0,
       "sector_hits": [],
       "sector_fund": [],
-      "final_score": 4.5,
+      "final_score": 4.4,
       "mix_pct": 100.0,
-      "buy_score": 4.5,
-      "enter_date": "2026-11-24",
+      "buy_score": 4.4,
+      "enter_date": "2026-11-25",
       "signals": [
         "因子榜入选"
       ],
@@ -133,19 +133,19 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "因子积分榜入选（第1名）",
       "industry": "资本市场服务",
       "concepts": [
-        "AH股",
+        "互联网金融",
+        "深圳特区",
+        "周期股",
         "央国企改革",
-        "上证180",
+        "证金持股",
         "大盘价值",
-        "券商概念",
-        "标准普尔",
-        "机构重仓",
-        "深圳特区"
+        "AH股",
+        "金融地产风格"
       ],
       "tracking": {
-        "entry_date": "2026-11-24",
-        "entry_price": 15.21,
-        "latest_price": 15.21,
+        "entry_date": "2026-11-25",
+        "entry_price": 15.18,
+        "latest_price": 15.18,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
@@ -161,11 +161,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "sh",
       "board": "主板",
       "horizon": "中长线",
-      "close": 16.09,
+      "close": 16.0,
       "close_date": "2026-11-25",
       "close_source": "STOCK_QUOTE",
       "close_verified": true,
-      "pct_chg": -2.07,
+      "pct_chg": -2.62,
       "limit_up": false,
       "limit_up_note": null,
       "stop_loss": 14.72,
@@ -178,17 +178,17 @@ window.FINAL_RECOMMEND_DATA = {
         "因子榜"
       ],
       "source_scores": {
-        "因子榜": 4.5
+        "因子榜": 4.4
       },
       "resonance": 1,
-      "strength": 4.5,
+      "strength": 4.4,
       "sector_score": 0.0,
       "sector_hits": [],
       "sector_fund": [],
-      "final_score": 4.5,
+      "final_score": 4.4,
       "mix_pct": 100.0,
-      "buy_score": 4.5,
-      "enter_date": "2026-11-24",
+      "buy_score": 4.4,
+      "enter_date": "2026-11-25",
       "signals": [
         "因子榜入选"
       ],
@@ -196,19 +196,19 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "因子积分榜入选（第2名）",
       "industry": "资本市场服务",
       "concepts": [
-        "AH股",
-        "上证180",
-        "券商概念",
-        "标准普尔",
-        "机构重仓",
+        "互联网金融",
+        "周期股",
         "并购重组概念",
-        "股权激励",
-        "金融地产风格"
+        "上证50",
+        "权重股",
+        "证金持股",
+        "AH股",
+        "股权激励"
       ],
       "tracking": {
-        "entry_date": "2026-11-24",
-        "entry_price": 16.09,
-        "latest_price": 16.09,
+        "entry_date": "2026-11-25",
+        "entry_price": 16.0,
+        "latest_price": 16.0,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
@@ -226,11 +226,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "沪市",
       "board": "主板",
       "horizon": "中长线",
-      "close": 8.59,
+      "close": 8.75,
       "close_date": "2026-11-25",
       "close_source": "STOCK_QUOTE",
       "close_verified": true,
-      "pct_chg": 1.18,
+      "pct_chg": 3.06,
       "stop_loss": 7.51,
       "target_price": 14.89,
       "risk_reward": 7.85,
@@ -242,34 +242,34 @@ window.FINAL_RECOMMEND_DATA = {
         "因子榜"
       ],
       "source_scores": {
-        "因子榜": 3.1,
+        "因子榜": 4.3,
         "动量共识": 1.0
       },
       "resonance": 2,
-      "strength": 4.1,
-      "final_score": 3.1,
+      "strength": 5.3,
+      "final_score": 4.3,
       "sector_score": 0.0,
       "sector_hits": [],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "signals": [
         "因子榜入选",
         "动量共识"
       ],
       "_60m_resonance": false,
-      "reason": "因子积分榜入选（第10名）；动量共识筛选共振（无未来函数版）",
+      "reason": "因子积分榜入选（第3名）；动量共识筛选共振（无未来函数版）",
       "industry": "零售业",
       "concepts": [
-        "融资融券",
-        "央国企改革",
-        "新零售",
-        "长江三角",
         "参股券商",
-        "内贸流通"
+        "内贸流通",
+        "融资融券",
+        "长江三角",
+        "新零售",
+        "央国企改革"
       ],
       "tracking": {
-        "entry_date": "2026-11-24",
-        "entry_price": 8.59,
-        "latest_price": 8.59,
+        "entry_date": "2026-11-25",
+        "entry_price": 8.75,
+        "latest_price": 8.75,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
@@ -285,11 +285,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "沪市",
       "board": "科创板",
       "horizon": "中长线",
-      "close": 94.8,
+      "close": 94.4,
       "close_date": "2026-11-25",
       "close_source": "STOCK_QUOTE",
       "close_verified": true,
-      "pct_chg": -7.16,
+      "pct_chg": -7.55,
       "stop_loss": 91.76,
       "target_price": 122.88,
       "risk_reward": 2.05,
@@ -301,36 +301,36 @@ window.FINAL_RECOMMEND_DATA = {
         "因子榜"
       ],
       "source_scores": {
-        "因子榜": 3.0,
+        "因子榜": 2.5,
         "动量共识": 1.0
       },
       "resonance": 2,
-      "strength": 4.0,
-      "final_score": 3.0,
+      "strength": 3.5,
+      "final_score": 2.5,
       "sector_score": 0.0,
       "sector_hits": [],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "signals": [
         "因子榜入选",
         "动量共识"
       ],
       "_60m_resonance": false,
-      "reason": "因子积分榜入选（第15名）；动量共识筛选共振（无未来函数版）",
+      "reason": "因子积分榜入选（第19名）；动量共识筛选共振（无未来函数版）",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "专精特新",
-        "机器人概念",
         "机器视觉",
+        "虚拟现实",
+        "中证500",
         "英伟达概念",
-        "生物识别",
-        "破增发价股",
-        "国产芯片",
-        "元宇宙概念"
+        "人工智能",
+        "中盘成长",
+        "3D摄像头",
+        "上证380"
       ],
       "tracking": {
-        "entry_date": "2026-11-24",
-        "entry_price": 94.8,
-        "latest_price": 94.8,
+        "entry_date": "2026-11-25",
+        "entry_price": 94.4,
+        "latest_price": 94.4,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
@@ -347,11 +347,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "深市",
       "board": "创业板",
       "horizon": "短线",
-      "close": 82.19,
+      "close": 82.0,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -8.38,
-      "final_score": 4.5,
+      "pct_chg": -8.59,
+      "final_score": 4.4,
       "mix_pct": 100.0,
       "resonance": 1,
       "sources": [
@@ -363,14 +363,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "传感器",
+        "小盘股",
         "小盘成长",
+        "深股通",
         "融资融券",
         "人形机器人",
-        "专精特新",
-        "创业板综",
-        "传感器",
-        "深股通",
-        "小盘股"
+        "新能源车",
+        "创业板综"
       ],
       "enter_date": "2026-11-24",
       "stop_loss": 67.28,
@@ -386,11 +386,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "沪市",
       "board": "主板",
       "horizon": "中长线",
-      "close": 15.21,
+      "close": 15.18,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -2.5,
-      "final_score": 4.5,
+      "pct_chg": -2.69,
+      "final_score": 4.4,
       "mix_pct": 100.0,
       "resonance": 1,
       "sources": [
@@ -401,16 +401,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "资本市场服务",
       "concepts": [
-        "AH股",
+        "互联网金融",
+        "深圳特区",
+        "周期股",
         "央国企改革",
-        "上证180",
+        "证金持股",
         "大盘价值",
-        "券商概念",
-        "标准普尔",
-        "机构重仓",
-        "深圳特区"
+        "AH股",
+        "金融地产风格"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 14.2,
       "target_price": 18.76,
       "risk_reward": 1.89,
@@ -424,11 +424,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "沪市",
       "board": "主板",
       "horizon": "中长线",
-      "close": 16.09,
+      "close": 16.0,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -2.07,
-      "final_score": 4.5,
+      "pct_chg": -2.62,
+      "final_score": 4.4,
       "mix_pct": 100.0,
       "resonance": 1,
       "sources": [
@@ -439,16 +439,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "资本市场服务",
       "concepts": [
-        "AH股",
-        "上证180",
-        "券商概念",
-        "标准普尔",
-        "机构重仓",
+        "互联网金融",
+        "周期股",
         "并购重组概念",
-        "股权激励",
-        "金融地产风格"
+        "上证50",
+        "权重股",
+        "证金持股",
+        "AH股",
+        "股权激励"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 14.72,
       "target_price": 17.75,
       "risk_reward": 0.85,
@@ -457,41 +457,41 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
-      "code": "300083",
-      "name": "创世纪",
-      "market": "深市",
-      "board": "创业板",
+      "code": "600838",
+      "name": "上海九百",
+      "market": "沪市",
+      "board": "主板",
       "horizon": "中长线",
-      "close": 8.83,
+      "close": 8.75,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -5.16,
-      "final_score": 4.4,
-      "mix_pct": 94.4,
-      "resonance": 1,
+      "pct_chg": 3.06,
+      "final_score": 4.3,
+      "mix_pct": 94.7,
+      "resonance": 2,
       "sources": [
+        "动量共识",
         "因子榜"
       ],
       "signals": [
+        "动量共识",
         "因子榜入选"
       ],
-      "industry": "通用设备制造业",
+      "industry": "零售业",
       "concepts": [
+        "参股券商",
+        "内贸流通",
         "融资融券",
-        "工业互联",
-        "人形机器人",
-        "飞行汽车(eVTOL)",
-        "创业板综",
-        "医疗器械概念",
-        "新型工业化",
-        "深股通"
+        "长江三角",
+        "新零售",
+        "央国企改革"
       ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 8.15,
-      "target_price": 14.39,
-      "risk_reward": 5.9,
-      "support": 8.48,
-      "resistance": 11.67,
+      "enter_date": "2026-11-25",
+      "stop_loss": 7.51,
+      "target_price": 14.89,
+      "risk_reward": 7.85,
+      "support": 7.38,
+      "resistance": 14.89,
       "factor_actions": []
     },
     {
@@ -500,12 +500,12 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
-      "close": 25.51,
+      "close": 25.43,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -4.35,
-      "final_score": 4.4,
-      "mix_pct": 94.4,
+      "pct_chg": -4.65,
+      "final_score": 4.3,
+      "mix_pct": 94.7,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -515,16 +515,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "超清视频",
+        "昨日高振幅",
         "智能穿戴",
-        "东方财富热股",
-        "AH股",
-        "物联网",
-        "液冷概念",
-        "科技风格",
-        "IPv6"
+        "网络安全",
+        "深圳特区",
+        "通信技术",
+        "5G概念",
+        "AI手机",
+        "数据中心"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 23.98,
       "target_price": 34.89,
       "risk_reward": 3.1,
@@ -538,12 +538,12 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "深市",
       "board": "创业板",
       "horizon": "中长线",
-      "close": 15.75,
+      "close": 15.65,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -5.75,
-      "final_score": 4.4,
-      "mix_pct": 94.4,
+      "pct_chg": -6.34,
+      "final_score": 4.3,
+      "mix_pct": 94.7,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -553,16 +553,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "concepts": [
-        "融资融券",
+        "低空经济",
         "无人机",
-        "军民融合",
-        "人形机器人",
-        "飞行汽车(eVTOL)",
-        "专精特新",
-        "创业板综",
-        "航天航空"
+        "商业航天",
+        "军工",
+        "深股通",
+        "航天航空",
+        "大飞机",
+        "融资融券"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 14.8,
       "target_price": 24.86,
       "risk_reward": 5.11,
@@ -571,16 +571,92 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
+      "code": "688158",
+      "name": "优刻得",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "中长线",
+      "close": 22.66,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -6.79,
+      "final_score": 4.2,
+      "mix_pct": 89.5,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "互联网和相关服务",
+      "concepts": [
+        "互联网服务",
+        "DeepSeek概念",
+        "商业航天",
+        "VPN",
+        "数据中心",
+        "人工智能",
+        "信创",
+        "小盘股"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 22.08,
+      "target_price": 32.58,
+      "risk_reward": 3.28,
+      "support": 22.96,
+      "resistance": 31.12,
+      "factor_actions": []
+    },
+    {
+      "code": "300083",
+      "name": "创世纪",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "中长线",
+      "close": 8.76,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -5.91,
+      "final_score": 4.2,
+      "mix_pct": 89.5,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "通用设备制造业",
+      "concepts": [
+        "医疗器械概念",
+        "新型工业化",
+        "低空经济",
+        "小盘股",
+        "机构重仓",
+        "工业母机",
+        "富时罗素",
+        "深股通"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 8.15,
+      "target_price": 14.39,
+      "risk_reward": 5.9,
+      "support": 8.48,
+      "resistance": 11.67,
+      "factor_actions": []
+    },
+    {
       "code": "600261",
       "name": "阳光照明",
       "market": "沪市",
       "board": "主板",
       "horizon": "短线",
-      "close": 4.53,
+      "close": 4.37,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -6.6,
-      "final_score": 4.07,
+      "pct_chg": -9.9,
+      "final_score": 3.94,
       "mix_pct": 76.0,
       "resonance": 1,
       "sources": [
@@ -592,13 +668,13 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "破增发价股",
-        "融资融券",
-        "LED概念",
-        "证金持股",
-        "低价股",
-        "贬值受益",
+        "参股券商",
         "氢能源",
+        "贬值受益",
+        "富时罗素",
+        "标准普尔",
+        "LED概念",
+        "融资融券",
         "长江三角"
       ],
       "enter_date": "2026-11-24",
@@ -615,12 +691,12 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
-      "close": 32.47,
+      "close": 32.2,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -4.5,
+      "pct_chg": -5.29,
       "final_score": 3.8,
-      "mix_pct": 61.1,
+      "mix_pct": 68.4,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -630,16 +706,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "金属制品业",
       "concepts": [
-        "央国企改革",
-        "可控核聚变",
-        "PCB",
-        "海南自贸",
+        "医疗器械概念",
+        "昨日高振幅",
+        "养老金",
         "新材料",
-        "深股通",
-        "融资融券",
-        "养老金"
+        "周期股",
+        "央国企改革",
+        "工业母机",
+        "MSCI中国"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 31.44,
       "target_price": 69.58,
       "risk_reward": 9.92,
@@ -648,55 +724,17 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
-      "code": "002432",
-      "name": "九安医疗",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 46.19,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -2.39,
-      "final_score": 3.7,
-      "mix_pct": 55.6,
-      "resonance": 1,
-      "sources": [
-        "因子榜"
-      ],
-      "signals": [
-        "因子榜入选"
-      ],
-      "industry": "专用设备制造业",
-      "concepts": [
-        "多模态AI",
-        "昨日高换手",
-        "智能穿戴",
-        "东方财富热股",
-        "创新医疗服务",
-        "物联网",
-        "新零售",
-        "互联医疗"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 43.58,
-      "target_price": 70.95,
-      "risk_reward": 4.65,
-      "support": 44.84,
-      "resistance": 60.42,
-      "factor_actions": []
-    },
-    {
       "code": "688403",
       "name": "汇成股份",
       "market": "沪市",
       "board": "科创板",
       "horizon": "中长线",
-      "close": 12.3,
+      "close": 12.2,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -8.35,
+      "pct_chg": -9.09,
       "final_score": 3.6,
-      "mix_pct": 50.0,
+      "mix_pct": 57.9,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -706,7 +744,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 11.89,
       "target_price": 27.46,
       "risk_reward": 10.79,
@@ -715,16 +753,54 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
+      "code": "002432",
+      "name": "九安医疗",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "中长线",
+      "close": 46.0,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -2.79,
+      "final_score": 3.5,
+      "mix_pct": 52.6,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "专用设备制造业",
+      "concepts": [
+        "医疗器械概念",
+        "数据要素",
+        "昨日高振幅",
+        "智能穿戴",
+        "中证500",
+        "互联医疗",
+        "DeepSeek概念",
+        "小米概念"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 43.58,
+      "target_price": 70.95,
+      "risk_reward": 4.65,
+      "support": 44.84,
+      "resistance": 60.42,
+      "factor_actions": []
+    },
+    {
       "code": "300539",
       "name": "横河精密",
       "market": "深市",
       "board": "创业板",
       "horizon": "短线",
-      "close": 21.42,
+      "close": 21.37,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -5.14,
-      "final_score": 3.42,
+      "pct_chg": -5.36,
+      "final_score": 3.26,
       "mix_pct": 40.0,
       "resonance": 1,
       "sources": [
@@ -736,14 +812,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "橡胶和塑料制品业",
       "concepts": [
-        "减速器",
-        "华为汽车",
-        "无人机",
-        "股权激励",
-        "PEEK材料概念",
-        "专精特新",
         "创业板综",
-        "机器人概念"
+        "股权激励",
+        "无人机",
+        "深股通",
+        "智能家居",
+        "减速器",
+        "机器人概念",
+        "新能源车"
       ],
       "enter_date": "2026-11-24",
       "stop_loss": 16.94,
@@ -759,11 +835,11 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
-      "close": 12.39,
+      "close": 12.31,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -7.33,
-      "final_score": 3.28,
+      "pct_chg": -7.93,
+      "final_score": 3.11,
       "mix_pct": 32.0,
       "resonance": 1,
       "sources": [
@@ -775,14 +851,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "多模态AI",
+        "无人驾驶",
+        "华为概念",
+        "人工智能",
         "氢能源",
-        "机器人概念",
-        "标准普尔",
-        "海洋经济",
-        "可控核聚变",
-        "无人机",
-        "股权激励"
+        "小盘股",
+        "股权激励",
+        "多模态AI",
+        "军工"
       ],
       "enter_date": "2026-11-24",
       "stop_loss": null,
@@ -793,16 +869,166 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
+      "code": "300199",
+      "name": "翰宇药业",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "中长线",
+      "close": 19.4,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -4.67,
+      "final_score": 3.1,
+      "mix_pct": 31.6,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "医药制造业",
+      "concepts": [
+        "医美概念",
+        "深圳特区",
+        "互联医疗",
+        "华为概念",
+        "创业板综",
+        "AI制药（医疗）",
+        "辅助生殖",
+        "小盘股"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 17.99,
+      "target_price": 27.7,
+      "risk_reward": 3.86,
+      "support": 18.85,
+      "resistance": 25.27,
+      "factor_actions": []
+    },
+    {
+      "code": "688432",
+      "name": "有研硅",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "中长线",
+      "close": 26.8,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -8.84,
+      "final_score": 3.0,
+      "mix_pct": 26.3,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "半导体概念",
+        "沪股通",
+        "小盘股",
+        "存储芯片",
+        "融资融券",
+        "中芯概念"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 27.54,
+      "target_price": 60.59,
+      "risk_reward": 9.8,
+      "support": 28.12,
+      "resistance": 36.67,
+      "factor_actions": []
+    },
+    {
+      "code": "300007",
+      "name": "汉威科技",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "中长线",
+      "close": 36.94,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -7.53,
+      "final_score": 3.0,
+      "mix_pct": 26.3,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "软件和信息技术服务业",
+      "concepts": [
+        "智能穿戴",
+        "互联医疗",
+        "华为概念",
+        "核污染防治",
+        "小米概念",
+        "创业板综",
+        "地下管网",
+        "氢能源"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 32.49,
+      "target_price": 45.37,
+      "risk_reward": 2.57,
+      "support": 29.12,
+      "resistance": 45.37,
+      "factor_actions": []
+    },
+    {
+      "code": "688549",
+      "name": "中巨芯",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "中长线",
+      "close": 13.57,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -9.83,
+      "final_score": 3.0,
+      "mix_pct": 26.3,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "半导体概念",
+        "沪股通",
+        "小盘股",
+        "小盘成长",
+        "氟化工概念",
+        "高带宽内存",
+        "融资融券",
+        "中芯概念"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 13.71,
+      "target_price": 27.5,
+      "risk_reward": 8.06,
+      "support": 14.07,
+      "resistance": 18.88,
+      "factor_actions": []
+    },
+    {
       "code": "002685",
       "name": "华东重机",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
-      "close": 8.97,
+      "close": 8.99,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": 0.22,
-      "final_score": 3.13,
+      "pct_chg": 0.45,
+      "final_score": 2.96,
       "mix_pct": 24.0,
       "resonance": 1,
       "sources": [
@@ -814,14 +1040,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "TOPCon电池",
+        "半导体概念",
+        "传感器",
+        "氢能源",
+        "富时罗素",
+        "深股通",
         "2026中报预增",
         "融资融券",
-        "国产芯片",
-        "专精特新",
-        "氢能源",
-        "半导体概念",
-        "传感器"
+        "TOPCon电池"
       ],
       "enter_date": "2026-11-24",
       "stop_loss": 7.33,
@@ -832,93 +1058,17 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
-      "code": "688158",
-      "name": "优刻得",
+      "code": "688797",
+      "name": "臻宝科技",
       "market": "沪市",
       "board": "科创板",
       "horizon": "中长线",
-      "close": 22.86,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -5.96,
-      "final_score": 3.1,
-      "mix_pct": 22.2,
-      "resonance": 1,
-      "sources": [
-        "因子榜"
-      ],
-      "signals": [
-        "因子榜入选"
-      ],
-      "industry": "互联网和相关服务",
-      "concepts": [
-        "液冷概念",
-        "智谱AI概念",
-        "破发股",
-        "商业航天",
-        "QFII重仓",
-        "小盘成长",
-        "东数西算",
-        "股权激励"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 22.08,
-      "target_price": 32.58,
-      "risk_reward": 3.28,
-      "support": 22.96,
-      "resistance": 31.12,
-      "factor_actions": []
-    },
-    {
-      "code": "600838",
-      "name": "上海九百",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 8.59,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": 1.18,
-      "final_score": 3.1,
-      "mix_pct": 22.2,
-      "resonance": 2,
-      "sources": [
-        "动量共识",
-        "因子榜"
-      ],
-      "signals": [
-        "动量共识",
-        "因子榜入选"
-      ],
-      "industry": "零售业",
-      "concepts": [
-        "融资融券",
-        "央国企改革",
-        "新零售",
-        "长江三角",
-        "参股券商",
-        "内贸流通"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 7.51,
-      "target_price": 14.89,
-      "risk_reward": 7.85,
-      "support": 7.38,
-      "resistance": 14.89,
-      "factor_actions": []
-    },
-    {
-      "code": "688836",
-      "name": "宇树科技",
-      "market": "沪市",
-      "board": "科创板",
-      "horizon": "中长线",
-      "close": 690.0,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -3.9,
-      "final_score": 3.1,
-      "mix_pct": 22.2,
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 2.9,
+      "mix_pct": 21.1,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -928,12 +1078,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-11-24",
-      "stop_loss": 637.2,
-      "target_price": 809.0,
-      "risk_reward": 1.43,
-      "support": 565.0,
-      "resistance": 809.0,
+      "enter_date": "2026-11-25",
+      "stop_loss": 145.24,
+      "target_price": 338.18,
+      "risk_reward": 10.96,
+      "support": 149.49,
+      "resistance": 218.0,
       "factor_actions": []
     },
     {
@@ -946,8 +1096,8 @@ window.FINAL_RECOMMEND_DATA = {
       "close_date": "2026-11-25",
       "close_verified": true,
       "pct_chg": -12.58,
-      "final_score": 3.1,
-      "mix_pct": 22.2,
+      "final_score": 2.9,
+      "mix_pct": 21.1,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -957,16 +1107,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专业技术服务业",
       "concepts": [
-        "多模态AI",
-        "飞行汽车(eVTOL)",
-        "智谱AI概念",
-        "机器人概念",
-        "海洋经济",
+        "新型工业化",
+        "数据要素",
+        "DeepSeek概念",
+        "无人驾驶",
         "英伟达概念",
-        "减速器",
-        "宠物经济"
+        "人工智能",
+        "华为汽车",
+        "创业板综"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 9.64,
       "target_price": 15.91,
       "risk_reward": 4.86,
@@ -975,17 +1125,55 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
-      "code": "300007",
-      "name": "汉威科技",
+      "code": "300408",
+      "name": "三环集团",
       "market": "深市",
       "board": "创业板",
       "horizon": "中长线",
-      "close": 37.14,
+      "close": 62.22,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -7.03,
-      "final_score": 3.1,
-      "mix_pct": 22.2,
+      "pct_chg": -5.6,
+      "final_score": 2.7,
+      "mix_pct": 10.5,
+      "resonance": 1,
+      "sources": [
+        "因子榜"
+      ],
+      "signals": [
+        "因子榜入选"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "被动元件概念",
+        "基金重仓",
+        "智能穿戴",
+        "新材料",
+        "华为概念",
+        "通信技术",
+        "5G概念",
+        "周期股"
+      ],
+      "enter_date": "2026-11-25",
+      "stop_loss": 58.81,
+      "target_price": 139.5,
+      "risk_reward": 11.35,
+      "support": 61.58,
+      "resistance": 89.5,
+      "factor_actions": []
+    },
+    {
+      "code": "688213",
+      "name": "思特威",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "中长线",
+      "close": 95.8,
+      "close_date": "2026-11-25",
+      "close_verified": true,
+      "pct_chg": -4.2,
+      "final_score": 2.6,
+      "mix_pct": 5.3,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -995,52 +1183,53 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
+        "医疗器械概念",
+        "机器视觉",
+        "虚拟现实",
         "智能穿戴",
-        "专精特新",
-        "物联网",
-        "氢能源",
-        "机器人概念",
-        "互联医疗",
-        "小盘成长",
-        "无人机"
+        "安防概念",
+        "中证500",
+        "无人驾驶",
+        "小米概念"
       ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 32.49,
-      "target_price": 45.37,
-      "risk_reward": 2.57,
-      "support": 29.12,
-      "resistance": 45.37,
+      "enter_date": "2026-11-25",
+      "stop_loss": 90.42,
+      "target_price": 114.42,
+      "risk_reward": 1.39,
+      "support": 94.85,
+      "resistance": 113.5,
       "factor_actions": []
     },
     {
-      "code": "603799",
-      "name": "华友钴业",
+      "code": "603662",
+      "name": "柯力传感",
       "market": "沪市",
       "board": "主板",
-      "horizon": "中长线",
-      "close": 30.13,
+      "horizon": "短线",
+      "close": 50.51,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -4.65,
-      "final_score": 3.1,
-      "mix_pct": 22.2,
+      "pct_chg": -4.72,
+      "final_score": 2.5,
+      "mix_pct": 0.0,
       "resonance": 1,
       "sources": [
-        "因子榜"
+        "强势跟踪"
       ],
       "signals": [
-        "因子榜入选"
+        "强势跟踪·当日新入选",
+        "高手共振"
       ],
-      "industry": "有色金属冶炼和压延加工业",
+      "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "QFII重仓",
-        "融资融券",
-        "电池技术",
-        "锂电池概念",
-        "大盘股",
-        "固态电池",
-        "小金属概念",
-        "上证180"
+        "传感器",
+        "机器视觉",
+        "小盘股",
+        "小盘成长",
+        "沪股通",
+        "华为概念",
+        "物联网",
+        "边缘计算"
       ],
       "enter_date": "2026-11-24",
       "stop_loss": null,
@@ -1056,12 +1245,12 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "沪市",
       "board": "科创板",
       "horizon": "中长线",
-      "close": 94.8,
+      "close": 94.4,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -7.16,
-      "final_score": 3.0,
-      "mix_pct": 16.7,
+      "pct_chg": -7.55,
+      "final_score": 2.5,
+      "mix_pct": 0.0,
       "resonance": 2,
       "sources": [
         "动量共识",
@@ -1073,16 +1262,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "专精特新",
-        "机器人概念",
         "机器视觉",
+        "虚拟现实",
+        "中证500",
         "英伟达概念",
-        "生物识别",
-        "破增发价股",
-        "国产芯片",
-        "元宇宙概念"
+        "人工智能",
+        "中盘成长",
+        "3D摄像头",
+        "上证380"
       ],
-      "enter_date": "2026-11-24",
+      "enter_date": "2026-11-25",
       "stop_loss": 91.76,
       "target_price": 122.88,
       "risk_reward": 2.05,
@@ -1091,55 +1280,17 @@ window.FINAL_RECOMMEND_DATA = {
       "factor_actions": []
     },
     {
-      "code": "300199",
-      "name": "翰宇药业",
-      "market": "深市",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": 19.56,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -3.88,
-      "final_score": 3.0,
-      "mix_pct": 16.7,
-      "resonance": 1,
-      "sources": [
-        "因子榜"
-      ],
-      "signals": [
-        "因子榜入选"
-      ],
-      "industry": "医药制造业",
-      "concepts": [
-        "肝炎概念",
-        "AI制药（医疗）",
-        "医美概念",
-        "深圳特区",
-        "互联医疗",
-        "小盘成长",
-        "流感",
-        "新消费"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 17.99,
-      "target_price": 27.7,
-      "risk_reward": 3.86,
-      "support": 18.85,
-      "resistance": 25.27,
-      "factor_actions": []
-    },
-    {
-      "code": "688019",
-      "name": "安集科技",
+      "code": "688200",
+      "name": "华峰测控",
       "market": "沪市",
       "board": "科创板",
       "horizon": "中长线",
-      "close": 197.3,
+      "close": 182.42,
       "close_date": "2026-11-25",
       "close_verified": true,
-      "pct_chg": -9.41,
-      "final_score": 2.9,
-      "mix_pct": 11.1,
+      "pct_chg": -10.28,
+      "final_score": 2.5,
+      "mix_pct": 0.0,
       "resonance": 1,
       "sources": [
         "因子榜"
@@ -1147,181 +1298,72 @@ window.FINAL_RECOMMEND_DATA = {
       "signals": [
         "因子榜入选"
       ],
-      "industry": "计算机、通信和其他电子设备制造业",
+      "industry": "专用设备制造业",
       "concepts": [
-        "中盘股",
-        "存储芯片",
-        "融资融券",
-        "中证500",
+        "半导体概念",
+        "昨日高振幅",
         "上证380",
+        "中证500",
+        "基金重仓",
+        "沪股通",
         "股权激励",
-        "光刻机(胶)",
-        "LED概念"
+        "华为概念"
       ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 186.23,
-      "target_price": 251.88,
-      "risk_reward": 2.17,
-      "support": 158.0,
-      "resistance": 227.47,
-      "factor_actions": []
-    },
-    {
-      "code": "688797",
-      "name": "臻宝科技",
-      "market": "沪市",
-      "board": "科创板",
-      "horizon": "中长线",
-      "close": 148.97,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -7.97,
-      "final_score": 2.8,
-      "mix_pct": 5.6,
-      "resonance": 1,
-      "sources": [
-        "因子榜"
-      ],
-      "signals": [
-        "因子榜入选"
-      ],
-      "industry": "",
-      "concepts": [],
-      "enter_date": "2026-11-24",
-      "stop_loss": 145.24,
-      "target_price": 338.18,
-      "risk_reward": 10.96,
-      "support": 149.49,
-      "resistance": 218.0,
-      "factor_actions": []
-    },
-    {
-      "code": "000776",
-      "name": "广发证券",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 18.19,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -1.52,
-      "final_score": 2.8,
-      "mix_pct": 5.6,
-      "resonance": 1,
-      "sources": [
-        "因子榜"
-      ],
-      "signals": [
-        "因子榜入选"
-      ],
-      "industry": "资本市场服务",
-      "concepts": [
-        "2026中报预增",
-        "融资融券",
-        "AH股",
-        "证金持股",
-        "深证100R",
-        "金融地产风格",
-        "深股通",
-        "MSCI中国"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 16.79,
-      "target_price": 22.39,
-      "risk_reward": 2.0,
-      "support": 17.58,
-      "resistance": 19.55,
-      "factor_actions": []
-    },
-    {
-      "code": "603662",
-      "name": "柯力传感",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "短线",
-      "close": 50.6,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -4.55,
-      "final_score": 2.7,
-      "mix_pct": 0.0,
-      "resonance": 1,
-      "sources": [
-        "强势跟踪"
-      ],
-      "signals": [
-        "强势跟踪·当日新入选",
-        "高手共振"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "小盘成长",
-        "机器人执行器",
-        "融资融券",
-        "人形机器人",
-        "物联网",
-        "华为概念",
-        "传感器",
-        "边缘计算"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null,
-      "factor_actions": []
-    },
-    {
-      "code": "300408",
-      "name": "三环集团",
-      "market": "深市",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": 62.41,
-      "close_date": "2026-11-25",
-      "close_verified": true,
-      "pct_chg": -5.31,
-      "final_score": 2.7,
-      "mix_pct": 0.0,
-      "resonance": 1,
-      "sources": [
-        "因子榜"
-      ],
-      "signals": [
-        "因子榜入选"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "智能穿戴",
-        "AH股",
-        "科技风格",
-        "机构重仓",
-        "5G概念",
-        "被动元件概念",
-        "新材料",
-        "深股通"
-      ],
-      "enter_date": "2026-11-24",
-      "stop_loss": 58.81,
-      "target_price": 139.5,
-      "risk_reward": 11.35,
-      "support": 61.58,
-      "resistance": 89.5,
+      "enter_date": "2026-11-25",
+      "stop_loss": 178.65,
+      "target_price": 423.0,
+      "risk_reward": 11.31,
+      "support": 179.5,
+      "resistance": 260.0,
       "factor_actions": []
     }
   ],
   "factor_chain": {
-    "update_time": "2026-11-26 00:04:28",
+    "update_time": "2026-11-26 01:37:51",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
-    "where": "algorithms/final_recommend.py :: 方案B 因子融合",
+    "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
       "V8_FUSION_NOISE_FILTER": 1,
-      "regime_open": true
+      "regime_open": true,
+      "regime_coef_note": "非开仓期(_open_regime=False) 因子权重 ×0.3（仅对真计分的因子生效）"
     },
-    "integrated": [],
-    "skipped": true,
-    "skip_reason": "本轮 FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 因子融合整体跳过（数据降级）"
+    "integrated": [
+      {
+        "key": "weak",
+        "name": "放量弱势",
+        "role": "仅标注",
+        "scored": false,
+        "adj": 0.0,
+        "where": "2026-09-20 已随第二套 final_score 公式清除；仅写 signals 展示",
+        "n_hit": 0,
+        "evidence": "未回测",
+        "why": "FACTOR_LAB 异常换手率 **bottom 档**（放量=弱势）命中池内票即扣分　⚠️ 三重问题（2026-09-18 实测取证）：① **无依据** —— 本档从未纳入 walk-forward 回测（−2.21pp 是 **top 档**的实测值，bottom 档无同类证据），属「凭空的惩罚」，与 P5 明文原则「反向档位无显著负 edge 不给惩罚」冲突；② **设计上不相交** —— bottom 榜 = 极端放量股（abn 最大，弱势特征），而候选池由选股策略产出、天然偏缩量强势，两集合语义相反；实测 bottom ∩ pool = **0** ⇒ 本条几乎恒为 0 分；③ **代码失配（已修）** —— _weak 集合原缺 .lstrip('.') 导致恒不匹配，29 轮 / 1333 条候选命中 0 次"
+      },
+      {
+        "key": "abn",
+        "name": "异常换手率",
+        "role": "仅展示",
+        "scored": false,
+        "adj": 0.0,
+        "where": "写 tags（V8_FUSION_NOISE_FILTER=1），不写 sources/source_scores",
+        "n_hit": 0,
+        "evidence": "薄样本(9 信号日 / 85 命中)",
+        "why": "实测边际 −2.21pp（负 alpha，命中 85 条）⇒ 整源剔除，不计共振/strength"
+      },
+      {
+        "key": "roe",
+        "name": "ROE_TTM",
+        "role": "仅展示",
+        "scored": false,
+        "adj": 0.0,
+        "where": "写 signals「高ROE」+ reasons，不写 sources/source_scores",
+        "n_hit": 0,
+        "evidence": "薄样本(9 信号日 / 89 命中)",
+        "why": "实测边际 +0.68pp（弱正，命中 89 条 ≈ 43.9% 覆盖率，无选择性）⇒ 不足与强源同权"
+      }
+    ],
+    "evidence_note": "计分依据分级：①「未回测」= 无任何样本外证据（放量弱势）；②「薄样本」= 9 信号日实测边际，样本不足以定权重，故不计分（异常换手率/ROE_TTM/高手跟踪）；③「walk-forward」= ≥4/5 年 OOS 检验通过才给分（候选池层 P5 的 amt60/turntrend，+6/+3）。本层当前**没有任何因子持有第③级证据** ⇒ 除放量弱势外全部为 0 分，属**有意的保守**。　🔴 结论（2026-09-18 主人问「扣分标准科学吗？别一开始就犯错」）：本层唯一记分的「放量弱势 −0.5」有**三重问题** —— ①无回测依据（bottom 榜从未回测）；②设计上不相交（bottom=极端放量股 vs 候选池=缩量强势，实测交集 0 ⇒ 几乎恒不触发）；③上游 _weak 集合曾因 norm_code 未剥点而恒失配（29 轮命中 0 次，本补丁已修）。⇒ **因子在本层的实际计分影响 = 0**，现状等于「全部只做标注」；要让它真正成为加减分项，须先补 walk-forward 回测（流程见下方 ③ 待接入队列 / 明细见本页 🧪 因子审计卡）。",
+    "dedup_note": "因子只对**池内已有票**动作（_factor_in_pool 只查不建）⇒ 不产池、不决定谁能进榜"
   },
   "factor_trace": [],
   "validity": {
@@ -1329,6 +1371,6 @@ window.FINAL_RECOMMEND_DATA = {
     "reason": "候选源正常",
     "ima_data_date": "2026-11-24",
     "ima_pool_total": 8,
-    "assessed_at": "2026-11-26 00:04:28"
+    "assessed_at": "2026-11-26 01:37:51"
   }
 };

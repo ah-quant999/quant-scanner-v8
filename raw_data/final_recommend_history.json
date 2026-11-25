@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-25 19:21:10",
-  "update_time": "2026-11-25 19:21:10",
+  "generated": "2026-11-26 01:40:14",
+  "update_time": "2026-11-26 01:40:14",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -2096,9 +2096,9 @@
     },
     "2026-11-25": {
       "date": "2026-11-25",
-      "update_time": "2026-11-25 19:01:56",
-      "file": "final_recommend_20261125.json",
-      "degraded": true,
+      "update_time": "2026-11-26 01:37:51",
+      "file": "final_recommend_20261126.json",
+      "degraded": false,
       "top3": [
         {
           "rank": 1,
@@ -2106,7 +2106,7 @@
           "name": "招商证券",
           "close": 15.18,
           "close_date": "2026-11-25",
-          "final_score": 4.3,
+          "final_score": 4.4,
           "resonance": 1,
           "sources": [
             "因子榜"
@@ -2118,22 +2118,9 @@
           "name": "国泰海通",
           "close": 16.0,
           "close_date": "2026-11-25",
-          "final_score": 4.3,
+          "final_score": 4.4,
           "resonance": 1,
           "sources": [
-            "因子榜"
-          ]
-        },
-        {
-          "rank": 3,
-          "code": "600838",
-          "name": "上海九百",
-          "close": 8.75,
-          "close_date": "2026-11-25",
-          "final_score": 4.2,
-          "resonance": 2,
-          "sources": [
-            "动量共识",
             "因子榜"
           ]
         }

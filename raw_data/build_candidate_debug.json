@@ -3,20 +3,20 @@
   "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": true,
-    "stocks": 8
+    "stocks": 3
   },
   "guanlan_reports": {
     "exists": true,
-    "reports": 18,
-    "stocks_in_reports": 8
+    "reports": 20,
+    "stocks_in_reports": 3
   },
   "source_dist": {
     "主板成交前100": 130,
-    "外资研投": 210,
+    "外资研投": 211,
     "创业板成交前100": 124,
-    "全市场流动性溢出": 512,
-    "科创板成交前100": 114,
-    "港股成交前50": 79,
-    "因子优选": 134
+    "全市场流动性溢出": 499,
+    "科创板成交前100": 101,
+    "港股成交前50": 80,
+    "因子优选": 136
   }
 }
