@@ -1,14 +1,9 @@
 {
-  "check_time": "2026-11-25 16:46:52",
+  "check_time": "2026-11-26 05:33:54",
   "last_trade_close": "2026-11-25 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
   "warn_stale": [
-    {
-      "var": "SECTOR_YEAR_FLOW",
-      "reason": "文件缺失",
-      "category": "post_close"
-    },
     {
       "var": "HUIJIN_ETF_DRILL",
       "reason": "文件缺失",
@@ -18,9 +13,9 @@
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
-    "total_checked": 45,
+    "total_checked": 44,
     "core_stale": 0,
-    "warn_stale": 2,
+    "warn_stale": 1,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
