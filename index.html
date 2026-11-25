@@ -141,7 +141,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=dfa79e7923" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4e838c1e84" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=f33eb82eea" defer></script>
-    <script src="data/CRED_LEDGER.js?v=c71b6c54c6" defer></script>
+    <script src="data/CRED_LEDGER.js?v=131bbac7fa" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=d51bb5341e" defer></script>
     <script src="data/GOLD_POOL.js?v=69038a20d9" defer></script>
@@ -154,7 +154,7 @@ window.__domReadyFns=[];
     <script src="data/MACRO_BRIEF.js?v=22f2a391a2" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=af7e89aaff" defer></script>
-<script src="data/LHB_DATA.js?v=e85fcf30a0" defer></script>
+<script src="data/LHB_DATA.js?v=576128889f" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
@@ -164,8 +164,8 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=e10d278322" defer></script>
 <script src="data/MARGIN_DATA.js?v=19bce68427" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=fa8ab56594" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=87c5833f79" defer></script>
-<script src="data/BOND_FUTURES.js?v=c1cb3adbbd" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=e76d6d3c1c" defer></script>
+<script src="data/BOND_FUTURES.js?v=fa4f0f7ba5" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=11c1bf9bf7" defer></script>
 <script src="data/IPO_DATA.js?v=f1a1f2f657" defer></script>
     <script src="data/CRISIS_DATA.js?v=63299194e4" defer></script>
@@ -20944,7 +20944,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=93b5f3d1e3', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=41ae3284a5', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=9bfab7633f', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=7781cddeec', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
