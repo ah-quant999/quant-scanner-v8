@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-26 17:29",
-  "republish_time": "2026-11-26 22:20:12",
+  "update_time": "2026-11-26 20:05",
+  "republish_time": "2026-11-26 22:58:06",
   "data_date": "2026-11-25",
   "rule_ver": 2,
   "top_n": 5,
@@ -149,35 +149,35 @@
           "name": "天山生物",
           "price": 8.75,
           "chg": 0.81,
-          "main_net": null
+          "main_net": -6403154.0
         },
         {
           "code": "002321",
           "name": "华英农业",
           "price": 1.79,
           "chg": 0.56,
-          "main_net": null
+          "main_net": 6328990.0
         },
         {
           "code": "000735",
           "name": "罗 牛 山",
           "price": 4.7,
           "chg": 0.43,
-          "main_net": null
+          "main_net": -687852.0
         },
         {
           "code": "301116",
           "name": "益客食品",
           "price": 6.87,
           "chg": 0.0,
-          "main_net": null
+          "main_net": 1837630.0
         },
         {
           "code": "002157",
           "name": "正邦科技",
           "price": 2.89,
           "chg": -0.34,
-          "main_net": null
+          "main_net": 361823.0
         }
       ],
       "match": "exact"
