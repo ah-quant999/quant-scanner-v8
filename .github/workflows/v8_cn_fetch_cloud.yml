@@ -1362,12 +1362,14 @@ jobs:
               print(f"[relay] 在途查询失败({e}) ⇒ 保守照常派发")
 
           # ① 派发下一轮 intraday（自接力主环）
+          # 🔴 2026-11-26 根治：改派中国 IP 链（selfhosted）。原派 hosted 链 ⇒ 东财源必 empty，
+          #   且 hosted 单档占并发组 39 分钟 ⇒ 把唯一能产数的 cn 链挤成 pending 再被顶杀（饥饿）。
           try:
               if successor:
                   print("[relay] ⏭ 跳过本轮 intraday 派发")
               else:
                   api("POST",
-                      f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud.yml/dispatches",
+                      f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud_selfhosted.yml/dispatches",
                       {"ref": "main", "inputs": {"category": "intraday"}})
                   print("[relay] ✅ 已派发下一轮 intraday（自接力）")
           except Exception as e:

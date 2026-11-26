@@ -81,6 +81,10 @@ def dispatch(wf):
     #   dispatch 前查全组（hosted/selfhosted/lemoncat 任一近期在跑/排队）⇒ 让位不派，
     #   返回 False（本档不标 fired，20s 后重查；迟到超 SLOT_TOL_MIN 自弃）。
     if wf in FETCH_TRIO and fetch_trio_busy(TOK, REPO, log=print):
+        # 🛡 2026-11-26 盘中断更实证：让位必须留痕。原实现静默 return False ⇒
+        #   精准调度器日志里连一行都没有 ⇒ 09:32/09:42/10:02 三档盘中抓取链被静默漏派，
+        #   而 SLOT_TOL_MIN=7 超时自弃 ⇒ 当日盘中档零产出（板块资金等东财源全线停更）。
+        print(f"  dispatch {wf} 让位（fetch 三链有在跑/排队）⇒ 本档不派，20s 后重查", flush=True)
         return False
     try:
         st, _ = req(API + wf + "/dispatches", "POST", {"ref": "main"})

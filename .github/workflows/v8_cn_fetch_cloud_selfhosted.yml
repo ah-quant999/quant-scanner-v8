@@ -34,7 +34,17 @@ on:
     # 🔴 2026-10-09 CN runner2号机的工程师：cn-IP 硬约束源常规兜底档（W52_HIGH 等东财 push2delay 系
     #   在境外托管 runner 上结构性不可达）。cron 字符串必须与下方 step1 case 分支逐字匹配。
     - cron: '25 0 * * 0-6'   # 08:25 CST 盘前 → category=premarket
+    - cron: '*/20 1-7 * * 1-5'   # CST 09:00/09:20/…/15:40 每 20 分钟 → category=intraday
     - cron: '20 9 * * 0-6'   # 17:20 CST 盘后 → category=post_close
+    # 🔴 2026-11-26 主人令「盘中别再卡壳」一劳永逸根治（当日实证：盘中 intraday 档全天零产出）：
+    #   根因① 主力链 v8_cn_fetch_cloud.yml 固定 runs-on: ubuntu-latest（GitHub 托管·境外 IP）
+    #        ⇒ 东财 push2delay 镜像对境外结构性不可达（run 日志实锤 RemoteDisconnected）
+    #        ⇒ 盘中全部东财源（板块资金/概念排名/涨停热力/ETF 异动/指数快照）每轮 empty、不覆盖旧产物；
+    #   根因② 本链（[self-hosted, cn] 中国 IP）是**唯一**能产东财盘中数据的链，却只有盘前/盘后两档
+    #        （case 分支里 intraday 分支一直都在，只是对应 cron 被摘掉）⇒ 盘中时段无人产出；
+    #   修法：补回 intraday cron（CST 09:00-15:40 每 20 分钟一档，主人明令 15-20 分钟），
+    #        与主链共用 concurrency 组 v8-cn-fetch-cloud-v2-<category> ⇒ 同 category 天然互斥排队，
+    #        不会与 hosted 档并行写 main ⇒ 不制造风暴/排队踩踏。
   workflow_dispatch:
     inputs:
       category:
@@ -123,9 +133,9 @@ jobs:
             "25 0 * * 0-6")
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
-            "*/30 1-8 * * 0-6")
+            "*/30 1-8 * * 0-6"|"*/20 1-7 * * 1-5")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
-              echo "label=盘中" ;;
+              echo "label=盘中(20分档·中国IP)" ;;
             "20 9 * * 0-6")
               echo "category=post_close" >> "$GITHUB_OUTPUT"
               echo "label=盘后" ;;
