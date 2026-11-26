@@ -1,15 +1,15 @@
 {
- "update_time": "2026-11-26 21:06:49",
+ "update_time": "2026-11-27 00:22:13",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w] × conf(n_h)；h∈{5:(6.0,0.15),10:(2.0,0.1)}；conf(n)=max(0.15,min(1,n/12)) 小样本可信度折扣（2026-11-01 防小样本霸榜）；2026-11-18 主人令收益率再平衡：T+5均益唯一主项、T+10慢变量减权、胜率腿减半(占比≤8%)",
-  "n_signals": 2406,
+  "n_signals": 2426,
   "n_stocks": 395,
   "signal_date_range": [
    "2026-06-06",
-   "2026-11-25"
+   "2026-11-26"
   ]
  },
  "stocks": [
@@ -213,12 +213,12 @@
   {
    "code": "000657",
    "name": "中钨高新",
-   "n_signals": 12,
+   "n_signals": 13,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-06-06",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -409,12 +409,12 @@
   {
    "code": "688403",
    "name": "汇成股份",
-   "n_signals": 13,
+   "n_signals": 14,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-06-06",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -537,6 +537,71 @@
    "rank": 8
   },
   {
+   "code": "600885",
+   "name": "宏发股份",
+   "n_signals": 9,
+   "kinds": [
+    "top10"
+   ],
+   "first_seen": "2026-07-17",
+   "last_seen": "2026-11-13",
+   "is_final": false,
+   "horizons": {
+    "1": {
+     "n": 9,
+     "win": 44.4,
+     "avg": 0.8,
+     "med": -0.1,
+     "best": 5.61,
+     "worst": -3.26,
+     "win_shrunk": 47.4,
+     "avg_shrunk": 0.38
+    },
+    "3": {
+     "n": 9,
+     "win": 55.6,
+     "avg": 2.8,
+     "med": 1.42,
+     "best": 12.2,
+     "worst": -1.07,
+     "win_shrunk": 52.6,
+     "avg_shrunk": 1.33
+    },
+    "5": {
+     "n": 9,
+     "win": 100.0,
+     "avg": 5.13,
+     "med": 5.23,
+     "best": 10.54,
+     "worst": 0.76,
+     "win_shrunk": 73.7,
+     "avg_shrunk": 2.43
+    },
+    "10": {
+     "n": 7,
+     "win": 85.7,
+     "avg": 6.75,
+     "med": 9.26,
+     "best": 13.37,
+     "worst": -0.48,
+     "win_shrunk": 64.7,
+     "avg_shrunk": 2.78
+    },
+    "20": {
+     "n": 4,
+     "win": 100.0,
+     "avg": 16.71,
+     "med": 17.18,
+     "best": 17.18,
+     "worst": 15.28,
+     "win_shrunk": 64.3,
+     "avg_shrunk": 4.77
+    }
+   },
+   "winrate_score": 17.7,
+   "rank": 9
+  },
+  {
    "code": "300302",
    "name": "同有科技",
    "n_signals": 4,
@@ -599,71 +664,6 @@
     }
    },
    "winrate_score": 17.66,
-   "rank": 9
-  },
-  {
-   "code": "600885",
-   "name": "宏发股份",
-   "n_signals": 9,
-   "kinds": [
-    "top10"
-   ],
-   "first_seen": "2026-07-17",
-   "last_seen": "2026-11-13",
-   "is_final": false,
-   "horizons": {
-    "1": {
-     "n": 9,
-     "win": 44.4,
-     "avg": 0.8,
-     "med": -0.1,
-     "best": 5.61,
-     "worst": -3.26,
-     "win_shrunk": 47.4,
-     "avg_shrunk": 0.38
-    },
-    "3": {
-     "n": 9,
-     "win": 55.6,
-     "avg": 2.8,
-     "med": 1.42,
-     "best": 12.2,
-     "worst": -1.07,
-     "win_shrunk": 52.6,
-     "avg_shrunk": 1.33
-    },
-    "5": {
-     "n": 9,
-     "win": 100.0,
-     "avg": 5.13,
-     "med": 5.23,
-     "best": 10.54,
-     "worst": 0.76,
-     "win_shrunk": 73.7,
-     "avg_shrunk": 2.43
-    },
-    "10": {
-     "n": 6,
-     "win": 100.0,
-     "avg": 7.96,
-     "med": 9.26,
-     "best": 13.37,
-     "worst": 0.95,
-     "win_shrunk": 68.8,
-     "avg_shrunk": 2.98
-    },
-    "20": {
-     "n": 4,
-     "win": 100.0,
-     "avg": 16.71,
-     "med": 17.18,
-     "best": 17.18,
-     "worst": 15.28,
-     "win_shrunk": 64.3,
-     "avg_shrunk": 4.77
-    }
-   },
-   "winrate_score": 17.52,
    "rank": 10
   },
   {
@@ -1192,13 +1192,13 @@
   {
    "code": "688432",
    "name": "有研硅",
-   "n_signals": 16,
+   "n_signals": 17,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-08-20",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": true,
    "horizons": {
     "1": {
@@ -1388,12 +1388,12 @@
   {
    "code": "688549",
    "name": "中巨芯",
-   "n_signals": 9,
+   "n_signals": 10,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-08-08",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1778,13 +1778,13 @@
   {
    "code": "300199",
    "name": "翰宇药业",
-   "n_signals": 35,
+   "n_signals": 36,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": true,
    "horizons": {
     "1": {
@@ -1909,12 +1909,12 @@
   {
    "code": "688797",
    "name": "臻宝科技",
-   "n_signals": 7,
+   "n_signals": 8,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-10-29",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2030,12 +2030,12 @@
   {
    "code": "300408",
    "name": "三环集团",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-25",
-   "last_seen": "2026-11-24",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2290,12 +2290,12 @@
   {
    "code": "688213",
    "name": "思特威",
-   "n_signals": 9,
+   "n_signals": 10,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-27",
-   "last_seen": "2026-08-23",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2746,12 +2746,12 @@
   {
    "code": "002270",
    "name": "华明装备",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-09-17",
-   "last_seen": "2026-10-11",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2811,12 +2811,12 @@
   {
    "code": "688322",
    "name": "奥比中光",
-   "n_signals": 2,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-10-20",
-   "last_seen": "2026-11-24",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3386,12 +3386,12 @@
   {
    "code": "002415",
    "name": "海康威视",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-22",
-   "last_seen": "2026-08-01",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3896,12 +3896,12 @@
   {
    "code": "000951",
    "name": "中国重汽",
-   "n_signals": 1,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-07-17",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -4857,12 +4857,12 @@
   {
    "code": "300014",
    "name": "亿纬锂能",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-11-12",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -6108,13 +6108,14 @@
   {
    "code": "000063",
    "name": "中兴通讯",
-   "n_signals": 5,
+   "n_signals": 7,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-11-19",
-   "last_seen": "2026-11-25",
-   "is_final": false,
+   "last_seen": "2026-11-26",
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 4,
@@ -6333,13 +6334,13 @@
   {
    "code": "300900",
    "name": "广联航空",
-   "n_signals": 6,
+   "n_signals": 7,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-11-18",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": true,
    "horizons": {
     "1": {
@@ -6464,13 +6465,13 @@
   {
    "code": "600838",
    "name": "上海九百",
-   "n_signals": 5,
+   "n_signals": 7,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-11-20",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": true,
    "horizons": {
     "1": {
@@ -6500,7 +6501,7 @@
   {
    "code": "600999",
    "name": "招商证券",
-   "n_signals": 11,
+   "n_signals": 10,
    "kinds": [
     "final",
     "top10"
@@ -6561,7 +6562,7 @@
   {
    "code": "601211",
    "name": "国泰海通",
-   "n_signals": 11,
+   "n_signals": 10,
    "kinds": [
     "final",
     "top10"
@@ -6699,12 +6700,12 @@
   {
    "code": "688158",
    "name": "优刻得",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-11-23",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -9655,12 +9656,12 @@
   {
    "code": "002432",
    "name": "九安医疗",
-   "n_signals": 7,
+   "n_signals": 8,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-08-22",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -10035,13 +10036,13 @@
   {
    "code": "300083",
    "name": "创世纪",
-   "n_signals": 7,
+   "n_signals": 8,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-11-18",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "is_final": true,
    "horizons": {
     "1": {
