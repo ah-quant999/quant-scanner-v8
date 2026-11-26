@@ -1,5 +1,5 @@
 window.FRACTAL_CONFLUENCE = {
- "update_time": "2026-11-26 09:07:10",
+ "update_time": "2026-11-26 09:50:53",
  "sample": {
   "start": "2005-01-04",
   "end": "2026-11-25",
@@ -162,14 +162,14 @@ window.FRACTAL_CONFLUENCE = {
  ],
  "today": {
   "date": "2026-11-26",
-  "close": 3476.47,
+  "close": 3476.9465,
   "above_ma60": false,
-  "kdj_j": -0.2,
-  "dev250": -18.37,
-  "vol_shrink": true,
+  "kdj_j": 0.0,
+  "dev250": -18.36,
+  "vol_shrink": null,
   "live": true,
-  "as_of": "09:07",
-  "last_bottom": "2026-11-23",
+  "as_of": "09:50",
+  "last_bottom": "2026-11-25",
   "last_top": "2026-11-24"
  },
  "boundary": "样本内统计≠未来承诺；指数日线口径；分型确认滞后1根K线已计入；不构成投资建议"
