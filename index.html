@@ -16408,7 +16408,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         body.innerHTML = '<div style="padding:10px 12px;border:1px dashed rgba(148,163,184,0.5);border-radius:8px;font-size:12.5px;line-height:1.75;color:var(--txt)">'
           + '🌡️ 本轮尚未产出「涨停热力 · 板块龙头股」名单（' + _luTs + _slTs + '）——'
           + '生成器每个盘后批次随「主升/启动板块·龙头股」同轮重算，下轮自动补；本条随真实名单替换。</div>';
-        _setFresh((sl && sl.update_time) || '—');
+        _setFresh((lu && lu.update_time) || (sl && sl.update_time) || '—');
         if(!window.__luRetryTimer){
           window.__luRetryN = 0;
           window.__luRetryTimer = setInterval(function(){
@@ -16465,7 +16465,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
          + '个股 = 板块成分股当日涨幅前 5；龙头快照 ' + _slUt + '。</div>';
       body.innerHTML = h;
       card.style.display = 'block';
-      _setFresh((sl && sl.update_time) || (lu && lu.update_time) || '—');
+      _setFresh((lu && lu.update_time) || (sl && sl.update_time) || '—');
     }catch(e){ console.warn('[fillLuLeaders]', e); }
   };
 
