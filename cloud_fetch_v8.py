@@ -2699,7 +2699,26 @@ def f_margin_data():
                         "rq_balance_amt": round(float(z["融资融券余额"]) - float(z["融资余额"])),
                     }
             except Exception:
-                continue  # 单日失败跳过
+                # 🆕 2026-11-26 深交所单日接口偶发超时（实测一次跑只回 59/80 天）→ 补 2 次重试。
+                #   缺日会直接造成「沪深合计」序列断层、近1/3月统计失真，故此处必须重试。
+                _got = False
+                for _try in range(2):
+                    try:
+                        time.sleep(0.5)
+                        dfz2 = ak.stock_margin_szse(date=d8)
+                        if dfz2 is not None and not dfz2.empty:
+                            z2 = dfz2.iloc[0]
+                            sz_map[r["date_raw"]] = {
+                                "rz_balance": round(float(z2["融资余额"])),
+                                "total": round(float(z2["融资融券余额"])),
+                                "rq_balance_amt": round(float(z2["融资融券余额"]) - float(z2["融资余额"])),
+                            }
+                            _got = True
+                            break
+                    except Exception:
+                        continue
+                if not _got:
+                    continue  # 单日重试仍失败才跳过
         sz_rows = []
         for r in rows:
             z = sz_map.get(r["date_raw"])
@@ -2734,26 +2753,27 @@ def f_margin_data():
     except Exception as e:
         print(f"  ❌ 两融余额失败: {e}")
         return None
-    # 🆕 2026-11-26 两融动向：顺带取上证指数日频收盘，供前端做「两融 vs 大盘」对照。
-    #   复用 akshare stock_zh_index_daily_em（与 f_sh_sz_history 同源，post_close 档已实证可用）。
+    # 🆕 2026-11-26 两融动向：取上证指数日频收盘，供前端做「两融 vs 大盘」对照。
+    #   来源：复用 f_market_fund_flow_data() 的 sh_quote（同一个 push2his daykline 接口，
+    #   f62=上证收盘），零新增数据源/零新增依赖；该函数自带 baseline 合并
+    #   （远端 main raw_data 优先），接口失败也能拿到历史序列。
     #   刻意不重新注入 data/INDEX_HISTORY.js（91.2 KB）——2026-08-31 轻量化已停注，
     #   改为随两融数据内嵌 ~130 根日线（数 KB），既拿到指数对照又不破坏轻量化。
     idx_rows = []
     try:
-        dfx = get_ak().stock_zh_index_daily_em(symbol="sh000001")
-        if dfx is not None and not dfx.empty:
-            dcol = next((c for c in dfx.columns if c in ("日期", "date")), None)
-            ccol = next((c for c in dfx.columns if c in ("收盘", "close")), None)
-            if dcol and ccol:
-                for _, rx in dfx.iterrows():
-                    try:
-                        idx_rows.append({"date_raw": str(rx[dcol])[:10],
-                                         "close": round(float(rx[ccol]), 2)})
-                    except Exception:
-                        continue
-                idx_rows.sort(key=lambda x: x["date_raw"])
-                idx_rows = idx_rows[-130:]
-                print(f"  ✅ 上证指数日频(对照): {len(idx_rows)} 条")
+        _mff = f_market_fund_flow_data()
+        _sq = (_mff or {}).get("sh_quote") or {}
+        for _ds in sorted(_sq.keys()):
+            try:
+                _c = float(_sq[_ds].get("close"))
+            except Exception:
+                continue
+            _ds = str(_ds)
+            if len(_ds) == 8:
+                idx_rows.append({"date_raw": "%s-%s-%s" % (_ds[:4], _ds[4:6], _ds[6:8]),
+                                 "close": round(_c, 2)})
+        idx_rows = idx_rows[-130:]
+        print(f"  ✅ 上证指数日频(对照): {len(idx_rows)} 条")
     except Exception as e:
         print(f"  ⚠️ 上证指数日频取数失败（两融对照降级，不影响主数据）: {e}")
     result["index"] = idx_rows
