@@ -15,7 +15,7 @@ import os, sys, time, json, datetime, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，统一让位守卫（全组 dedupe）
-from v8_dispatch_guard import fetch_trio_busy, FETCH_TRIO
+from v8_dispatch_guard import fetch_trio_busy, FETCH_TRIO, local_tick_fresh
 
 TOK = os.environ["GITHUB_TOKEN"]
 REPO = os.environ["REPO"]
@@ -80,6 +80,12 @@ def dispatch(wf):
     # 🛡 2026-11-23 死亡旋转根治：fetch 三链共用并发组，组内排队 run 会被新 dispatch 顶杀。
     #   dispatch 前查全组（hosted/selfhosted/lemoncat 任一近期在跑/排队）⇒ 让位不派，
     #   返回 False（本档不标 fired，20s 后重查；迟到超 SLOT_TOL_MIN 自弃）。
+    # 🛡 2026-11-26 双源互踢根治：小九机本地 tick 接管时（raw_data/local_tick.json 每轮刷新），
+    #   云端整体让位。本机一档 2-4 分钟、原子单提交；云端一档 26-73 分钟（push 步单独 21.7 分钟）
+    #   ⇒ 双源同跑只会互踢 + 推半截。本机离线 20 分钟后标记自然陈旧 ⇒ 云端自动接回。
+    if wf in FETCH_TRIO and local_tick_fresh(TOK, REPO):
+        print(f"  dispatch {wf} 让位（小九机本地 tick 正在接管）", flush=True)
+        return False
     if wf in FETCH_TRIO and fetch_trio_busy(TOK, REPO, log=print):
         # 🛡 2026-11-26 盘中断更实证：让位必须留痕。原实现静默 return False ⇒
         #   精准调度器日志里连一行都没有 ⇒ 09:32/09:42/10:02 三档盘中抓取链被静默漏派，

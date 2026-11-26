@@ -24,6 +24,37 @@ FETCH_TRIO = (
 RECENT_SEC = 40 * 60   # 活跃 run 新鲜窗
 
 
+def local_tick_fresh(token, repo, fresh_min=20, timeout=20):
+    """小九机本地盘中 tick 是否在接管（2026-11-26 起）。
+
+    raw_data/local_tick.json 每轮由本机 v8/intraday_tick_local.py 刷新。
+    新鲜（<=fresh_min 分钟）⇒ 云端 fetch 三链让位：本机一档 2-4 分钟、原子单提交，
+    云同一档 26-73 分钟且经并发组，双源同时写 main 只会互踢。
+    本机离线/守护挂掉 ⇒ 标记变陈旧 ⇒ 云端自动接管（无需人工）。
+    任何异常一律返回 False（fail-open：宁可云端接手，不可整条链停摆）。
+    """
+    import base64
+    import datetime as _dt
+    bj = _dt.timezone(_dt.timedelta(hours=8))
+    try:
+        url = ("https://api.github.com/repos/" + repo +
+               "/contents/raw_data/local_tick.json?ref=main")
+        rq = urllib.request.Request(url, headers={
+            "Authorization": "Bearer " + token,
+            "Accept": "application/vnd.github.raw",
+            "User-Agent": "v8-dispatch-guard"})
+        with urllib.request.urlopen(rq, timeout=timeout) as resp:
+            body = resp.read()
+        d = json.loads(body.decode("utf-8", "ignore"))
+        ts = _dt.datetime.strptime(d["update_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=bj)
+        age = (_dt.datetime.now(bj) - ts).total_seconds() / 60
+        if 0 <= age <= fresh_min:
+            return True
+    except Exception:
+        return False
+    return False
+
+
 def fetch_trio_busy(token, repo, per_page=12, timeout=20, log=print):
     """True = fetch 三链任一有近期在跑/排队 run ⇒ 派发源让位。"""
     api = "https://api.github.com/repos/" + repo + "/actions/workflows/"
