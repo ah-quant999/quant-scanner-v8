@@ -2969,8 +2969,8 @@ window.STRATEGY_WALKFORWARD = {
     })();
     </script>
 
-    <details class="v8-fold" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
-      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none">▸ 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11px;opacity:.7">（点开查看，默认收起）</span></summary>
+    <details open class="v8-fold v8-fold-defopen" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
+      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none"><span class="v8fold-arrow">▸</span> 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11px;opacity:.7">（点击收起）</span></summary>    <script>    /* 🟢 2026-11-26 主人令「外围行情与宏观观测」默认展开（不再默认收起）：       open 属性已加上，此处仅负责三角随 open 状态自动切换（▸/▾）。 */    (function(){      var d=document.querySelector('details.v8-fold-defopen');      if(!d)return;      var mk=d.querySelector('.v8fold-arrow');      function upd(){if(mk)mk.textContent=d.open?'▾':'▸';}      d.addEventListener('toggle',upd);      upd();    })();    </script>
       <div style="padding:0 12px 6px">这些卡提供大盘环境背景，不直接给出买卖标的；方向判断请看下方的资金/板块/龙头卡。</div>
           <!-- 指数快览（2026-08-30：实时数据补位） -->
           <div class="card" style="margin-bottom:16px">
