@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-26 23:24",
-  "republish_time": "2026-11-27 01:52:31",
+  "update_time": "2026-11-27 02:04",
+  "republish_time": "2026-11-27 04:40:16",
   "data_date": "2026-11-26",
   "rule_ver": 2,
   "top_n": 5,
@@ -532,7 +532,7 @@
     {
       "name": "机器人",
       "today": 9,
-      "sum5": 34,
+      "sum5": 41,
       "cons_count": 360,
       "leaders": [
         {
@@ -572,12 +572,12 @@
         }
       ],
       "board_count": 6,
-      "bk": "BK1236"
+      "bk": "BK0545"
     },
     {
       "name": "新能源车",
       "today": 8,
-      "sum5": 38,
+      "sum5": 43,
       "cons_count": 105,
       "leaders": [
         {
@@ -622,7 +622,7 @@
     {
       "name": "AI算力",
       "today": 7,
-      "sum5": 27,
+      "sum5": 31,
       "cons_count": 290,
       "leaders": [
         {
@@ -662,12 +662,12 @@
         }
       ],
       "board_count": 4,
-      "bk": "BK1268"
+      "bk": "BK1238"
     },
     {
       "name": "消费电子",
       "today": 5,
-      "sum5": 23,
+      "sum5": 25,
       "cons_count": 238,
       "leaders": [
         {
@@ -707,12 +707,12 @@
         }
       ],
       "board_count": 8,
-      "bk": "BK1239"
+      "bk": "BK1241"
     },
     {
       "name": "白酒消费",
       "today": 5,
-      "sum5": 15,
+      "sum5": 18,
       "cons_count": 45,
       "leaders": [
         {
@@ -752,12 +752,12 @@
         }
       ],
       "board_count": 9,
-      "bk": "BK1582"
+      "bk": "BK1256"
     },
     {
       "name": "半导体",
       "today": 3,
-      "sum5": 13,
+      "sum5": 12,
       "cons_count": 229,
       "leaders": [
         {

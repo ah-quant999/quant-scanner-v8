@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-11-27 00:19:06",
+  "update_time": "2026-11-27 03:38:27",
   "data_date": "2026-11-26",
   "meta": {
     "data_date": "2026-11-26",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 1319,
-    "n_at_valid": 1864,
+    "n_universe": 1320,
+    "n_at_valid": 1865,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -1134,7 +1134,7 @@
     ]
   },
   "yield_rank": {
-    "update_time": "2026-11-27 00:19:06",
+    "update_time": "2026-11-27 03:38:27",
     "meta": {
       "cost_pct_roundtrip": 0.3,
       "entry": "信号日次一交易日开盘",
@@ -1506,7 +1506,7 @@
       {
         "code": "sh.688146",
         "name": "中船特气",
-        "n_klines": 801,
+        "n_klines": 250,
         "available": true,
         "yield_t5": 6.831,
         "win_t5": 58.7,
@@ -1627,6 +1627,27 @@
         "n_t30": 189,
         "yield_t60": 102.608,
         "win_t60": 80.4,
+        "n_t60": 189
+      },
+      {
+        "code": "sz.002931",
+        "name": "锋龙股份",
+        "n_klines": 800,
+        "available": true,
+        "yield_t5": 3.864,
+        "win_t5": 46.0,
+        "n_t5": 189,
+        "yield_t10": 10.385,
+        "win_t10": 44.4,
+        "n_t10": 189,
+        "yield_t20": 27.569,
+        "win_t20": 45.0,
+        "n_t20": 189,
+        "yield_t30": 41.661,
+        "win_t30": 39.7,
+        "n_t30": 189,
+        "yield_t60": 56.525,
+        "win_t60": 32.8,
         "n_t60": 189
       },
       {
@@ -1753,27 +1774,6 @@
         "n_t30": 189,
         "yield_t60": 100.178,
         "win_t60": 65.1,
-        "n_t60": 189
-      },
-      {
-        "code": "sz.300209",
-        "name": "行云科技",
-        "n_klines": 801,
-        "available": true,
-        "yield_t5": 6.414,
-        "win_t5": 58.7,
-        "n_t5": 189,
-        "yield_t10": 12.822,
-        "win_t10": 68.8,
-        "n_t10": 189,
-        "yield_t20": 25.952,
-        "win_t20": 79.9,
-        "n_t20": 189,
-        "yield_t30": 40.026,
-        "win_t30": 86.2,
-        "n_t30": 189,
-        "yield_t60": 85.156,
-        "win_t60": 87.3,
         "n_t60": 189
       }
     ]

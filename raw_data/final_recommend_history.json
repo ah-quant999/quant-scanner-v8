@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-27 01:25:41",
-  "update_time": "2026-11-27 01:25:41",
+  "generated": "2026-11-27 04:40:16",
+  "update_time": "2026-11-27 04:40:16",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -2141,9 +2141,9 @@
     },
     "2026-11-26": {
       "date": "2026-11-26",
-      "update_time": "2026-11-27 01:12:44",
-      "file": "final_recommend_20261127.json",
-      "degraded": false,
+      "update_time": "2026-11-26 22:16:19",
+      "file": "final_recommend_20261126.json",
+      "degraded": true,
       "top3": [
         {
           "rank": 1,
@@ -2151,7 +2151,7 @@
           "name": "广联航空",
           "close": 15.36,
           "close_date": "2026-11-26",
-          "final_score": 4.2,
+          "final_score": 4.1,
           "resonance": 1,
           "sources": [
             "因子榜"
@@ -2163,7 +2163,7 @@
           "name": "优刻得",
           "close": 22.74,
           "close_date": "2026-11-26",
-          "final_score": 4.1,
+          "final_score": 4.0,
           "resonance": 1,
           "sources": [
             "因子榜"

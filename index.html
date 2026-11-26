@@ -1375,7 +1375,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=f8e2ab5cc2" defer></script>
 <script src="data/EXPERIMENT.js?v=6768291159" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=87e9378a22" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=a8fae6382d" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=924ff0ef2b" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
+<script src="data/FINAL_RECOMMEND_DATA.js?v=c1354a8313" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=a8fae6382d" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=924ff0ef2b" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=918c26d871" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=d87bfb243d" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=3353bb0a3f" defer></script>
@@ -1426,8 +1426,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          前端不再注入 data/VOLUME_DIVERGENCE.js；raw_data/volume_divergence.json 仍由算法链产出，
          供 algorithms/gen_verdict.py 合成「别碰」提示。 -->
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
-    <script src="data/CITIC_PE_THERMO.js?v=f56b3cc3f0" defer></script>
-    <script src="data/CITIC_PE_BACKTEST.js?v=88ffb94e90" defer></script>
+    <script src="data/CITIC_PE_THERMO.js?v=3fea7034b2" defer></script>
+    <script src="data/CITIC_PE_BACKTEST.js?v=b99b8ca60a" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <script src="data/VALUATION_PERCENTILE.js?v=1bff15a5d5" defer></script>
     <!-- 🛡 2026-11-21 主人令「哪些卡没更新·一劳永逸修复」：回撤闸/策略walk-forward 生成器已挂 E 批链尾，
