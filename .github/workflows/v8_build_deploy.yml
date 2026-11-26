@@ -116,7 +116,7 @@ concurrency:
   #   algo_cloud 三处早已生效的写法对齐（本文件是最后一个漏网）。
   #   配套：新增「⚡ 抢跑短路」步，让同桶内较旧的 run 主动让位，既保证不白烧算力，
   #   又保证**最新的那个 build 一定跑完并落地**。
-  group: v8-build-deploy-${{ github.event_name }}
+  group: v8-build-deploy-v2-${{ github.event_name }}  # v2 2026-11-26 结构换组(盘前): 旧组 workflow_run 桶僵尸 #45723627989 卡部署步 48min+1 pending, cancel-in-progress:false => 新 build 排队堵死 Pages; 家族语义不变, 仅换组逃逸, 不动在跑 run
   cancel-in-progress: false
 
 jobs:
