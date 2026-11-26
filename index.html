@@ -16868,10 +16868,37 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
          + '<b style="color:'+AMB+'">当下判读（'+T.date+'）</b>'+_liveTag+'：'+(T.above_ma60?'多头区(>MA60)':'空头区(<MA60)——裸底分型负期望区，触发只可观察')
          + ' · KDJ J='+T.kdj_j+' · 距250日高点 '+T.dev250+'% · '+_volTxt
          + ' · 最近底分型 '+T.last_bottom+' / 顶分型 '+T.last_top+'（均未叠加过滤，仅供定位）</div>';
-      h += '<div style="background:#34d39910;border:1px solid #34d39933;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.75;color:#e8eef5">'
-         + '<b style="color:#ffffff">实测结论（人话）</b>：光看 K 线抄底信号≈抛硬币；只有「<b style="color:#ffffff">超卖＋站上 60 日线</b>」才升到约 60% 胜率，是唯一靠谱的组合。'
-         + '多头区缩量回踩也不错（61.1%、平均 +0.56%）。反直觉的是：跌得最狠时单独抄底反而更差（50.9%、-0.41%），只靠缩量也没用。'
-         + '顶部信号基本没用，只有极小样本（n=17）勉强达标，别重仓。实战：分型只当扳机和止损锚（跌破分型低点就认错），方向交给资金/超卖/位置共振。</div>';
+      // 🧭 2026-11-26 主人令：把静态结论改成「四步行动框架」——现在在哪区/要做什么/能做什么/怎么做最好
+      //   胜率数字全部从 D.bottom / D.top 真实回测行动态 lookup，不写死不编造；状态取自 D.today 实时字段。
+      var _findB = function(kw){ var a=(D.bottom||[]); for(var q=0;q<a.length;q++){ if(a[q].name.indexOf(kw)>=0) return a[q]; } return null; };
+      var _fmtR = function(r){ return r? (r.wr5+'% / '+(r.m5>=0?'+':'')+r.m5+'%（n='+r.n+'）') : '—'; };
+      var _bear = !T.above_ma60;
+      var _os = (T.kdj_j!=null && T.kdj_j<10);
+      var _zone = _bear?'空头区（指数在 MA60 下方）':'多头区（指数站上 MA60）';
+      var _zoneC = _bear?AMB:GRN;
+      // ① 现在在哪区（含当下三个可验证条件）
+      var _conds = 'KDJ J='+T.kdj_j+(_os?'（超卖<10）':'（未达超卖）')+' · '+_volTxt+' · 距250日高点 '+T.dev250+'%';
+      // ② 要做什么（当下唯一动作指令，按区域+条件分支）
+      var _todo;
+      if(_bear && _os) _todo='只可<b style="color:'+AMB+'">观察</b>，不主动抄底：空头区超卖底分型是本卡空头侧唯一正期望组合，但样本仅 '+(_findB('KDJ_J')?_findB('KDJ_J').n:'—')+' 例，且需等一根 K 线确认分型成立。';
+      else if(_bear) _todo='<b style="color:'+GRN+'">不动手</b>：空头区未超卖时底分型≈抛硬币，等 KDJ J&lt;10 或站回 MA60 再看。';
+      else _todo='<b style="color:'+GRN+'">可留意缩量回踩</b>：多头区里只有「缩量回踩」是稳定正期望（'+_fmtR(_findB('缩量回踩'))+'），放量冲高反而是逃顶信号。';
+      // ③ 能做什么（列本卡验证过的可用/无效组合，数字动态）
+      var _can = _bear
+        ? '空头侧可用：超卖底分型 '+_fmtR(_findB('KDJ_J'))
+          +'；四重共振 '+_fmtR(_findB('四重共振'))
+          +'。无效：裸分型 '+_fmtR(_findB('裸底分型'))
+          +'、单独缩量 '+_fmtR(_findB('缩量('))+'。'
+        : '多头侧可用：缩量回踩 '+_fmtR(_findB('缩量回踩'))
+          +'。高危：放量冲高顶分型 '+_fmtR(_findB('近10日冲高'))+'（胜率=下跌确认概率，越低越危险）；顶分型四重共振 '+_fmtR(_findB('四重共振：多头'))+' 仅 n=17，别重仓。';
+      // ④ 怎么做最好（跨区通用纪律）
+      var _best='分型只当<b style="color:'+CY+'">扳机+止损锚</b>——触发后买入，跌破分型低点即认错离场；方向交给资金/超卖/位置共振，不靠单根 K 线；历史胜率是统计不是承诺，小样本（n&lt;30）一律轻仓。';
+      h += '<div style="background:linear-gradient(135deg,#41c9ff0d,#34d3990d);border:1px solid #41c9ff33;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.8;color:#e8eef5">'
+         + '<b style="color:'+CY+';font-size:12.5px">🧭 现在怎么做（四步）</b><br>'
+         + '<b style="color:'+_zoneC+'">① 现在在哪区</b>：'+_zone+' · '+_conds+'<br>'
+         + '<b style="color:'+AMB+'">② 要做什么</b>：'+_todo+'<br>'
+         + '<b style="color:'+CY+'">③ 能做什么</b>：'+_can+'<br>'
+         + '<b style="color:'+GRN+'">④ 怎么做最好</b>：'+_best+'</div>';
       // 口径 + 随机基线（主人令：白话化——先看卡能给你什么，再看术语）
       h += '<div style="background:#41c9ff12;border:1px solid #41c9ff33;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.75;color:#e8eef5">'
          + '<b style="color:#ffffff;font-size:12.5px">这张卡干嘛用</b>：它<b style="color:#ffffff">不荐股</b>，只回答一个问题——"看到抄底信号时，什么条件下才靠谱"。下面每行是一种条件组合的<b style="color:#ffffff">历史胜率</b>，绿色=别碰，红色=可留意。仅作观测，不进选股。<br>'
@@ -16909,11 +16936,15 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         return t;
       };
       // 底分型
+      // 🔽 2026-11-26 主人令：底/顶分型回测明细表默认折叠（结论已在四步框架，明细按需展开）
+      h += '<details style="border:1px solid var(--border2);border-radius:8px;padding:7px 10px;margin-top:10px;background:var(--card2)">'
+         + '<summary style="cursor:pointer;font-size:12px;font-weight:600;color:'+CY+';list-style:none">🔽 展开回测明细表（底分型 / 顶分型各组合 T+5/10/20 胜率） <span style="color:var(--dim);font-weight:400;font-size:11px">点开看全部 '+((D.bottom||[]).length+(D.top||[]).length)+' 行</span></summary>'
+         + '<div style="margin-top:10px">';
       h += '<div style="font-size:12.5px;font-weight:700;color:'+GRN+';margin:4px 0 6px">▼ 底分型（抄底触发器）</div>';
       h += tbl(D.bottom||[], 'bottom');
-      // 顶分型
       h += '<div style="font-size:12.5px;font-weight:700;color:'+RED+';margin:12px 0 6px">▲ 顶分型（逃顶触发器·胜率=下跌确认概率）</div>';
       h += tbl(D.top||[], 'top');
+      h += '</div></details>';
       // 诚实边界
       h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">⚠ '+(D.missing_layers||'')+'。<br>📌 '+(D.boundary||'')+'。数据源与口径登记见逻辑详解页。</div>';
       body.innerHTML = h;
