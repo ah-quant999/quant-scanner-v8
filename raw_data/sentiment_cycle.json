@@ -1,43 +1,41 @@
 {
-  "update_time": "2026-11-26 10:44:38",
+  "update_time": "2026-11-26 12:32:49",
   "data_date": "2026-11-26",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "高潮",
   "color": "#f59e0b",
-  "score": 76.0,
-  "delta_pct": 0.0,
+  "score": 74.0,
+  "delta_pct": 15.69,
   "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
   "metrics": {
-    "total_up": 51,
-    "max_ladder": 5,
-    "high_ladder_count": 9,
+    "total_up": 59,
+    "max_ladder": 3,
+    "high_ladder_count": 4,
     "sectors_count": 10
   },
   "ladder_dist": {
-    "1": 37,
-    "2": 5,
-    "3": 6,
-    "4": 2,
-    "5": 1
+    "1": 49,
+    "2": 6,
+    "3": 4
   },
   "leaders": [
     {
-      "code": "002579",
-      "name": "中京电子",
-      "lbc": 5,
+      "code": "002651",
+      "name": "利君股份",
+      "lbc": 3,
       "chg": 10.0
     },
     {
-      "code": "002548",
-      "name": "金新农",
-      "lbc": 4,
-      "chg": 10.11
+      "code": "002872",
+      "name": "天圣制药",
+      "lbc": 3,
+      "chg": 10.0
     },
     {
-      "code": "603960",
-      "name": "克来机电",
-      "lbc": 4,
-      "chg": 9.99
+      "code": "600722",
+      "name": "金牛化工",
+      "lbc": 3,
+      "chg": 10.04
     }
   ],
   "prev_total": 51,
