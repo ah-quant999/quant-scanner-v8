@@ -3,41 +3,41 @@
   {
    "date": "2026-11-24",
    "stance": "watch",
-   "score_norm": 0.156,
-   "crisis": 35.6,
-   "zt": 81,
-   "zt_ratio": 0.74,
-   "sh_net5": -913.5,
-   "tactic_score": 1,
-   "pace_hot": 17,
-   "pace_cool": 2,
-   "res_win": 41.8
+   "score_norm": -0.052,
+   "crisis": 36.0,
+   "zt": 83,
+   "zt_ratio": 0.76,
+   "sh_net5": -685.3,
+   "tactic_score": -1,
+   "pace_hot": 13,
+   "pace_cool": 3,
+   "res_win": 41.3
   },
   {
    "date": "2026-11-25",
-   "stance": "watch",
-   "score_norm": 0.021,
-   "crisis": 35.4,
-   "zt": 81,
+   "stance": "defense",
+   "score_norm": -0.312,
+   "crisis": 36.2,
+   "zt": 77,
    "zt_ratio": 0.74,
-   "sh_net5": -913.5,
-   "tactic_score": -1,
-   "pace_hot": 0,
-   "pace_cool": 0,
-   "res_win": 41.8
+   "sh_net5": -1090.0,
+   "tactic_score": -2,
+   "pace_hot": 7,
+   "pace_cool": 2,
+   "res_win": 41.3
   },
   {
    "date": "2026-11-26",
-   "stance": "defense",
-   "score_norm": -0.479,
-   "crisis": 35.9,
-   "zt": 69,
-   "zt_ratio": 0.73,
+   "stance": "watch",
+   "score_norm": -0.24,
+   "crisis": 35.7,
+   "zt": 76,
+   "zt_ratio": 0.8,
    "sh_net5": -1090.0,
-   "tactic_score": -2,
-   "pace_hot": 3,
-   "pace_cool": 8,
-   "res_win": 41.9
+   "tactic_score": -1,
+   "pace_hot": 0,
+   "pace_cool": 0,
+   "res_win": 41.3
   }
  ]
 }
