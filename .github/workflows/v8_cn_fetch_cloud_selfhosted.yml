@@ -34,7 +34,12 @@ on:
     # 🔴 2026-10-09 CN runner2号机的工程师：cn-IP 硬约束源常规兜底档（W52_HIGH 等东财 push2delay 系
     #   在境外托管 runner 上结构性不可达）。cron 字符串必须与下方 step1 case 分支逐字匹配。
     - cron: '25 0 * * 0-6'   # 08:25 CST 盘前 → category=premarket
-    - cron: '*/20 1-7 * * 1-5'   # CST 09:00/09:20/…/15:40 每 20 分钟 → category=intraday
+    # 🔴 2026-11-26 主人令「盘中别再卡壳」二次根治（当日实证）：盘中 intraday 档实测单轮 26 分钟
+    #   （09:57 上机 → 10:23 推数据），而触发间隔仅 20 分钟 ⇒ **间隔 < 耗时** ⇒ 每档到达时上一档
+    #   仍在跑 → GitHub「同组仅保留 1 running + 1 pending，新 run 顶掉 pending」⇒
+    #   10:10/10:24/10:49/11:01/11:03/11:14/11:22/11:26 连续 8 档 jobs=0 全 cancelled、零产出。
+    #   触发频率必须 **大于** 实测单轮耗时（留余量），故 20 → 30 分钟。
+    - cron: '*/30 1-7 * * 1-5'   # CST 09:00/09:30/…/15:30 每 30 分钟 → category=intraday（间隔 > 实测 26 分钟耗时）
     - cron: '20 9 * * 0-6'   # 17:20 CST 盘后 → category=post_close
     # 🔴 2026-11-26 主人令「盘中别再卡壳」一劳永逸根治（当日实证：盘中 intraday 档全天零产出）：
     #   根因① 主力链 v8_cn_fetch_cloud.yml 固定 runs-on: ubuntu-latest（GitHub 托管·境外 IP）
@@ -75,7 +80,11 @@ concurrency:
   #   ⚠️ 矩阵化枚举铁律（本仓唯一「跨文件共用组名」即本族，已全量 grep 核验）：
   #     grep -rn "v8-cn-fetch-cloud" --include=*.yml .github/workflows/
   #   改本族任一并发组名，必须把 cloud / hosted / selfhosted 三份**逐项勾选**，禁只改一处。
-  group: v8-cn-fetch-cloud-v2-${{ github.event.inputs.category || 'scheduled' }}  # v2 2026-11-25 结构性换组(幽灵排队逃逸): 旧组队列头有 10-19/10-08 幽灵 queued run(API cancel 409 不可清) 新 run 永不启动被顶杀; 按仓内结构性变更铁律整体换新组, 家族互斥语义不变(cloud/hosted/selfhosted 三份同步改名)
+  # v3 2026-11-26 主人令「盘中别再卡壳」：schedule 事件没有 inputs.category ⇒ 原表达式恒落 'scheduled' 组，
+  #   与「不带 category 的 dispatch 档」同组 ⇒ GitHub「同组仅保留 1 running + 1 pending，新 run 顶掉 pending」
+  #   ⇒ 盘中 intraday 档互相顶杀（当日 8 档 jobs=0 全灭）。本次按 cron 字符串反推 category，
+  #   使 cron 档与 dispatch 档按 category 严格互斥（排队不互杀），家族互斥语义不变。
+  group: "v8-cn-fetch-cloud-v2-${{ github.event_name == 'schedule' && (startsWith(github.event.schedule, '*/30 1-7') && 'intraday' || startsWith(github.event.schedule, '20 9') && 'post_close' || startsWith(github.event.schedule, '25 0') && 'premarket') || github.event.inputs.category || 'scheduled' }}"  # v3 2026-11-26 schedule 感知分组(盘中顶杀根治)
   cancel-in-progress: false
 
 jobs:
@@ -133,9 +142,9 @@ jobs:
             "25 0 * * 0-6")
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
-            "*/30 1-8 * * 0-6"|"*/20 1-7 * * 1-5")
+            "*/30 1-8 * * 0-6"|"*/30 1-7 * * 1-5")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
-              echo "label=盘中(20分档·中国IP)" ;;
+              echo "label=盘中(30分档·中国IP·间隔>实测26分钟耗时)" ;;
             "20 9 * * 0-6")
               echo "category=post_close" >> "$GITHUB_OUTPUT"
               echo "label=盘后" ;;
