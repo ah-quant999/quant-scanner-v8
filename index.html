@@ -160,7 +160,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=ef7a7e7ec1" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=6dd1358bf7" defer></script>
+<script src="data/INDEX_QUOTES.js?v=66f11cc66f" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=c053fe1197" defer></script>
 <script src="data/MARGIN_DATA.js?v=2864e7352c" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=6cc050ac8e" defer></script>
@@ -170,7 +170,7 @@ window.__domReadyFns=[];
 <script src="data/IPO_DATA.js?v=36909820c3" defer></script>
     <script src="data/CRISIS_DATA.js?v=603cf9a625" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=1bbb893780" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=31dd92d5ea" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=829f05f1ad" defer></script>
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
@@ -180,7 +180,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=cca81fc0f1" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=4d2e3cad7d" defer></script>
-<script src="data/INVEST_AVOID.js?v=a235773936" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=e7a37d7455" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=1d352c4058" defer></script>
     <script src="data/KEY_NOTICES.js?v=18e82fca7a" defer></script>
@@ -21108,7 +21108,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fa64a1bd37', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=555dde51b4', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=b4334684af', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=83014a672a', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
