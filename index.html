@@ -136,7 +136,7 @@ window.__domReadyFns=[];
     <script src="data/MARKET_VERDICT.js?v=2f28d12f14" defer></script>
     <!-- 🎯 2026-11-26 主人拍板：今日作战指令·唯一裁决卡（gen_verdict.py，纯合成器零新预测；
          仓位 = min(攻防档位, 情绪闸门, 风控系数)；数据落 raw_data/verdict.json，口径见逻辑详解页） -->
-    <script src="data/V8_VERDICT.js?v=0290e4bcb5" defer></script>
+    <script src="data/V8_VERDICT.js?v=fbed0b0320" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=514346f778" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=31f5bf6d6a" defer></script>
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=2fc335cd4f" defer></script>
@@ -2191,7 +2191,7 @@ window.STRATEGY_WALKFORWARD = {
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
         <span style="font-size:15px;font-weight:700;color:#c084fc">&#x1F3AF; 今日作战指令</span>
         <span id="verdictFresh" style="display:inline-flex;align-items:center">&#x2014;</span>
-        <span style="font-size:12px;color:var(--dim)">全站信号收敛成一张卡 · 只回答「买不买 / 买多少」</span>
+        <span style="font-size:12px;color:var(--dim)">全站信号收敛成一张卡 · 只回答「今天做什么 / 买什么 / 别碰什么」· 不涉及你的持仓与资金</span>
       </div>
       <div id="verdictBody"><div class="note">汇总中&#x2026;</div></div>
     </div>
@@ -17359,6 +17359,13 @@ h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-
    + '<span id="comprehensiveFresh" style="display:inline-flex;align-items:center">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim)">观测类 &#183; 盘前/状态/避雷/资金 合并视图</span>'
    + '</div>';
+// ── 🏛 2026-11-26 主人令：「大盘档位 · 仓位天花板」自「🏆 最终推荐」页移入本卡，
+//    与 15 源综合解析合并成「观测大盘」的统一视图。
+//    理由（主人原话）：「不要放在最终推荐页，移到暂未上架，和这卡合并」——
+//    最终推荐页只回答「我该做什么」（买什么/别碰什么/什么信号变），
+//    档位/上限/三档拆解属于「大盘现在什么环境」，归观测。
+//    数据 window.V8_VERDICT.head + .position（gen_verdict.py 同一份，零新源）。
+h += '<div id="stanceBody" style="margin:12px 0 0"><div class="note">档位读取中&#x2026;</div></div>';
 // ── 2026-10-28 主人令：综合解析（不是把卡移到一起，是综合各卡数据给解析结论）──
 h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;border-radius:9px;padding:10px 12px">'
    + '<div style="font-size:13.5px;font-weight:700;color:#c084fc;margin-bottom:6px">&#x1F9E0; 综合解析 &#183; 多源信号汇总</div>'
@@ -17898,6 +17905,54 @@ window.__renderKeyNotices = function(){
 // 只读下方各卡已消费的同一批 window 数据源，规则化汇总为「多空矩阵+一句话结论+今日要点」；
 // 零新后端/零新数据源/零新定时任务。数据源：JUDGMENT_DATA.consensus / __marketStateResult /
 // INVEST_AVOID(或 RISK_GAUGE/MACRO_BRIEF/DAJIJIN/SUSPENSION 散源)。
+// 🏛 2026-11-26 新增：大盘档位 · 仓位天花板（自最终推荐页迁入，与综合解析同卡）
+//   三档拆解 = 攻防档位 / 情绪闸门 / 风控系数，**取最小值不取平均**（任一维度否决即生效）。
+//   诚实边界：情绪闸门那条标 untested —— 没做样本外检验，卡上自己说出来，不美化。
+window.__renderStanceBlock = function(){
+  var host = document.getElementById('stanceBody');
+  if(!host) return;
+  var V = window.V8_VERDICT || null;
+  if(!V || !V.head){
+    if((window.__renderStanceBlock._n = (window.__renderStanceBlock._n||0)+1) < 10){
+      setTimeout(function(){ try{ window.__renderStanceBlock(); }catch(e){} }, 800);
+      return;
+    }
+    host.innerHTML = '<div class="note">档位数据未生成（gen_verdict.py）&#183; 不影响其余卡片</div>';
+    return;
+  }
+  var DIM='var(--dim)', SUB='var(--sub)', TXT='var(--txt)', GLD='#ffd024';
+  function E(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var H=V.head||{}, PH=V.position||{}, TR=V.triggers||{};
+  var col = H.color || '#c084fc';
+  var hit=(TR.add&&TR.add.hit)||0, tot=(TR.add&&TR.add.total)||0;
+  var s='<div style="background:'+col+'10;border:1px solid '+col+'44;border-radius:9px;padding:11px 13px">';
+  s+='<div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">'
+   +  '<span style="font-size:11px;color:'+DIM+'">大盘档位</span>'
+   +  '<span style="font-size:22px;font-weight:800;color:'+col+';line-height:1.2">'+E(H.icon||'')+' '+E(H.label||'')+'</span>'
+   +  '<span style="font-size:12px;color:'+SUB+'">仓位上限 <b style="color:'+TXT+'">'+E(PH.cap_pct)+'%</b></span>'
+   +  '<span style="font-size:12px;color:'+SUB+'">加仓条件 <b style="color:'+(hit>=5?GLD:TXT)+'">'+hit+'/'+tot+'</b></span>'
+   +  '</div>';
+  var parts=PH.parts||[];
+  if(parts.length){
+    s+='<div style="margin-top:9px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px">';
+    parts.forEach(function(p){
+      s+='<div style="background:rgba(255,255,255,.04);border-radius:7px;padding:6px 9px">'
+       +  '<div style="font-size:11px;color:'+DIM+'">'+E(p.k||'')+'</div>'
+       +  '<div style="font-size:15px;font-weight:700;color:'+TXT+'">'+E(p.v||'')+'</div>'
+       +  '<div style="font-size:10.5px;color:'+SUB+';line-height:1.55;margin-top:1px">'+E(p.plain||'')
+       +  (p.untested?' <span style="color:'+GLD+'">&#183; 未做样本外检验</span>':'')+'</div>'
+       +  '</div>';
+    });
+    s+='</div>';
+    s+='<div style="font-size:10.5px;color:'+DIM+';margin-top:6px">三档<b style="color:'+TXT+'">取最小值</b>、不取平均 —— 任一维度否决，上限就压到它。</div>';
+  }
+  if(PH.diverge){
+    s+='<div style="margin-top:7px;font-size:11.5px;line-height:1.7;color:'+SUB+'">'+E(PH.diverge)+'</div>';
+  }
+  s+='</div>';
+  host.innerHTML=s;
+};
+
 window.__renderComprehensiveSynthesis = function(){
   var host = document.getElementById('comprehensiveSynthesisBody');
   if(!host) return;
@@ -18013,6 +18068,8 @@ window.__renderComprehensiveSynthesis = function(){
     }
   }catch(e){}
   host.innerHTML = html;
+  // 🏛 同卡兄弟块：档位天花板与本块同一数据节奏，一起刷新（避免切页只刷一半）
+  try{ if(window.__renderStanceBlock) window.__renderStanceBlock(); }catch(e){}
 };
 
   function renderMahoroCard(){
@@ -20723,25 +20780,25 @@ window.__renderV8CalToday();
     function B(s){ return E(s).replace(/\*\*(.+?)\*\*/g,'<b style="color:#fff">$1</b>'); }
     function pct(x,d){ var v=Number(x); return isFinite(v)?v.toFixed(d==null?1:d):'--'; }
     function sgn(x,d){ var v=Number(x); if(!isFinite(v)) return '--'; return (v>0?'+':'')+v.toFixed(d==null?2:d); }
-    var P=V.plain||{},PH=V.position||{},HO=V.holdings||{},BU=V.buy||{},TR=V.triggers||{};
+    var P=V.plain||{},PH=V.position||{},BU=V.buy||{},TR=V.triggers||{};
     var ans=String(BU.answer_short||'');
     var isNo=(ans.indexOf('不买')===0);
     var col=(V.head&&V.head.color)||PUR;
 
     var h='';
-    /* ── ① 结论条：三秒看懂 ── */
-    h+='<div style="background:'+col+'16;border:1px solid '+col+'55;border-radius:10px;padding:12px 14px">'
-     +  '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between">'
-     +    '<div><div style="font-size:11.5px;color:'+DIM+';margin-bottom:2px">大盘档位 · 仓位天花板</div>'
-     +      '<div style="font-size:25px;font-weight:800;color:'+col+';line-height:1.15">'+E(V.head.icon||'')+' '+E(V.head.label||'')+'</div></div>'
-     +    '<div style="text-align:right"><div style="font-size:11.5px;color:'+DIM+';margin-bottom:2px">今天该做什么</div>'
-     +      '<div style="font-size:19px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+';line-height:1.2">'+E(ans)+'</div></div>'
-     +  '</div>'
-     +  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-top:11px">'
-     +    '<div style="background:rgba(255,255,255,.05);border-radius:7px;padding:6px 9px"><div style="font-size:10.5px;color:'+DIM+'">仓位上限</div><div style="font-size:16px;font-weight:700;color:'+TXT+'">'+E(PH.cap_pct)+'%</div></div>'
-     +    '<div style="background:rgba(255,255,255,.05);border-radius:7px;padding:6px 9px"><div style="font-size:10.5px;color:'+DIM+'">你现在</div><div style="font-size:16px;font-weight:700;color:'+TXT+'">'+pct(HO.cur_pct)+'%</div></div>'
-     +    '<div style="background:rgba(255,255,255,.05);border-radius:7px;padding:6px 9px"><div style="font-size:10.5px;color:'+DIM+'">加仓条件</div><div style="font-size:16px;font-weight:700;color:'+(TR.add&&TR.add.hit>=5?GLD:TXT)+'">'+(TR.add?TR.add.hit:'--')+'/'+(TR.add?TR.add.total:'--')+'</div></div>'
-     +    '<div style="background:rgba(255,255,255,.05);border-radius:7px;padding:6px 9px"><div style="font-size:10.5px;color:'+DIM+'">现金可用</div><div style="font-size:16px;font-weight:700;color:'+SUB+'">'+(HO.cash!=null?(HO.cash/10000).toFixed(1)+'万':'--')+'</div></div>'
+    /* ── ① 结论条：三秒看懂 ──
+       🔴 2026-11-26 主人令：本卡只给「判断」，不再显示大盘档位天花板、现仓%、现金、
+          持仓明细。档位块（守·3成 / 上限 / 三档拆解）已移交「暂未上架 → 综合研判」卡，
+          与 15 源综合解析合并展示 —— 那边是「观测大盘」，这边是「我该做什么」。 */
+    var _hitN=(TR.add&&TR.add.hit)||0, _hitT=(TR.add&&TR.add.total)||0;
+    h+='<div style="background:'+col+'16;border:1px solid '+col+'55;border-radius:10px;padding:13px 15px">'
+     +  '<div style="font-size:11.5px;color:'+DIM+';margin-bottom:3px">今天该做什么</div>'
+     +  '<div style="font-size:24px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+';line-height:1.2">'+E(ans)+'</div>'
+     +  '<div style="margin-top:7px;font-size:12.5px;line-height:1.7;color:'+SUB+'">'
+     +    '仓位上限 <b style="color:'+TXT+'">'+E(PH.cap_pct)+'%</b>'
+     +    '<span style="color:'+DIM+';margin:0 6px">·</span>'
+     +    '加仓条件 <b style="color:'+(_hitN>=5?GLD:TXT)+'">'+_hitN+'/'+_hitT+'</b>'
+     +    '<span style="color:'+DIM+'">（≥5 条才加仓）</span>'
      +  '</div></div>';
 
     /* ── ② 人话三段：局面 → 所以 → 怎么做 ── */
@@ -20843,24 +20900,11 @@ window.__renderV8CalToday();
     var tb=trigBlock('什么时候该减',GLD,TR.cut)+trigBlock('什么时候必须清仓',RED,TR.exit);
     if(tb){ h+='<div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap">'+tb+'</div>'; }
 
-    /* ── ⑥ 我的持仓怎么办 ── */
-    if(HO.rows&&HO.rows.length){
-      h+='<div style="margin-top:12px;border-top:1px dashed rgba(255,255,255,.12);padding-top:11px">';
-      h+='<div style="font-size:12.5px;font-weight:700;color:'+TXT+';margin-bottom:2px">我的持仓 '
-       + '<span style="font-weight:400;color:'+DIM+';font-size:11px">总资产 '+(HO.total_assets/10000).toFixed(1)+'万 · 累计 '+(HO.profit_rate>0?'+':'')+pct(HO.profit_rate,2)+'%</span></div>';
-      HO.rows.forEach(function(p){
-        var pc=p.pnl_pct>0?RED:(p.pnl_pct<0?GRN:SUB);
-        var ac=(p.action==='清仓'||p.action==='减半')?RED:(p.action==='持有'?BLU:GLD);
-        h+='<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
-         +  '<span style="font-size:12.5px;font-weight:700;color:'+TXT+';min-width:76px">'+E(p.name)+'</span>'
-         +  '<span style="font-size:11px;color:'+DIM+'">'+E(p.qty)+'股 成本'+pct(p.cost,2)+' 现价'+pct(p.live,2)+'</span>'
-         +  '<span style="font-size:12px;font-weight:700;color:'+pc+'">'+sgn(p.pnl_pct,1)+'%</span>'
-         +  '<span style="font-size:11.5px;font-weight:700;color:'+ac+';margin-left:auto">'+E(p.action)+'</span>'
-         +  '<div style="flex:0 0 100%;font-size:11px;color:'+SUB+';line-height:1.6;padding-left:2px">'+E(p.why)+'</div>'
-         +  '</div>';
-      });
-      h+='</div>';
-    }
+    /* ── ⑥ 持仓块已整块删除 ──
+       🔴 2026-11-26 主人令「这早就不是我的持仓了，你不用管我的持仓，只要给我判断」：
+          v8 里的 PORTFOLIO 是一份过期账本，继续显示「你亏 45%、该清仓」属于报假账。
+          真账本在券商 App。本卡只回答「该不该动手 / 买什么 / 别碰什么 / 什么信号变」。
+          结构性防复发：此块不得恢复，除非主人明确要求「重新接入我的真实持仓」并给出同步口径。 */
 
     /* ── ⑦ 依据 + 诚实声明 ── */
     if((V.evidence||[]).length){
@@ -20880,7 +20924,7 @@ window.__renderV8CalToday();
     var st=V.sources||{};
     h+='<div style="margin-top:8px;font-size:10.5px;color:'+DIM+';line-height:1.6">'
      + '合成源：攻防 '+E(st.tactic||'--')+' · 综合解析 '+E(st.verdict||'--')+' · 情绪 '+E(st.senti||'--')
-     + ' · 资金 '+E(st.flow||'--')+' · 持仓 '+E(st.portfolio||'--')+'</div>';
+     + ' · 资金 '+E(st.flow||'--')+'</div>';
 
     el.innerHTML=h;
     // 🗣 把结论同步给 Top5 卡的那句提示，避免「上面说不买、下面列5只票」互相打架
@@ -20900,6 +20944,8 @@ window.__renderV8CalToday();
       if(f&&st.tactic&&typeof _uBadge==='function') f.innerHTML=_uBadge('auto','',st.tactic,'','盘后');
       else if(f&&st.tactic) f.innerHTML='<span style="font-size:11px;color:var(--dim)">'+E(st.tactic)+'</span>';
     }catch(e){}
+    // 🏛 2026-11-26：档位块已迁到「暂未上架 → 综合研判」，同源刷新一次
+    try{ if(window.__renderStanceBlock) window.__renderStanceBlock(); }catch(e){}
   }
   try{ window.renderVerdict=renderVerdict; }catch(e){}
 

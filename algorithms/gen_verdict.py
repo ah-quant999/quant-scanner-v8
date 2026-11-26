@@ -21,7 +21,8 @@ gen_verdict.py — 今日作战指令（唯一裁决卡）· 2026-11-26 主人�
 输入（全部本地 data/*.js，缺失自动降级不崩）：
   MARKET_TACTIC · MARKET_VERDICT · SENTIMENT_CYCLE · INDEX_QUOTES
   SECTOR_FUND_FLOW · SECTOR_FUND_FLOW_TREND · CRISIS_DATA · RISK_GUARD
-  TOP10_DAILY · PORTFOLIO · LIMIT_UP_HEATMAP
+  TOP10_DAILY · LIMIT_UP_HEATMAP
+  （⚠️ 2026-11-26 起**不读 PORTFOLIO**：主人令「不用管我的持仓，只要给我判断」）
 
 输出：
   raw_data/verdict.json                 → 由 update_v8 生成 data/V8_VERDICT.js
@@ -131,7 +132,7 @@ def compute_cap(tactic, senti, rg, breadth):
             "k": "风控系数",
             "v": "×%.2f" % mult,
             "raw": mult,
-            "plain": "组合最大回撤 %.1f%%（%s档）⇒ 攻防额度再打 %.2f 折"
+            "plain": "策略组合回撤 %.1f%%（%s档）⇒ 攻防额度再打 %.2f 折"
                      % (_f(rg.get("max_drawdown")) * 100, rg.get("tier") or "正常", mult),
         })
 
@@ -274,46 +275,16 @@ def build_avoid(flow, trend):
 
 
 # ────────────────────────── 持仓动作 ──────────────────────────
-def build_holdings(pf, tac_label, cap):
-    pos = pf.get("positions") or []
-    acct = pf.get("account") or {}
-    rows = []
-    for p in pos:
-        cost = _f(p.get("cost_price"))
-        live = _f(p.get("live_price"))
-        qty = _i(p.get("qty"))
-        if not cost or not live:
-            continue
-        pnl = (live / cost - 1.0) * 100.0
-        mv = live * qty
-        if pnl <= -15:
-            act, why = "清仓", "已亏 %.1f%%，远超单票止损线（-7%%），纪律上没有再讨论的余地" % pnl
-        elif pnl <= -7:
-            act, why = "减半", "亏 %.1f%% 破了 -7%% 的止损线，先砍一半，剩下的等反抽再处理" % pnl
-        elif pnl >= 8:
-            act, why = "移动止盈", "已有 %.1f%% 浮盈，把止盈线提到成本上方 3%%，回撤 5%% 就走" % pnl
-        else:
-            act, why = "持有", "盈亏 %.1f%% 在可承受区间，跌破成本 -7%% 就止损" % pnl
-        if tac_label in ("守", "防", "退"):
-            why += "；大盘档位为「%s」，不加仓" % tac_label
-        rows.append({
-            "code": p.get("code"), "name": p.get("name"), "qty": qty,
-            "cost": round(cost, 2), "live": round(live, 2),
-            "pnl_pct": round(pnl, 1), "mv": round(mv, 0), "action": act, "why": why,
-        })
-    rows.sort(key=lambda x: x["pnl_pct"])
-    total = _f(acct.get("total_assets"))
-    mv = _f(acct.get("market_value"))
-    cur = (mv / total) if total else 0.0
-    return {
-        "rows": rows,
-        "cur_pct": round(cur * 100, 1),
-        "cash": round(_f(acct.get("available_cash")), 0),
-        "total_assets": round(total, 0),
-        "profit_rate": _f(acct.get("total_profit_rate")),
-        "cap_pct": round(cap * 100),
-        "gap_pct": round(max(0.0, cap - cur) * 100, 1),
-    }
+# 🔴 2026-11-26 主人令：「这早就不是我的持仓了，你不用管我的持仓，只要给我判断就行。」
+#   ⇒ 整块「持仓明细 + 逐只动作」**彻底删除**，不再读 PORTFOLIO.js，也不再输出
+#     holdings / 现仓% / 现金 / 总资产 任何字段。
+#   理由（主人原话）：v8 的职责是给「大盘 + 方向 + 标的」的判断，不是记账。
+#   记账口径各有各的（券商 App 才是真账本），v8 里那份早就过期，
+#   继续显示「你亏了 45%、该清仓」只会误导 —— 报的是一份不存在的持仓。
+#   ⚠️ 保留的仍是纯判断：仓位上限（该用几成）、加仓条件（能不能加）、
+#     买卖方向（买什么/别碰什么）、触发线（什么信号该减/该清）。
+#   ⚠️ 结构性防复发：本文件不再 import/读取任何持仓源；若将来要恢复，
+#     必须是主人明确要求「重新接入我的真实持仓」并给出同步方式，不得默认恢复。
 
 
 # ────────────────────────── 加仓检查表 ──────────────────────────
@@ -393,7 +364,7 @@ def main():
     crisis = load("CRISIS_DATA")
     rg = load("RISK_GUARD")
     top10 = load("TOP10_DAILY")
-    pf = load("PORTFOLIO", "PORTFOLIO_DATA")
+    # 🔴 2026-11-26：不再读 PORTFOLIO（主人令「不用管我的持仓，只要给我判断」）
     sl = load("SECTOR_LEADERS")
     etfm = load("CONCEPT_ETF_MAP")
     heat = load("LIMIT_UP_HEATMAP")
@@ -414,7 +385,6 @@ def main():
     avoid = build_avoid(flow, trend)
     avoid_names = [a["name"] for a in avoid]
     buy = build_buy(trend, flow, top10, avoid_names, sl, etfm)
-    hold = build_holdings(pf, tac.get("label") or "", cap)
     checks, hit = build_checks(tac, senti, flow, trend, idx, crisis)
     triggers = build_triggers(checks, cap)
 
@@ -490,22 +460,20 @@ def main():
         read += " 这种「局部发热、整体缺血」的背离日，最容易骗人。"
 
     if buy["answer_short"].startswith("不买"):
-        so = ("所以今天不用动：你的仓位上限是 %d%%，现在只有 %.1f%%，"
-              "但加仓条件只满足 %d/%d 条，**不加仓**。"
-              "仓位上限是天花板，不是让你必须用满 —— 空仓也是一种仓位。"
-              % (round(cap * 100), hold["cur_pct"], hit, len(checks)))
+        so = ("所以今天不用动：仓位上限是 %d%%，但加仓条件只满足 %d/%d 条，**不加仓**。"
+              "上限是天花板，不是让你必须用满 —— 空仓也是一种仓位。"
+              % (round(cap * 100), hit, len(checks)))
     else:
-        so = ("所以今天可以做，但**只能拿上限以内的钱做**：仓位上限 %d%%，"
-              "你现在 %.1f%%，还能加 %.1f 个点，分批加，一次打满明天一个低开就全吐回去。"
-              % (round(cap * 100), hold["cur_pct"], hold["gap_pct"]))
+        so = ("所以今天可以做，但**只能拿上限以内的钱做**：仓位上限 %d%%，分批建，"
+              "一次打满明天一个低开就全吐回去。" % round(cap * 100))
 
     if buy["answer_short"].startswith("不买"):
         how = (buy["answer"] + " 今天的可买额度就是 0，别手痒；明天开仓前先看「加仓检查表」，"
                "凑够 5 条再动手。仓位上限 %d%% 是天花板，不是目标。" % round(cap * 100))
     else:
-        how = (buy["advice"] + " 额度：单票不超过总资产 %.1f%%（约 %.1f 万），首批只用一半；"
+        how = (buy["advice"] + " 额度：单票不超过总资产的 %.1f%%，首批只用一半；"
                "买进去就设 -7%% 止损，破了就走，不讨论。"
-               % (cap * 20 * buy["factor"], hold["total_assets"] * cap * buy["factor"] / 5 / 10000))
+               % (cap * 20 * buy["factor"],))
 
     verdict = {
         "update_time": NOW.strftime("%Y-%m-%d %H:%M:%S"),
@@ -516,12 +484,10 @@ def main():
             "icon": tac.get("icon") or "🛡️",
             "color": tac.get("color") or "#26a69a",
             "cap_pct": round(cap * 100),
-            "cur_pct": hold["cur_pct"],
         },
         "plain": {"读今天": read, "所以": so, "怎么做": how},
-        "position": {"cap_pct": round(cap * 100), "parts": parts, "diverge": div,
-                     "cur_pct": hold["cur_pct"], "gap_pct": hold["gap_pct"],
-                     "cash": hold["cash"], "total_assets": hold["total_assets"]},
+        # 📊 档位明细（2026-11-26 主人令：不在最终推荐页显示，移交「综合研判」卡合并展示）
+        "position": {"cap_pct": round(cap * 100), "parts": parts, "diverge": div},
         "buy": buy,
         "avoid": avoid,
         "sizing": {
@@ -537,7 +503,6 @@ def main():
                      % (round(cap * 100), round(cap * 20), round(cap * 50))),
         },
         "triggers": triggers,
-        "holdings": hold,
         "evidence": [
             {"name": "攻防档位", "plain": "五个信号打分：趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1，合计 %+d"
              % _i(tac.get("score")), "value": "%+d" % _i(tac.get("score"))},
@@ -559,7 +524,7 @@ def main():
                    "从今天起每天留痕，攒够 3-6 个月再回测。在此之前它只约束你别乱来，不代表能提高收益。"),
         "sources": {"tactic": tac.get("update_time"), "verdict": mv.get("update_time"),
                     "senti": senti.get("update_time"), "flow": flow.get("update_time"),
-                    "trend": trend.get("update_time"), "portfolio": pf.get("update_time")},
+                    "trend": trend.get("update_time")},
     }
 
     os.makedirs(RAW, exist_ok=True)
@@ -582,7 +547,7 @@ def main():
     snap = {
         "date": verdict["data_date"],
         "generated": verdict["update_time"],
-        "verdict": {"cap_pct": round(cap * 100), "label": tac_lab, "cur_pct": hold["cur_pct"]},
+        "verdict": {"cap_pct": round(cap * 100), "label": tac_lab},
         "inputs": {
             "tactic_score": _i(tac.get("score")), "tactic_exposure": _f(tac.get("exposure")),
             "senti_phase": phase, "senti_score": _f(senti.get("score")),
@@ -605,8 +570,8 @@ def main():
         json.dump(snap, f, ensure_ascii=False, indent=1)
 
     print("✅ verdict.json  %s" % OUT)
-    print("   档位 %s · 仓位上限 %d%% · 现仓 %.1f%% · 加仓条件 %d/%d"
-          % (tac_lab, round(cap * 100), hold["cur_pct"], hit, len(checks)))
+    print("   档位 %s · 仓位上限 %d%% · 加仓条件 %d/%d"
+          % (tac_lab, round(cap * 100), hit, len(checks)))
     print("   买 %s | 避 %s" % ([s["name"] for s in buy["sectors"]],
                                 [a["name"] for a in avoid[:2]]))
     print("   留痕 %s" % hp)

@@ -399,6 +399,59 @@ _PROTECTED_RAW = {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
+# 🐘 2026-11-26 主人令「全面科学修复·别再膨胀」—— **重缓存目录 · 推送闸门**
+#
+#   【病灶 · 实测归因】
+#     kline_cache（6244 文件 / 208MB）与 _wf_cache（603 文件 / 125MB）属「云端算法数据源」，
+#     前端一个字节都不读，但本推送器**每次运行都全量 os.walk 读进内存**再逐个算 blob sha：
+#       · v8_algo_cloud 每天唤醒 6 次（16:40/18:10/20:00/21:00/22:30/00:30），每次末尾都跑
+#         本推送器 ⇒ 每天 6 轮 × 208MB 读盘 + 6244 次 sha1 计算；
+#       · 实测单日有 682 个 kline_cache 文件被无谓重写（内容不变、仅 mtime 变），
+#         682 × 88KB ≈ 60MB/轮 白推到 main。
+#   【修法】把重缓存从「默认推送面」摘出：**只有显式设置 V8_ALLOW_CACHE_PUSH=1 的批次才推**。
+#     默认（未设）= 完全不进队列，walk 阶段就地剪枝（顺带省掉整棵子树的遍历与读盘）。
+#     ⚠️ 与 2026-09-08 主人令「kline_cache 入仓、云端零网络取数」**不冲突**：
+#        文件仍然入仓、仍然被推，只是**不再每天推 6 次**，改由唯一指定批次推一次。
+#     ⚠️ 与 _SKIP_DIR_NAMES 的区别：那批是「永不该进仓库的运行时垃圾」；
+#        本表是「该进仓库、但不该高频推的业务数据源」——语义不同，勿合并。
+# ═══════════════════════════════════════════════════════════════════════════
+_CACHE_DIRS = ("raw_data/kline_cache", "raw_data/_wf_cache")
+
+
+def _cache_push_allowed():
+    """重缓存目录是否允许在本次推送。
+
+    优先级：显式环境变量 > 北京时间窗口自动判定。
+      V8_ALLOW_CACHE_PUSH=1 → 强制放行（单次补推 / 人工补救用）
+      V8_ALLOW_CACHE_PUSH=0 → 强制关闭
+      未设置（默认）        → 盘后窗口放行：北京时间 16:00–23:59 与 00:00–03:59
+    【为什么按窗口】：日 K 在收盘 15:00 后才定型，盘后批次推才有意义；
+      盘中 09:00–15:00 一律不推 —— 这正是「每轮 208MB 读盘 + 6244 次 sha1」被浪费的时段。
+      而「内容没变就不写盘」的守卫（fetch_multiyear_kline.py）保证同一交易日内缓存只变一次，
+      ⇒ 盘后的多个批次里只有第一批会真的产生变更，其余推的是空集，成本≈0。
+    铁律⑤：一切时间逻辑用北京时间，不得用 UTC 直接判。
+    """
+    v = os.environ.get("V8_ALLOW_CACHE_PUSH", "").strip()
+    if v == "1":
+        return True
+    if v == "0":
+        return False
+    try:
+        h = now_cst().hour
+        return (16 <= h <= 23) or (h <= 3)
+    except Exception:
+        return False
+
+
+def _is_cache_path(rel):
+    """判定相对路径是否落在重缓存目录内（含目录本身）。"""
+    rel = rel.replace("\\", "/")
+    for d in _CACHE_DIRS:
+        if rel == d or rel.startswith(d + "/"):
+            return True
+    return False
+
+# ═══════════════════════════════════════════════════════════════════════════
 # 🗑 2026-09-21 一劳永逸（小九）：**已退役产物 · 拒绝回推表**
 #
 #   【问题 · 实测根因】
@@ -683,9 +736,18 @@ def walk_raw():
     #   ⚠️ 有意不排除 kline_cache：2026-09-08 主人令明确入仓（云端零网络取数，根治静默断更）。
     _SKIP_DIR_NAMES = ("__pycache__", "_rps_cache", "_tdx_cache", "_archive")
     _SKIP_SUFFIXES = (".bak", ".tmp", ".pyc", ".pyo")
+    # 🐘 2026-11-26：重缓存目录默认剪枝（见 _CACHE_DIRS 段头）。剪枝发生在 walk 阶段，
+    #   ⇒ 不仅「不推送」，连读盘和 sha1 计算一并省掉（208MB/轮 × 每天 6 轮）。
+    _allow_cache = _cache_push_allowed()
     for root, _dirs, files in os.walk("raw_data"):
         # 就地剪枝：不进入被排除的目录（os.walk 原生支持，顺带省一遍遍历）
         _dirs[:] = [d for d in _dirs if d not in _SKIP_DIR_NAMES]
+        if not _allow_cache:
+            _dirs[:] = [
+                d for d in _dirs
+                if not _is_cache_path(
+                    os.path.relpath(os.path.join(root, d), ".").replace("\\", "/"))
+            ]
         for f in files:
             if f.startswith(_ALGO_RAW_PREFIXES) and not push_algo_raw:
                 continue
@@ -1115,6 +1177,11 @@ def main():
             if _rel in _SKIP_LOCAL_PUSH:
                 # 🛡 防覆盖：index.html 只从远端正文重算 ?v，绝不推本地字节（见 _SKIP_LOCAL_PUSH 取证）
                 print(f"  🛡 防覆盖：{_rel} 不从本地推（其 ?v 由远端正文就地重算）")
+                continue
+            if _is_cache_path(_rel) and not _cache_push_allowed():
+                # 🐘 2026-11-26：清单通道同样拦住重缓存（workflow 用 git status 收集 changed 时
+                #    会把 kline_cache 的 682 个「仅 mtime 变」文件带进来）
+                print(f"  🐘 缓存闸门：{_rel} 不在本批推送面（需 V8_ALLOW_CACHE_PUSH=1）")
                 continue
             if _is_retired(_rel):
                 # 🗑 2026-09-21 防回推：该产物已随主人令退役，本地残留副本不得复活它

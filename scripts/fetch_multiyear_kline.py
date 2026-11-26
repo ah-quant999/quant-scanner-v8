@@ -156,15 +156,53 @@ def main():
     ok = fail = 0
     failed_codes = []
 
+    # 🔴 2026-11-26 主人令「全面科学修复·内容没变就不要写盘」（膨胀归因实测）：
+    #   ① 本函数被 run_algorithms 调度，而 v8_algo_cloud 每天唤醒 6 次（16:40/18:10/20:00/
+    #      21:00/22:30/00:30）⇒ 每天最多重写 6 轮 kline_cache；
+    #   ② 上方幂等条件要求 `深度 ≥ 761 根`，但 kline_cache 里大量票只有 250~800 根
+    #      （实测 000004=250 根 / 000002=800 根）⇒ 这批**永远不满足跳过条件**，每轮都
+    #      重抓重写；实测本地 6244 个文件中 682 个当天被改写（另有 5231 个 >3 天未动）；
+    #   ③ 而这些票抓回来的内容与磁盘**逐字段完全一致**（同一交易日没有新 bar）——
+    #      变化只有 mtime，对数据零价值，对推送成本 100% 浪费（每次 682×88KB ≈ 60MB）。
+    #   【修法】写盘前做内容比对：一致则不写（保住 mtime，git/Contents API 的增量推送
+    #   自然零感知）。这是「当天没有新 bar 就整批跳过」的落地形态，且比按日期判断更稳
+    #   （盘中/盘后数据源回包差异、零股/停牌导致的短窗都不会误判）。
+    _WRITE_SAME = [0]   # 内容相同而未写盘的数量（收尾打印，便于审计）
+
     def _one(job):
         code, sym = job
         bars_n = 1200 if sym == "sh000001" else 800
         k = fetch_kline(sym, bars_n)
         rows = to_rows(k)
-        if len(rows) >= 60:
-            json.dump(rows, open(os.path.join(OUT, code + ".json"), "w", encoding="utf-8"))
-            return code, True, len(rows)
-        return code, False, 0
+        if len(rows) < 60:
+            return code, False, 0
+        outp = os.path.join(OUT, code + ".json")
+        # 🛡 防倒退守卫（与 api_push_raw 同精神）：新数据不得让历史变短
+        #   —— 数据源窗口缩水 / 单日异常回包时，宁可保留磁盘上更长的那份。
+        try:
+            old = json.load(open(outp, encoding="utf-8"))
+            if isinstance(old, list) and old:
+                if old == rows:
+                    _WRITE_SAME[0] += 1
+                    return code, True, len(rows)
+                _new_last = rows[-1].get("date", "")
+                _old_last = old[-1].get("date", "")
+                # 末根同一天且磁盘条数不更少 ⇒ 抓回来的不优于磁盘，不写
+                if _old_last == _new_last and len(old) >= len(rows):
+                    _WRITE_SAME[0] += 1
+                    return code, True, len(old)
+                # 🛡 防倒退（与 api_push_raw 的防倒退守卫同精神）：
+                #   回包末根比磁盘还早 = 数据源滞后/异常（实测有停牌补发、限流回短窗两种）
+                #   ⇒ 绝不能把磁盘上更新的那份盖掉，否则 kline_cache 会整体倒退，
+                #     下游 factor_walkforward/backtest 拿旧数据算，比不更新更糟。
+                if _new_last and _old_last and _new_last < _old_last:
+                    _WRITE_SAME[0] += 1
+                    return code, True, len(old)
+        except Exception:
+            pass
+        with open(outp, "w", encoding="utf-8") as fh:
+            json.dump(rows, fh)
+        return code, True, len(rows)
 
     done_cnt = 0
     with ThreadPoolExecutor(max_workers=args.workers) as ex:
@@ -186,6 +224,8 @@ def main():
             if done_cnt % 100 == 0 or done_cnt == n:
                 print("progress %d/%d ok=%d fail=%d skip=%d %.0fs" % (done_cnt, n, ok, fail, skip, time.time() - t0), flush=True)
     print("DONE ok=%d fail=%d skip=%d 用时%.0fs" % (ok, fail, skip, time.time() - t0), flush=True)
+    if _WRITE_SAME[0]:
+        print("未写盘(内容未变)=%d —— 已省下同等数量的无用重写" % _WRITE_SAME[0], flush=True)
     if failed_codes:
         print("FAILED_CODES(%d): %s" % (len(failed_codes), ",".join(failed_codes[:50])), flush=True)
 

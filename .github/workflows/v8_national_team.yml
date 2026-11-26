@@ -57,7 +57,8 @@ jobs:
   national-team:
     # ⏰ 2026-11-26 主人令「盘后链不许在盘前/盘中浪费资源」：国家队活跃度是季报十大股东口径，
     #   一天之内不可能变 ⇒ 盘中触发纯浪费。原实现 cn 抓取链每次 completed 都触发（今日 09:05 就跑了一次）。
-    #   修法：workflow_run 只在 UTC 07:00-15:59（CST 15:00-23:59 盘后窗）放行；自有 cron(20:50) 与手动 dispatch 不受影响。
+    #   修法：workflow_run 只在 **北京时间 15:00–23:59（盘后窗）** 放行；自有 cron(20:50) 与手动 dispatch 不受影响。
+    #   ⚠️ 铁律⑤：结论用北京时间表述；下方 'T07:'-'T15:' 是 UTC 字面量（= 北京时间 15:00–23:59）。
     if: |
       github.event_name != 'workflow_run' || (
         github.event.workflow_run.conclusion == 'success' && (

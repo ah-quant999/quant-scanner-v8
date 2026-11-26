@@ -134,6 +134,15 @@ jobs:
           find raw_data -maxdepth 1 -name '*.bak' -print0 2>/dev/null \
             | xargs -0 -r git rm --cached --ignore-unmatch --quiet 2>/dev/null || true
           git add -A
+          # 🐘 2026-11-26 主人令「全面科学修复·别再膨胀」：重缓存目录不进**盘中**提交。
+          #   本链盘中每 2 小时跑一次（CST 09/11/13/15），而 kline_cache 是 6244 文件 /
+          #   208MB、_wf_cache 603 文件 / 125MB —— 一旦被 git add -A 带上，就在盘中反复
+          #   推大包；且盘中日 K 根本没定型，推上去的也是半成品。
+          #   缓存只由**盘后**批次推（api_push_raw._cache_push_allowed 的北京时间窗口闸门
+          #   16:00–03:59 自动放行；v8_backup 每天 23:00 兜底）。
+          #   ⚠️ 用 `git reset`（mixed，只摘暂存）而非 `rm --cached`：文件仍被跟踪，
+          #      只是本次变更不进提交 —— 绝不会把缓存从仓库里删掉。
+          git reset -q -- raw_data/kline_cache raw_data/_wf_cache 2>/dev/null || true
           # 仅有变更时提交（无变更 = noop）
           if git diff --cached --quiet; then
             echo "⏭️ 无任何变更，跳过推送"
