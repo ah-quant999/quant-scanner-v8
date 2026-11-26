@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-26 07:14:59",
-  "run_start": "2026-11-26 05:18:01",
+  "update_time": "2026-11-26 19:03:42",
+  "run_start": "2026-11-26 16:48:35",
   "ok": 49,
   "fail": 3,
   "failed_scripts": [
@@ -9,8 +9,8 @@
       "reason": "超时 >40min"
     },
     {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "fetch_orphan_sector_fund_flow.py",
+      "reason": "监督器静默杀(>15min 无输出)"
     },
     {
       "script": "factor_walkforward.py",

@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-26 07:14:34",
- "update_time": "2026-11-26 07:14:34",
+ "generated": "2026-11-26 19:03:17",
+ "update_time": "2026-11-26 19:03:17",
  "card": "最终推荐 · Top5",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
@@ -27,27 +27,27 @@
  "attribution_rule": "update_time 小时 < 9 归前一自然日（与闸门 _NIGHT_CUT 同源）；同一入场日的多个归档版本只认最新版（旧版视为被刷新替代），杜绝周末/国庆重跑双计",
  "versions_total": 21,
  "versions_superseded": 5,
- "versions_no_entry": 2,
+ "versions_no_entry": 1,
  "signals_missing_kline": 0,
- "total_signals": 25,
- "signal_days": 9,
- "signal_date_range": "2026-11-02 ~ 2026-11-25",
- "kline_calendar_range": "2023-07-07 ~ 2026-11-25",
+ "total_signals": 28,
+ "signal_days": 10,
+ "signal_date_range": "2026-11-02 ~ 2026-11-26",
+ "kline_calendar_range": "2023-07-07 ~ 2026-11-26",
  "periods": {
   "1d": {
-   "samples": 20,
+   "samples": 21,
    "immature": false,
-   "win": 8,
+   "win": 9,
    "loss": 12,
-   "win_rate": 40.0,
-   "avg_return": 1.01,
-   "median_return": -1.01,
+   "win_rate": 42.9,
+   "avg_return": 1.1,
+   "median_return": -0.92,
    "best_return": 21.84,
    "worst_return": -9.25,
-   "max_drawdown": -1.49,
-   "bench_avg_return": -0.6017,
-   "bench_win_rate": 38.5,
-   "bench_days": 8
+   "max_drawdown": -1.42,
+   "bench_avg_return": -0.7431,
+   "bench_win_rate": 36.09,
+   "bench_days": 9
   },
   "2d": {
    "samples": 17,
@@ -60,9 +60,9 @@
    "best_return": 34.03,
    "worst_return": -18.35,
    "max_drawdown": -4.27,
-   "bench_avg_return": -0.0906,
-   "bench_win_rate": 50.76,
-   "bench_days": 7
+   "bench_avg_return": -0.5255,
+   "bench_win_rate": 46.32,
+   "bench_days": 8
   },
   "3d": {
    "samples": 13,
@@ -75,21 +75,24 @@
    "best_return": 32.04,
    "worst_return": -13.14,
    "max_drawdown": -5.99,
-   "bench_avg_return": 1.0873,
-   "bench_win_rate": 51.39,
-   "bench_days": 6
+   "bench_avg_return": -0.0071,
+   "bench_win_rate": 45.64,
+   "bench_days": 7
   },
   "5d": {
-   "samples": 11,
+   "samples": 12,
    "immature": false,
    "win": 6,
-   "loss": 5,
-   "win_rate": 54.5,
-   "avg_return": 6.44,
-   "median_return": 2.77,
+   "loss": 6,
+   "win_rate": 50.0,
+   "avg_return": 5.14,
+   "median_return": 1.19,
    "best_return": 55.17,
    "worst_return": -15.3,
-   "max_drawdown": -8.57
+   "max_drawdown": -8.65,
+   "bench_avg_return": -1.7865,
+   "bench_win_rate": 36.83,
+   "bench_days": 5
   },
   "10d": {
    "samples": 6,
@@ -375,6 +378,27 @@
    "name": "国泰海通",
    "rank": 2,
    "src_file": "final_recommend_20261124.json"
+  },
+  {
+   "entry_date": "2026-11-26",
+   "code": "600999",
+   "name": "招商证券",
+   "rank": 1,
+   "src_file": "final_recommend_20261125.json"
+  },
+  {
+   "entry_date": "2026-11-26",
+   "code": "601211",
+   "name": "国泰海通",
+   "rank": 2,
+   "src_file": "final_recommend_20261125.json"
+  },
+  {
+   "entry_date": "2026-11-26",
+   "code": "600838",
+   "name": "上海九百",
+   "rank": 3,
+   "src_file": "final_recommend_20261125.json"
   }
  ]
 }

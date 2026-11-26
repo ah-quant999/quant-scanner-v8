@@ -1,5 +1,5 @@
 window.STRATEGY_WALKFORWARD = {
-  "update_time": "2026-11-26 07:14:44",
+  "update_time": "2026-11-26 19:03:27",
   "source": "raw_data/history/final_recommend_*.json（56 个每日快照）",
   "method": "因子清账 + 胜率加权 组合的【样本外选股稳定性】walk-forward（非收益率 OOS，历史快照无已实现盈亏）",
   "is_ratio": 0.7,
@@ -12,10 +12,10 @@ window.STRATEGY_WALKFORWARD = {
   },
   "oos_window": {
     "n": 17,
-    "overlap_ratio": 0.422,
-    "industry_hhi": 0.549,
-    "max_industry_pct": 58.824,
-    "avg_final_score": 17.328
+    "overlap_ratio": 0.402,
+    "industry_hhi": 0.52,
+    "max_industry_pct": 55.882,
+    "avg_final_score": 17.316
   },
   "verdict": "样本外需关注 ⚠️",
   "stable": false,
@@ -352,15 +352,15 @@ window.STRATEGY_WALKFORWARD = {
     },
     {
       "date": "20261125",
-      "overlap_ratio": 0.35,
+      "overlap_ratio": 0.317,
       "industry_hhi": 0.5889,
       "max_industry_pct": 63.3
     },
     {
       "date": "20261126",
-      "overlap_ratio": 0.35,
-      "industry_hhi": 0.6333,
-      "max_industry_pct": 66.7
+      "overlap_ratio": 0.317,
+      "industry_hhi": 0.5833,
+      "max_industry_pct": 61.7
     }
   ],
   "rows": [
@@ -853,8 +853,8 @@ window.STRATEGY_WALKFORWARD = {
     {
       "date": "20261125",
       "n": 3,
-      "overlap": 2,
-      "overlap_ratio": 0.667,
+      "overlap": 1,
+      "overlap_ratio": 0.333,
       "industry_hhi": 0.5556,
       "max_industry_pct": 66.7,
       "avg_final_score": 4.27
@@ -864,9 +864,9 @@ window.STRATEGY_WALKFORWARD = {
       "n": 2,
       "overlap": 0,
       "overlap_ratio": 0.0,
-      "industry_hhi": 1.0,
-      "max_industry_pct": 100.0,
-      "avg_final_score": 4.4
+      "industry_hhi": 0.5,
+      "max_industry_pct": 50.0,
+      "avg_final_score": 4.2
     }
   ]
 };

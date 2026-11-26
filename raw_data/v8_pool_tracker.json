@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-26 05:18:01",
+  "update_time": "2026-11-26 16:48:35",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,54 +9,54 @@
   "items": [],
   "sentiment_meta": {
     "phase": "高潮",
-    "score": 76.0,
-    "delta_pct": -7.27,
+    "score": 77.0,
+    "delta_pct": 1.96,
     "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "新零售",
+        "name": "通信技术",
         "type": "概念",
-        "net": 11.22
+        "net": 79.17
       },
       {
-        "name": "流感",
+        "name": "5G概念",
         "type": "概念",
-        "net": 8.75
+        "net": 77.24
       },
       {
-        "name": "中药概念",
+        "name": "CPO概念",
         "type": "概念",
-        "net": 8.62
+        "net": 64.67
       },
       {
-        "name": "白酒",
+        "name": "光通信模块",
         "type": "概念",
-        "net": 7.72
+        "net": 47.22
       },
       {
-        "name": "超级品牌",
-        "type": "概念",
-        "net": 7.69
+        "name": "元件",
+        "type": "行业",
+        "net": 45.27
       }
     ],
     "top_out": [
       {
-        "name": "可燃冰",
-        "type": "概念",
-        "net": -0.02
+        "name": "基建市政工程",
+        "type": "行业",
+        "net": -1.17
       },
       {
-        "name": "熔盐储能",
-        "type": "概念",
-        "net": -0.03
+        "name": "医院",
+        "type": "行业",
+        "net": -1.17
       },
       {
-        "name": "B股",
-        "type": "概念",
-        "net": -0.08
+        "name": "金属新材料",
+        "type": "行业",
+        "net": -1.17
       }
     ]
   },
