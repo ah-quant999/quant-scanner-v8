@@ -18404,82 +18404,197 @@ window.__renderComprehensiveSynthesis = function(){
   }
   window.__renderCycleLadderCard = __renderCycleLadderCard;
   
+  var V8_MARGIN_RANGE = 60;   // 默认近3月（交易日）
+  function v8MarginSeries(){
+    var d=window.MARGIN_DATA||{};
+    if(d.total_market&&d.total_market.length) return d.total_market;
+    return d.sh||[];
+  }
   function drawV8MarginChart(){
-    var data=window.MARGIN_DATA||{};
-    var shData=data.sh||[];
-    if(!shData.length) return;
+    var arr=v8MarginSeries();
+    if(!arr.length) return;
     var el=document.getElementById('v8MarginChart');
     if(!el) return;
-    var W=el.offsetWidth||680, H=240;
-    var PAD={top:55, left:70, bottom:36, right:10};
-    var gw=W-PAD.left-PAD.right, gh=H-PAD.top-PAD.bottom;
-    var vals=[];
-    shData.forEach(function(d){ vals.push(d.rz_balance||0); vals.push(d.total||0); vals.push(d.rq_balance_amt||0); });
-    var maxV=Math.max.apply(null,vals)*1.02;
-    var minV=-maxV*0.05;
-    if(maxV===0){ minV=-100; maxV=100; }
-    var yScale=function(v){ return PAD.top+gh-(v-minV)/(maxV-minV)*gh; };
-    var xScale=function(i){ return PAD.left+gw*i/(shData.length-1); };
-    var path1='', path2='', path3='';
-    shData.forEach(function(d,i){
-      var x=xScale(i);
-      path1+=(i===0?'M':'L')+x.toFixed(1)+','+yScale(d.rz_balance||0).toFixed(1);
-      path2+=(i===0?'M':'L')+x.toFixed(1)+','+yScale(d.total||0).toFixed(1);
-      path3+=(i===0?'M':'L')+x.toFixed(1)+','+yScale(d.rq_balance_amt||0).toFixed(1);
-    });
+    var W=el.offsetWidth||680, H=340;
+    var RANGES=[{k:20,label:'近1月'},{k:60,label:'近3月'},{k:120,label:'近6月'}];
+    var range=V8_MARGIN_RANGE;
+    /* ── 区间切换按钮 ── */
+    var bar=document.getElementById('v8MarginRangeBar');
+    if(bar){
+      var bh='<span style="font-size:11px;color:var(--dim)">区间:</span>';
+      RANGES.forEach(function(r){
+        var on=(r.k===range);
+        bh+='<button class="v8mrg-btn" data-v8mrg="'+r.k+'" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid '+(on?'#41c9ff':'var(--border)')+';background:'+(on?'rgba(65,201,255,.12)':'var(--bg2)')+';color:'+(on?'#41c9ff':'var(--sub)')+'">'+r.label+'</button>';
+      });
+      bh+='<span style="font-size:11px;color:var(--dim);margin-left:auto">沪深合计口径 · 交易日</span>';
+      bar.innerHTML=bh;
+      var btns=bar.querySelectorAll('.v8mrg-btn');
+      for(var bi=0;bi<btns.length;bi++){
+        btns[bi].onclick=function(){ V8_MARGIN_RANGE=parseInt(this.getAttribute('data-v8mrg'),10)||60; drawV8MarginChart(); };
+      }
+    }
+    var seg=arr.slice(Math.max(0,arr.length-range));
+    if(seg.length<2) seg=arr.slice(-2);
+    var first=seg[0], last=seg[seg.length-1];
+    /* ── 统计量 ── */
+    var balNow=last.rz_balance||0, balPrev=first.rz_balance||0;
+    var balChg=balNow-balPrev, balChgPct=balPrev?balChg/balPrev*100:0;
+    var netSum=0, netPos=0, netNeg=0;
+    seg.forEach(function(d){ var n=d.rz_net||0; netSum+=n; if(n>0) netPos++; else if(n<0) netNeg++; });
+    var rqNow=last.rq_balance_amt||0, rqPrev=first.rq_balance_amt||0;
+    var totNow=last.total||0;
+    var peakPct=totNow?totNow/22700*100:0;
+    /* ── 上证指数对照（MARGIN_DATA.index，随两融数据内嵌，避免额外注入 91KB 指数历史） ── */
+    var kl=(window.MARGIN_DATA||{}).index||[];
+    var idx0=null, idx1=null;
+    for(var ki=0;ki<kl.length;ki++){
+      var kd=kl[ki].date_raw;
+      if(kd<=first.date_raw) idx0=kl[ki].close;
+      if(kd<=last.date_raw) idx1=kl[ki].close;
+    }
+    var idxChgPct=(idx0&&idx1)?(idx1/idx0-1)*100:null;
+    var cols=function(v){ return v>0?'#ef5350':(v<0?'#26a69a':'var(--sub)'); };
+    var sgn=function(v){ return (v>0?'+':'')+v; };
+    /* ── 统计块 ── */
+    var st=document.getElementById('v8MarginStats');
+    if(st){
+      function blk(title,val,unit,sub,subColor){
+        return '<div style="padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.02)">'
+          +'<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px">'+title+'</div>'
+          +'<div style="font-size:19px;font-weight:700;color:'+(subColor||'var(--txt)')+';line-height:1.15">'+val+'<span style="font-size:11px;font-weight:600;color:var(--dim);margin-left:2px">'+unit+'</span></div>'
+          +'<div style="font-size:10.5px;color:'+(subColor||'var(--dim)')+';margin-top:3px">'+sub+'</div></div>';
+      }
+      var stx='';
+      stx+=blk('融资余额',balNow,'亿','较期初 '+sgn(balChg)+'亿 · '+sgn(+balChgPct.toFixed(2))+'%',cols(balChg));
+      stx+=blk('区间累计净买入',sgn(netSum),'亿','日均 '+sgn(+(netSum/seg.length).toFixed(1))+'亿 · 净买 '+netPos+'天/回撤 '+netNeg+'天',cols(netSum));
+      stx+=blk('融券余额',rqNow,'亿','较期初 '+sgn(rqNow-rqPrev)+'亿',cols(rqNow-rqPrev));
+      stx+=blk('两融合计',totNow,'亿','占2015峰值 '+peakPct.toFixed(0)+'%','');
+      st.innerHTML=stx;
+    }
+    /* ── SVG ── */
+    var PAD={top:42,left:64,bottom:34,right:56};
+    var MAIN_H=196, SUB_TOP=262, SUB_H=52;
+    var gw=W-PAD.left-PAD.right, gh=MAIN_H;
+    var bals=seg.map(function(d){ return d.rz_balance||0; });
+    var nets=seg.map(function(d){ return d.rz_net||0; });
+    var bMax=Math.max.apply(null,bals), bMin=Math.min.apply(null,bals);
+    var padB=(bMax-bMin)*0.25||Math.max(10,bMax*0.02);
+    var yTop=bMax+padB, yBot=bMin-padB;
+    var yS=function(v){ return PAD.top+gh-(v-yBot)/(yTop-yBot)*gh; };
+    var xS=function(i){ return PAD.left+gw*(seg.length===1?0.5:i/(seg.length-1)); };
+    /* 指数归一化（起点=100）→ 右轴 */
+    var idxNorm=[], base=idx0;
+    if(base){
+      for(var ii=0;ii<seg.length;ii++){
+        var tgt=null;
+        for(var jj=0;jj<kl.length;jj++){ if(kl[jj].date_raw<=seg[ii].date_raw) tgt=kl[jj].close; }
+        idxNorm.push(tgt? tgt/base*100 : null);
+      }
+    }
+    var nMin=100, nMax=100;
+    idxNorm.forEach(function(v){ if(v!==null){ if(v<nMin)nMin=v; if(v>nMax)nMax=v; } });
+    var nPad=(nMax-nMin)*0.2||0.5;
+    var nTop=nMax+nPad, nBot=nMin-nPad;
+    var yN=function(v){ return PAD.top+gh-(v-nBot)/(nTop-nBot)*gh; };
+    /* 净买入柱：零轴居中 */
+    var nAbs=Math.max.apply(null,nets.map(function(v){ return Math.abs(v); }))||1;
+    var zeroY=SUB_TOP+SUB_H/2;
+    var barW=Math.max(2, gw/seg.length*0.62);
     var html='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:100%">';
-    html+='<line x1="'+PAD.left+'" y1="'+PAD.top+'" x2="'+PAD.left+'" y2="'+(H-PAD.bottom)+'" stroke="#555" stroke-width="1"/>';
-    for(var i=0;i<=4;i++){
-      var y=PAD.top+gh*i/4;
-      html+='<line x1="'+PAD.left+'" y1="'+y.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+    /* 主图网格 */
+    for(var gi=0;gi<=4;gi++){
+      var gy=PAD.top+gh*gi/4;
+      html+='<line x1="'+PAD.left+'" y1="'+gy.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>';
     }
-    html+='<path d="'+path1+'" fill="none" stroke="#60a5fa" stroke-width="2"/>';
-    html+='<path d="'+path3+'" fill="none" stroke="#e91e63" stroke-width="2" stroke-dasharray="6"/>';
-    html+='<path d="'+path2+'" fill="none" stroke="#f59e0b" stroke-width="2"/>';
-    var last=shData[shData.length-1];
-    if(last){
-      var lx=xScale(shData.length-1);
-      html+='<circle cx="'+lx.toFixed(1)+'" cy="'+yScale(last.rz_balance||0).toFixed(1)+'" r="4" fill="#60a5fa"/>';
-      html+='<circle cx="'+lx.toFixed(1)+'" cy="'+yScale(last.rq_balance_amt||0).toFixed(1)+'" r="4" fill="#e91e63"/>';
-      var cyGold=yScale(last.total||0);
-      html+='<circle cx="'+lx.toFixed(1)+'" cy="'+cyGold.toFixed(1)+'" r="4" fill="#f59e0b"/>';
-      html+='<text x="'+lx.toFixed(1)+'" y="'+(PAD.top-32).toFixed(1)+'" text-anchor="end" font-size="10" fill="#f59e0b" font-weight="bold">'+(last.total||0).toFixed(0)+'</text>';
-      html+='<text x="'+lx.toFixed(1)+'" y="'+(PAD.top-20).toFixed(1)+'" text-anchor="end" font-size="10" fill="#60a5fa" font-weight="bold">'+(last.rz_balance||0).toFixed(0)+'</text>';
-      html+='<text x="'+lx.toFixed(1)+'" y="'+(PAD.top-8).toFixed(1)+'" text-anchor="end" font-size="10" fill="#e91e63" font-weight="bold">'+(last.rq_balance_amt||0).toFixed(0)+'</text>';
+    html+='<line x1="'+PAD.left+'" y1="'+(PAD.top+gh)+'" x2="'+(W-PAD.right)+'" y2="'+(PAD.top+gh)+'" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>';
+    /* 主图：融资余额线 */
+    var pBal='',pIdx='',pIdxOpen=false;
+    for(var bi2=0;bi2<seg.length;bi2++){
+      var bx=xS(bi2), by=yS(seg[bi2].rz_balance||0);
+      pBal+=(bi2===0?'M':'L')+bx.toFixed(1)+','+by.toFixed(1);
+      if(idxNorm[bi2]!==null&&idxNorm[bi2]!==undefined){
+        var ny=yN(idxNorm[bi2]);
+        pIdx+=(pIdxOpen?'L':'M')+bx.toFixed(1)+','+ny.toFixed(1); pIdxOpen=true;
+      }
     }
-    for(var i=0;i<=4;i++){
-      var v=minV+(maxV-minV)*(1-i/4);
-      var y=PAD.top+gh*i/4;
-      var absV=Math.abs(v);
-      var label=absV>=1000?v.toFixed(0):absV>=10?v.toFixed(1):v.toFixed(2);
-      html+='<text x="'+(PAD.left-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#888">'+label+'</text>';
+    html+='<path d="'+pBal+'" fill="none" stroke="#60a5fa" stroke-width="2"/>';
+    if(pIdx) html+='<path d="'+pIdx+'" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="5 3"/>';
+    /* 末点标记 */
+    var lx=xS(seg.length-1), ly=yS(last.rz_balance||0);
+    html+='<circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="3.5" fill="#60a5fa"/>';
+    html+='<text x="'+(lx+6).toFixed(1)+'" y="'+(ly-4).toFixed(1)+'" font-size="10.5" fill="#60a5fa" font-weight="bold">'+balNow+'</text>';
+    /* 副图：净买入柱 */
+    html+='<text x="'+(PAD.left-52)+'" y="'+(SUB_TOP+4)+'" font-size="10" fill="#888">净买入</text>';
+    html+='<line x1="'+PAD.left+'" y1="'+zeroY.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+zeroY.toFixed(1)+'" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>';
+    for(var ni=0;ni<seg.length;ni++){
+      var v=nets[ni]||0;
+      var y1=zeroY - (v/nAbs)*(SUB_H/2-2);
+      var top2=Math.min(y1,zeroY), hgt=Math.max(1,Math.abs(y1-zeroY));
+      var nx=xS(ni)-barW/2;
+      html+='<rect x="'+nx.toFixed(1)+'" y="'+top2.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+hgt.toFixed(1)+'" fill="'+(v>0?'#ef5350':(v<0?'#26a69a':'#555'))+'" opacity="'+(Math.abs(v)>0?0.85:0.3)+'"/>';
     }
-    var showCount=Math.min(shData.length,6);
-    var idxStep=Math.max(1,Math.floor((shData.length-1)/(showCount-1)));
-    // 🔴 2026-08-12 修复：原循环 for(si=0; si<shData.length; si+=idxStep) 含最后一个，
-    // 与下方单独渲染的最后一个标签位置完全重叠→ 主人截图「8/0711」即为「8/07」与「11」挤压。
-    // 改为循环不包含最后一个，统一由下方单独高亮渲染。
-    for(var si=0; si<shData.length-1; si+=idxStep){
-      var i=si;
-      var x=xScale(i);
-      var dt=shData[i].date||'';
-      if(dt && dt.length===8 && dt.indexOf('/')<0) dt=dt.slice(4,6)+'/'+dt.slice(6);
-      html+='<text x="'+x.toFixed(1)+'" y="'+(H-PAD.bottom+14)+'" text-anchor="middle" font-size="10" fill="#888">'+dt+'</text>';
+    html+='<text x="'+(PAD.left-52)+'" y="'+(zeroY+11)+'" font-size="9.5" fill="#888">0</text>';
+    /* 左轴刻度（融资余额·亿） */
+    for(var ti=0;ti<=4;ti++){
+      var tv=yTop-(yTop-yBot)*ti/4, ty=PAD.top+gh*ti/4;
+      var lab=Math.abs(tv)>=1000?tv.toFixed(0):(Math.abs(tv)>=10?tv.toFixed(0):tv.toFixed(1));
+      html+='<text x="'+(PAD.left-6)+'" y="'+(ty+4).toFixed(1)+'" text-anchor="end" font-size="9.5" fill="#8a8a8a">'+lab+'</text>';
     }
-    if(shData.length>0){
-      var li=shData.length-1, lx=xScale(li);
-      var ldt=shData[li].date||'';
-      if(ldt && ldt.length===8 && ldt.indexOf('/')<0) ldt=ldt.slice(4,6)+'/'+ldt.slice(6);
-      /* 2026-10-17 修复：末标签原 middle 锚定位在图最右缘(PAD.right=10)，「10/15」右半溢出 viewBox 被裁成「10/1」→ 改 end 锚收进图内 */
-      html+='<text x="'+(lx+8).toFixed(1)+'" y="'+(H-PAD.bottom+14)+'" text-anchor="end" font-size="10" fill="#e91e63" font-weight="bold">'+ldt+'</text>';
+    /* 右轴刻度（指数归一化） */
+    if(base){
+      for(var ri=0;ri<=4;ri++){
+        var rv=nTop-(nTop-nBot)*ri/4, ry=PAD.top+gh*ri/4;
+        html+='<text x="'+(W-PAD.right+6)+'" y="'+(ry+4).toFixed(1)+'" font-size="9.5" fill="#8a8a8a">'+rv.toFixed(1)+'</text>';
+      }
     }
-    html+='<text x="'+(PAD.left+5)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#60a5fa">● 融资余额</text>';
-    html+='<text x="'+(PAD.left+95)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#e91e63">● 融券余额</text>';
-    html+='<text x="'+(PAD.left+185)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#f59e0b">● 两融合计</text>';
+    /* X 轴日期 */
+    var step=Math.max(1,Math.floor(seg.length/6));
+    for(var xi=0;xi<seg.length;xi+=step){
+      var xx=xS(xi), dd=seg[xi].date||'';
+      html+='<text x="'+xx.toFixed(1)+'" y="'+(H-PAD.bottom+16)+'" text-anchor="middle" font-size="9.5" fill="#8a8a8a">'+dd+'</text>';
+    }
+    var ldd=last.date||'', lxx=xS(seg.length-1);
+    html+='<text x="'+Math.min(lxx+6,W-4).toFixed(1)+'" y="'+(H-PAD.bottom+16)+'" text-anchor="end" font-size="9.5" fill="#ef5350" font-weight="bold">'+ldd+'</text>';
+    /* 图例 */
+    html+='<text x="'+(PAD.left+2)+'" y="'+(PAD.top-26)+'" font-size="10.5" fill="#60a5fa">● 融资余额(亿·左轴)</text>';
+    html+='<text x="'+(PAD.left+130)+'" y="'+(PAD.top-26)+'" font-size="10.5" fill="#94a3b8">● 上证指数(起点=100·右轴)</text>';
+    html+='<text x="'+(PAD.left+300)+'" y="'+(PAD.top-26)+'" font-size="10.5" fill="#ef5350">■ 融资净买入(亿)</text>';
     html+='</svg>';
     el.innerHTML=html;
+    /* ── 解读：对大盘判断 ── */
+    var vd=document.getElementById('v8MarginVerdict');
+    if(vd){
+      var tag,tone,body;
+      var rngLabel=(range===20?'近1月':(range===60?'近3月':'近6月'));
+      var idxTxt=(idxChgPct===null)?'（指数对照数据缺失）':('同期上证指数 '+sgn(+idxChgPct.toFixed(2))+'%');
+      if(netSum>0&&balChgPct>0){
+        if(idxChgPct!==null&&idxChgPct<=0){
+          tag='偏多（逆势加杠杆）'; tone='#ef5350';
+          body='杠杆资金逆势净买入 '+sgn(netSum)+'亿、融资余额较期初 '+sgn(+balChgPct.toFixed(2))+'%，而'+idxTxt+' —— 典型的「越跌越买」，抄底意愿强。这类背离通常对应反弹质量较高的阶段，持股信心尚在。';
+        }else{
+          tag='偏多（量价共振）'; tone='#ef5350';
+          body='杠杆资金净买入 '+sgn(netSum)+'亿、融资余额较期初 '+sgn(+balChgPct.toFixed(2))+'%，'+idxTxt+'，指数与杠杆同向向上 —— 有真实增量杠杆资金支撑，趋势延续概率较高。';
+        }
+        if(balChgPct>10) body+=' ⚠️ 但余额增速已超 10% 警戒线，杠杆累积过快本身就是风险放大器，情绪过热阶段需防补跌。';
+        else if(balChgPct>20) body+=' 🔴 余额增速超 20%，属历史高位区，建议降低杠杆与仓位。';
+      }else if(netSum<0&&balChgPct<0){
+        if(idxChgPct!==null&&idxChgPct>=0){
+          tag='偏空（负背离）'; tone='#26a69a';
+          body='指数在涨（'+idxTxt+'），但杠杆资金净流出 '+sgn(netSum)+'亿、融资余额较期初 '+sgn(+balChgPct.toFixed(2))+'% —— 上涨缺乏增量杠杆资金配合，属存量博弈，脆弱性上升，追高需谨慎。';
+        }else{
+          tag='偏空（杠杆撤退）'; tone='#26a69a';
+          body='杠杆资金净流出 '+sgn(netSum)+'亿、融资余额较期初 '+sgn(+balChgPct.toFixed(2))+'%，'+idxTxt+' —— 杠杆撤退与指数回落共振，通常尚未见到资金面底部，不宜抢反弹。';
+        }
+      }else{
+        tag='中性（杠杆平稳）'; tone='#ffd024';
+        body='区间内融资净买入 '+sgn(netSum)+'亿、融资余额较期初 '+sgn(+balChgPct.toFixed(2))+'%，'+idxTxt+' —— 杠杆资金基本维持存量，无明显增减方向，对大盘暂无增量或拖累信号。';
+      }
+      var heat=(netPos>=netNeg)?('偏多日 '+netPos+' 天 / 偏空日 '+netNeg+' 天'):('偏空日 '+netNeg+' 天 / 偏多日 '+netPos+' 天');
+      vd.innerHTML='<div style="font-weight:700;color:'+tone+';margin-bottom:4px">🔎 '+rngLabel+'两融信号：'+tag+'</div>'
+        +'<div style="color:var(--txt)">'+body+'</div>'
+        +'<div style="color:var(--sub);font-size:11px;margin-top:4px">资金节奏：'+heat+' · 累计净买入 '+sgn(netSum)+'亿 · 日均 '+sgn(+(netSum/seg.length).toFixed(1))+'亿 · 余额 '+(balPrev>0?(balChgPct>=0?'扩张':'收缩'):'—')+'</div>';
+    }
   }
-
   function renderDelisted(elId){
     // 2026-08-30 主人令：运维内 opTab4 已删除，默认容器改为一级 nav 的 delistedTopPanel
     var el=$(elId||'delistedTopPanel');
@@ -18558,18 +18673,23 @@ h+='</div>';
       +'<div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5">📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。</div>'
       +'</div></div>';
 
-    /* 5. 两融余额走势（2026-10-04 主人令：由「🌍 观测平台 > 📊 大盘观测」迁回「🔒 已下架」——两融归属已下架，大盘观测不再渲染，避免 #v8MarginChart 重复 id） */
+    /* 5. 两融动向（2026-11-26 主人令：只要「近1/3月增减动向 + 对大盘判断帮助」，原位留在「🔒 已下架」）
+       原「两融余额走势」单线图升级为：区间切换 + 4统计块 + 余额/指数双轴 + 净买入柱 + 大盘解读。 */
     var margin=window.MARGIN_DATA||{}, marginT=margin.update_time||'';
+    var _mArr=(margin.total_market&&margin.total_market.length)?margin.total_market:(margin.sh||[]);
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1976d2">';
-    h+=v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:marginT,slot:'盘后',horizon:'中长线'},!margin||!margin.sh||!margin.sh.length);
+    h+=v8CardHeader('📊','两融动向（杠杆资金 · 对大盘判断）','','update_time',{update_time:marginT,slot:'盘后',horizon:'中长线'},!_mArr.length);
     h+='<div style="padding:12px 14px">';
-    if(margin&&margin.sh&&margin.sh.length){
-      h+='<div id="v8MarginChart" style="width:100%;height:240px"></div>';
+    if(_mArr.length){
+      h+='<div id="v8MarginRangeBar" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap"></div>';
+      h+='<div id="v8MarginStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px"></div>';
+      h+='<div id="v8MarginChart" style="width:100%;height:340px"></div>';
+      h+='<div id="v8MarginVerdict" class="note note-insight" style="margin-top:12px;line-height:1.8"></div>';
+      h+='<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.6">📌 口径：融资净买入 = 融资余额一阶差分（交易所两融汇总表无「融资偿还额」项，余额差分为交易所/券商通行口径）；沪深合计口径，与 2015 全市场峰值(≈2.27万亿)可比。日频数据，交易日 16:15 后更新。</div>';
     } else {
       h+='<div class="note" style="text-align:center">两融数据暂不可用</div>';
     }
     h+='</div></div>';
-
     /* 2026-09-02 主人令：已下架选股模块整体删除（大牛股猎手/全站精选与选股策略高度重复；
        四量终极迁回「选股策略」子页面）。星级表 __MODULE_STARS 已提前到全局作用域。 */
 

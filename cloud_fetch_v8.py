@@ -2644,6 +2644,11 @@ def f_margin_data():
     total_market 与 2015 全市场峰值(≈2.27万亿)同口径可比——此前沪市单边 vs 全市场峰值
     口径错配（观测台显示 51% 是错的，全市场真实约 97%）。
     深市逐日取数（深交所接口单日查询），失败日跳过不影响整体。
+    🆕 2026-11-26 主人令（两融动向）：新增「融资净买入 rz_net」序列与深市「融券余额 rq_balance_amt」。
+       · rz_net = 融资余额一阶差分（余额t - 余额t-1）≈ 当日融资净买入。
+         SSE/SZSE 两融汇总表均不提供「融资偿还额」，余额差分为交易所/券商两融分析通行口径；
+         首日无前值置 0。沪深合计 rz_net = 沪 + 深。
+       · 深市融券余额 = 融资融券余额 - 融资余额（同表同单位，避免二次换算口径错位）。
     """
     end = now_cst().strftime("%Y%m%d")
     start = (now_cst() - timedelta(days=120)).strftime("%Y%m%d")
@@ -2670,6 +2675,11 @@ def f_margin_data():
             })
         # 按日期升序（旧→新），保证图表方向正确
         rows.sort(key=lambda x: x["date_raw"])
+        # 🆕 2026-11-26 两融动向：沪市融资净买入 = 融资余额一阶差分（首日置 0）
+        for _i in range(1, len(rows)):
+            rows[_i]["rz_net"] = round(rows[_i]["rz_balance"] - rows[_i - 1]["rz_balance"])
+        if rows:
+            rows[0]["rz_net"] = 0
         result["sh"] = rows
         print(f"  ✅ 两融余额(沪): {len(rows)} 条")
         # 🆕 2026-11-20 深市单边（逐日查询）+ 沪深合计全市场口径
@@ -2685,30 +2695,68 @@ def f_margin_data():
                     sz_map[r["date_raw"]] = {
                         "rz_balance": round(float(z["融资余额"])),
                         "total": round(float(z["融资融券余额"])),
+                        # 融券余额 = 两融合计 - 融资余额（同表同单位，规避单位口径错位）
+                        "rq_balance_amt": round(float(z["融资融券余额"]) - float(z["融资余额"])),
                     }
             except Exception:
                 continue  # 单日失败跳过
         sz_rows = []
-        tm_rows = []
         for r in rows:
             z = sz_map.get(r["date_raw"])
             if z:
                 sz_rows.append({
                     "date": r["date"], "date_raw": r["date_raw"],
                     "rz_balance": z["rz_balance"], "total": z["total"],
+                    "rq_balance_amt": z["rq_balance_amt"],
                 })
+        # 深市净买入差分（缺日按实际相邻可得日计算）
+        for _i in range(1, len(sz_rows)):
+            sz_rows[_i]["rz_net"] = round(sz_rows[_i]["rz_balance"] - sz_rows[_i - 1]["rz_balance"])
+        if sz_rows:
+            sz_rows[0]["rz_net"] = 0
+        _sz_net_map = {s["date_raw"]: s.get("rz_net", 0) for s in sz_rows}
+        tm_rows = []
+        for r in rows:
+            z = sz_map.get(r["date_raw"])
+            if z:
                 tm_rows.append({
                     "date": r["date"], "date_raw": r["date_raw"],
                     "rz_balance": r["rz_balance"] + z["rz_balance"],
                     "total": r["total"] + z["total"],
+                    "rq_balance_amt": r.get("rq_balance_amt", 0) + z["rq_balance_amt"],
+                    "rz_net": r.get("rz_net", 0) + _sz_net_map.get(r["date_raw"], 0),
                 })
         result["sz"] = sz_rows
         result["total_market"] = tm_rows
         print(f"  ✅ 两融余额(深): {len(sz_rows)} 条 | 沪深合计: {len(tm_rows)} 条"
-              + (f" | 最新全市场融资余额 {tm_rows[-1]['rz_balance']}亿" if tm_rows else ""))
+              + (f" | 最新全市场融资余额 {tm_rows[-1]['rz_balance']}亿" if tm_rows else "")
+              + (f" | 当日融资净买入 {tm_rows[-1].get('rz_net', 0)}亿" if tm_rows else ""))
     except Exception as e:
         print(f"  ❌ 两融余额失败: {e}")
         return None
+    # 🆕 2026-11-26 两融动向：顺带取上证指数日频收盘，供前端做「两融 vs 大盘」对照。
+    #   复用 akshare stock_zh_index_daily_em（与 f_sh_sz_history 同源，post_close 档已实证可用）。
+    #   刻意不重新注入 data/INDEX_HISTORY.js（91.2 KB）——2026-08-31 轻量化已停注，
+    #   改为随两融数据内嵌 ~130 根日线（数 KB），既拿到指数对照又不破坏轻量化。
+    idx_rows = []
+    try:
+        dfx = get_ak().stock_zh_index_daily_em(symbol="sh000001")
+        if dfx is not None and not dfx.empty:
+            dcol = next((c for c in dfx.columns if c in ("日期", "date")), None)
+            ccol = next((c for c in dfx.columns if c in ("收盘", "close")), None)
+            if dcol and ccol:
+                for _, rx in dfx.iterrows():
+                    try:
+                        idx_rows.append({"date_raw": str(rx[dcol])[:10],
+                                         "close": round(float(rx[ccol]), 2)})
+                    except Exception:
+                        continue
+                idx_rows.sort(key=lambda x: x["date_raw"])
+                idx_rows = idx_rows[-130:]
+                print(f"  ✅ 上证指数日频(对照): {len(idx_rows)} 条")
+    except Exception as e:
+        print(f"  ⚠️ 上证指数日频取数失败（两融对照降级，不影响主数据）: {e}")
+    result["index"] = idx_rows
     result["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M")
     return result
 
