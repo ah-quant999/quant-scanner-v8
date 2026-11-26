@@ -28,6 +28,24 @@ on:
     branches: [main]
     paths:
       - 'raw_data/**'
+      # 🔴 2026-11-26 一劳永逸（主人令「怎么突然又膨胀了 / 越跑越久」· 实测归因）：
+      #   【病灶】raw_data 里 85% 是「云端算法数据源缓存」，前端一个字节都不读：
+      #     · raw_data/kline_cache  6245 文件 / 186MB（每日被推 8~15 次）
+      #     · raw_data/_wf_cache     603 文件 / 125MB
+      #     · raw_data/history       218 文件 /  12MB（每日归档快照）
+      #     · raw_data/sw_index_daily_cache 37 文件 / 10MB
+      #   这些目录每次推送都命中上面的 raw_data/** ⇒ 触发一场【全量 update_v8(≈14min)
+      #   + Pages 部署】。实测 2026-11-26 部署链 200 个 run 里 141 个是 push 触发，
+      #   93 个被同桶排队/取消（cancel-in-progress:false ⇒ 串行堵塞）。
+      #   【修法】否定规则把它们摘出触发面 —— 业务数据（candidate/lhb/stock_quote/
+      #   sector_fund_flow…）仍在 raw_data/** 内，该触发的照常触发，可达性零损失。
+      - '!raw_data/kline_cache/**'
+      - '!raw_data/_wf_cache/**'
+      - '!raw_data/history/**'
+      - '!raw_data/sw_index_daily_cache/**'
+      - '!raw_data/_rps_cache/**'
+      - '!raw_data/_tdx_cache/**'
+      - '!raw_data/backtest_kline_cache/**'
       - 'data/**'
       - '!data/freshness_status.json'
       - 'index.html'

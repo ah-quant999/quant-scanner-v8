@@ -1039,13 +1039,27 @@ jobs:
       #     「🛡️ 原子提交 index.html ?v」(pos21)。若只后移到 pos14，仍挡在 pos20/21 之前，
       #     一旦 hang 则 data/*.js 与 ?v 依旧上不了线 —— 主人的卡照样陈旧（因为
       #     data/V8_CAL.js 重建完却推不出去）。⇒ 正确位置 = 全部推送动作之后。
-      - name: "💰 分红方案刷新（cninfo·云端主跑）"
+      - name: "💰 分红方案刷新（cninfo·云端主跑 · 每日一档）"
         id: soft_1
         if: (steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all') && steps.td.outputs.proceed != 'false'
         continue-on-error: true
         timeout-minutes: 20
         shell: bash
         run: |
+          # 🔴 2026-11-26 一劳永逸（主人令「越跑越久」· 实测归因）：
+          #   【病灶】本步实测单次 1212s ≈ 20.2 分钟，占单档总时长（46~49min）的 44%，
+          #     而它**每个 premarket / post_close 档都跑**（盘前 08:25 跑一遍、
+          #     盘后 17:20/18:20/19:20 各跑一遍 ⇒ 一天白烧 ~80 分钟槽位）。
+          #     分红方案是「日频」数据，一天刷新一次完全够。
+          #   【连带伤害】cn 抓取链与盘中链共用并发槽，单档被这 20 分钟拖到 46 分钟
+          #     > 盘中 20~30 分钟档间隔 ⇒ 每档必被下一档顶杀（11-26 cancelled 率 70%）。
+          #   【修法】加北京时间闸门：只在 19:20 之后的 post_close 档跑一次，其余档秒退。
+          #     省下的 20 分钟直接还给抓取档，是本次「不加重排、只减耗时」的关键一刀。
+          BJ_HM=$(date -u -d '+8 hours' +%H%M)
+          if [ "$BJ_HM" -lt 1920 ]; then
+            echo "⏭ 分红每日一档（仅 19:20 后 post_close 档执行），当前 ${BJ_HM} CST → 跳过（释放 20 分钟并发槽）"
+            exit 0
+          fi
           # 🛡 2026-09-18：脚本内置 900s 总时长预算闸门（到点优雅落盘已刷部分，
           #   保证早于步级 20min 超时退出）；此处再传 --budget 显式覆盖，双保险。
           python algorithms/refresh_dividend_cninfo.py --budget=900
