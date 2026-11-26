@@ -1421,7 +1421,7 @@ jobs:
               #   盘中(09:00-15:30)一律不派：本 workflow 的产物不参与任何盘中卡计算，
               #   盘中刷 9915 只票的全量快照只服务手工查询，纯占 cn 单机。
               if 9 * 60 <= hm <= 15 * 60 + 30:
-                  print(f"[relay] ⏭ 盘中不派 STOCK_QUOTE（{label}）—— 2026-11-26 改盘后 15:35/20:00 两档")
+                  print(f"[relay] ⏭ 盘中不派 STOCK_QUOTE（{label}）—— 2026-11-26 改盘后 16:00/20:00 两档")
                   return
               try:
                   api("POST",
