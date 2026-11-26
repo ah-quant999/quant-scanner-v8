@@ -2441,7 +2441,7 @@ window.STRATEGY_WALKFORWARD = {
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=ae14273bbb" defer> 和 <script src="data/MACRO_BRIEF.js?v=4e75bae9b8" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=ae14273bbb" defer> 和 <script src="data/MACRO_BRIEF.js?v=fde1faeebd" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
@@ -2970,7 +2970,20 @@ window.STRATEGY_WALKFORWARD = {
     </script>
 
     <details open class="v8-fold v8-fold-defopen" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
-      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none"><span class="v8fold-arrow">▸</span> 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11px;opacity:.7">（点击收起）</span></summary>    <script>    /* 🟢 2026-11-26 主人令「外围行情与宏观观测」默认展开（不再默认收起）：       open 属性已加上，此处仅负责三角随 open 状态自动切换（▸/▾）。 */    (function(){      var d=document.querySelector('details.v8-fold-defopen');      if(!d)return;      var mk=d.querySelector('.v8fold-arrow');      function upd(){if(mk)mk.textContent=d.open?'▾':'▸';}      d.addEventListener('toggle',upd);      upd();    })();    </script>
+      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none"><span class="v8fold-arrow">▸</span> 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11px;opacity:.7">（点击收起）</span></summary>
+
+    <script>
+    /* 🟢 2026-11-26 主人令「外围行情与宏观观测」默认展开（不再默认收起）：
+       open 属性已加上，此处仅负责三角随 open 状态自动切换（▸/▾）。 */
+    (function(){
+      var d=document.querySelector('details.v8-fold-defopen');
+      if(!d)return;
+      var mk=d.querySelector('.v8fold-arrow');
+      function upd(){if(mk)mk.textContent=d.open?'▾':'▸';}
+      d.addEventListener('toggle',upd);
+      upd();
+    })();
+    </script>
       <div style="padding:0 12px 6px">这些卡提供大盘环境背景，不直接给出买卖标的；方向判断请看下方的资金/板块/龙头卡。</div>
           <!-- 指数快览（2026-08-30：实时数据补位） -->
           <div class="card" style="margin-bottom:16px">
@@ -10919,11 +10932,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=0e7e6d7259"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=d0e4227a92"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=0e7e6d7259';
+        return 'data/IPO_DATA.js?v=d0e4227a92';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -13140,6 +13153,9 @@ function drawUpDownChart(){
 
           {name:'板块技术研判', source:'SECTOR_TECH_JUDG', freq:'盘后1次', slots:['16:00'], note:'申万一级31行业·L4/L3分级+量价+压力支撑·东财日K'},  /* 🚚 2026-11-20 审计对齐：11-18 卡已迁 unlistedPanel（主升/启动上方），原误挂实时数据页组迁正·档位订正 16:00 */
           {name:'主升/启动板块·龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', maturity:'T+1', slots:['21:45'], note:'观测类·板块龙头'},
+          /* 🌡️ 2026-11-26 主人令：涨停热力·板块龙头股 —— 与上一行**同一数据文件**（SECTOR_LEADERS.lu_sectors，
+             同一个盘后批次同轮生成/同批推送），故 source 相同、时隙相同，不做第二套调度假象。 */
+          {name:'涨停热力·板块龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', maturity:'T+1', slots:['21:45'], note:'个股类·涨停潮板块龙头（读取 LIMIT_UP_HEATMAP 板块清单）'},
           {name:'市场利率环境', source:'MARKET_REGIME', freq:'收盘后1次', slots:['19:15'], note:'宏观利率环境'},
           {name:'国家队活跃度', source:'NATIONAL_TEAM', freq:'工作日20:50', slots:['20:50'], note:'托盘代理信号'},
           {name:'股票型ETF申赎净流入·观测', source:'ETF_FLOW_OBS', freq:'每交易日盘后(随v8_cn_fetch_cloud post_close)', slots:['17:20'], note:'观测类·Wind主源+上交所备源'},
@@ -15867,6 +15883,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       //   （data/SECTOR_LEADERS.js，生成器 scripts/fetch_sector_leaders.py）降级为
       //   「板块名 → 龙头股」字典。此处保留一次调用，作为独立卡的自愈触发点之一。
       _fillSectorLeaders();
+      /* 🌡️ 2026-11-26 主人令：涨停热力·板块龙头股 独立卡（自愈触发点之一） */
+      try{ window._fillLuLeaders(); }catch(e2lu){}
       /* 📊 2026-10-19 主人令：最终推荐·强势板块龙头股 独立卡（自愈触发点之一） */
       try{ window._fillFrLeaders(); }catch(e2f){}
       var em = window.CONCEPT_ETF_MAP || {};
@@ -16359,6 +16377,96 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       body.innerHTML = h;
       card.style.display = 'block';
     }catch(e){ console.warn('[fillFrLeaders]', e); }
+  };
+
+  /* ═══ 🌡️ 2026-11-26 主人令：涨停热力 · 板块龙头股（个股类，置于「主升/启动板块·龙头股」之上）═══
+     需求原话（截图标注）：「涨停热力矩阵这卡我也想要［类似］最终推荐·强势板块龙头股这样的卡，
+     做好放暂未上架个股类 tab 的『主升/启动板块·龙头股』这卡上方」。
+     数据：window.SECTOR_LEADERS.lu_sectors（scripts/fetch_sector_leaders.py 扩展节，
+          板块清单 = LIMIT_UP_HEATMAP 当日涨停家数 TOP6，剔除「其他」汇总桶；个股 = 对应板块
+          成分股并集当日涨幅前 5，与主升/启动、最终推荐两卡同口径、同生成器、同推送批）。
+     护栏：lu_sectors 缺失/为空 ⇒ 亮卡用真实数据说明（不隐藏、不产空壳），600ms×30 自愈轮询。 */
+  window._fillLuLeaders = function(){
+    try{
+      var card = document.getElementById('luLeadersCard');
+      var body = document.getElementById('luLeadersBody');
+      if(!card || !body) return;
+      var sl = window.SECTOR_LEADERS || null;
+      var lus = (sl && sl.lu_sectors) || [];
+      var lu = window.LIMIT_UP_HEATMAP || null;
+      var _setFresh = function(ts){
+        var fb = document.getElementById('luLeadersFresh');
+        if(!fb) return;
+        if(typeof _uBadge === 'function'){ try{ fb.innerHTML = _uBadge('auto', '盘后', ts); }catch(e1){ fb.textContent = ts; } }
+        else { fb.textContent = ts; }
+      };
+      if(!lus.length){
+        /* 亮卡明示实况（主人 11-24 令：不要隐藏，用真实数据说明情况） */
+        card.style.display = 'block';
+        var _luTs = (lu && lu.update_time) ? ('涨停矩阵 update_time ' + lu.update_time) : '涨停矩阵未注入';
+        var _slTs = (sl && sl.update_time) ? ('；龙头字典 update_time ' + sl.update_time) : '；龙头字典未注入';
+        body.innerHTML = '<div style="padding:10px 12px;border:1px dashed rgba(148,163,184,0.5);border-radius:8px;font-size:12.5px;line-height:1.75;color:var(--txt)">'
+          + '🌡️ 本轮尚未产出「涨停热力 · 板块龙头股」名单（' + _luTs + _slTs + '）——'
+          + '生成器每个盘后批次随「主升/启动板块·龙头股」同轮重算，下轮自动补；本条随真实名单替换。</div>';
+        _setFresh((sl && sl.update_time) || '—');
+        if(!window.__luRetryTimer){
+          window.__luRetryN = 0;
+          window.__luRetryTimer = setInterval(function(){
+            window.__luRetryN++;
+            var _l2 = ((window.SECTOR_LEADERS || {}).lu_sectors) || [];
+            if(_l2.length){
+              clearInterval(window.__luRetryTimer); window.__luRetryTimer = null; window.__luRetryN = 0;
+              try{ window._fillLuLeaders(); }catch(e){}
+            } else if(window.__luRetryN > 30){
+              clearInterval(window.__luRetryTimer); window.__luRetryTimer = null; window.__luRetryN = 0;
+            }
+          }, 600);
+        }
+        return;
+      }
+      if(window.__luRetryTimer){ clearInterval(window.__luRetryTimer); window.__luRetryTimer = null; window.__luRetryN = 0; }
+      var _dsrc = (sl && sl.em_boards_source) || '';
+      var MSG_NOMATCH = '&#x26A0;&#xFE0F; 该板块在东财无对应行业板块映射（聚合名需补 LU_BOARD_KW）';
+      var MSG_EMLIMIT = '&#x26A0;&#xFE0F; 数据接口本轮受限，龙头股名单暂缺，下轮自动补抓';
+      var MSG_FAIL    = '&#x26A0;&#xFE0F; 龙头股行情本轮抓取失败，待下轮盘后自动补抓';
+      var h = '';
+      lus.forEach(function(s, i){
+        var _hasL = s.leaders && s.leaders.length;
+        h += '<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);margin-bottom:7px">';
+        h += '  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:' + (_hasL ? '7px' : '0') + '">';
+        h += '    <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,159,67,0.6);color:#ff9f43;font-size:11px;font-weight:700;flex:none">' + (i + 1) + '</span>';
+        h += '    <span style="font-weight:700;color:var(--txt);font-size:13px">' + s.name + '</span>';
+        h += '    <span style="font-size:10px;color:#ff9f43">今日涨停 ' + (s.today == null ? '—' : s.today) + ' 家</span>';
+        h += '    <span style="font-size:10px;color:var(--dim)">近5日 ' + (s.sum5 == null ? '—' : s.sum5) + ' 家 · 成分股 ' + (s.cons_count || 0) + ' 只</span>';
+        h += '  </div>';
+        if(_hasL){
+          h += '  <div style="display:flex;flex-wrap:wrap;gap:6px 10px">';
+          s.leaders.forEach(function(p, idx){
+            var _c = (p.chg == null) ? 0 : p.chg;
+            var col = (_c >= 0) ? 'var(--up)' : 'var(--down)';
+            h += '<span style="display:inline-flex;align-items:baseline;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.04);border-left:3px solid ' + col + ';font-size:12px;white-space:nowrap">';
+            h += '  <span style="color:var(--dim);font-size:10px">' + (idx + 1) + '</span>';
+            h += '  <span style="color:var(--txt);font-weight:600">' + p.name + '</span>';
+            h += '  <span style="color:var(--sub);font-size:10px">' + p.code + '</span>';
+            h += '  <span style="color:' + col + ';font-weight:700">' + (_c >= 0 ? '+' : '') + _c.toFixed(2) + '%</span>';
+            h += '</span>';
+          });
+          h += '  </div>';
+        } else {
+          var _msg = s.no_match ? ((_dsrc === 'unavailable') ? MSG_EMLIMIT : MSG_NOMATCH) : (s.leaders_error ? MSG_FAIL : MSG_NOMATCH);
+          h += '  <div style="font-size:11px;color:#ffd024;border:1px dashed rgba(255,208,36,0.51);border-radius:6px;padding:6px 9px">' + _msg + '</div>';
+        }
+        h += '</div>';
+      });
+      var _luUt = (lu && lu.update_time) || '—';
+      var _slUt = (sl && sl.update_time) || '—';
+      h += '<div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px;border-top:1px dashed var(--border);padding-top:6px">'
+         + '&#x1F517; 板块清单 = 「涨停热力矩阵」当日涨停家数 TOP' + lus.length + '（剔除「其他」汇总桶，同源同序 · 矩阵 ' + _luUt + '）；'
+         + '个股 = 板块成分股当日涨幅前 5；龙头快照 ' + _slUt + '。</div>';
+      body.innerHTML = h;
+      card.style.display = 'block';
+      _setFresh((sl && sl.update_time) || (lu && lu.update_time) || '—');
+    }catch(e){ console.warn('[fillLuLeaders]', e); }
   };
 
 // 🗑 2026-10-23 主人令：三新算法（缩量回踩 VCP/板块共振/龙虎机构 LHB）经真实信号流回测确认不达标，整支下架删除（子页/渲染函数/后端脚本/数据全部清除）；其原迁入选股策略子页的内容与「暂未上架」观测卡一并移除。
@@ -17063,7 +17171,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       //   两函数原独立卡撤壳并入主卡，研判类名单移除二者。
       var lists = {
         research: ['__renderComprehensiveSynthesis', '__renderMarketState', 'renderSectorTech', '__renderFractalConfluence', '__renderVolumeDivergence', '_fillEtfFlowObs'],
-        stock: ['__renderCashflow', '__renderCashflowQualityBT', '_fillSectorLeaders', '_fillEtfMap', '_fillFrLeaders', '__renderThemeValue', '_fillUsHkMap']
+        stock: ['__renderCashflow', '__renderCashflowQualityBT', '_fillLuLeaders', '_fillSectorLeaders', '_fillEtfMap', '_fillFrLeaders', '__renderThemeValue', '_fillUsHkMap']
       };
       var names = lists[tab] || lists.research;
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
@@ -17142,7 +17250,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=af83d68963');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=25790f2b8d');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -17151,7 +17259,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=126cb62267');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=12148a3b13');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -17308,6 +17416,19 @@ h += '<div class="card" id="cashflowCard" style="margin-bottom:16px;border-left:
    + '<div id="cfqBtHeader"></div>'
    + '<div id="cfqBtBody"><div class="note">现金流质量榜回测数据加载中&#x2026;</div></div></div>'
    + '</div>';
+
+// 🌡️ 2026-11-26 主人令：涨停热力 · 板块龙头股（个股类，置于「主升/启动 板块·龙头股」上方）。
+//   数据 window.SECTOR_LEADERS.lu_sectors（scripts/fetch_sector_leaders.py 扩展节）；
+//   板块清单 = LIMIT_UP_HEATMAP 当日涨停家数 TOP（剔除「其他」），个股 = 成分股当日涨幅前 5。
+h += '<div class="card" id="luLeadersCard" style="display:none;margin-bottom:16px;border-left:4px solid #ff9f43">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
+   + '<span style="font-size:15px;font-weight:700;color:#ff9f43">&#x1F321;&#xFE0F; 涨停热力 &#183; 板块龙头股</span>'
+   + '<span class="fresh" id="luLeadersFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim)">个股类 &#183; 跟随「涨停热力矩阵」日更</span></div>'
+   + '<div style="border:1px solid rgba(255,159,67,0.63);border-radius:7px;padding:8px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt)">'
+   + '<b style="color:#ff9f43">&#x1F4CC; 核心：</b>把「涨停热力矩阵」当日涨停家数最多的板块直接翻译成龙头股。板块名单 = 矩阵当日 TOP（剔除「其他」汇总桶）<b>同源同序</b>；个股 = 东财对应板块成分股当日涨幅前 5。</div>'
+   + '<div id="luLeadersBody"><div class="note">加载中&#x2026;</div></div>'
+   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px">&#x26A0;&#xFE0F; 个股为板块内当日涨幅排序，<b style="color:#ffd024">非推荐信号，不构成投资建议</b>。</div></div>';
 
 // 🚚 2026-11-24 10:10 主人令：主升/启动 板块·龙头股卡移入「个股类」，置于「概念/行业→ETF·龙头参考」卡上方。
 //   数据 window.SECTOR_LEADERS（data/SECTOR_LEADERS.js，scripts/fetch_sector_leaders.py 盘后生成）。
@@ -21108,7 +21229,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fa64a1bd37', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=09aab8c663', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=71ae5585f4', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=83014a672a', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){

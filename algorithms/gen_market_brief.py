@@ -563,23 +563,14 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             _total_net_yi = None
     if _total_net_yi is not None:
         _tn_color = "#ef5350" if _total_net_yi >= 0 else "#26a69a"   # 红涨绿跌铁律
-        # 🏷 2026-11-17 主人令「AI速览ETF资金条断更一劳永逸」：底表降级产出（拼页未全齐
-        #   走 partial 口径）时，合计只覆盖已拼到的页 ⇒ 必须按真实口径标注样本覆盖，
-        #   绝不让降级合计顶着「全市场」三字误导（与 cloud_fetch_v8 partial 标注对齐）。
-        _cov_note = ""
-        if isinstance(etf_daily, dict) and etf_daily.get("partial"):
-            try:
-                _cov_note = (
-                    '<span style="font-size:10px;color:#8b93a7;font-weight:400;">'
-                    f'（样本 {etf_daily.get("covered_pages")}/{etf_daily.get("total_pages")} 页）'
-                    '</span>'
-                )
-            except Exception:
-                _cov_note = ""
+        # 🗑 2026-11-26 主人令（截图标注删除）：「（样本 16/17 页）」这个页数标注整段删掉，
+        #   只保留「全市场ETF合计净流入 +X.XX亿」。原 11-17 版为防止降级合计冒称全市场而加的
+        #   覆盖度标注，主人明确不要（页数是给排障看的，不该占 AI速览位置）。
+        #   partial 口径仍由 bottom part（_cov_note 相关）以外的数据侧 note 保留，卡面不再显示。
         _etf_parts.append(
             '<span style="white-space:nowrap;">全市场ETF合计净'
             f'<span style="color:{_tn_color};font-weight:800;">'
-            f'{"流入" if _total_net_yi >= 0 else "流出"} {_total_net_yi:+.2f}亿</span>{_cov_note}</span>'
+            f'{"流入" if _total_net_yi >= 0 else "流出"} {_total_net_yi:+.2f}亿</span></span>'
         )
 
     # 🛡 2026-09-17 主人令：原「分类概览」段（cat_nets[0] ≥ +5亿 时报「XXETF 净流入 +X.XX亿」，

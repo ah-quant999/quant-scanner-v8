@@ -612,6 +612,165 @@ def _compute_fr_sectors(fr_names, boards_exact, boards_norm, src_date):
     return fr_out
 
 
+# ═══ 🌡️ 2026-11-26 主人令：涨停热力 · 板块龙头股（个股类，置于「主升/启动板块·龙头股」上方）═══
+#   需求原话（截图标注）：「涨停热力矩阵这卡我也想要［类似］最终推荐·强势板块龙头股这样的卡，
+#   做好放暂未上架个股类 tab 的『主升/启动板块·龙头股』这卡上方」。
+#   口径：板块清单 = data/LIMIT_UP_HEATMAP.js 当日涨停家数 TOP（剔除「其他」汇总桶，矩阵同源同序）；
+#        个股 = 该规范板块对应东财行业板块**成分股并集**的当日涨幅前 5（与主升/启动、最终推荐两卡同口径）。
+#   为什么必须展开：涨停矩阵的规范板块名（半导体/机器人/AI算力/白酒消费…）是它自己按关键词
+#        归并出来的聚合名，东财与同花顺都**没有同名板块**（实测直接 _resolve_bk 必 no_match）⇒
+#        先用 LU_BOARD_KW 展开成子板块关键词（与 fetch_limit_up_heatmap_v8.SECTOR_MAP 同一套归类），
+#        再逐个子板块取成分股、按代码并集去重、统一按涨幅排序取前 5。
+SRC_LU = os.path.join(ROOT, "data", "LIMIT_UP_HEATMAP.js")
+LU_TOP_SECTORS = 6          # 当日涨停家数 TOP6（剔除「其他」）
+# ⚠️ 这里写的是东财**板块基名**（去掉 Ⅰ/Ⅱ/Ⅲ 级后缀后精确相等才算命中），不是含词匹配：
+#   实测含词匹配会把三级细分板块一起扫进来（关键词「自动化设」命中「电网自动化设备」、
+#   「专用设备」命中「锂电专用设备」、「工程机械」命中「工程机械整机」）⇒ 一个板块被算 3 遍
+#   且混入无关成分股。故一律精确基名匹配，多子板块合并只发生在同一规范板块内部。
+LU_BOARD_KW = {
+    "半导体":   ["半导体", "电子化学品", "元件", "其他电子"],
+    "新能源车": ["汽车整车", "汽车零部件", "摩托车", "汽车服务"],
+    "机器人":   ["通用设备", "专用设备", "自动化设备", "工程机械", "电机", "轨交设备"],
+    "光伏":     ["光伏设备", "风电设备"],
+    "军工":     ["航天装备", "航空装备", "地面兵装", "军工电子"],
+    "消费电子": ["消费电子", "光学光电子", "家电零部件", "白色家电", "黑色家电", "照明设备",
+                 "厨卫电器", "小家电"],
+    "通信设备": ["通信设备", "通信服务"],
+    "AI算力":   ["软件开发", "计算机设备", "IT服务", "互联网电商"],
+    "医药":     ["化学制药", "中药", "生物制品", "医疗器械", "医疗服务", "医药商业", "动物保健"],
+    "电力":     ["电力", "电网设备", "其他电源设备"],
+    "地产链":   ["房地产开发", "装修装饰", "装修建材"],
+    "白酒消费": ["白酒", "非白酒", "饮料乳品", "食品加工", "农产品加工", "调味发酵品",
+                 "休闲食品", "烘焙食品", "软饮料"],
+    "券商":     ["证券", "保险", "期货", "多元金融"],
+    "固态电池": ["电池", "能源金属"],
+}
+
+
+def _lu_bks(name, exact, norm):
+    """规范板块名 → 东财行业板块 BK 列表（多子板块合并）；展开不到再退回逐名解析。
+    匹配口径：板块名去掉 Ⅰ/Ⅱ/Ⅲ 级后缀后与基名**精确相等**；同一基名的多级条目只取一条
+    （Ⅱ 级优先，与 _resolve_bk 的同级碰撞规则一致）。"""
+    bases = LU_BOARD_KW.get(name) or []
+    picked = {}          # 基名 -> (bk, 是否Ⅱ级)
+    for nm, bk in (exact or {}).items():
+        base = _norm(nm)
+        if base not in bases:
+            continue
+        lvl2 = nm.endswith("Ⅱ")
+        cur = picked.get(base)
+        if cur is None or (lvl2 and not cur[1]):
+            picked[base] = (bk, lvl2)
+    bks = [v[0] for v in picked.values()]
+    if not bks:
+        bk, how = _resolve_bk(name, exact or {}, norm or {})
+        if bk:
+            bks = [bk]
+            log("lu 名直解: %s → %s(%s)" % (name, bk, how))
+    return bks
+
+
+def _compute_lu_sectors(boards_exact, boards_norm, src_date=""):
+    #   与 _compute_fr_sectors 同范式：保留板块（失败也写明原因），同日保底锁防洗回。
+    lu = _read_window_js(SRC_LU) or {}
+    secs = lu.get("sectors") or []
+    if not secs:
+        log("lu: LIMIT_UP_HEATMAP 无 sectors ⇒ 本轮跳过涨停热力龙头节")
+        return []
+    rows = []
+    for x in secs:
+        nm = str(x.get("name") or "")
+        if not nm or nm == "其他":       # 「其他」= 汇总桶（非单一主线），不进本卡
+            continue
+        data = x.get("data") or []
+        today = int(data[-1] or 0) if data else 0
+        s5 = int(sum([v or 0 for v in data[-5:]]) or 0) if data else 0
+        rows.append({"name": nm, "today": today, "sum5": s5})
+    rows.sort(key=lambda r: (-r["today"], -r["sum5"], r["name"]))
+    rows = [r for r in rows if r["today"] > 0 or r["sum5"] > 0][:LU_TOP_SECTORS]
+    if not rows:
+        log("lu: 涨停矩阵全板块当日/近5日均为 0 ⇒ 本轮不产卡")
+        return []
+    if boards_exact is None:
+        boards_exact, boards_norm = fetch_em_boards()
+    # 同日保底锁底稿（同 data_date 才有效）
+    _prev = {}
+    if src_date:
+        _pr = _cache_load(OUT_RAW)
+        if isinstance(_pr, dict) and str(_pr.get("data_date") or "")[:10] == src_date:
+            for _p in (_pr.get("lu_sectors") or []):
+                if isinstance(_p, dict) and _p.get("name"):
+                    _prev[_p["name"]] = _p
+    out = []
+    _fail_run = 0        # 连续失败计数（熔断用）
+    # 🛡 2026-11-26（实测 17:16 东财断连时本节空转 165s）：板块列表都不在线（cache/unavailable）
+    #   ⇒ 东财 clist 必然同断 ⇒ 直接熔断，后面子板块只走「成员缓存 → 腾讯行情」，不再每次干等 6 次重试。
+    _degraded = (EM_BOARDS_SOURCE != "live")
+    if _degraded:
+        log("lu: em_boards_source=%s ⇒ 预熔断，子板块走成员缓存+腾讯行情" % EM_BOARDS_SOURCE)
+    _mem_all = ((_cache_load(CACHE_MEMBERS) or {}).get("members") or {})
+
+    def _cons_of(bk):
+        nonlocal _fail_run, _degraded
+        if not _degraded:
+            try:
+                cons = fetch_cons_safe(bk)
+                if cons:
+                    _fail_run = 0
+                    return cons
+                _fail_run += 1
+            except Exception as e:
+                _fail_run += 1
+                log("lu cons fail %s: %s" % (bk, str(e)[:50]))
+            if _fail_run >= 2 and not _degraded:
+                _degraded = True
+                log("lu 东财连续 %d 个子板块断连 ⇒ 熔断：后续子板块直接走成员缓存+腾讯行情" % _fail_run)
+            if not _degraded:
+                return []
+        ml = _mem_all.get(bk) or []
+        if not ml:
+            return []
+        try:
+            return _tx_cons(ml)
+        except Exception as e2:
+            log("lu 腾讯兜底失败 %s: %s" % (bk, str(e2)[:50]))
+            return []
+
+    for r in rows:
+        nm = r["name"]
+        bks = _lu_bks(nm, boards_exact, boards_norm)
+        merged, got = {}, False
+        for bk in bks:
+            cons = _cons_of(bk)
+            if cons:
+                got = True
+            for c in cons:
+                _c = str(c.get("code") or "")
+                if not _c:
+                    continue
+                if _c not in merged or (c.get("chg") or 0) > (merged[_c].get("chg") or 0):
+                    merged[_c] = c
+            time.sleep(0.12)
+        leaders = sorted(merged.values(), key=lambda z: z.get("chg") or -999, reverse=True)[:TOP_N]
+        item = {"name": nm, "today": r["today"], "sum5": r["sum5"],
+                "cons_count": len(merged), "leaders": leaders, "board_count": len(bks),
+                "bk": (bks[0] if bks else None)}
+        if not leaders:
+            item["leaders_error" if got else "no_match"] = 1
+            _pl = (_prev.get(nm) or {}).get("leaders") or []
+            if _pl:
+                item["leaders"] = _pl
+                item["cons_count"] = (_prev[nm].get("cons_count") or len(_pl))
+                item["match"] = "retained"
+                item.pop("leaders_error", None)
+                log("lu retained %s: %d leaders（同 data_date=%s 过继）" % (nm, len(_pl), src_date))
+        if not item.get("leaders"):
+            log("lu 空龙头: %s（子板块 %d 个；东财断连或该聚合名无对应板块）" % (nm, len(bks)))
+        out.append(item)
+    log("lu sectors: %s" % "、".join("%s(%d涨停/%d只)" % (x["name"], x["today"], x["cons_count"]) for x in out))
+    return out
+
+
 def build():
     rs = _read_window_js(SRC_RS)
     if not rs or not rs.get("sectors"):
@@ -784,6 +943,8 @@ def build():
     # 📊 2026-10-19/10-29：fr_sectors 生成抽离至 _compute_fr_sectors（与 --fr-only 共用，
     #   保证 fr_sectors 永远跟随最新 FINAL_RECOMMEND_DATA.strong_sectors，消除 A批/D批 时序 race）
     fr_out = _compute_fr_sectors(fr_names, boards_exact, boards_norm, src_date)
+    # 🌡️ 2026-11-26 主人令：涨停热力 · 板块龙头股（同管线扩展，产物键 lu_sectors）
+    lu_out = _compute_lu_sectors(boards_exact, boards_norm, src_date)
 
     # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
     #   原口径 `"update_time": time.strftime(...)` = **本脚本落盘时刻**，与数据日期无关。
@@ -808,6 +969,7 @@ def build():
                    + (" + 腾讯NeoData 板块成分明细（东财 push2 封禁兜底 %d 板块）" % n_neo if n_neo else "")),
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
         "fr_count": len(fr_out), "fr_sectors": fr_out,
+        "lu_count": len(lu_out), "lu_sectors": lu_out,
         "nomatch_count": n_nomatch, "leaders_fail_count": n_fail,
         "neo_fallback_count": n_neo,
         "retained_count": n_retained,
