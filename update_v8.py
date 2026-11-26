@@ -245,6 +245,12 @@ DATA_SOURCES = {
     #   ⚠️ 本表必须登记：否则 update_v8 永不生成 data/FUNDAMENTAL_QUALITY.js ——
     #   与 2026-08-18 overseas_markets / 2026-08-26 final_recommend 同类「raw 已新、js 永旧」半截更新事故预防。
     "fundamental_quality.json":   "FUNDAMENTAL_QUALITY",
+    # 🎯 2026-11-26 主人令「卡片信息太多我很混乱，给我一个综合研判」：
+    #   今日作战指令·唯一裁决卡。raw_data/verdict.json 由 algorithms/gen_verdict.py 产出
+    #   （纯合成器：只读已上线产物，不新增任何模型/权重/回测）。
+    #   ⚠️ 必须登记本表，否则 update_v8 永不生成 data/V8_VERDICT.js ⇒ 卡面永远「数据未生成」
+    #   （与 2026-08-18 overseas_markets / 08-26 final_recommend 同类「raw 已新、js 永旧」事故预防）。
+    "verdict.json":               "V8_VERDICT",
 }
 
 # 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
@@ -1704,6 +1710,32 @@ def run_health_check():
         print(f"[WARN] 健康检查调用失败: {e}")
 
 
+def _run_gen_verdict():
+    """🎯 2026-11-26 主人令：今日作战指令（唯一裁决卡）随数据刷新自动重算。
+
+    位置要求：必须在 data/*.js 全部重建**之后**跑 —— 它读的就是 data/*.js（与前端同一口径），
+    再写 raw_data/verdict.json（本文件映射成 data/V8_VERDICT.js）与 data/V8_VERDICT.js（双写）。
+    失败只告警不阻断部署（卡面会显「数据未生成」，其余卡不受影响）。
+    """
+    import subprocess
+    path = Path(__file__).resolve().parent / "algorithms" / "gen_verdict.py"
+    if not path.exists():
+        print("[verdict] ⚠️ 缺失 gen_verdict.py，跳过")
+        return
+    print(f"[verdict] ▶ gen_verdict.py ({datetime.now():%H:%M:%S})")
+    try:
+        r = subprocess.run([sys.executable, str(path)], cwd=str(path.parent),
+                           capture_output=True, text=True, timeout=180)
+        if r.returncode == 0:
+            for l in (r.stdout or "").strip().splitlines()[:3]:
+                print(f"[verdict]   {l[:110]}")
+        else:
+            print(f"[verdict]   ⚠️ 退出码 {r.returncode}")
+            print("     " + "\n     ".join((r.stdout + r.stderr).strip().splitlines()[-3:])[:300])
+    except Exception as e:
+        print(f"[verdict]   ⚠️ 异常: {e}")
+
+
 def run_experiment_cards():
     """2026-08-13 主人令：暂未上架三张新卡（涨价弹性榜/情绪周期/潜力挖掘）随数据刷新自动重算。
     三脚本读 data/*.js（build 刚生成的），写 data/COMMODITY_ELASTICITY.js 等。
@@ -2126,6 +2158,10 @@ def main():
         # 3) 健康校验 / 实验卡（辅助，失败不影响上线）
         _safe("run_health_check", run_health_check)
         _safe("run_experiment_cards", run_experiment_cards)
+        # 4) 🎯 2026-11-26 主人令：今日作战指令（唯一裁决卡）必须在 data/*.js 全部重建**之后**合成，
+        #    因为它读的是 data/*.js（前端同一口径）；脚本自身同时写 raw_data/verdict.json
+        #    与 data/V8_VERDICT.js，双写保证前端不出现「raw 已新、js 永旧」。
+        _safe("gen_verdict", _run_gen_verdict)
     return rc
 
 

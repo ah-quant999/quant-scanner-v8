@@ -1,0 +1,41 @@
+{
+ "date": "2026-11-26",
+ "generated": "2026-11-26 19:34:52",
+ "verdict": {
+  "cap_pct": 30,
+  "label": "守",
+  "cur_pct": 4.1
+ },
+ "inputs": {
+  "tactic_score": -2,
+  "tactic_exposure": 0.3,
+  "senti_phase": "狂热",
+  "senti_score": 85.0,
+  "zt": 76,
+  "max_ladder": 5,
+  "up": 784,
+  "down": 1488,
+  "breadth": 0.34507042253521125,
+  "crisis": 35.9,
+  "sh_close": 3476.88,
+  "sh_chg": 0.01,
+  "zz1000_close": 5541.55,
+  "flow_in_cnt": 29,
+  "top_sectors": [
+   "液冷概念",
+   "保险新进",
+   "英伟达概念"
+  ],
+  "top_stocks": [
+   "招商证券",
+   "国泰海通",
+   "上海九百"
+  ]
+ },
+ "checks_hit": 4,
+ "checks_total": 7,
+ "forward_ref": {
+  "sh_close": 3476.88,
+  "date": "2026-11-26"
+ }
+}
