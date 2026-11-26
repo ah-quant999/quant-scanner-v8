@@ -1915,15 +1915,20 @@ def run_experiment_cards():
         print("[experiment] ⚠️ 缺失 scripts/gen_fractal_confluence.py，跳过")
 
     # ⚠️ 2026-11-23 主人令：量价背离预警·缩量新高灯（暂未上架·观测类）。
-    #   gen_volume_divergence.py 每轮重算（候选池精选~75只+案例4只，全程 ~70s）：
+    #   gen_volume_divergence.py 每轮重算（候选池 736 只，改读 kline_cache 后实测 ~8s）：
     #   信号=收盘创20日新高 且 5均量<0.85×20均量（量价背离·见顶预警灯，回测255次信号超额-3.0pp）。
     #   ⚠️ 预警/过滤层：预警≠卖出，不参与选股评分（评审中）。失败隔离不阻断。
+    # 🔴 2026-11-26 根因修复 + 超时收缩（盘中减负）：
+    #   原 timeout=600。脚本内部逐只走 akshare 串行抓 736 只 ⇒ 每轮必然吃满 600s 被杀，
+    #   两遍（全量 + post_close）共白烧 20 分钟，产物恒为 scanned:0 空卡（云端日志铁证
+    #   "timed out after 600 seconds"）。脚本已改为优先读 raw_data/kline_cache（同为 qfq），
+    #   实测 736 只 7.6 秒 ⇒ 超时同步收到 180s：既留足余量，又保证任何退化都不会再白等 10 分钟。
     voldiv_py = Path(__file__).resolve().parent / "scripts" / "gen_volume_divergence.py"
     if voldiv_py.exists():
         print(f"[experiment] ▶ gen_volume_divergence.py ({datetime.now():%H:%M:%S})")
         try:
             r = subprocess.run([sys.executable, str(voldiv_py)],
-                               capture_output=True, text=True, timeout=600)
+                               capture_output=True, text=True, timeout=180)
             if r.returncode == 0:
                 last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
                 print(f"[experiment]   ✅ {last[0][:80]}")

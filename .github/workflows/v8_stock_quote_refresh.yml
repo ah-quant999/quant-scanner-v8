@@ -8,8 +8,16 @@
 #   + workflow_dispatch 手动触发应急。比 v8_algo_cloud 整套 1-2h 轻量得多。
 #
 # 调度策略：
-#   - 交易时间 09:00-16:30（北京时间）每 30 分钟刷新一次，保证盘中实时性
-#   - workflow_dispatch 应急手动触发（仍受 09:00-16:30 交易时间门控，除非显式 skip）
+#   🔴 2026-11-26 主人令（盘中减负第三轮）：「个股报价可以不用了，盘后跑就好」。
+#     —— 全站个股查询的报价是「查一下多少钱」性质，盘中每隔 30 分刷一次 9915 只票的
+#        全量快照，对本机是纯负担：它占 cn 单机 4.8 分钟/日，却只服务手工查询；
+#        而盘中真正在变的行情（板块/涨停/指数/候选池）由 cn 抓取主链的 intraday 档供给，
+#        本 workflow 的产物不参与任何盘中卡的计算。
+#     ⇒ 盘中档全部撤除，只在盘后跑两档：15:35（收盘价定稿）／20:00（晚间补漏）。
+#     ⇒ 同步撤除两处盘中派发源（只改 cron 不够，派发会绕过 cron）：
+#        ① v8_cn_fetch_cloud.yml 的 relay ②「STOCK_QUOTE 刷新派发」
+#        ② scripts/intraday_first_batch_gate.py 的必需卡清单与派发目标
+#   - workflow_dispatch 应急手动触发（仍受 15:30-21:30 盘后时段门控，除非显式 skip）
 #   - 内部走 A 股交易日历 gate，非交易日自动跳过（与 v8_algo_cloud 一致）
 #
 # ⚠️ 2026-08-20 主人令·一劳永逸：改为 ubuntu-latest（云端）。
@@ -35,15 +43,12 @@ name: "📈 v8 STOCK_QUOTE 轻量 refresh"
 
 on:
   schedule:
-    # 09:00-16:30 北京时间（UTC 01:00-08:30），每 30 分钟一次
-    # 🔧 2026-09-07 一修失败：仅改注释未唤醒调度器（09-07 全天 6 轮全是 workflow_dispatch，
-    #   schedule 自 09-04 18:41 起零触发 → 实测「注释变更」不足以让 GitHub 重新注册 cron）。
-    # 🔧 2026-09-07 二修（结构性变更）：把 '*/30 1-8 * * 1-5' 拆成显式「整点 + 半点」两条 cron 行。
-    #   语义等价（北京 09:00/09:30/…/16:30），但对 schedule 段做结构改动，强制重新注册。
-    #   兜底不撤：82038f74(15分级) + 11:10/13:10/15:10 三档仍常驻；cron 恢复后由
-    #   「age<=15min」与「查活跃 run」双重防互踩拦截，不会重复派发。
-    - cron: '0 1-8 * * 1-5'
-    - cron: '30 1-8 * * 1-5'
+    # 🔴 2026-11-26 主人令：盘中档全部撤除，只保留盘后两档（UTC = 北京 -8）
+    #   '35 7'  ⇒ 北京 15:35（收盘定稿：收盘价/停牌状态已落定）
+    #   '0 12'  ⇒ 北京 20:00（晚间补漏：错过 15:35 档或抓取失败的第二次机会）
+    #   注意：改动 schedule 段属结构性变更，GitHub 会重新注册 cron（09-07 已验证此做法）。
+    - cron: '35 7 * * 1-5'
+    - cron: '0 12 * * 1-5'
   workflow_dispatch:
     inputs:
       skip_trading_day_gate:
@@ -222,24 +227,27 @@ jobs:
           fi
           echo "✅ akshare 依赖装好"
 
-      - name: "🕘 交易时间 gate（09:00-16:30 北京时间）"
+      - name: "🕘 盘后时段 gate（15:30-21:30 北京时间）"
         id: trading_hours
         run: |
           if [ "${{ github.event.inputs.skip_trading_day_gate }}" = "true" ]; then
             echo "is_trading_hours=true" >> "$GITHUB_OUTPUT"
-            echo "  ⚡ 应急模式：跳过交易时间 gate（手动触发 + skip=true）"
+            echo "  ⚡ 应急模式：跳过盘后时段 gate（手动触发 + skip=true）"
           else
             python - <<'PY'
           from datetime import datetime, timedelta
           now = datetime.utcnow() + timedelta(hours=8)
           hm = now.hour * 60 + now.minute
-          ok = 540 <= hm <= 990  # 09:00..16:30
-          print(f"  Beijing time: {now:%H:%M} ({'inside' if ok else 'outside'} 09:00-16:30)")
+          # 🔴 2026-11-26：09:00-16:30 → 15:30-21:30。盘中档已撤除，若沿用旧窗则
+          #   20:00 那档会被本 gate 拦掉（等于白设）；同时开窗即拦，任何残留的盘中
+          #   派发（旧 relay/旧脚本/manual）都会被这里二次兜住。
+          ok = 930 <= hm <= 1290  # 15:30..21:30
+          print(f"  Beijing time: {now:%H:%M} ({'inside' if ok else 'outside'} 15:30-21:30)")
           import os
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               f.write(f"is_trading_hours={'true' if ok else 'false'}\n")
           if not ok:
-              print("  ⏸️ 不在交易时间，跳过本次 refresh")
+              print("  ⏸️ 不在盘后时段，跳过本次 refresh")
           PY
           fi
 

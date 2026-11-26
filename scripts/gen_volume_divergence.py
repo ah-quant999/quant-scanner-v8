@@ -53,10 +53,53 @@ def _sina_symbol(code):
     return None  # 北交所/港股/美股跳过（信号域=A股沪深）
 
 
+_CACHE_DIR = os.path.join("raw_data", "kline_cache")
+# 缓存缺失（新股/退市/首次建仓）时允许回退 akshare 的额度上限。
+# 不设上限 = 一旦缓存大面积缺失又退化成 736 只串行 10 分钟，回到本次修掉的老病灶。
+_FALLBACK_LEFT = [25]
+
+
+def _from_cache(code):
+    """读仓库自带日线缓存 raw_data/kline_cache/{code}.json。
+
+    口径：fetch_multiyear_kline.py 走腾讯 qfqday（**前复权**）落盘，与
+    ak.stock_zh_a_daily(adjust="qfq") 同口径，字段 date/open/high/low/close/volume 齐全。
+    """
+    p = os.path.join(_CACHE_DIR, code + ".json")
+    if not os.path.exists(p):
+        return None
+    try:
+        rows = json.load(open(p, encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(rows, list) or len(rows) < 60:
+        return None
+    try:
+        df = pd.DataFrame(rows)
+        df["date"] = pd.to_datetime(df["date"])
+        return df.sort_values("date").reset_index(drop=True)
+    except Exception:
+        return None
+
+
 def load_daily(code):
     sym = _sina_symbol(code)
     if not sym:
         return None
+    # 🔴 2026-11-26 根因修复（盘中减负·云端日志铁证）：
+    #   【病灶】原先逐只调 ak.stock_zh_a_daily（串行、零缓存）。扫描域从设计时的「~75 只」
+    #     涨到 736 只（candidate_quotes 扩容后本脚本没跟上）⇒ 单轮 ≈600s，被 update_v8 的
+    #     timeout=600 判超时杀掉，且**每档跑两遍**（全量 + post_close 各一遍）⇒ 每档白烧
+    #     20 分钟，产物恒为空卡（线上实证 16:41 档日志 "timed out after 600 seconds"，
+    #     data/VOLUME_DIVERGENCE.js 里 scanned:0 / hits:[] 就是这个原因）。
+    #   【修法】优先读仓库自带缓存（同为 qfq 前复权、736 只读本地 ≈1 秒），
+    #     缺失的新股才回退 akshare，并设额度上限防止退化为原病灶。
+    df = _from_cache(code)
+    if df is not None:
+        return df
+    if _FALLBACK_LEFT[0] <= 0:
+        return None
+    _FALLBACK_LEFT[0] -= 1
     try:
         df = ak.stock_zh_a_daily(symbol=sym, adjust="qfq")
     except Exception:

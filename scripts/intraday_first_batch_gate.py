@@ -46,8 +46,10 @@ API = "https://api.github.com/repos/ah-quant999/quant-scanner-v8"
 #   修复：按真实 cadence 分层——高频卡仍用 now-25；低频卡只要求「今日已生成」，
 #   真断更（update_time 停在前一日）仍判红，不再误报。
 # 第一批必需卡·高频盘中卡（now-25 动态判定线）
+# 🔴 2026-11-26 主人令：「个股报价可以不用了，盘后跑就好」⇒ STOCK_QUOTE 退出必需清单。
+#   注意必须连 DISPATCH_WFS 一起摘（只摘清单不够：清单判红会触发 dispatch，dispatch 又派它）。
+#   退出后它仍在 OPTIONAL 里可见（陈旧只打印、不判红、不派发、不发邮件），不会静默失联。
 REQUIRED_INTRADAY = [
-    ("STOCK_QUOTE", "个股行情"),
     ("SECTOR_FUND_FLOW", "板块资金全量"),
     ("LIMIT_UP_HEATMAP", "涨停热力"),
     ("MARKET_FUND_FLOW_DATA", "大盘资金流向"),
@@ -61,6 +63,7 @@ REQUIRED_SCHEDULED = [
 REQUIRED = REQUIRED_INTRADAY + REQUIRED_SCHEDULED  # 兼容原 7 卡清单/外部引用
 # 可选卡（陈旧只告警不判红）
 OPTIONAL = [
+    ("STOCK_QUOTE", "个股行情(盘后档)"),
     ("VALUATION_PERCENTILE", "估值分位"),
     ("CITIC_PE_THERMO", "中信PE温度计"),
     ("CITIC_PE_BACKTEST", "中信PE回测"),
@@ -69,10 +72,11 @@ OPTIONAL = [
 ]
 
 # 派发目标（workflow 文件名 → GitHub workflow 路径）
+# 🔴 2026-11-26：v8_stock_quote_refresh.yml 移出 —— 个股报价改盘后 15:35/20:00 两档，
+#   盘中不再由本闸门救援派发（该 workflow 自身的盘后 gate 也会拦掉盘中触发）。
 DISPATCH_WFS = [
     ".github/workflows/v8_cn_fetch_cloud_hosted.yml",   # 重抓取（板块资金/涨停/大盘/候选池…）
     ".github/workflows/v8_intraday_snapshot.yml",       # 板块资金日内快照
-    ".github/workflows/v8_stock_quote_refresh.yml",     # 行情轻量刷新
 ]
 
 CTX = ssl.create_default_context()

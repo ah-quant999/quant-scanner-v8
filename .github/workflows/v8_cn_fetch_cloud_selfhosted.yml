@@ -500,6 +500,13 @@ jobs:
         # 🔴 2026-08-18 主人根治令：health_check 硬失败曾 3 次拖垮 workflow → 软失败只留痕。
         # 🛡️ 2026-08-30 补充：cn runner 内网连线上 github.io/api 大量超时重试，
         #   实测单次 1847s(31min) 白耗 runner。加 8 分钟上限，超时按软失败处理。
+        # 🔴 2026-11-26 盘中减负（第三黑洞）：盘中档整步跳过。
+        #   【账】本步上限 8 分钟且**每档必然跑满被杀**（cn 机连 github.io 结构性超时），
+        #     等于盘中共 12 档 × 8 分钟 = 96 分钟纯空转，直接把 cn 单机吃穿。
+        #   【为何盘中无意义】health_check 探的是「线上 Pages 数据新鲜度」，而盘中档自己
+        #     就是生产者 —— 探自己刚推的数据，属于自证循环；且它连不上 Pages，探不出任何东西。
+        #   【保留】盘后档（post_close / all 兜底）照旧跑：那时才需要给主人一份完整健康快照。
+        if: steps.cat.outputs.category != 'intraday'
         timeout-minutes: 8
         continue-on-error: true
         shell: bash
