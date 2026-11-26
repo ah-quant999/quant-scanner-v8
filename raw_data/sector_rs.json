@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-26 16:43",
+  "update_time": "2026-11-26 16:51",
   "data_date": "2026-11-25",
   "data_date_source": "kline",
   "fetch_date": "2026-11-26",
@@ -131,6 +131,24 @@
       "relative_90d": -28.38,
       "relative_180d": -35.69,
       "relative_52w": -39.3
+    },
+    {
+      "name": "电机",
+      "pct_day": -5.01,
+      "pct_5d": -5.79,
+      "pct_20d": -21.49,
+      "pct_30d": -12.15,
+      "pct_60d": -19.11,
+      "pct_90d": -19.25,
+      "pct_180d": -29.3,
+      "pct_52w": -29.56,
+      "relative_5d": -5.79,
+      "relative_20d": -21.49,
+      "relative_30d": -12.15,
+      "relative_60d": -19.11,
+      "relative_90d": -19.25,
+      "relative_180d": -29.3,
+      "relative_52w": -29.56
     },
     {
       "name": "电力",
@@ -527,6 +545,24 @@
       "relative_90d": -8.41,
       "relative_180d": -14.23,
       "relative_52w": -12.53
+    },
+    {
+      "name": "化学纤维",
+      "pct_day": -3.28,
+      "pct_5d": -8.37,
+      "pct_20d": -13.99,
+      "pct_30d": -17.29,
+      "pct_60d": -21.78,
+      "pct_90d": -18.0,
+      "pct_180d": -30.2,
+      "pct_52w": -27.72,
+      "relative_5d": -8.37,
+      "relative_20d": -13.99,
+      "relative_30d": -17.29,
+      "relative_60d": -21.78,
+      "relative_90d": -18.0,
+      "relative_180d": -30.2,
+      "relative_52w": -27.72
     },
     {
       "name": "化学原料",
@@ -1427,6 +1463,24 @@
       "relative_90d": 13.26,
       "relative_180d": 12.33,
       "relative_52w": 7.45
+    },
+    {
+      "name": "医药商业",
+      "pct_day": 0.87,
+      "pct_5d": -5.06,
+      "pct_20d": -10.13,
+      "pct_30d": -12.62,
+      "pct_60d": -14.08,
+      "pct_90d": -9.26,
+      "pct_180d": -21.38,
+      "pct_52w": -21.47,
+      "relative_5d": -5.06,
+      "relative_20d": -10.13,
+      "relative_30d": -12.62,
+      "relative_60d": -14.08,
+      "relative_90d": -9.26,
+      "relative_180d": -21.38,
+      "relative_52w": -21.47
     },
     {
       "name": "养殖业",
