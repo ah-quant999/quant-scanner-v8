@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-26 18:15:43",
-  "summary": "上证指数涨0.01%。",
+  "update_time": "2026-11-26 21:36:57",
+  "summary": "上证指数涨0.01%，涨停65只、跌停0只。情绪积极。",
   "indices": [
     {
       "name": "上证指数",
@@ -54,5 +54,11 @@
   ],
   "top_sectors": [],
   "bottom_sectors": [],
-  "mood": {}
+  "mood": {
+    "up": 1730,
+    "down": 3395,
+    "flat": 173,
+    "limit_up": 65,
+    "limit_down": 0
+  }
 }

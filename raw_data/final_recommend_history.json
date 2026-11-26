@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-26 19:13:06",
-  "update_time": "2026-11-26 19:13:06",
+  "generated": "2026-11-26 22:20:12",
+  "update_time": "2026-11-26 22:20:12",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -2141,30 +2141,29 @@
     },
     "2026-11-26": {
       "date": "2026-11-26",
-      "update_time": "2026-11-26 18:58:07",
+      "update_time": "2026-11-26 22:16:19",
       "file": "final_recommend_20261126.json",
-      "degraded": false,
+      "degraded": true,
       "top3": [
         {
           "rank": 1,
-          "code": "600838",
-          "name": "上海九百",
-          "close": 8.83,
+          "code": "300900",
+          "name": "广联航空",
+          "close": 15.36,
           "close_date": "2026-11-26",
-          "final_score": 4.2,
-          "resonance": 2,
+          "final_score": 4.1,
+          "resonance": 1,
           "sources": [
-            "动量共识",
             "因子榜"
           ]
         },
         {
           "rank": 2,
-          "code": "000063",
-          "name": "中兴通讯",
-          "close": 25.66,
+          "code": "688158",
+          "name": "优刻得",
+          "close": 22.74,
           "close_date": "2026-11-26",
-          "final_score": 4.2,
+          "final_score": 4.0,
           "resonance": 1,
           "sources": [
             "因子榜"

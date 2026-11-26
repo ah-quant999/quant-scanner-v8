@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-26 19:03:42",
-  "run_start": "2026-11-26 16:48:35",
+  "update_time": "2026-11-26 22:22:24",
+  "run_start": "2026-11-26 19:53:27",
   "ok": 49,
   "fail": 3,
   "failed_scripts": [
@@ -9,8 +9,8 @@
       "reason": "超时 >40min"
     },
     {
-      "script": "fetch_orphan_sector_fund_flow.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout failed!"
     },
     {
       "script": "factor_walkforward.py",
