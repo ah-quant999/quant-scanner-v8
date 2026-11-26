@@ -1,9 +1,9 @@
 {
- "update_time": "2026-11-26 21:24:54",
+ "update_time": "2026-11-27 04:47:35",
  "data_date": "2026-11-23",
  "universe": {
-  "total": 736,
-  "scanned": 705
+  "total": 983,
+  "scanned": 953
  },
  "signal": "收盘创20日新高 且 5日均量<0.85×20日均量（量价背离·缩量新高）",
  "hits": [
@@ -23,6 +23,51 @@
    }
   },
   {
+   "code": "688309",
+   "name": "恒誉科技",
+   "case": false,
+   "price": 81.65,
+   "above_ma20": true,
+   "vol_ratio": 0.833,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-09-08",
+    "days_ago": 0,
+    "vol_ratio": 0.833
+   }
+  },
+  {
+   "code": "301261",
+   "name": "恒工精密",
+   "case": false,
+   "price": 76.28,
+   "above_ma20": true,
+   "vol_ratio": 0.983,
+   "off_high20": 0.0,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-24",
+    "days_ago": 1,
+    "vol_ratio": 0.763
+   }
+  },
+  {
+   "code": "000400",
+   "name": "许继电气",
+   "case": false,
+   "price": 25.9,
+   "above_ma20": true,
+   "vol_ratio": 0.807,
+   "off_high20": -1.22,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-24",
+    "days_ago": 2,
+    "vol_ratio": 0.845
+   }
+  },
+  {
    "code": "688082",
    "name": "盛美上海",
    "case": false,
@@ -35,36 +80,6 @@
     "date": "2026-11-24",
     "days_ago": 2,
     "vol_ratio": 0.844
-   }
-  },
-  {
-   "code": "600028",
-   "name": "中国石化",
-   "case": false,
-   "price": 5.92,
-   "above_ma20": true,
-   "vol_ratio": 0.868,
-   "off_high20": -1.82,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-18",
-    "days_ago": 3,
-    "vol_ratio": 0.806
-   }
-  },
-  {
-   "code": "002311",
-   "name": "海大集团",
-   "case": false,
-   "price": 49.25,
-   "above_ma20": true,
-   "vol_ratio": 0.889,
-   "off_high20": -1.01,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-20",
-    "days_ago": 3,
-    "vol_ratio": 0.719
    }
   },
   {
@@ -83,18 +98,33 @@
    }
   },
   {
-   "code": "000568",
-   "name": "泸州老窖",
+   "code": "601021",
+   "name": "春秋航空",
    "case": false,
-   "price": 79.84,
+   "price": 44.95,
    "above_ma20": true,
-   "vol_ratio": 0.665,
-   "off_high20": -2.5,
+   "vol_ratio": 0.768,
+   "off_high20": -1.66,
    "hit_now": false,
    "recent": {
     "date": "2026-11-19",
     "days_ago": 4,
-    "vol_ratio": 0.848
+    "vol_ratio": 0.811
+   }
+  },
+  {
+   "code": "300760",
+   "name": "迈瑞医疗",
+   "case": false,
+   "price": 183.5,
+   "above_ma20": true,
+   "vol_ratio": 0.799,
+   "off_high20": -1.01,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.735
    }
   },
   {
@@ -113,18 +143,63 @@
    }
   },
   {
-   "code": "002867",
-   "name": "周大生",
+   "code": "601088",
+   "name": "中国神华",
    "case": false,
-   "price": 11.52,
+   "price": 53.0,
    "above_ma20": true,
-   "vol_ratio": 0.939,
-   "off_high20": -4.16,
+   "vol_ratio": 0.929,
+   "off_high20": 0.0,
    "hit_now": false,
    "recent": {
-    "date": "2026-11-17",
+    "date": "2026-11-20",
     "days_ago": 4,
-    "vol_ratio": 0.832
+    "vol_ratio": 0.844
+   }
+  },
+  {
+   "code": "002311",
+   "name": "海大集团",
+   "case": false,
+   "price": 48.66,
+   "above_ma20": false,
+   "vol_ratio": 0.938,
+   "off_high20": -2.19,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-20",
+    "days_ago": 4,
+    "vol_ratio": 0.719
+   }
+  },
+  {
+   "code": "601988",
+   "name": "中国银行",
+   "case": false,
+   "price": 7.51,
+   "above_ma20": true,
+   "vol_ratio": 0.954,
+   "off_high20": -0.53,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-20",
+    "days_ago": 4,
+    "vol_ratio": 0.766
+   }
+  },
+  {
+   "code": "601601",
+   "name": "中国太保",
+   "case": false,
+   "price": 32.98,
+   "above_ma20": true,
+   "vol_ratio": 0.955,
+   "off_high20": 0.0,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-16",
+    "days_ago": 4,
+    "vol_ratio": 0.806
    }
   },
   {
@@ -143,6 +218,36 @@
    }
   },
   {
+   "code": "600887",
+   "name": "伊利股份",
+   "case": false,
+   "price": 32.85,
+   "above_ma20": true,
+   "vol_ratio": 1.003,
+   "off_high20": -1.5,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.811
+   }
+  },
+  {
+   "code": "601398",
+   "name": "工商银行",
+   "case": false,
+   "price": 9.23,
+   "above_ma20": true,
+   "vol_ratio": 1.154,
+   "off_high20": -1.81,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-20",
+    "days_ago": 4,
+    "vol_ratio": 0.84
+   }
+  },
+  {
    "code": "600660",
    "name": "福耀玻璃",
    "case": false,
@@ -155,6 +260,21 @@
     "date": "2026-11-17",
     "days_ago": 4,
     "vol_ratio": 0.828
+   }
+  },
+  {
+   "code": "300703",
+   "name": "创源股份",
+   "case": false,
+   "price": 14.91,
+   "above_ma20": true,
+   "vol_ratio": 1.532,
+   "off_high20": 0.0,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-09-01",
+    "days_ago": 4,
+    "vol_ratio": 0.838
    }
   },
   {
@@ -188,6 +308,21 @@
    }
   },
   {
+   "code": "000568",
+   "name": "泸州老窖",
+   "case": false,
+   "price": 78.01,
+   "above_ma20": false,
+   "vol_ratio": 0.651,
+   "off_high20": -4.74,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-19",
+    "days_ago": 5,
+    "vol_ratio": 0.848
+   }
+  },
+  {
    "code": "601598",
    "name": "中国外运",
    "case": false,
@@ -218,18 +353,18 @@
    }
   },
   {
-   "code": "000651",
-   "name": "格力电器",
+   "code": "601328",
+   "name": "交通银行",
    "case": false,
-   "price": 40.65,
+   "price": 9.27,
    "above_ma20": true,
-   "vol_ratio": 1.049,
-   "off_high20": -0.81,
+   "vol_ratio": 1.119,
+   "off_high20": 0.0,
    "hit_now": false,
    "recent": {
-    "date": "2026-11-16",
+    "date": "2026-11-19",
     "days_ago": 5,
-    "vol_ratio": 0.788
+    "vol_ratio": 0.78
    }
   },
   {
@@ -245,6 +380,21 @@
     "date": "2026-11-16",
     "days_ago": 5,
     "vol_ratio": 0.783
+   }
+  },
+  {
+   "code": "601318",
+   "name": "中国平安",
+   "case": false,
+   "price": 54.58,
+   "above_ma20": true,
+   "vol_ratio": 1.28,
+   "off_high20": -1.59,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-19",
+    "days_ago": 5,
+    "vol_ratio": 0.816
    }
   }
  ],

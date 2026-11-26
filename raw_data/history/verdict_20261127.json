@@ -1,0 +1,42 @@
+{
+ "date": "2026-11-27",
+ "generated": "2026-11-27 04:47:39",
+ "verdict": {
+  "cap_pct": 30,
+  "label": "观"
+ },
+ "inputs": {
+  "tactic_score": -1,
+  "tactic_exposure": 0.5,
+  "senti_phase": "狂热",
+  "senti_score": 85.0,
+  "zt": 76,
+  "max_ladder": 5,
+  "up": 784,
+  "down": 1488,
+  "breadth": 0.34507042253521125,
+  "crisis": 36.1,
+  "sh_close": 3476.88,
+  "sh_chg": 0.01,
+  "zz1000_close": 5531.84,
+  "flow_in_cnt": 40,
+  "top_sectors": [
+   "同花顺漂亮100",
+   "高股息精选",
+   "液冷概念"
+  ],
+  "top_stocks": [
+   "广联航空",
+   "优刻得",
+   "上海九百"
+  ]
+ },
+ "checks_hit": 4,
+ "checks_total": 8,
+ "list_gate_ok": false,
+ "list_gate_why": "榜单陈旧11-26、validity=degraded、无分辨度max=4.1、缺维度inst_w52/inst_analyst",
+ "forward_ref": {
+  "sh_close": 3476.88,
+  "date": "2026-11-27"
+ }
+}

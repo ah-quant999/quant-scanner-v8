@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-11-27 03:39",
- "generated": "2026-11-27 03:39",
+ "update_time": "2026-11-27 04:47",
+ "generated": "2026-11-27 04:47",
  "meta": {
-  "generated": "2026-11-27 03:39",
+  "generated": "2026-11-27 04:47",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 33,
+  "total_days": 32,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -13465,301 +13465,28 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "consensus": []
   },
   {
-   "date": "2026-11-26",
-   "categories": {
-    "突破": [
-     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 7.089,
-      "price": 21.45,
-      "category": "突破"
-     },
-     {
-      "code": "600540",
-      "name": "新赛股份",
-      "change_pct": 3.958,
-      "price": 3.94,
-      "category": "突破"
-     },
-     {
-      "code": "301046",
-      "name": "能辉科技",
-      "change_pct": 3.691,
-      "price": 21.35,
-      "category": "突破"
-     },
-     {
-      "code": "300741",
-      "name": "华宝股份",
-      "change_pct": 3.875,
-      "price": 15.01,
-      "category": "突破"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 10.01,
-      "price": 11.1,
-      "category": "突破"
-     },
-     {
-      "code": "002702",
-      "name": "海欣食品",
-      "change_pct": 4.425,
-      "price": 4.72,
-      "category": "突破"
-     },
-     {
-      "code": "000523",
-      "name": "红棉股份",
-      "change_pct": 3.861,
-      "price": 2.69,
-      "category": "突破"
-     },
-     {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 5.556,
-      "price": 1.71,
-      "category": "突破"
-     },
-     {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 3.278,
-      "price": 30.88,
-      "category": "突破"
-     },
-     {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 10.0,
-      "price": 14.52,
-      "category": "突破"
-     },
-     {
-      "code": "603051",
-      "name": "鹿山新材",
-      "change_pct": 10.0,
-      "price": 21.78,
-      "category": "突破"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 7.523,
-      "price": 61.6,
-      "category": "突破"
-     }
-    ],
-    "加速": [
-     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 7.089,
-      "price": 21.45,
-      "category": "加速"
-     },
-     {
-      "code": "600540",
-      "name": "新赛股份",
-      "change_pct": 3.958,
-      "price": 3.94,
-      "category": "加速"
-     },
-     {
-      "code": "301046",
-      "name": "能辉科技",
-      "change_pct": 3.691,
-      "price": 21.35,
-      "category": "加速"
-     },
-     {
-      "code": "300741",
-      "name": "华宝股份",
-      "change_pct": 3.875,
-      "price": 15.01,
-      "category": "加速"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 10.01,
-      "price": 11.1,
-      "category": "加速"
-     },
-     {
-      "code": "002702",
-      "name": "海欣食品",
-      "change_pct": 4.425,
-      "price": 4.72,
-      "category": "加速"
-     },
-     {
-      "code": "000523",
-      "name": "红棉股份",
-      "change_pct": 3.861,
-      "price": 2.69,
-      "category": "加速"
-     },
-     {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 5.556,
-      "price": 1.71,
-      "category": "加速"
-     },
-     {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 3.278,
-      "price": 30.88,
-      "category": "加速"
-     }
-    ],
-    "短线选股": [
-     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 7.089,
-      "price": 21.45,
-      "category": "短线选股"
-     },
-     {
-      "code": "600540",
-      "name": "新赛股份",
-      "change_pct": 3.958,
-      "price": 3.94,
-      "category": "短线选股"
-     },
-     {
-      "code": "301046",
-      "name": "能辉科技",
-      "change_pct": 3.691,
-      "price": 21.35,
-      "category": "短线选股"
-     },
-     {
-      "code": "300741",
-      "name": "华宝股份",
-      "change_pct": 3.875,
-      "price": 15.01,
-      "category": "短线选股"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 10.01,
-      "price": 11.1,
-      "category": "短线选股"
-     },
-     {
-      "code": "002702",
-      "name": "海欣食品",
-      "change_pct": 4.425,
-      "price": 4.72,
-      "category": "短线选股"
-     },
-     {
-      "code": "000523",
-      "name": "红棉股份",
-      "change_pct": 3.861,
-      "price": 2.69,
-      "category": "短线选股"
-     },
-     {
-      "code": "000056",
-      "name": "*ST皇庭",
-      "change_pct": 5.556,
-      "price": 1.71,
-      "category": "短线选股"
-     },
-     {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 3.278,
-      "price": 30.88,
-      "category": "短线选股"
-     },
-     {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 10.0,
-      "price": 14.52,
-      "category": "短线选股"
-     },
-     {
-      "code": "603051",
-      "name": "鹿山新材",
-      "change_pct": 10.0,
-      "price": 21.78,
-      "category": "短线选股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 7.523,
-      "price": 61.6,
-      "category": "短线选股"
-     }
-    ],
-    "强势股": [
-     {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 10.0,
-      "price": 14.52,
-      "category": "强势股"
-     },
-     {
-      "code": "603051",
-      "name": "鹿山新材",
-      "change_pct": 10.0,
-      "price": 21.78,
-      "category": "强势股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 7.523,
-      "price": 61.6,
-      "category": "强势股"
-     }
-    ]
-   },
-   "consensus": []
-  },
-  {
    "date": "2026-11-27",
    "categories": {
     "突破": [
      {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 7.089,
-      "price": 21.45,
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 8.662,
+      "price": 41.9,
       "category": "突破"
      },
      {
       "code": "600540",
       "name": "新赛股份",
-      "change_pct": 3.958,
-      "price": 3.94,
+      "change_pct": 3.166,
+      "price": 3.91,
       "category": "突破"
      },
      {
-      "code": "301046",
-      "name": "能辉科技",
-      "change_pct": 3.691,
-      "price": 21.35,
-      "category": "突破"
-     },
-     {
-      "code": "300741",
-      "name": "华宝股份",
-      "change_pct": 3.875,
-      "price": 15.01,
+      "code": "002579",
+      "name": "中京电子",
+      "change_pct": 7.912,
+      "price": 19.23,
       "category": "突破"
      },
      {
@@ -13772,29 +13499,50 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002702",
       "name": "海欣食品",
-      "change_pct": 4.425,
-      "price": 4.72,
+      "change_pct": 3.982,
+      "price": 4.7,
       "category": "突破"
      },
      {
       "code": "000523",
       "name": "红棉股份",
-      "change_pct": 3.861,
-      "price": 2.69,
+      "change_pct": 3.475,
+      "price": 2.68,
       "category": "突破"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 5.556,
-      "price": 1.71,
+      "change_pct": 7.407,
+      "price": 1.74,
       "category": "突破"
      },
      {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 3.278,
-      "price": 30.88,
+      "code": "600814",
+      "name": "杭州解百",
+      "change_pct": 10.06,
+      "price": 9.19,
+      "category": "突破"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 4.236,
+      "price": 19.44,
+      "category": "突破"
+     },
+     {
+      "code": "000698",
+      "name": "ST沈化",
+      "change_pct": 6.582,
+      "price": 4.21,
+      "category": "突破"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 3.492,
+      "price": 9.78,
       "category": "突破"
      },
      {
@@ -13809,43 +13557,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "鹿山新材",
       "change_pct": 10.0,
       "price": 21.78,
-      "category": "突破"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 7.523,
-      "price": 61.6,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 7.089,
-      "price": 21.45,
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 8.662,
+      "price": 41.9,
       "category": "加速"
      },
      {
       "code": "600540",
       "name": "新赛股份",
-      "change_pct": 3.958,
-      "price": 3.94,
+      "change_pct": 3.166,
+      "price": 3.91,
       "category": "加速"
      },
      {
-      "code": "301046",
-      "name": "能辉科技",
-      "change_pct": 3.691,
-      "price": 21.35,
-      "category": "加速"
-     },
-     {
-      "code": "300741",
-      "name": "华宝股份",
-      "change_pct": 3.875,
-      "price": 15.01,
+      "code": "002579",
+      "name": "中京电子",
+      "change_pct": 7.912,
+      "price": 19.23,
       "category": "加速"
      },
      {
@@ -13858,59 +13592,59 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002702",
       "name": "海欣食品",
-      "change_pct": 4.425,
-      "price": 4.72,
+      "change_pct": 3.982,
+      "price": 4.7,
       "category": "加速"
      },
      {
       "code": "000523",
       "name": "红棉股份",
-      "change_pct": 3.861,
-      "price": 2.69,
+      "change_pct": 3.475,
+      "price": 2.68,
       "category": "加速"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 5.556,
-      "price": 1.71,
+      "change_pct": 7.407,
+      "price": 1.74,
       "category": "加速"
      },
      {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 3.278,
-      "price": 30.88,
+      "code": "600814",
+      "name": "杭州解百",
+      "change_pct": 10.06,
+      "price": 9.19,
+      "category": "加速"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 4.236,
+      "price": 19.44,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "605577",
-      "name": "龙版传媒",
-      "change_pct": 7.089,
-      "price": 21.45,
+      "code": "002242",
+      "name": "九阳股份",
+      "change_pct": 8.662,
+      "price": 41.9,
       "category": "短线选股"
      },
      {
       "code": "600540",
       "name": "新赛股份",
-      "change_pct": 3.958,
-      "price": 3.94,
+      "change_pct": 3.166,
+      "price": 3.91,
       "category": "短线选股"
      },
      {
-      "code": "301046",
-      "name": "能辉科技",
-      "change_pct": 3.691,
-      "price": 21.35,
-      "category": "短线选股"
-     },
-     {
-      "code": "300741",
-      "name": "华宝股份",
-      "change_pct": 3.875,
-      "price": 15.01,
+      "code": "002579",
+      "name": "中京电子",
+      "change_pct": 7.912,
+      "price": 19.23,
       "category": "短线选股"
      },
      {
@@ -13923,29 +13657,50 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002702",
       "name": "海欣食品",
-      "change_pct": 4.425,
-      "price": 4.72,
+      "change_pct": 3.982,
+      "price": 4.7,
       "category": "短线选股"
      },
      {
       "code": "000523",
       "name": "红棉股份",
-      "change_pct": 3.861,
-      "price": 2.69,
+      "change_pct": 3.475,
+      "price": 2.68,
       "category": "短线选股"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 5.556,
-      "price": 1.71,
+      "change_pct": 7.407,
+      "price": 1.74,
       "category": "短线选股"
      },
      {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 3.278,
-      "price": 30.88,
+      "code": "600814",
+      "name": "杭州解百",
+      "change_pct": 10.06,
+      "price": 9.19,
+      "category": "短线选股"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 4.236,
+      "price": 19.44,
+      "category": "短线选股"
+     },
+     {
+      "code": "000698",
+      "name": "ST沈化",
+      "change_pct": 6.582,
+      "price": 4.21,
+      "category": "短线选股"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 3.492,
+      "price": 9.78,
       "category": "短线选股"
      },
      {
@@ -13960,18 +13715,25 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "鹿山新材",
       "change_pct": 10.0,
       "price": 21.78,
-      "category": "短线选股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 7.523,
-      "price": 61.6,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
+      "code": "000698",
+      "name": "ST沈化",
+      "change_pct": 6.582,
+      "price": 4.21,
+      "category": "强势股"
+     },
+     {
+      "code": "002272",
+      "name": "川润股份",
+      "change_pct": 3.492,
+      "price": 9.78,
+      "category": "强势股"
+     },
+     {
       "code": "603386",
       "name": "骏亚科技",
       "change_pct": 10.0,
@@ -13983,13 +13745,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "鹿山新材",
       "change_pct": 10.0,
       "price": 21.78,
-      "category": "强势股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 7.523,
-      "price": 61.6,
       "category": "强势股"
      }
     ]
