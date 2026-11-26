@@ -506,6 +506,35 @@ jobs:
             exit 1
           fi
 
+      - name: "📤 推送重建的 data/*.js（自闭环，防 build 触发失效）"
+        id: soft_14
+        # 🔴 2026-11-26 盘中全线停更一劳永逸根治（最后一环）：
+        #   cn 链（本链，中国 IP）跑完 update_v8.py 后**只推 raw_data/，从不推 data/*.js**
+        #   ⇒ raw 新了但页面永远停在旧值（实测 10:23/10:41 两档提交各含 48/82 个 raw_data 文件，
+        #   data/ 计数为 0 ⇒ Pages 上 ETF_PULSE 停在 04:32、LIMIT_UP_HEATMAP 停在 09:05）。
+        #   对照主链 v8_cn_fetch_cloud.yml 已有同名步骤（soft_14），本链缺失 ⇒ 此处按主链同款补齐。
+        #   注意：本链下一「原子提交 index.html ?v」步里有 `git reset --hard FETCH_HEAD`，
+        #   会把本步产出的 data/*.js 改动一并冲掉 ⇒ 所以本步必须**先于**它完成并独立推送。
+        timeout-minutes: 30
+        continue-on-error: true
+        shell: bash
+        run: |
+          DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -z "$DATA_MANIFEST" ]; then
+            echo "ℹ️ 本次无 data 变更，跳过推送"
+          else
+            echo "📋 推送重建 data: ${DATA_MANIFEST%,}"
+            PUSH_FILES="$DATA_MANIFEST" python api_push_raw.py
+          fi
+
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天同款静默失败。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_14(exit=$_v8_rc)::📤 推送重建的 data/*.js（自闭环，防 build 触发失效） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "🛡️ 原子提交 index.html ?v（与本次 data 同轮上线，根治 ?v 失配）"
         id: soft_9
         # 2026-09-02 一劳永逸根治「?v 缓存戳失配」：生成器跑完 update_v8.py 已本地重写
