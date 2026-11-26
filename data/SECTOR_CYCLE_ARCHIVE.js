@@ -1,1 +1,228 @@
-window.SECTOR_CYCLE_ARCHIVE = {"update_time":"2026-11-26 16:33:45","version":1,"source":"raw_data/limit_up_heatmap.json","params":{"hot_min":3,"cycle_gap":3,"min_len":1},"range":["10/16","11/26"],"columns":30,"cycle_count":15,"cycles":[{"sector":"AI算力","start":"10/16","end":"11/26","start_idx":0,"end_idx":29,"days":30,"hot_days":24,"peak":25,"peak_date":"10/26","total":183,"ongoing":true},{"sector":"其他","start":"10/16","end":"11/26","start_idx":0,"end_idx":29,"days":30,"hot_days":30,"peak":83,"peak_date":"11/04","total":1452,"ongoing":true},{"sector":"医药","start":"10/16","end":"11/19","start_idx":0,"end_idx":24,"days":25,"hot_days":21,"peak":17,"peak_date":"11/02","total":180,"ongoing":false},{"sector":"机器人","start":"10/16","end":"11/26","start_idx":0,"end_idx":29,"days":30,"hot_days":28,"peak":37,"peak_date":"10/23","total":466,"ongoing":true},{"sector":"消费电子","start":"10/16","end":"11/26","start_idx":0,"end_idx":29,"days":30,"hot_days":29,"peak":19,"peak_date":"11/10","total":277,"ongoing":true},{"sector":"电力","start":"10/16","end":"10/19","start_idx":0,"end_idx":1,"days":2,"hot_days":2,"peak":7,"peak_date":"10/19","total":13,"ongoing":false},{"sector":"白酒消费","start":"10/16","end":"11/19","start_idx":0,"end_idx":24,"days":25,"hot_days":24,"peak":17,"peak_date":"11/02","total":168,"ongoing":false},{"sector":"新能源车","start":"10/19","end":"11/26","start_idx":1,"end_idx":29,"days":29,"hot_days":26,"peak":30,"peak_date":"10/28","total":299,"ongoing":true},{"sector":"通信设备","start":"10/21","end":"11/03","start_idx":3,"end_idx":12,"days":10,"hot_days":8,"peak":4,"peak_date":"10/26","total":28,"ongoing":false},{"sector":"电力","start":"10/27","end":"11/24","start_idx":7,"end_idx":27,"days":21,"hot_days":19,"peak":18,"peak_date":"11/17","total":126,"ongoing":false},{"sector":"通信设备","start":"11/11","end":"11/23","start_idx":18,"end_idx":26,"days":9,"hot_days":5,"peak":6,"peak_date":"11/12","total":26,"ongoing":false},{"sector":"半导体","start":"11/20","end":"11/20","start_idx":25,"end_idx":25,"days":1,"hot_days":1,"peak":4,"peak_date":"11/20","total":4,"ongoing":false},{"sector":"医药","start":"11/25","end":"11/25","start_idx":28,"end_idx":28,"days":1,"hot_days":1,"peak":4,"peak_date":"11/25","total":4,"ongoing":true},{"sector":"白酒消费","start":"11/25","end":"11/26","start_idx":28,"end_idx":29,"days":2,"hot_days":2,"peak":6,"peak_date":"11/25","total":11,"ongoing":true},{"sector":"半导体","start":"11/26","end":"11/26","start_idx":29,"end_idx":29,"days":1,"hot_days":1,"peak":3,"peak_date":"11/26","total":3,"ongoing":true}],"republish_time":"2026-11-26 22:42:08"};
+// ═══════════════════════════════════════════════════════════════════════
+// 🔴🔴 重要档案文件 · 禁止删除 · 禁止 git rm · 禁止加入清理白名单 🔴🔴
+//
+// 板块周期档案（SECTOR_CYCLE_ARCHIVE）
+//   —— 由 raw_data/limit_up_heatmap.json 的累积长表派生，记录每个板块的
+//      「启动 → 退潮」周期区间（几几年几月启动、几月结束），可逐年回查。
+//
+// ⚠️ 本文件是**长期累积数据**，价值随年月增长，一旦删除无法恢复
+//    （涨停数据源只保留最近 1 个月，历史无法重新拉取）。
+//    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
+//
+// 生成器：build_sector_cycle_archive.py
+// 最后更新：2026-11-27 00:33:52
+// ═══════════════════════════════════════════════════════════════════════
+
+window.SECTOR_CYCLE_ARCHIVE = {
+  "update_time": "2026-11-27 00:33:52",
+  "version": 1,
+  "source": "raw_data/limit_up_heatmap.json",
+  "params": {
+    "hot_min": 3,
+    "cycle_gap": 3,
+    "min_len": 1
+  },
+  "range": [
+    "10/19",
+    "11/27"
+  ],
+  "columns": 30,
+  "cycle_count": 15,
+  "cycles": [
+    {
+      "sector": "AI算力",
+      "start": "10/19",
+      "end": "11/27",
+      "start_idx": 0,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 24,
+      "peak": 25,
+      "peak_date": "10/26",
+      "total": 185,
+      "ongoing": true
+    },
+    {
+      "sector": "其他",
+      "start": "10/19",
+      "end": "11/27",
+      "start_idx": 0,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 30,
+      "peak": 83,
+      "peak_date": "11/04",
+      "total": 1442,
+      "ongoing": true
+    },
+    {
+      "sector": "医药",
+      "start": "10/19",
+      "end": "11/19",
+      "start_idx": 0,
+      "end_idx": 23,
+      "days": 24,
+      "hot_days": 20,
+      "peak": 17,
+      "peak_date": "11/02",
+      "total": 170,
+      "ongoing": false
+    },
+    {
+      "sector": "新能源车",
+      "start": "10/19",
+      "end": "11/27",
+      "start_idx": 0,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 27,
+      "peak": 30,
+      "peak_date": "10/28",
+      "total": 307,
+      "ongoing": true
+    },
+    {
+      "sector": "机器人",
+      "start": "10/19",
+      "end": "11/27",
+      "start_idx": 0,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 28,
+      "peak": 37,
+      "peak_date": "10/23",
+      "total": 469,
+      "ongoing": true
+    },
+    {
+      "sector": "消费电子",
+      "start": "10/19",
+      "end": "11/27",
+      "start_idx": 0,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 29,
+      "peak": 19,
+      "peak_date": "11/10",
+      "total": 279,
+      "ongoing": true
+    },
+    {
+      "sector": "电力",
+      "start": "10/19",
+      "end": "10/19",
+      "start_idx": 0,
+      "end_idx": 0,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 7,
+      "peak_date": "10/19",
+      "total": 7,
+      "ongoing": false
+    },
+    {
+      "sector": "白酒消费",
+      "start": "10/19",
+      "end": "11/19",
+      "start_idx": 0,
+      "end_idx": 23,
+      "days": 24,
+      "hot_days": 23,
+      "peak": 17,
+      "peak_date": "11/02",
+      "total": 165,
+      "ongoing": false
+    },
+    {
+      "sector": "通信设备",
+      "start": "10/21",
+      "end": "11/03",
+      "start_idx": 2,
+      "end_idx": 11,
+      "days": 10,
+      "hot_days": 8,
+      "peak": 4,
+      "peak_date": "10/26",
+      "total": 28,
+      "ongoing": false
+    },
+    {
+      "sector": "电力",
+      "start": "10/27",
+      "end": "11/24",
+      "start_idx": 6,
+      "end_idx": 26,
+      "days": 21,
+      "hot_days": 19,
+      "peak": 18,
+      "peak_date": "11/17",
+      "total": 126,
+      "ongoing": false
+    },
+    {
+      "sector": "通信设备",
+      "start": "11/11",
+      "end": "11/23",
+      "start_idx": 17,
+      "end_idx": 25,
+      "days": 9,
+      "hot_days": 5,
+      "peak": 6,
+      "peak_date": "11/12",
+      "total": 26,
+      "ongoing": false
+    },
+    {
+      "sector": "半导体",
+      "start": "11/20",
+      "end": "11/20",
+      "start_idx": 24,
+      "end_idx": 24,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 4,
+      "peak_date": "11/20",
+      "total": 4,
+      "ongoing": false
+    },
+    {
+      "sector": "医药",
+      "start": "11/25",
+      "end": "11/25",
+      "start_idx": 27,
+      "end_idx": 27,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 4,
+      "peak_date": "11/25",
+      "total": 4,
+      "ongoing": false
+    },
+    {
+      "sector": "白酒消费",
+      "start": "11/25",
+      "end": "11/27",
+      "start_idx": 27,
+      "end_idx": 29,
+      "days": 3,
+      "hot_days": 3,
+      "peak": 6,
+      "peak_date": "11/25",
+      "total": 16,
+      "ongoing": true
+    },
+    {
+      "sector": "半导体",
+      "start": "11/26",
+      "end": "11/27",
+      "start_idx": 28,
+      "end_idx": 29,
+      "days": 2,
+      "hot_days": 2,
+      "peak": 3,
+      "peak_date": "11/26",
+      "total": 6,
+      "ongoing": true
+    }
+  ]
+};
