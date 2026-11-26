@@ -205,7 +205,7 @@ ALLOW_NO_CRON = {
     "v8_jinzuan_track": "💎 金钻跟踪monitor(已退役·停cron·仅dispatch)",
     # 2026-11-19 小九：盘中数据链 lemoncat 拆除全部 14 条日间 cron（GitHub schedule 日间失灵
     #   根治），触发权移交 v8_intraday_precise_sched，本链仅 workflow_dispatch + 手动兜底。
-    "v8_cn_fetch_intraday_lemoncat": "盘中数据链(触发权移交精准调度器·仅dispatch)",
+    "v8_cn_fetch_intraday_lemoncat": "盘中调度壳(2026-11-27 已退出自动派发·仅手动兜底)",
 }
 
 

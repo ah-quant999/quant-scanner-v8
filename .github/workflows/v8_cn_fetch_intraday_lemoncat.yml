@@ -46,6 +46,12 @@
 #   - 不写 raw_data/、不写 data/、不 git push → 不会有 api_push_raw 互踢。
 #   - 三层 dispatch 全走同 group v8-cn-fetch-cloud 互斥排队。
 
+# 🔴 2026-11-27 主人令「空转派发无用就取消」：本 workflow **已退出自动调度**。
+#   11-26 实测 40 次 run 里 29 次 cancelled（同组 pending 被新 dispatch 顶杀、jobs=0），
+#   属于纯调度壳空转、零产出。盘中时间源已收敛为 cn 数据链自身 */30 cron +
+#   v8_intraday_precise_sched 直派 v8_cn_fetch_cloud_selfhosted（漏档兜底）。
+#   本文件仅保留 workflow_dispatch 作人工排障/手动补档入口，勿再接回自动派发。
+
 name: "🇨🇳 v8 盘中准点档调度器(CN runner1号机 self-hosted cn 主力)"
 
 on:

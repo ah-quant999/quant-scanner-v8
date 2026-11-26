@@ -1862,6 +1862,8 @@ def main():
     _regime_gate = load_json(os.path.join(DATA_DIR, "strategy_regime_gate.json"), {})
     ic_weight = float((_ic_gate.get("factors") or {}).get("ge3", {}).get("ic_weight") or 1.0)
     ic_action = (_ic_gate.get("overall_action") or "ok")
+    # 🔴 2026-11-27：门禁所用样本必须一路披露到日志，避免"样本内判 ok"冒充"策略有效"
+    ic_sample = ((_ic_gate.get("factors") or {}).get("ge3", {}).get("sample_used") or "unknown")
     _strat = (_regime_gate.get("strategies") or {}).get("ge3", {})
     regime_weight = float(_strat.get("weight") or 1.0)
     regime_action = (_regime_gate.get("overall_action") or "ok")
@@ -1888,7 +1890,7 @@ def main():
     gate_multiplier = max(0.3, min(1.05, open_multiplier * ic_weight_adj * regime_weight_adj))
     print(f"  🚦 择时门控: regime={current_regime or '未知'}({'开仓' if regime_open else '观望'}) "
           f"ok={_regime_ok}{'' if _regime_ok else ' reason=' + _regime_reason} "
-          f"× ic={ic_weight:.2f}→{ic_weight_adj:.2f}({ic_action}) "
+          f"× ic={ic_weight:.2f}→{ic_weight_adj:.2f}({ic_action}/{ic_sample}) "
           f"× regime_w={regime_weight:.2f}→{regime_weight_adj:.2f}({regime_action}) "
           f"→ 乘子={gate_multiplier:.3f}")
 
@@ -2842,7 +2844,7 @@ def main():
 
     gate_note = ""
     if abs(gate_multiplier - 1.0) > 0.01:
-        gate_note = f" [门禁×{gate_multiplier:.2f} ic={ic_weight:.2f}({ic_action}) regime={regime_weight:.2f}({regime_action})]"
+        gate_note = f" [门禁×{gate_multiplier:.2f} ic={ic_weight:.2f}({ic_action}/{ic_sample}) regime={regime_weight:.2f}({regime_action})]"
     print(f"  ✅ TOP10 已生成: {len(top10)} 只{gate_note}")
     for t in top10:
         print(f"     #{t['rank']} {t['name']}({t['code']}) 评分{t['total_score']} "

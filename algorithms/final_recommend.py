@@ -1933,7 +1933,15 @@ def main():
             "total": len(pool),
             "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%",
         },
-        "strong_sectors": sorted(rel_set)[:20],
+        # 🔴 2026-11-27 主人令「强势板块不得字母序冒充强度」：
+        #   原 sorted(rel_set) 是**字典序**（rel_set 是 set，本身无序，sorted 只能按字面排），
+        #   而前端把它当「强势板块（相对强度 TOP）」展示、还标「同源同序」——名不符实。
+        #   现改为按 score_map 的 relative_5d（5 日相对强度）真实降序；缺值的排最后（不伪造 0）。
+        "strong_sectors": sorted(
+            [n for n in rel_set if n],
+            key=lambda _n: (score_map.get(_n, {}).get("relative_5d") is None,
+                            -(score_map.get(_n, {}).get("relative_5d") or 0.0))
+        )[:20],
         "stocks": out_stocks,
         "consensus_stocks": consensus_stocks,  # 2026-08-13 双轨：共振最强排名（独立于 stocks 分数最强）
         "all_candidates": [

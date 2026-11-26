@@ -9,7 +9,7 @@
   ① 实例 dedupe：已有实例在跑 → 让位退出；
   ② 档位容差 7 分钟：深夜补投实例全部档位过期 → 空转退出；
   ③ 新鲜度兜底：目标链 >25min 无 run 即补派（限交易日窗口内）。
-覆盖链：lemoncat 14档主链 / 实时报价 refresh（cn）/ 国债期货 futures_realtime（cn）
+覆盖链：cn 数据链直派（漏档兜底）/ 实时报价 refresh（cn）/ 国债期货 futures_realtime（cn）
 """
 import os, sys, time, json, datetime, urllib.request
 
@@ -25,10 +25,15 @@ BJ = datetime.timezone(datetime.timedelta(hours=8))
 API = "https://api.github.com/repos/" + REPO + "/actions/workflows/"
 
 TARGETS = {
-    "v8_cn_fetch_intraday_lemoncat.yml": {
-        "slots": ["09:32", "09:42", "10:02", "10:22", "10:42", "11:02", "11:22",
-                  "11:42", "13:02", "13:22", "13:42", "14:02", "14:22", "14:42", "15:02"],
-        "fresh_window": ("09:32", "15:05"), "fresh_thresh": 25},
+    # 🔴 2026-11-27 主人令「空转派发无用就取消」：撤掉 v8_cn_fetch_intraday_lemoncat 这层
+    #   纯调度壳（11-26 实测 40 次 run 里 29 次 cancelled、零产出），改由本调度器**直派**
+    #   真正干活的 cn 数据链 v8_cn_fetch_cloud_selfhosted（category 默认 intraday）。
+    #   cn 链自身已有 */30 1-7 * * 1-5 cron（CST 09:00-15:30）作单一时间源；
+    #   本层只在 :02/:32 做「漏档兜底」，dispatch() 的 fetch_trio_busy + local_tick_fresh
+    #   会先让位，绝不与 cron/本机 tick 叠派 → 不再制造 pending 互杀。
+    "v8_cn_fetch_cloud_selfhosted.yml": {
+        "slots": ["09:32", "10:02", "10:32", "11:02", "13:02", "13:32", "14:02", "14:32", "15:02"],
+        "fresh_window": ("09:32", "15:05"), "fresh_thresh": 35},
     # 🛡 2026-11-26 主人令「个股报价盘后跑就好」：撤出全部盘中档。
     #   原 range(9,17) 16 档/天 是最大盘中空转源，且与 workflow 自身 15:30-21:30 gate
     #   冲突 ⇒ 判红→派发→被 gate 拦掉闭环。只留 16:02/20:02 两档盘后接力。
