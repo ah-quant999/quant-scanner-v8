@@ -181,7 +181,10 @@ jobs:
     #   复后构建能跑满 15min 才暴露此超时 bug。提至 60 分钟：全量构建(~14min)+
     #   部署步二次全量(~14min，仅 workflow_dispatch 触发)仍留足余量，正常流水线
     #   (selective+全量≈16min) 更宽松。GitHub 免费 runner 单 job 上限 6h，60 安全。
-    timeout-minutes: 60
+    # ⚠️ 2026-11-26：60→90 分钟。部署步 timeout 一并提至 55（原 30 必然超时被杀），
+    #   叠加 gate+checkout+依赖+构建等前置约 10 分钟，60 分钟 job 线同样会顶满。
+    #   GitHub 免费 runner 单 job 上限 6h，90 安全。
+    timeout-minutes: 90
     # 🛡 构建条件：workflow_run 上游成功 / 手动 dispatch / 任意 push 均构建。
     #   注：曾误以为「bot 自触发」靠 github.actor=='github-actions[bot]' 排除，但实测云端
     #   workflow 用 PAT 推送，actor 实为 ah-quant999（≠ github-actions[bot]），故 actor 过滤无效。
@@ -324,7 +327,14 @@ jobs:
           echo "✅ 层B标注存在：盘中不刷新档位卡已如实标注，未回退"
 
       - name: "📤 部署到 main（GitHub Pages 源）"
-        timeout-minutes: 30
+        # ⚠️ 2026-11-26 一劳永逸（主人令「盘中别再卡壳」·实测根因修复）：
+        #   本步内含【三次构建】——全量 update_v8.py + update_v8.py --category post_close
+        #   + update_v8.py --only-cache-busters。2026-11-26 实测单轮 update_v8 耗时
+        #   22-24 分钟 ⇒ 本步真实需求 40-45 分钟，而超时只给 30 分钟
+        #   ⇒ 正常节奏也必被 GitHub 以 timeout 判 cancelled ⇒ 主人反复看到的
+        #      「数据一直在跑、页面却不动」= 构建全做完却零落地。
+        #   提至 55 分钟留足余量；配合 job 级 60→90 分钟与触发频率收敛（快照链 10→20 分）。
+        timeout-minutes: 55
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ★ 2026-08-15 根治 build clobber：update_v8.py 的 ?v 计算需 GITHUB_TOKEN 才能
