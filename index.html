@@ -136,7 +136,7 @@ window.__domReadyFns=[];
     <script src="data/MARKET_VERDICT.js?v=da01ef3126" defer></script>
     <!-- 🎯 2026-11-26 主人拍板：今日作战指令·唯一裁决卡（gen_verdict.py，纯合成器零新预测；
          仓位 = min(攻防档位, 情绪闸门, 风控系数)；数据落 raw_data/verdict.json，口径见逻辑详解页） -->
-    <script src="data/V8_VERDICT.js?v=4f478452af" defer></script>
+    <script src="data/V8_VERDICT.js?v=83f718dea3" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=514346f778" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=4abdf1f0d2" defer></script>
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=83b68044ee" defer></script>
@@ -1422,8 +1422,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/CASHFLOW_QUALITY_BACKTEST.js?v=a50d25988f" defer></script>
     <!-- 🔬 2026-11-23 主人令：分型×共振回测观测卡数据源，gen_fractal_confluence.py 2005→今真实回测；放暂未上架·观测类（现金流质量榜卡下方） -->
     <script src="data/FRACTAL_CONFLUENCE.js?v=1e376a924e" defer></script>
-    <!-- ⚠️ 2026-11-23 主人令：量价背离预警·缩量新高灯数据源，gen_volume_divergence.py 候选池精选+案例票真实扫描；放暂未上架·观测类（分型卡下方）·预警层不参与选股评分 -->
-    <script src="data/VOLUME_DIVERGENCE.js?v=e5e5d1118e" defer></script>
+    <!-- ⚠️ 2026-11-26 主人令：量价背离独立卡已删（信号并入「综合研判 → 别碰」行），
+         前端不再注入 data/VOLUME_DIVERGENCE.js；raw_data/volume_divergence.json 仍由算法链产出，
+         供 algorithms/gen_verdict.py 合成「别碰」提示。 -->
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=90279b95a8" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=ac130f22f0" defer></script>
@@ -10949,7 +10950,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         「script src=data/IPO_DATA.js?v=70de0bd18d」标签 实时读取，不再手写 hash。
+         「script src=data/IPO_DATA.js?v=79362aa12b」标签 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
@@ -17082,94 +17083,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">分型共振卡渲染异常：'+e.message+'</div>'; console.warn('[fractalConfluence]',e); }
   };
 
-  // ⚠️ 2026-11-23 主人令：量价背离预警·缩量新高灯（暂未上架·观测类，分型卡下方）
-  //   背景=主人自选票9月集体见顶共性（缩量新高）；回测255次信号超额-3.0pp ⇒ 见顶预警灯有效。
-  //   定位=预警/过滤层：预警≠卖出，不参与选股评分（评审中）。
-  window.__renderVolumeDivergence = function(){
-    var body = document.getElementById('volDivBody');
-    if(!body) return;
-    var D = window.VOLUME_DIVERGENCE;
-    if(!D){ body.innerHTML = '<div class="note" style="color:#fbbf24">量价背离预警数据未注入，如实留空不编造。</div>'; return; }
-    var hd = document.getElementById('volDivHeader');
-    if(hd && typeof window.v8CardHeader === 'function'){
-      hd.innerHTML = window.v8CardHeader('&#x26A0;&#xFE0F;', '量价背离预警 · 缩量新高灯',
-        '扫描 ' + (D.universe?D.universe.scanned:'—') + '/' + (D.universe?D.universe.total:'—') + ' 只 · 价格创新高而量能显著萎缩',
-        'update_time', {update_time:D.update_time, slot:'预警观测', horizon:'T+20'})
-        + '<div style="padding:0 14px 9px;margin-top:-2px"><span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">预警 &#183; 不参与选股评分（评审中）</span></div>';
-    }
-    try{
-      var GRN='#34d399', RED='#ef5350', AMB='#fbbf24', DIM='var(--dim)';
-      var h = '';
-      // 口径（主人令：白话化——这是排雷器不是买入榜）
-      h += '<div style="background:#fbbf2410;border:1px solid #fbbf2433;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.7;color:'+DIM+'">'
-         + '<b style="color:'+AMB+';font-size:12.5px">这张卡干嘛用</b>：它是<b style="color:'+AMB+'">排雷器，不是买入榜</b>——列出"股价创新高、成交量反而缩小"的票。意思是涨得虚、后面容易回落，<b>看到就别追高</b>。它不参与选股评分，只提醒风险。<br>'
-         + '<span style="font-size:11px">为什么：这种"缩量新高"历史上信号后20天平均跑输大盘约3个百分点，是见顶预警灯、不是卖出指令。表格里"信号=今日"是刚触发，"量比"越小背离越重。完整参数与回测口径见逻辑详解页。</span></div>';
-      // 命中区
-      var hits = D.hits||[];
-      h += '<div style="font-size:12.5px;font-weight:700;margin:4px 0 6px;color:'+(hits.length?AMB:GRN)+'">'
-         + (hits.length?('▼ 命中 '+hits.length+' 只（近5日内触发过信号）'):'✅ 当前扫描域无缩量新高背离命中（无票处于「价创新高+量萎缩」状态）') + '</div>';
-      if(hits.length){
-        var t = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:520px">'
-           + '<thead><tr style="border-bottom:1px solid var(--border);color:'+DIM+';font-weight:600;text-align:left">'
-           + '<th style="padding:6px 5px">股票</th><th style="padding:6px 5px;text-align:right">现价</th>'
-           + '<th style="padding:6px 5px;text-align:center">信号</th><th style="padding:6px 5px;text-align:right" title="5日均量÷20日均量，越小背离越重">量比</th>'
-           + '<th style="padding:6px 5px;text-align:center">MA20</th><th style="padding:6px 5px;text-align:right">距20日高点</th></tr></thead><tbody>';
-        hits.forEach(function(r){
-          var vr = (r.vol_ratio!=null? r.vol_ratio : '—');
-          t += '<tr style="border-bottom:1px solid var(--border)">'
-             + '<td style="padding:6px 5px">'+r.name+' <span style="color:'+DIM+';font-size:11px">'+r.code+'</span>'+(r.case?' <span style="color:'+AMB+';font-size:10px">案例</span>':'')+'</td>'
-             + '<td style="padding:6px 5px;text-align:right">'+r.price+'</td>'
-             + '<td style="padding:6px 5px;text-align:center;color:'+(r.hit_now?AMB:DIM)+';font-weight:'+(r.hit_now?'700':'400')+'">'+(r.hit_now?'● 今日':(r.recent?r.recent.date+'（'+r.recent.days_ago+'日前）':'—'))+'</td>'
-             + '<td style="padding:6px 5px;text-align:right;color:'+(r.vol_ratio!=null&&r.vol_ratio<0.75?AMB:DIM)+'">'+vr+'</td>'
-             + '<td style="padding:6px 5px;text-align:center;color:'+(r.above_ma20?RED:GRN)+'">'+(r.above_ma20?'上':'下')+'</td>'
-             + '<td style="padding:6px 5px;text-align:right;color:'+DIM+'">'+(r.off_high20!=null?r.off_high20+'%':'—')+'</td></tr>';
-        });
-        t += '</tbody></table></div>';
-        h += t;
-      }
-      // 回测统计
-      var bt = D.backtest||{};
-      h += '<div style="background:#34d39910;border:1px solid #34d39933;border-radius:6px;padding:9px 11px;margin:11px 0;font-size:12px;line-height:1.75;color:#e8eef5">'
-         + '<b style="color:#ffffff">实测解析（人话）</b>：这种「股价创新高、成交量反而缩小」的票，历史上 '+(bt.sig_n||'—')+' 次信号后 20 天平均 <b style="color:'+GRN+'">'+(bt.t20!=null?bt.t20+'%':'—')+'</b>（胜率 '+(bt.wr20||'—')+'%），比同期全期基线 +'+(bt.base_t20!=null?bt.base_t20:'—')+'%（胜率 '+(bt.base_wr||'—')+'%）差 <b style="color:'+GRN+'">'+(bt.excess!=null?bt.excess:'—')+' 个百分点</b>。'
-         + '说人话：这种涨法是虚的，后面更容易回落，<b style="color:#ffffff">看到别追高</b>。这是排雷提醒、不是卖出指令，也不参与选股打分。'+(bt.note||'')+'</div>';
-      // 案例票现状（常驻跟踪）
-      var cn = D.cases_now||[];
-      if(cn.length){
-        h += '<div style="font-size:12.5px;font-weight:700;color:'+DIM+';margin:10px 0 6px">案例票现状（9月顶四票 · 常驻跟踪）</div>';
-        h += '<div style="font-size:12px;line-height:1.9;color:'+DIM+'">';
-        cn.forEach(function(r){
-          h += '<span style="display:inline-block;margin:0 14px 4px 0">'+r.name
-             + ' <b style="color:'+(r.above_ma20?RED:GRN)+'">'+(r.off_high20!=null?r.off_high20+'%':'—')+'</b><span style="color:'+DIM+'">（距20日高点 · MA20'+(r.above_ma20?'上':'下')+'）</span></span>';
-        });
-        h += '</div>';
-      }
-      // 案例实证
-      var ce = D.case_evidence||[];
-      if(ce.length){
-        var t2 = '<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px">'
-           + '<thead><tr style="border-bottom:1px solid var(--border);color:'+DIM+';font-weight:600;text-align:left">'
-           + '<th style="padding:5px">股票</th><th style="padding:5px;text-align:right">顶部</th><th style="padding:5px;text-align:right">现回撤</th>'
-           + '<th style="padding:5px;text-align:right" title="顶前20日中 5均量<20均量 的天数">顶前缩量天</th>'
-           + '<th style="padding:5px;text-align:right" title="成交量峰值领先价格顶的天数">量峰领先</th>'
-           + '<th style="padding:5px;text-align:right">顶后破MA20</th></tr></thead><tbody>';
-        ce.forEach(function(r){
-          t2 += '<tr style="border-bottom:1px solid var(--border)">'
-             + '<td style="padding:5px">'+r.name+'</td>'
-             + '<td style="padding:5px;text-align:right;color:'+DIM+'">'+r.peak_date.slice(5)+'</td>'
-             + '<td style="padding:5px;text-align:right;color:'+GRN+'">'+r.drawdown+'%</td>'
-             + '<td style="padding:5px;text-align:right;color:'+(r.shrink_days>=15?AMB:DIM)+'">'+r.shrink_days+'/20</td>'
-             + '<td style="padding:5px;text-align:right;color:'+DIM+'">'+r.vol_peak_lead+'天</td>'
-             + '<td style="padding:5px;text-align:right;color:'+DIM+'">'+r.ma20_break+'天</td></tr>';
-        });
-        t2 += '</tbody></table></div>';
-        h += '<div style="font-size:12.5px;font-weight:700;color:'+AMB+';margin:10px 0 4px">案例实证（本信号来源的四只票）</div>' + t2;
-      }
-      // 诚实边界
-      h += '<div style="font-size:10.5px;color:'+DIM+';margin-top:9px;line-height:1.6">⚠ '+(D.boundary||'')+'。数据源与口径登记见逻辑详解页。</div>';
-      body.innerHTML = h;
-    }catch(e){ body.innerHTML = '<div class="note" style="color:'+RED+'">量价背离卡渲染异常：'+e.message+'</div>'; console.warn('[volDiv]',e); }
-  };
-
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -17193,7 +17106,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       // 🚚 2026-11-24 主人令：增持榜回测→盘后数据页（switchSec('ph')）、现金流回测→个股类（stock 名单），
       //   两函数原独立卡撤壳并入主卡，研判类名单移除二者。
       var lists = {
-        research: ['__renderComprehensiveSynthesis', '__renderMarketState', 'renderSectorTech', '__renderFractalConfluence', '__renderVolumeDivergence', '_fillEtfFlowObs'],
+        research: ['__renderComprehensiveSynthesis', '__renderMarketState', 'renderSectorTech', '__renderFractalConfluence', '_fillEtfFlowObs'],
         stock: ['__renderCashflow', '__renderCashflowQualityBT', '_fillLuLeaders', '_fillSectorLeaders', '_fillEtfMap', '_fillFrLeaders', '__renderThemeValue', '_fillUsHkMap']
       };
       var names = lists[tab] || lists.research;
@@ -17345,49 +17258,30 @@ h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
    + '<span style="font-size:15px;font-weight:700;color:#c084fc">&#x1F9ED; 综合研判</span>'
    + '<span id="comprehensiveFresh" style="display:inline-flex;align-items:center">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim)">观测类 &#183; 盘前/状态/避雷/资金 合并视图</span>'
+   + '<span style="font-size:12px;color:var(--dim)">大盘档位 / 今天做什么 / 买什么 / 别碰什么 / 什么信号变</span>'
    + '</div>';
-// ── 🏛 2026-11-26 主人令：「大盘档位 · 仓位天花板」自「🏆 最终推荐」页移入本卡，
-//    与 15 源综合解析合并成「观测大盘」的统一视图。
-//    理由（主人原话）：「不要放在最终推荐页，移到暂未上架，和这卡合并」——
-//    最终推荐页只回答「我该做什么」（买什么/别碰什么/什么信号变），
-//    档位/上限/三档拆解属于「大盘现在什么环境」，归观测。
-//    数据 window.V8_VERDICT.head + .position（gen_verdict.py 同一份，零新源）。
-// 🎯 2026-11-26 主人令（第二轮）：「今日作战指令」整卡自「🏆 最终推荐」页迁入本卡。
-//   原话：「这卡不要放在最终推荐页，只能我看，移到暂未上架页，和综合研判合并，有重复的啰嗦的直接删除」。
-//   ⇒ 最终推荐页恢复原样（Top5/候选池/因子实验室），本页 = 我自己的研判台：
-//      第一步「今天该做什么」→ 第二步「为什么给这个上限」→ 第三步「买什么/别碰」→ 底部多源解析。
-//   ⇒ 去重：仓位上限/加仓条件只在档位块说一次；「所以」「怎么做」两段与档位块、买什么三层重复，已删。
-h += '<div id="verdictSection" style="margin:12px 0 0">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
-   + '<span style="font-size:13.5px;font-weight:700;color:#c084fc">&#x1F3AF; 今日作战指令</span>'
-   + '<span id="verdictFresh" style="display:inline-flex;align-items:center">&#x2014;</span>'
-   + '<span style="font-size:11px;color:var(--dim)">只回答今天做什么 / 买什么 / 别碰什么</span>'
-   + '</div>'
-   + '<div id="verdictBody"><div class="note">汇总中&#x2026;</div></div></div>';
-h += '<div id="stanceBody" style="margin:12px 0 0"><div class="note">档位读取中&#x2026;</div></div>';
-// ── 2026-10-28 主人令：综合解析（不是把卡移到一起，是综合各卡数据给解析结论）──
-h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;border-radius:9px;padding:10px 12px">'
-   + '<div style="font-size:13.5px;font-weight:700;color:#c084fc;margin-bottom:6px">&#x1F9E0; 综合解析 &#183; 多源信号汇总</div>'
-   + '<div id="comprehensiveSynthesisBody"><div class="note">综合各卡数据解析中&#x2026;</div></div>'
-   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px">&#x26A0;&#xFE0F; 全部结论由规则从下方各卡真实数据自动汇总，<b style="color:#ffd024">非人工观点、不构成投资建议</b>。</div></div>';
-// ── 今日判定·环境综合（2026-10-28 主人令：自「今日事件」迁入合并；渲染走永久自愈轮询）──
-h += '<div id="judgmentCardHeader"></div>';
-h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px"></div>';
-// 🗑 2026-11-15 主人令：金钻跟踪卡整支退役——该卡回测实证「无稳定盈利边缘·非买卖建议」（tier1确认21信号胜率33-48%中位负、tier2/3≈硬币），
-//   既不能给可执行建议，按主人令删除：选股策略 st-jztrack 子页/tab/数据注入/渲染构建器/兜底/派发/就绪判定全部移除。
-//   最终推荐四腿信号（sig_jinzuan 等）与 TOP10 融合逻辑不受影响，原样保留。此处旧墓碑（2026-11-09 删重复演示卡）一并归档。
-h += '<div id="marketStateCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-   + '<span style="font-size:15px;font-weight:700;color:#41c9ff">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
-   + '<span id="marketStateFresh">&#x2014;</span>'
-   + '</div>'
-   + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>';
-// 🗑 2026-11-05 主人令：投资避雷针·新闻语料量化整卡迁往「今日事件」页（打新速览卡下方）——
-//   卡壳改静态 HTML 随 sec-td 输出（见上方今日事件 section），本处旧复合卡内 section 删除；
-//   渲染函数 __renderInvestAvoid 原样保留（下方脚本块），switchSec('td') 进入时触发。
-//   综合解析卡不受影响（其 votes 直读 window.INVEST_AVOID，不依赖本 section DOM）。
-// 🗑️ 2026-10-28 主人令：大基金 增减持监控卡删除（与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图；数据源 DAJIJIN_REDUCTION 保留供投资避雷针消费，v8_dajijin_fetch 定时任务保留）。
+// ── 🧭 2026-11-26 主人令（第三轮）：「综合研判」与「今日作战指令」合并成**一张卡**。
+//   主人原话：「我要的是这两张卡合并成一张，不是像现在这样写一大堆！简洁明了但要覆盖全部，
+//             不能给我建议的、没必要的可以删除。」
+//   ⇒ 全文只有一个卡头；正文只有一块紧凑视图（判定位 + 盘面一句 + 买什么/别碰/信号变/额度四行）；
+//     原来并列的 4 个块（档位三档拆解 / 多源交叉验证 15 源 / 环境综合 / L1L2 状态机）全部收进折叠，
+//     默认不看、要用时一点就开 —— 覆盖全部信息，但首屏只有一屏。
+//   ⇒ 保留的 DOM id 一律不变（stanceBody / comprehensiveSynthesisBody / judgmentBodyOp / marketStateBody），
+//     4 个渲染函数与它们的自愈轮询零改动，避免「改了壳、渲染丢了」的老毛病。
+var _foldCmp = function(title, inner){
+  return '<details style="margin-top:9px;border-top:1px dashed rgba(255,255,255,.10);padding-top:7px">'
+    + '<summary style="cursor:pointer;font-size:11.5px;color:#94a3b8;list-style:none;outline:none">&#9654; ' + title + '</summary>'
+    + '<div style="margin-top:8px">' + inner + '</div></details>';
+};
+h += '<div id="verdictBody"><div class="note">汇总中&#x2026;</div></div>';
+h += _foldCmp('档位怎么算 · 三档取小',
+      '<div id="stanceBody"><div class="note">档位读取中&#x2026;</div></div>');
+h += _foldCmp('多源交叉验证 · 15 源加权 / 六源快判',
+      '<div id="comprehensiveSynthesisBody"><div class="note">综合各卡数据解析中&#x2026;</div></div>');
+h += _foldCmp('环境综合 · 宏观 / 美股 / 技术 / 情绪',
+      '<div id="judgmentCardHeader"></div><div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>');
+h += _foldCmp('L1 市场状态机 · L2 仓位引擎',
+      '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div>');
 h += '</div>'; // /comprehensiveCard;
 
 // 🆕 2026-11-08 主人令：严重异动雷达 已迁至「盘后数据」页（股东增减持·结构化监控卡下方）；卡 DOM 与 __renderSevereSwing 派发同步迁往 sec-ph（见下方盘后数据 section 与 switchSec('ph') 分支）。
@@ -17423,13 +17317,6 @@ h += '<div class="card" style="margin-bottom:16px">'
 h += '<div class="card" id="fractalCard" style="margin-bottom:16px;border-left:4px solid #41c9ff">'
    + '<div id="fractalHeader"></div>'
    + '<div id="fractalBody"><div class="note">分型共振回测数据加载中&#x2026;</div></div></div>';
-
-// ⚠️ 2026-11-23 主人令：量价背离预警·缩量新高灯，置于「分型×共振回测观测」卡下方。
-//   数据 window.VOLUME_DIVERGENCE（data/VOLUME_DIVERGENCE.js，scripts/gen_volume_divergence.py 候选池精选+案例票扫描）。
-//   ⚠️ 预警/过滤层：预警≠卖出，不参与选股评分（评审中，主人定夺后再议接入 momentum 算法）。
-h += '<div class="card" id="volDivCard" style="margin-bottom:16px;border-left:4px solid #fbbf24">'
-   + '<div id="volDivHeader"></div>'
-   + '<div id="volDivBody"><div class="note">量价背离预警数据加载中&#x2026;</div></div></div>';
 
 // 🚚 2026-11-24 10:10 主人令：主升/启动 板块·龙头股卡移入「个股类」子页（置于「概念/行业→ETF·龙头参考」卡上方，见 ulPaneStock）。
 
@@ -20781,164 +20668,123 @@ window.__renderV8CalToday();
     function B(s){ return E(s).replace(/\*\*(.+?)\*\*/g,'<b style="color:#fff">$1</b>'); }
     function pct(x,d){ var v=Number(x); return isFinite(v)?v.toFixed(d==null?1:d):'--'; }
     function sgn(x,d){ var v=Number(x); if(!isFinite(v)) return '--'; return (v>0?'+':'')+v.toFixed(d==null?2:d); }
-    var P=V.plain||{},PH=V.position||{},BU=V.buy||{},TR=V.triggers||{};
+    var P=V.plain||{},PH=V.position||{},BU=V.buy||{},TR=V.triggers||{},H=V.head||{};
     var ans=String(BU.answer_short||'');
     var isNo=(ans.indexOf('不买')===0);
-    var col=(V.head&&V.head.color)||PUR;
+    var col=H.color||PUR;
+    var cap=(PH.cap_pct!=null?PH.cap_pct:H.cap_pct);
+    var hitN=(TR.add&&TR.add.hit)||0, hitT=(TR.add&&TR.add.total)||0;
+
+    /* 通用一行：左标签 + 右内容（全卡统一，避免东一个盒子西一个盒子） */
+    function row(label,lcol,inner,bottom){
+      return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;'
+        + (bottom?'':'border-bottom:1px solid rgba(255,255,255,.06)')+'">'
+        + '<span style="flex:0 0 56px;font-size:11.5px;font-weight:700;color:'+lcol+';padding-top:1px">'+label+'</span>'
+        + '<span style="flex:1;min-width:0;font-size:12px;line-height:1.7;color:'+TXT+'">'+inner+'</span></div>';
+    }
 
     var h='';
-    /* ── ① 结论条：三秒看懂 ──
-       🔴 2026-11-26 主人令：本卡只给「判断」，不再显示大盘档位天花板、现仓%、现金、
-          持仓明细。档位块（守·3成 / 上限 / 三档拆解）已移交「暂未上架 → 综合研判」卡，
-          与 15 源综合解析合并展示 —— 那边是「观测大盘」，这边是「我该做什么」。 */
-    var _hitN=(TR.add&&TR.add.hit)||0, _hitT=(TR.add&&TR.add.total)||0;
-    h+='<div style="background:'+col+'16;border:1px solid '+col+'55;border-radius:10px;padding:13px 15px">'
-     +  '<div style="font-size:11.5px;color:'+DIM+';margin-bottom:3px">今天该做什么</div>'
-     +  '<div style="font-size:24px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+';line-height:1.2">'+E(ans)+'</div>'
-     +  (BU.answer ? '<div style="margin-top:7px;font-size:12.5px;line-height:1.75;color:'+SUB+'">'+B(BU.answer)+'</div>' : '')
-     +  '</div>';
+    /* ── ① 判定位：一行说清「什么档位 / 上限几成 / 今天做不做」──
+       🔴 2026-11-26 主人令（第三轮）：「简洁明了但要覆盖全部」。
+          档位与上限不再单开一块，与今日动作压在同一行 —— 这三件事本来就是同一个判断。 */
+    h+='<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:'+col+'12;border:1px solid '+col+'44;border-radius:10px;padding:10px 14px">'
+     +  '<span style="font-size:17px;font-weight:800;color:'+col+'">'+E(H.icon||'')+' '+E(H.label||'')+'</span>'
+     +  '<span style="font-size:12px;color:'+SUB+'">仓位上限 <b style="font-size:14px;color:'+TXT+'">'+E(cap)+'%</b></span>'
+     +  '<span style="font-size:12px;color:'+SUB+'">加仓条件 <b style="font-size:14px;color:'+(hitN>=5?GLD:TXT)+'">'+hitN+'/'+hitT+'</b></span>'
+     +  '<span style="margin-left:auto;font-size:19px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+'">'+E(ans)+'</span>'
+     + '</div>';
 
-    /* ── ② 只留「盘面」一段 ──
-       🔴 2026-11-26 主人令「有重复的啰嗦的直接删除」：
-          原三段「读今天 / 所以 / 怎么做」里，「所以」说的就是档位块的仓位上限与加仓条件、
-          「怎么做」说的就是买什么三层的结论 —— 同一件事讲三遍。
-          现在只保留「盘面」（解释今天为什么是这个结论），其余交给下面的买什么三层与档位块。 */
+    /* ── ② 盘面一句：为什么是这个结论（只讲成因，不重复档位、不重复买什么）── */
     if(P['读今天']){
-      h+='<div style="margin-top:12px">'
-       +   '<div style="border-left:3px solid '+BLU+'66;padding:2px 0 2px 10px">'
-       +   '<div style="font-size:11.5px;font-weight:700;color:'+BLU+';margin-bottom:1px">盘面</div>'
-       +   '<div style="font-size:12.5px;line-height:1.75;color:'+TXT+'">'+B(P['读今天'])+'</div></div>'
-       + '</div>';
+      h+='<div style="margin-top:9px;font-size:12.5px;line-height:1.78;color:'+TXT+'">'+B(P['读今天'])+'</div>';
     }
 
-    /* ── ③ 三层买什么 + 别碰什么 ── */
-    function vehicle(c){
-      if(c.leaders&&c.leaders.length) return '<span style="color:'+SUB+'">标的：</span>'+c.leaders.map(function(x){return E(x.name)+' <span style="color:'+(x.chg>0?RED:GRN)+';font-size:11px">'+sgn(x.chg,1)+'%</span>';}).join('、');
-      if(c.etf) return '<span style="color:'+SUB+'">ETF：</span>'+E(c.etf.name)+' '+E(c.etf.code);
-      return '<span style="color:'+DIM+'">暂无成型标的（自选或买对应行业 ETF）</span>';
-    }
-    h+='<div style="margin-top:4px;border-top:1px dashed rgba(255,255,255,.12);padding-top:11px">';
-    h+='<div style="font-size:12.5px;font-weight:700;color:'+TXT+';margin-bottom:8px">买什么 &nbsp;<span style="font-weight:400;color:'+DIM+';font-size:11px">三层从上到下，越往下越激进；任何一层不对就跳过</span></div>';
-    // L1 资金主线
-    h+='<div style="background:rgba(65,201,255,.07);border:1px solid rgba(65,201,255,.22);border-radius:8px;padding:8px 10px;margin-bottom:7px">'
-     + '<div style="font-size:11.5px;font-weight:700;color:'+BLU+';margin-bottom:4px">L1 钱在连续进的方向（最稳，优先）</div>';
-    if((BU.sectors||[]).length){
-      BU.sectors.forEach(function(c){
-        h+='<div style="font-size:12px;line-height:1.7;color:'+TXT+'">&#183; <b>'+E(c.name)+'</b>'
-         + ' <span style="color:'+SUB+';font-size:11px">5日净流入 '+pct(c.net_5d,0)+'亿 · 连'+E(c.days)+'天 · 今日'+(c.net_today>0?'+':'')+pct(c.net_today,0)+'亿</span><br>'
-         + '<span style="padding-left:10px;font-size:11.5px">'+vehicle(c)+'</span></div>';
-      });
-    } else { h+='<div style="font-size:12px;color:'+DIM+'">今天没有连续 3 天以上净流入的板块 —— 别硬找方向</div>'; }
-    h+='</div>';
-    // L2 涨停龙头
-    h+='<div style="background:rgba(255,208,36,.06);border:1px solid rgba(255,208,36,.20);border-radius:8px;padding:8px 10px;margin-bottom:7px">'
-     + '<div style="font-size:11.5px;font-weight:700;color:'+GLD+';margin-bottom:4px">L2 今日涨停龙头（有具体票，但这是追高）</div>';
-    if((BU.chase||[]).length){
-      BU.chase.forEach(function(c){
-        h+='<div style="font-size:12px;line-height:1.7;color:'+TXT+'">&#183; <b>'+E(c.name)+'</b> <span style="color:'+SUB+';font-size:11px">今日涨停 '+c.today+' 家 · 近5日 '+c.sum5+' 家</span><br>'
-         + '<span style="padding-left:10px;font-size:11.5px;color:'+SUB+'">'+c.leaders.map(function(l){return E(l.name)+' <span style="color:'+(l.chg>0?RED:GRN)+'">'+sgn(l.chg,1)+'%</span>';}).join('、')+'</span></div>';
-      });
-      h+='<div style="font-size:11px;color:'+DIM+';margin-top:4px">防守档位下这层<b>只等回调</b>，不追当天涨停板；追进去就是给别人抬轿。</div>';
-    } else { h+='<div style="font-size:12px;color:'+DIM+'">今日无涨停板块数据</div>'; }
-    h+='</div>';
-    // L3 因子榜
-    h+='<div style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.20);border-radius:8px;padding:8px 10px">'
-     + '<div style="font-size:11.5px;font-weight:700;color:#94a3b8;margin-bottom:4px">L3 今日因子榜（选股引擎给的，跟上面不一定同向）</div>';
-    if((BU.stocks||[]).length){
-      BU.stocks.forEach(function(s){
-        var ok=s.buyable!==false;
-        h+='<div style="font-size:12px;line-height:1.65;color:'+TXT+'">'
-         + '<span style="color:'+(ok?GLD:DIM)+'">'+(s.same_theme?'★':'&#183;')+'</span> <b>'+E(s.name)+'</b> '+E(s.code)
-         + ' <span style="color:'+SUB+';font-size:11px">第'+E(s.rank)+'名 · '+sgn(s.chg,1)+'% · 止损 '+pct(s.stop,2)+' / 目标 '+pct(s.target,2)+'</span>'
-         + (s.same_theme?' <span style="color:'+GLD+';font-size:10.5px">与资金主线同向</span>':'')
-         + (ok?'':' <span style="color:'+RED+';font-size:10.5px">今日在跌，别接</span>')
-         + '</div>';
-      });
-      h+='<div style="font-size:11px;color:'+DIM+';margin-top:4px">★ = 与 L1 资金主线同向，这种才是「共振」，可以优先；没有 ★ 就说明两条线打架，<b>以资金为准</b>。</div>';
-    } else { h+='<div style="font-size:12px;color:'+DIM+'">今日无因子榜数据</div>'; }
-    h+='</div>';
-    // 额度（sizing 此前只在被删掉的 Top5 提示里用过，卡面没有出口）
-    if(V.sizing && V.sizing.per_stock_pct!=null){
-      h+='<div style="margin-top:7px;font-size:11.5px;line-height:1.7;color:'+SUB+'">'
-       + '<span style="color:'+DIM+'">额度：</span>单票不超过总资产 <b style="color:'+GLD+'">'+E(V.sizing.per_stock_pct)+'%</b>'
-       + ' · 首批只用一半（'+E(V.sizing.first_batch_pct)+'%）· 最多 '+E(V.sizing.max_positions)+' 只</div>';
-    }
-    // 别碰
+    /* ── ③ 买什么 / 别碰 / 信号变 / 额度：四行装完全部可执行信息 ── */
+    h+='<div style="margin-top:9px;border-top:1px dashed rgba(255,255,255,.12)">';
+
+    var l1=(BU.sectors||[]).map(function(c){
+      var vh=(c.leaders&&c.leaders.length)
+        ? c.leaders.map(function(x){return E(x.name)+' <span style="color:'+(x.chg>0?RED:GRN)+'">'+sgn(x.chg,1)+'%</span>';}).join('\u3001')
+        : (c.etf?('ETF '+E(c.etf.name)):'<span style="color:'+DIM+'">无成型标的</span>');
+      return '<div><b>'+E(c.name)+'</b> <span style="color:'+SUB+';font-size:11px">'+pct(c.net_5d,0)+'亿/5日 \u00b7 连'+E(c.days)+'天</span> \u2192 '+vh+'</div>';
+    }).join('');
+    var l2=(BU.chase||[]).map(function(c){
+      return '<div><b>'+E(c.name)+'</b> <span style="color:'+SUB+';font-size:11px">今涨停 '+c.today+' 家</span> \u2192 '
+        + (c.leaders||[]).slice(0,2).map(function(l){return E(l.name)+' <span style="color:'+(l.chg>0?RED:GRN)+'">'+sgn(l.chg,1)+'%</span>';}).join('\u3001')+'</div>';
+    }).join('');
+    var l3=(BU.stocks||[]).map(function(s){
+      return '<div><b>'+E(s.name)+'</b> <span style="color:'+(s.chg>0?RED:GRN)+'">'+sgn(s.chg,1)+'%</span>'
+        + '<span style="color:'+DIM+';font-size:11px"> \u00b7 止损 '+pct(s.stop,2)+' / 目标 '+pct(s.target,2)+'</span>'
+        + (s.buyable===false?' <span style="color:'+RED+';font-size:11px">在跌，别接</span>':'')
+        + (s.same_theme?' <span style="color:'+GLD+';font-size:11px">与主线同向</span>':'')+'</div>';
+    }).join('');
+
+    var buyH='';
+    if(l1) buyH+='<div><span style="color:'+BLU+';font-size:11px;font-weight:700">L1 钱在连续进（最稳）</span></div>'+l1;
+    if(l2) buyH+='<div style="margin-top:'+(l1?'6px':'0')+'"><span style="color:'+GLD+';font-size:11px;font-weight:700">L2 今日涨停龙头（追高，只等回调不追板）</span></div>'+l2;
+    if(l3) buyH+='<div style="margin-top:'+((l1||l2)?'6px':'0')+'"><span style="color:#94a3b8;font-size:11px;font-weight:700">L3 因子榜（与资金不一定同向）</span></div>'+l3;
+    if(!buyH) buyH='<span style="color:'+DIM+'">三层都没有成型标的 \u2014\u2014 不硬凑</span>';
+    h+=row('买什么','#41c9ff',buyH);
+
     if((V.avoid||[]).length){
-      h+='<div style="margin-top:9px;background:rgba(239,83,80,.07);border:1px solid rgba(239,83,80,.22);border-radius:8px;padding:8px 10px">'
-       + '<div style="font-size:11.5px;font-weight:700;color:'+RED+';margin-bottom:4px">今天别碰（钱在往外走）</div>';
-      V.avoid.forEach(function(a){
-        h+='<div style="font-size:11.5px;line-height:1.7;color:'+SUB+'">&#183; <b style="color:'+TXT+'">'+E(a.name)+'</b> — '+E(a.why)+'</div>';
-      });
-      h+='</div>';
+      var avTxt=(V.avoid||[]).map(function(a){
+        return '<b>'+E(a.name)+'</b>'+(a.dist?'<span style="color:'+RED+';font-size:11px">（涨着却在流出）</span>':'');
+      }).join(' \u00b7 ');
+      var avNote=(V.avoid_note?'<div style="margin-top:3px;font-size:11px;color:'+DIM+';line-height:1.6">'+E(V.avoid_note)+'</div>':'');
+      h+=row('\u522b\u78b0','#ef5350',avTxt+' <span style="color:'+DIM+';font-size:11px">\u94b1\u5728\u5f80\u5916\u8d70</span>'+avNote);
     }
+
+    var sig='<span style="color:'+GRN+'">加</span> 检查表满 5/7 \u2192 上限提到 5 成'
+      + ' <span style="color:'+DIM+'">|</span> '
+      + '<span style="color:'+RED+'">减</span> 危机雷达&gt;60 \u2192 1 成 \u00b7 沪指单日跌 2% \u2192 减半 \u00b7 单票 -7% \u2192 止损';
+    var szHtml='';
+    var hasSz=!!(V.sizing&&V.sizing.per_stock_pct!=null);
+    if(hasSz){
+      szHtml='\u5355\u7968 \u2264 <b style="color:'+GLD+'">'+E(V.sizing.per_stock_pct)+'%</b>'
+        + ' \u00b7 \u9996\u6279 '+E(V.sizing.first_batch_pct)+'%'
+        + ' \u00b7 \u6700\u591a '+E(V.sizing.max_positions)+' \u53ea'
+        + ' \u00b7 \u6b62\u635f '+E(V.sizing.stop_loss_pct)+'%';
+    }
+    h+=row('\u4fe1\u53f7\u53d8','#ffd024',sig,!hasSz);
+    if(hasSz) h+=row('\u989d\u5ea6',GLD,szHtml,true);
     h+='</div>';
 
-    /* ── ④ 加仓检查表：每天开仓前看一眼 ── */
-    if(TR.add&&TR.add.items&&TR.add.items.length){
-      h+='<div style="margin-top:12px;border-top:1px dashed rgba(255,255,255,.12);padding-top:11px">';
-      h+='<div style="font-size:12.5px;font-weight:700;color:'+TXT+';margin-bottom:7px">加仓检查表 '
-       + '<span style="color:'+(TR.add.hit>=5?GLD:SUB)+';font-weight:800">'+TR.add.hit+'/'+TR.add.total+'</span>'
-       + '<span style="font-weight:400;color:'+DIM+';font-size:11px"> — '+E(TR.add.rule||'')+'</span></div>';
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px">';
-      TR.add.items.forEach(function(c){
-        var mc=c.met?GRN:RED;
-        h+='<div style="background:rgba(255,255,255,.035);border:1px solid '+(c.met?GRN+'44':RED+'33')+';border-radius:7px;padding:5px 8px">'
-         +  '<div style="font-size:11.5px;font-weight:700;color:'+mc+'">'+(c.met?'&#10003;':'&#10007;')+' '+E(c.name)+'</div>'
-         +  '<div style="font-size:10.5px;color:'+DIM+';line-height:1.5">需 '+E(c.need)+'</div>'
-         +  '<div style="font-size:11px;color:'+TXT+'">现在 '+E(c.now)+'</div></div>';
-      });
-      h+='</div></div>';
+    /* ── ④「凭什么这么说」收进折叠：默认不看，要复核才点开 ──
+       🔴 主人令「不能给我建议的、没必要的可以删除」：7 格检查表 + 依据清单属于复核材料，
+          不占首屏；但一条都不少，点开全在。 */
+    var evN=(V.evidence||[]).length;
+    var addItems=(TR.add&&TR.add.items)||[];
+    if(evN||addItems.length){
+      var d='';
+      if(addItems.length){
+        d+='<div style="font-size:11.5px;font-weight:700;color:'+TXT+';margin-bottom:4px">\u5f00\u4ed3\u68c0\u67e5\u8868 '
+         + '<span style="color:'+(hitN>=5?GLD:SUB)+'">'+hitN+'/'+hitT+'</span>'
+         + '<span style="font-weight:400;color:'+DIM+';font-size:10.5px"> \u2014 '+E(TR.add.rule||'')+'</span></div>';
+        addItems.forEach(function(c){
+          d+='<div style="font-size:11.5px;line-height:1.65;color:'+SUB+'"><span style="color:'+(c.met?GRN:RED)+'">'+(c.met?'&#10003;':'&#10007;')+'</span> '
+           + E(c.name)+'\uff1a\u73b0\u5728 '+E(c.now)+' <span style="color:'+DIM+'">\uff08\u9700 '+E(c.need)+'\uff09</span></div>';
+        });
+      }
+      if(evN){
+        d+='<div style="margin-top:8px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.10)">';
+        (V.evidence||[]).forEach(function(e){
+          d+='<div style="font-size:11.5px;line-height:1.65;color:'+SUB+'"><b style="color:'+TXT+'">'+E(e.name)+'</b>\uff1a'+E(e.plain)+'</div>';
+        });
+        d+='</div>';
+      }
+      h+='<details style="margin-top:9px;border-top:1px dashed rgba(255,255,255,.10);padding-top:7px">'
+       + '<summary style="cursor:pointer;font-size:11.5px;color:#94a3b8;list-style:none;outline:none">\u25b6 \u51ed\u4ec0\u4e48\u8fd9\u4e48\u8bf4 \u00b7 \u5f00\u4ed3\u68c0\u67e5\u8868 '+hitN+'/'+hitT+' \u00b7 \u4f9d\u636e '+evN+' \u6761</summary>'
+       + '<div style="margin-top:7px">'+d+'</div></details>';
     }
 
-    /* ── ⑤ 什么时候减 / 清 ── */
-    function trigBlock(title,color,obj){
-      if(!obj||!obj.items||!obj.items.length) return '';
-      var s='<div style="flex:1 1 240px;min-width:220px;background:rgba(255,255,255,.03);border:1px solid '+color+'33;border-radius:8px;padding:8px 10px">'
-        + '<div style="font-size:11.5px;font-weight:700;color:'+color+';margin-bottom:3px">'+title+'</div>';
-      if(obj.rule) s+='<div style="font-size:10.5px;color:'+DIM+';margin-bottom:4px">'+E(obj.rule)+'</div>';
-      obj.items.forEach(function(t){
-        s+='<div style="font-size:11.5px;line-height:1.65;color:'+SUB+'">&#183; '+E(t.cond)+' &#8594; <b style="color:'+TXT+'">'+E(t.act)+'</b></div>';
-      });
-      return s+'</div>';
-    }
-    var tb=trigBlock('什么时候该减',GLD,TR.cut)+trigBlock('什么时候必须清仓',RED,TR.exit);
-    if(tb){ h+='<div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap">'+tb+'</div>'; }
-
-    /* ── ⑥ 持仓块已整块删除 ──
-       🔴 2026-11-26 主人令「这早就不是我的持仓了，你不用管我的持仓，只要给我判断」：
-          v8 里的 PORTFOLIO 是一份过期账本，继续显示「你亏 45%、该清仓」属于报假账。
-          真账本在券商 App。本卡只回答「该不该动手 / 买什么 / 别碰什么 / 什么信号变」。
-          结构性防复发：此块不得恢复，除非主人明确要求「重新接入我的真实持仓」并给出同步口径。 */
-
-    /* ── ⑦ 依据 + 诚实声明 ── */
-    if((V.evidence||[]).length){
-      h+='<details style="margin-top:11px"><summary style="cursor:pointer;font-size:11.5px;color:'+DIM+'">'
-       + '&#9654; 我凭什么这么说（'+V.evidence.length+' 条依据，点开看数字）</summary>'
-       + '<div style="margin-top:6px">';
-      V.evidence.forEach(function(e){
-        h+='<div style="font-size:11.5px;line-height:1.7;color:'+SUB+'"><b style="color:'+TXT+'">'+E(e.name)+'</b>：'+E(e.plain)+'</div>';
-      });
-      h+='</div></details>';
-    }
+    /* ── ⑤ 诚实边界：压成一行，不折叠（这条必须被看见）── */
     if(V.caveat){
-      h+='<div style="margin-top:9px;background:rgba(255,208,36,.06);border:1px solid rgba(255,208,36,.22);border-radius:8px;padding:8px 10px;font-size:11.5px;line-height:1.7;color:'+SUB+'">'
-       + '<b style="color:'+GLD+'">&#9888;&#65039; 老实说</b>：'+B(V.caveat)+'</div>';
+      h+='<div style="margin-top:9px;font-size:11px;line-height:1.65;color:'+DIM+'">'
+       + '<span style="color:'+GLD+'">\u26a0 \u8fb9\u754c</span>\uff1a'+B(V.caveat)+'</div>';
     }
-    // 底部时点
-    var st=V.sources||{};
-    h+='<div style="margin-top:8px;font-size:10.5px;color:'+DIM+';line-height:1.6">'
-     + '合成源：攻防 '+E(st.tactic||'--')+' · 综合解析 '+E(st.verdict||'--')+' · 情绪 '+E(st.senti||'--')
-     + ' · 资金 '+E(st.flow||'--')+'</div>';
 
     el.innerHTML=h;
-    // 🗣 2026-11-26 主人令：作战指令卡已迁到「暂未上架→综合研判」，本页不再跨卡指路
-    try{
-      var f=document.getElementById('verdictFresh');
-      if(f&&st.tactic&&typeof _uBadge==='function') f.innerHTML=_uBadge('auto','',st.tactic,'','盘后');
-      else if(f&&st.tactic) f.innerHTML='<span style="font-size:11px;color:var(--dim)">'+E(st.tactic)+'</span>';
-    }catch(e){}
-    // 🏛 2026-11-26：档位块已迁到「暂未上架 → 综合研判」，同源刷新一次
+    /* 档位块与本块同源同节奏，一起刷新（它现在在折叠里，数据照样要就绪） */
     try{ if(window.__renderStanceBlock) window.__renderStanceBlock(); }catch(e){}
   }
   try{ window.renderVerdict=renderVerdict; }catch(e){}

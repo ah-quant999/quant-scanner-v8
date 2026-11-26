@@ -29,6 +29,7 @@ def _bj_now():
 
 
 OUT = "data/VOLUME_DIVERGENCE.js"
+OUT_RAW = "raw_data/volume_divergence.json"
 CASES = [("688758", "赛分科技"), ("688690", "纳微科技"),
          ("688046", "药康生物"), ("688222", "成都先导")]
 
@@ -208,7 +209,12 @@ def main():
         f.write("window.VOLUME_DIVERGENCE = ")
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
         f.write(";\n")
-    print(f"✅ {OUT}: 扫描{n_ok}/{len(universe)}，命中 {len(hits)} 只（今日 {sum(1 for h in hits if h['hit_now'])}）", flush=True)
+    # 🔁 2026-11-26 主人令：独立卡已删（「预警」列的是候选池杂票，既非持仓也不在买入名单，无处落地），
+    #   信号并入「综合研判 → 别碰」一行 ⇒ 必须落一份纯 JSON 给 algorithms/gen_verdict.py 读。
+    os.makedirs("raw_data", exist_ok=True)
+    with open(OUT_RAW, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, indent=1)
+    print(f"✅ {OUT} + {OUT_RAW}: 扫描{n_ok}/{len(universe)}，命中 {len(hits)} 只（今日 {sum(1 for h in hits if h['hit_now'])}）", flush=True)
 
 
 if __name__ == "__main__":

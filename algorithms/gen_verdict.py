@@ -43,6 +43,18 @@ TODAY = NOW.strftime("%Y-%m-%d")
 
 
 # ────────────────────────── 读取 data/*.js ──────────────────────────
+def load_raw(name):
+    """读 raw_data/<name> 纯 JSON，失败返回 {}。用于「卡已删、信号还要用」的数据。"""
+    p = os.path.join(RAW, name)
+    if not os.path.exists(p):
+        return {}
+    try:
+        return json.load(open(p, encoding="utf-8"))
+    except Exception as e:
+        print("  ! load_raw %s 失败: %s" % (name, e))
+        return {}
+
+
 def load(name, win=None):
     """读 data/<name>.js 里的 window.<win> = {...}，失败返回 {}。
     win 缺省同 name（个别文件文件名与全局名不一致，如 PORTFOLIO.js → window.PORTFOLIO_DATA）。"""
@@ -453,11 +465,16 @@ def main():
     tac_lab = tac.get("label") or "—"
     top_sec = buy["sectors"][0]["name"] if buy["sectors"] else "没有明显主线"
 
-    read = ("今天涨停 %d 家、情绪 %s（%d 分），但上涨 %d 家、下跌 %d 家 —— "
-            "涨停集中在少数题材里，大盘整体是失血的。五个攻防信号合起来 %+d 分，档位是「%s」。"
-            % (zt, phase, round(_f(senti.get("score"))), up, down, _i(tac.get("score")), tac_lab))
-    if div:
-        read += " 这种「局部发热、整体缺血」的背离日，最容易骗人。"
+    # 🗣 2026-11-26 主人令「不能给我建议的、没必要的可以删除」：删掉「最容易骗人」这类说教；
+    #   并把「大盘整体失血」改为条件表述 —— 普涨日不许硬套空头措辞（旧版无条件写死，读起来像编的）。
+    _rd_head = ("今天涨停 %d 家、情绪 %s（%d 分），" % (zt, phase, round(_f(senti.get("score")))))
+    if up > down:
+        read = (_rd_head + "上涨 %d 家、下跌 %d 家 —— 个股是普涨的。五个攻防信号合起来 %+d 分，档位是「%s」。"
+                % (up, down, _i(tac.get("score")), tac_lab))
+    else:
+        read = (_rd_head + "但上涨 %d 家、下跌 %d 家 —— 涨停集中在少数题材里，大盘整体是失血的。"
+                "五个攻防信号合起来 %+d 分，档位是「%s」。"
+                % (up, down, _i(tac.get("score")), tac_lab))
 
     if buy["answer_short"].startswith("不买"):
         so = ("所以今天不用动：仓位上限是 %d%%，但加仓条件只满足 %d/%d 条，**不加仓**。"
@@ -475,6 +492,27 @@ def main():
                "买进去就设 -7%% 止损，破了就走，不讨论。"
                % (cap * 20 * buy["factor"],))
 
+    # ⚠️ 量价背离（缩量新高）：原「预警 · 缩量新高灯」独立卡已按主人令删除，
+    #   但信号本身有统计意义（255 次信号 T+20 平均 -2.05%、跑输基准 3.0pp、胜率 40%<45%），
+    #   唯一用途是「别追高」⇒ 并进「别碰」一行，不再单开一张表。
+    _vd = load_raw("volume_divergence.json")
+    _vd_hits = [x for x in (_vd.get("hits") or []) if x.get("name")]
+    _vd_vs = (_vd.get("backtest") or {})
+    avoid_note = ""
+    if _vd_hits:
+        _ex = _vd_vs.get("excess")
+        _ex_txt = ("%.1f" % abs(_ex)) if isinstance(_ex, (int, float)) else "3"
+        avoid_note = ("另有 %d 只「缩量新高」票别追高（%s 等）。这类票历史上信号后 20 日平均跑输基准 %s 个百分点。"
+                      % (len(_vd_hits), "、".join(x["name"] for x in _vd_hits[:3]), _ex_txt))
+
+    _per = cap * 100 / 5
+    _per_adj = _per * buy["factor"]
+    _sz_rule = ("上限 %d%% ÷ 最多 5 只 = 单票 %.1f%%；%s首批只下一半（%.1f%%），确认走强再补齐"
+                % (round(cap * 100), _per,
+                   ("今天只能试 ⇒ 再打 %.2f 折到 %.1f%%；" % (buy["factor"], _per_adj))
+                   if buy["factor"] < 1.0 else "",
+                   _per_adj / 2))
+
     verdict = {
         "update_time": NOW.strftime("%Y-%m-%d %H:%M:%S"),
         "data_date": (tac.get("data_date") or TODAY),
@@ -490,17 +528,16 @@ def main():
         "position": {"cap_pct": round(cap * 100), "parts": parts, "diverge": div},
         "buy": buy,
         "avoid": avoid,
+        "avoid_note": avoid_note,
         "sizing": {
-            "per_stock_pct": round(cap * 100 / 5 * buy["factor"], 1),
-            "first_batch_pct": round(cap * 100 / 2 * buy["factor"], 1),
+            # 🔴 2026-11-26 修：旧版 first_batch 按「上限÷2」算、per_stock 按「上限÷5」算，
+            #   两个基准不同 ⇒ 首批 7.5% 大于单票 3%，同一行里自相矛盾。
+            #   正确口径：单票 = 上限÷5（再乘试仓折扣）；首批 = 单票的一半。
+            "per_stock_pct": round(_per_adj, 1),
+            "first_batch_pct": round(_per_adj / 2, 1),
             "max_positions": 5,
             "stop_loss_pct": -7,
-            "rule": ("上限 %d%% ÷ 最多 5 只 = 单票 %d%%；今天只能试 ⇒ 再打半折到 %d%%，首次只下一半（%d%%）"
-                     % (round(cap * 100), round(cap * 20), round(cap * 20 * buy["factor"]),
-                        round(cap * 50 * buy["factor"])))
-                    if buy["factor"] < 1.0 else
-                    ("上限 %d%% ÷ 最多 5 只 = 单票 %d%%；首次只下一半（%d%%），确认走强再补齐"
-                     % (round(cap * 100), round(cap * 20), round(cap * 50))),
+            "rule": _sz_rule,
         },
         "triggers": triggers,
         "evidence": [
