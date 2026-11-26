@@ -1375,20 +1375,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=ad687ea976" defer></script>
 <script src="data/EXPERIMENT.js?v=bef0006396" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=ab230fd96e" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=89de4b4300" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=6b880ac264" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=4df685279a" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=ab230fd96e" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=684d942a97" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=924ff0ef2b" defer></script><!-- 🆕 真实信号流回测（gen_final_recommend_backtest.py 每晚随 final_recommend.py 重产；2026-11-08 主人令「用真实算出来的每日股票做回测」：已删除回放归档 FINAL_RECOMMEND_REPLAY.js 引用，本卡直接读真实流） --><!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
+<script src="data/V8_POOL_TRACKER.js?v=ea78d6a024" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=7376b9c4cd" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=3353bb0a3f" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <!-- 🗑 2026-11-08 主人令：盘前预案卡整卡下线，对应数据注入一并移除 -->
     <script src="data/FACTOR_LAB_BACKTEST.js?v=77a4f6f880" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
-<script src="data/BACKTEST_ALL_ALGOS.js?v=8724768199" defer></script>
+<script src="data/BACKTEST_ALL_ALGOS.js?v=c0d1113d33" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=58a71ac44a" defer></script>
+    <script src="data/FACTOR_LAB.js?v=324a359745" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=59b6fbfb20" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=1656e26100" defer></script>
@@ -1432,8 +1432,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/VALUATION_PERCENTILE.js?v=d63a42f00d" defer></script>
     <!-- 🛡 2026-11-21 主人令「哪些卡没更新·一劳永逸修复」：回撤闸/策略walk-forward 生成器已挂 E 批链尾，
          data/*.js 恢复真实日更（下方 defer 标签线上文件会覆盖内联冻结快照；内联仅作文件缺失时兜底） -->
-    <script src="data/RISK_GUARD.js?v=9d94031d74" defer></script>
-    <script src="data/STRATEGY_WALKFORWARD.js?v=60d7cf6945" defer></script>
+    <script src="data/RISK_GUARD.js?v=2b3cdfec54" defer></script>
+    <script src="data/STRATEGY_WALKFORWARD.js?v=507d27b2ff" defer></script>
     <!-- 🔴 2026-10-26 主人令·风险闸（回撤/估值/行业）落地：回撤闸 + 策略级 walk-forward 数据【内联本页兜底】
          （2026-10-26~11-20 期间生成器未挂链，data/*.js 被 bot 重建清掉，故内联保活；11-21 起已挂链根治） -->
     <script>
@@ -2130,7 +2130,7 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=2ba5409ab6" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=f6771d919a" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=6f6cfa3153" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=9a41a2f554" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=4cdc4618e0" defer></script>
@@ -21194,7 +21194,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fe0185f1b3', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=04ebb0a627', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=e3ddbe8634', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=4329221d5e', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
