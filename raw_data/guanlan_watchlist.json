@@ -1,43 +1,164 @@
 {
   "version": "2.0",
-  "updated": "2026-11-26 03:14:04",
+  "updated": "2026-11-27 02:07:34",
   "sources": [
     "guanlan"
   ],
-  "total": 3,
+  "total": 14,
   "stocks": [
     {
-      "name": "中芯国际",
-      "code": "688981",
-      "full_code": "sh688981",
-      "exchange": "SH",
-      "market": "沪市",
+      "name": "翰森制药集团",
+      "code": "3692",
+      "full_code": "3692.HK",
+      "exchange": "HK",
+      "market": "港股",
       "institution": "摩根士丹利",
-      "rating": "未评级",
+      "rating": "增持",
       "source": "外资研投",
-      "added_date": "2026-11-25"
+      "added_date": "2026-11-26"
     },
     {
-      "name": "中国船舶",
-      "code": "600150",
-      "full_code": "sh600150",
+      "name": "翰森制药",
+      "code": "03692",
+      "full_code": "03692.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "摩根士丹利",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "国电南瑞",
+      "code": "600406",
+      "full_code": "sh600406",
       "exchange": "SH",
       "market": "沪市",
       "institution": "摩根大通",
       "rating": "增持",
       "source": "外资研投",
-      "added_date": "2026-11-25"
+      "added_date": "2026-11-26"
     },
     {
-      "name": "牧原股份",
-      "code": "002714",
-      "full_code": "002714.SZ",
+      "name": "许继电气",
+      "code": "000400",
+      "full_code": "sz000400",
       "exchange": "SZ",
       "market": "深市",
-      "institution": "野村",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "特锐德",
+      "code": "300001",
+      "full_code": "sz300001",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "中信证券",
+      "code": "600030",
+      "full_code": "sh600030",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
       "rating": "买入",
       "source": "外资研投",
-      "added_date": "2026-11-25"
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "招商证券",
+      "code": "600999",
+      "full_code": "sh600999",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "国泰海通",
+      "code": "601211",
+      "full_code": "sh601211",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "中国银河",
+      "code": "601881",
+      "full_code": "sh601881",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "中金公司",
+      "code": "601995",
+      "full_code": "sh601995",
+      "exchange": "SH",
+      "market": "沪市",
+      "institution": "摩根大通",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "东方财富",
+      "code": "300059",
+      "full_code": "sz300059",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "摩根大通",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "金斯瑞生物科技",
+      "code": "01548",
+      "full_code": "01548.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "未知机构",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "英矽智能",
+      "code": "03696",
+      "full_code": "03696.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "未知机构",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
+    },
+    {
+      "name": "机器人",
+      "code": "300024",
+      "full_code": "sz300024",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "摩根士丹利",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-26"
     }
   ]
 }
