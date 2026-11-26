@@ -1,6 +1,6 @@
 {
  "date": "2026-11-26",
- "generated": "2026-11-26 22:45:22",
+ "generated": "2026-11-26 23:30:35",
  "verdict": {
   "cap_pct": 30,
   "label": "守"
@@ -32,7 +32,9 @@
   ]
  },
  "checks_hit": 4,
- "checks_total": 7,
+ "checks_total": 8,
+ "list_gate_ok": false,
+ "list_gate_why": "validity=degraded、无分辨度max=4.2、缺维度inst_w52/inst_analyst",
  "forward_ref": {
   "sh_close": 3476.88,
   "date": "2026-11-26"

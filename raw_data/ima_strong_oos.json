@@ -1,0 +1,48 @@
+{
+  "generated": "2026-11-26 23:40 CST",
+  "method": "信号日次一交易日开盘买入，T+5/T+10/T+20 收盘卖出，扣双边0.30%；K线缓存零新抓取",
+  "split_date": "2026-10-01",
+  "split_rule": "first_selected < split = 样本内；>= split = 样本外（时间顺序 60/40，不在 OOS 重拟合）",
+  "sample_decay": {
+    "raw_signals": 120,
+    "testable_total": 113,
+    "in_sample": 111,
+    "out_of_sample": 2,
+    "note": "全量 188 信号 → 可回测随持有期衰减（T+20 约 110）；本分段按 first_selected 时间切，样本量见各桶 n"
+  },
+  "verdict": "insufficient_data：OOS 仅 2 信号，不可据此进最终推荐",
+  "in_sample": {
+    "5": {
+      "n": 111,
+      "win_rate": 61.3,
+      "avg_return": 4.458
+    },
+    "10": {
+      "n": 111,
+      "win_rate": 64.0,
+      "avg_return": 7.937
+    },
+    "20": {
+      "n": 102,
+      "win_rate": 74.5,
+      "avg_return": 12.017
+    }
+  },
+  "out_of_sample": {
+    "5": {
+      "n": 2,
+      "win_rate": 50.0,
+      "avg_return": 6.368
+    },
+    "10": {
+      "n": 2,
+      "win_rate": 100.0,
+      "avg_return": 51.642
+    },
+    "20": {
+      "n": 1,
+      "win_rate": 100.0,
+      "avg_return": 57.084
+    }
+  }
+}

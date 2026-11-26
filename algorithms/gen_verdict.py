@@ -40,6 +40,16 @@ OUT = os.path.join(RAW, "verdict.json")
 
 NOW = datetime.now()
 TODAY = NOW.strftime("%Y-%m-%d")
+# 🔴 2026-11-26 主人令「全站北京时间」：第 8 条榜单闸门显式 UTC+8，
+#    期望日走仓内权威交易日历（休市日回退上一交易日），失败才回落当天。
+from datetime import timezone, timedelta
+TZ_CN = timezone(timedelta(hours=8))
+TODAY_CN = datetime.now(TZ_CN).strftime("%Y-%m-%d")
+try:
+    from v8_date import today_data_date as _today_data_date
+    EXPECT_DATE = _today_data_date()
+except Exception:
+    EXPECT_DATE = TODAY_CN
 
 
 # ────────────────────────── 读取 data/*.js ──────────────────────────
@@ -87,6 +97,42 @@ def _i(x, d=0):
         return int(float(x))
     except Exception:
         return d
+
+
+def _datestr(x):
+    m = re.search(r"(\d{4})-(\d{2})-(\d{2})", str(x or ""))
+    return "%s-%s-%s" % (m.group(1), m.group(2), m.group(3)) if m else ""
+
+
+def check_list_validity(top10, expect_date=None):
+    """第 8 条开仓检查「榜单有效」：一票否决，不进 7 条加仓条件的命中计数。
+    字段缺失/格式异常一律 fail-closed（只允许「不买」）；零新预测。"""
+    td = top10 if isinstance(top10, dict) else {}
+    v = td.get("validity") if isinstance(td.get("validity"), dict) else {}
+    ut = _datestr(td.get("update_time"))
+    exp = expect_date or EXPECT_DATE
+    ms = _f(td.get("max_score"), _f(v.get("max_score")))
+    missing = v.get("data_missing") if isinstance(v.get("data_missing"), list) else []
+    reasons = []
+    if not ut:
+        reasons.append("榜单日期缺失")
+    elif ut != exp:
+        reasons.append("榜单陈旧%s" % ut[5:])
+    if str(v.get("status") or "").strip().lower() != "ok":
+        reasons.append("validity=%s" % (v.get("status") or "缺失"))
+    if ms < 10:
+        reasons.append("无分辨度max=%.1f" % ms)
+    if missing or _i(v.get("data_missing_count"), len(missing)) > 0:
+        reasons.append("缺维度%s" % "/".join(str(x) for x in missing[:2]))
+    return (not reasons), {
+        "name": "榜单有效", "gate": True,
+        "need": "update_time=%s / validity=ok / max_score≥10 / 无缺失维度" % exp,
+        "now": "榜单%s · validity=%s · max=%.1f · 缺%d维"
+               % (ut or "缺失", v.get("status") or "缺失", ms, len(missing)),
+        "met": not reasons, "why": "、".join(reasons) or "榜单有效",
+        "date": ut, "expect_date": exp, "status": str(v.get("status") or ""),
+        "max_score": ms, "data_missing": missing,
+    }
 
 
 # ────────────────────────── 仓位闸门 ──────────────────────────
@@ -300,7 +346,7 @@ def build_avoid(flow, trend):
 
 
 # ────────────────────────── 加仓检查表 ──────────────────────────
-def build_checks(tactic, senti, flow, trend, idx, crisis):
+def build_checks(tactic, senti, flow, trend, idx, crisis, top10=None):
     d = tactic.get("dims") or {}
     br = d.get("breadth") or {}
     up, down = _i(br.get("up")), _i(br.get("down"))
@@ -331,7 +377,9 @@ def build_checks(tactic, senti, flow, trend, idx, crisis):
         {"name": "宏观无警报", "need": "危机雷达 < 40",
          "now": "%.1f（%s）" % (radar, crisis.get("level") or "—"), "met": radar < 40},
     ]
-    hit = sum(1 for c in checks if c["met"])
+    _gate_ok, _gate = check_list_validity(top10)
+    checks.append(_gate)   # 第 8 条只展示 + 一票否决；gate=True 不参与 7 条命中计数
+    hit = sum(1 for c in checks if c["met"] and not c.get("gate"))
     return checks, hit
 
 
@@ -340,9 +388,10 @@ def build_triggers(checks, cap):
     return {
         "add": {
             "need": 5,
-            "hit": sum(1 for c in checks if c["met"]),
-            "total": len(checks),
-            "rule": "上面 7 条里满足 ≥5 条，才把仓位往 5 成加；只满足 3-4 条，维持现在的上限不动",
+            "hit": sum(1 for c in checks if c["met"] and not c.get("gate")),
+            "total": sum(1 for c in checks if not c.get("gate")),
+            "rule": "上面 7 条加仓条件里满足 ≥5 条才把仓位往 5 成加；第 8 条「榜单有效」一票否决，不满足当日只观察",
+            "_old_rule": "上面 7 条里满足 ≥5 条，才把仓位往 5 成加；只满足 3-4 条，维持现在的上限不动",
             "items": add_items,
         },
         "cut": {
@@ -380,6 +429,7 @@ def main():
     sl = load("SECTOR_LEADERS")
     etfm = load("CONCEPT_ETF_MAP")
     heat = load("LIMIT_UP_HEATMAP")
+    alpha = load_raw("stock_forward_alpha.json")
 
     # 宽度
     items = idx.get("items") or []
@@ -397,7 +447,7 @@ def main():
     avoid = build_avoid(flow, trend)
     avoid_names = [a["name"] for a in avoid]
     buy = build_buy(trend, flow, top10, avoid_names, sl, etfm)
-    checks, hit = build_checks(tac, senti, flow, trend, idx, crisis)
+    checks, hit = build_checks(tac, senti, flow, trend, idx, crisis, top10)
     triggers = build_triggers(checks, cap)
 
     # ── 能不能买：由加仓条件命中数决定，不看心情 ──
@@ -427,22 +477,39 @@ def main():
             _veh = "这个方向 v8 里没有现成标的，要买只能自己挑该方向的票，或买对应行业 ETF"
     if buy["mode"] == "none":
         buy["advice"] = ("加仓条件只满足 %d/%d 条 —— 今天不买。不是没机会，是赔率不够，"
-                         "硬买等于用确定的亏损换不确定的收益。" % (hit, len(checks)))
+                         "硬买等于用确定的亏损换不确定的收益。" % (hit, 7))
     elif buy["mode"] == "half":
         buy["advice"] = ("加仓条件满足 %d/%d 条，只能小仓试：方向是 %s；%s。"
-                         "单票额度按半档算，错了立刻走。" % (hit, len(checks), _sec0, _veh))
+                         "单票额度按半档算，错了立刻走。" % (hit, 7, _sec0, _veh))
     else:
         buy["advice"] = ("加仓条件满足 %d/%d 条，可以按额买：方向是 %s；%s。"
-                         % (hit, len(checks), _sec0, _veh))
+                         % (hit, 7, _sec0, _veh))
     if buy["conflict"]:
         buy["advice"] += (" 注意：今天因子榜（%s）跟资金主线不是同一条线 —— "
                           "两条线打架时以资金为准，因子榜那几只别急着买。"
                           % "、".join(x["name"] for x in buy["stocks"][:2]))
 
+    # ── 第 8 条：榜单有效一票否决 ⇒ 当日只观察，判定位写明理由 ──
+    _gate = next((c for c in checks if c.get("gate")), None)
+    _gate_ok = bool(_gate and _gate.get("met"))
+    buy["list_gate"] = _gate or {"name": "榜单有效", "met": False, "why": "榜单检查缺失"}
+    if not _gate_ok:
+        _parts = []
+        if str(_gate.get("status") or "").lower() != "ok": _parts.append("降级")
+        if (_gate.get("max_score") or 0) < 10: _parts.append("低分辨")
+        if _gate.get("data_missing"): _parts.append("缺维度")
+        _why = "榜单" + ("/".join(_parts) if _parts else "无效")
+        buy["mode"] = "none"
+        buy["mode_txt"] = "只观察"
+        buy["factor"] = 0.0
+        buy["advice"] = "榜单无效（%s）⇒ 今天不买、只观察；榜单修好再谈仓位。" % _why
+        buy["answer"] = "今天不买，只观察 —— 榜单无效（%s）。" % _why
+        buy["answer_short"] = "不买（榜单无效：%s）" % _why
+
     # ── 一句话回答「今天到底买不买」：方向与标的必须对得上，否则不硬凑 ──
     _same_ok = [x for x in buy["stocks"] if x.get("same_theme") and x.get("buyable")]
     _lead_ok = [x for s in buy["sectors"] for x in (s.get("leaders") or [])]
-    if buy["mode"] == "none":
+    if buy["mode"] == "none" and _gate_ok:
         buy["answer"] = "今天不买，空仓等。"
         buy["answer_short"] = "不买"
     elif _same_ok:
@@ -476,10 +543,20 @@ def main():
                 "五个攻防信号合起来 %+d 分，档位是「%s」。"
                 % (up, down, _i(tac.get("score")), tac_lab))
 
+    # 🔴 榜单闸门最后兜底：上面方向/标的分支会覆盖 answer，这里把「榜单无效」写回判定位
+    if not _gate_ok:
+        _parts = []
+        if str(_gate.get("status") or "").lower() != "ok": _parts.append("降级")
+        if (_gate.get("max_score") or 0) < 10: _parts.append("低分辨")
+        if _gate.get("data_missing"): _parts.append("缺维度")
+        _why = "榜单" + ("/".join(_parts) if _parts else "无效")
+        buy["answer"] = "今天不买，只观察 —— 榜单无效（%s）。" % _why
+        buy["answer_short"] = "不买（榜单无效：%s）" % _why
+
     if buy["answer_short"].startswith("不买"):
         so = ("所以今天不用动：仓位上限是 %d%%，但加仓条件只满足 %d/%d 条，**不加仓**。"
               "上限是天花板，不是让你必须用满 —— 空仓也是一种仓位。"
-              % (round(cap * 100), hit, len(checks)))
+              % (round(cap * 100), hit, 7))
     else:
         so = ("所以今天可以做，但**只能拿上限以内的钱做**：仓位上限 %d%%，分批建，"
               "一次打满明天一个低开就全吐回去。" % round(cap * 100))
@@ -540,6 +617,18 @@ def main():
             "rule": _sz_rule,
         },
         "triggers": triggers,
+        # P2：榜单体检 + 前瞻 Alpha 明示（只进折叠块，不占首屏）
+        "list_check": {
+            "date": _gate.get("date") if _gate else "",
+            "expect_date": _gate.get("expect_date") if _gate else EXPECT_DATE,
+            "status": _gate.get("status") if _gate else "",
+            "max_score": _gate.get("max_score") if _gate else 0.0,
+            "data_missing": _gate.get("data_missing") if _gate else [],
+            "met": _gate_ok,
+            "why": _gate.get("why") if _gate else "榜单检查缺失",
+        },
+        "alpha": {"verdict": str(alpha.get("verdict") or "—"),
+                  "ir_oos": alpha.get("ir_oos"), "update_time": alpha.get("update_time") or ""},
         "evidence": [
             {"name": "攻防档位", "plain": "五个信号打分：趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1，合计 %+d"
              % _i(tac.get("score")), "value": "%+d" % _i(tac.get("score"))},
@@ -599,6 +688,8 @@ def main():
         },
         "checks_hit": hit,
         "checks_total": len(checks),
+        "list_gate_ok": _gate_ok,
+        "list_gate_why": (_gate.get("why") if _gate else ""),
         # 未来兑现位：3/5/10 日后由复盘脚本按这两个价位算前瞻收益
         "forward_ref": {"sh_close": sh.get("price"), "date": verdict["data_date"]},
     }
@@ -608,7 +699,7 @@ def main():
 
     print("✅ verdict.json  %s" % OUT)
     print("   档位 %s · 仓位上限 %d%% · 加仓条件 %d/%d"
-          % (tac_lab, round(cap * 100), hit, len(checks)))
+          % (tac_lab, round(cap * 100), hit, 7))
     print("   买 %s | 避 %s" % ([s["name"] for s in buy["sectors"]],
                                 [a["name"] for a in avoid[:2]]))
     print("   留痕 %s" % hp)

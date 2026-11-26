@@ -150,11 +150,30 @@ def main():
     else:
         action = "ok"
 
+    # 🔴 2026-11-26 主人令「不让 3 个月前的权重继续调今天的仓」：
+    #   IC 报告超过 30 天即整体失效，下游 ic_weight 强制回到中性 1.0（不再用陈旧权重调分）。
+    try:
+        _rep_ut = datetime.strptime(str(ic_report.get("update_time") or ""), "%Y-%m-%d %H:%M:%S")
+        _age_days = (datetime.now() - _rep_ut).days
+    except Exception:
+        _age_days = None
+    stale = (_age_days is None or _age_days > 30)
+    if stale:
+        for _f in factors.values():
+            if not _f:
+                continue
+            _f["ic_weight"] = 1.0
+            _f.setdefault("reasons", []).append("IC报告超30天失效(%s天)" % _age_days)
+        if action != "fail":
+            action = "stale"
+
     gate = {
         "policy": "ic_gate_v1_conservative",
         "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
         "thresholds": THRESH,
         "overall_action": action,
+        "ic_report_age_days": _age_days,
+        "ic_report_stale": stale,
         "factors": factors,
         "todo": [
             "下游接入 generate_top10.py：score_backtest 改读 ic_gate.json 的 ic_weight 做微调",

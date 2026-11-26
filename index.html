@@ -10949,7 +10949,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         「script src=data/IPO_DATA.js?v=79362aa12b」标签 实时读取，不再手写 hash。
+         「script src=data/IPO_DATA.js?v=2a11694148」标签 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
@@ -13118,8 +13118,6 @@ function drawUpDownChart(){
 
           {name:'主力净额分时累计曲线', source:'SECTOR_FUND_FLOW_INTRADAY', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'板块主力净额分时(两市累加)'},
 
-          {name:'商品涨价弹性榜', source:'COMMODITY_ELASTICITY', freq:'每日盘后', slots:['1','7',':','3','0'], note:'商品弹性'},
-
           {name:'概念资金热力图', source:'CONCEPT_RANKING', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'涨停概念追踪'},
 
           {name:'行业树图·细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', maturity:'盘中实时', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'行业涨跌 treemap'},
@@ -14868,8 +14866,7 @@ window.showRestrictedItems = showRestrictedItems;
     safe(renderAuditTrail, window.AUDIT_TRAIL || {});
     safe(renderTaskSchedule);
     safe(renderHealthCheck);
-    // 2026-08-16: 商品涨价弹性榜已从选股策略TAB移至盘后数据section，需在此处渲染
-    try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){ console.warn('商品涨价弹性榜渲染失败',e); }
+    // 2026-11-26：商品涨价弹性榜已在「已下架」页渲染（见 renderDelisted），此处旧盘后触发已撤。
 
     // 2026-08-30 主人令：盘后数据页扩展（宽度/期指/宏观/解禁日历/业绩预告）
     // 情绪温度条、龙虎榜净买榜已删除（分别与实时「连板天梯」、共振日历重复）
@@ -20857,7 +20854,7 @@ window.__renderV8CalToday();
       h+=row('\u522b\u78b0','#ef5350',avTxt+' <span style="color:'+DIM+';font-size:11px">\u94b1\u5728\u5f80\u5916\u8d70</span>'+avNote);
     }
 
-    var sig='<span style="color:'+GRN+'">加</span> 检查表满 5/7 \u2192 上限提到 5 成'
+    var sig='<span style="color:'+GRN+'">加</span> 检查表满 '+hitN+'/'+hitT+' \u2192 上限提到 5 成'
       + ' <span style="color:'+DIM+'">|</span> '
       + '<span style="color:'+RED+'">减</span> 危机雷达&gt;60 \u2192 1 成 \u00b7 沪指单日跌 2% \u2192 减半 \u00b7 单票 -7% \u2192 止损';
     var szHtml='';
@@ -20888,6 +20885,20 @@ window.__renderV8CalToday();
            + E(c.name)+'\uff1a\u73b0\u5728 '+E(c.now)+' <span style="color:'+DIM+'">\uff08\u9700 '+E(c.need)+'\uff09</span></div>';
         });
       }
+      /* 榜单有效性 + 前瞻 Alpha：只进折叠，复核才看 */
+      var LC=V.list_check||{}, AL=V.alpha||{};
+      d+='<div style="margin-top:8px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.10)">'
+       + '<div style="font-size:11.5px;line-height:1.65;color:'+SUB+'"><b style="color:'+TXT+'">榜单有效</b>：'
+       + '<b style="color:'+(LC.met?GRN:RED)+'">'+E(LC.met?'有效':'无效')+'</b>'
+       + ' · 榜单日期 '+E(LC.date||'—')
+       + (LC.expect_date&&LC.expect_date!==LC.date?'（应为 '+E(LC.expect_date)+'）':'')
+       + ' · max_score '+E(pct(LC.max_score,1))
+       + ' · 缺失维度 '+E((LC.data_missing||[]).join('、')||'无')
+       + (LC.why?' <span style="color:'+DIM+'">— '+E(LC.why)+'</span>':'')+'</div>'
+       + '<div style="font-size:11.5px;line-height:1.65;color:'+SUB+'"><b style="color:'+TXT+'">前瞻 Alpha</b>：verdict '
+       + '<b style="color:'+(String(AL.verdict||'').toUpperCase()==='PASS'?GRN:RED)+'">'+E(AL.verdict||'—')+'</b>'
+       + ' · IR_OOS '+E(AL.ir_oos==null?'—':Number(AL.ir_oos).toFixed(3))
+       + (AL.update_time?' <span style="color:'+DIM+'">（'+E(AL.update_time)+'）</span>':'')+'</div></div>';
       if(evN){
         d+='<div style="margin-top:8px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.10)">';
         (V.evidence||[]).forEach(function(e){
@@ -20937,6 +20948,21 @@ window.__renderV8CalToday();
     //   🔴 2026-11-07 主人令「最终推荐·宁缺毋滥」：TOP10_DAILY 即当日唯一"收益率最高"真源，缺失即"今日未算出"，绝不以陈旧 FINAL_RECOMMEND_DATA 兜底滥竽充数。
     var TD = window.TOP10_DAILY || null;
     var _tdList = (TD && TD.top10) ? TD.top10 : [];
+    /* 🔴 2026-11-26 主人令「max_score<10 不出 Top5，只出候选观察」：
+       榜单 validity≠ok 或无分辨度时，本页不摆 4.3/4.2 这种伪 Top5；
+       数据与候选池照常渲染，只是不伪装成「未来收益率最高的 5 只」。 */
+    var _vld = (TD && TD.validity) || {};
+    if (String(_vld.status || '') !== 'ok' || Number(_vld.max_score || 0) < 10) {
+      el.innerHTML = '<div class="note" style="padding:16px 18px;line-height:1.8;color:var(--sub)">'
+        + '<b style="color:#ffd024">今日只出「候选观察」，不展示 Top5</b><br>'
+        + '榜单日期 ' + (TD && TD.update_time ? String(TD.update_time).slice(0,10) : '—')
+        + ' · validity=' + String(_vld.status || '缺失')
+        + ' · max_score=' + String(_vld.max_score == null ? '—' : _vld.max_score)
+        + '（健康阈值 ≥10）<br>'
+        + '原因：' + String(_vld.reason || '榜单分辨度不足或状态降级')
+        + '。候选池与因子榜照常可查，但分数接近并列不等于「未来收益率最高」，故不硬排前 5。</div>';
+      return;
+    }
     function _normTop10(s){
       if(!s) return null;
       var _so = s.signals || {};

@@ -1,6 +1,6 @@
 {
   "policy": "ic_gate_v1_conservative",
-  "update_time": "2026-08-29 12:41:40",
+  "update_time": "2026-11-26 23:35:17",
   "thresholds": {
     "min_T1_win": 45.0,
     "min_T3_win": 35.0,
@@ -10,30 +10,24 @@
     "min_n_signals": 80
   },
   "overall_action": "warn",
+  "ic_report_age_days": 0,
+  "ic_report_stale": false,
   "factors": {
     "ge3": {
       "name": "ge3",
-      "n_signals": 371,
-      "T1_win": 49.1,
-      "T3_win": 32.3,
-      "T5_win": 38.3,
+      "n_signals": 921,
+      "T1_win": 48.5,
+      "T3_win": 38.0,
+      "T5_win": 37.9,
       "fixed_T1_win": 49.7,
       "fixed_T3_win": 25.9,
       "fixed_T5_win": 33.9,
       "gate": "warn",
       "reasons": [
-        "T3胜率32.3<35.0"
+        "固定样本T3胜率25.9<32.0"
       ],
       "ic_weight": 0.5,
-      "update_time": "2026-08-28 22:46:23"
-    },
-    "top5_累计": {
-      "name": "top5_累计",
-      "T1_win": null,
-      "T3_win": null,
-      "T5_win": null,
-      "n_signals": null,
-      "update_time": "2026-08-29 09:16"
+      "update_time": "2026-11-26 23:31:33"
     },
     "h_auto_buy_累计": null
   },

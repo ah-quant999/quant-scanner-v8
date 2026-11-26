@@ -4177,3 +4177,36 @@ items:
       ⑤ 明日 09:30-15:00 盘中每档是否仍 cancelled、单档是否 <30 分钟（北京时间，直接看 Actions steps 时长）。
     updated: "2026-11-26 22:47"
     updated_by: 小九的工程师
+
+  - id: verdict-list-gate-oos-1126-xiaojiu
+    owner: 小九的工程师
+    priority: P0
+    status: done
+    created: 2026-11-26
+    title: 榜单有效一票否决 + IC 真OOS + 高手强势股OOS分段 + Top5质量闸（2026-11-26 22:57-23:45 CST 实测）
+    note: >-
+      登记方：小九的工程师（主人令「全部按你的建议，科学修改修复」）。
+      ① gen_verdict.py 增加第 8 条「榜单有效」闸门：TOP10_DAILY 当日 + validity=ok + max_score≥10 + 无缺失维度，
+      任一不满足直接「不买/只观察」，理由进判定位；该条一票否决但不计入原 7 条命中数（仍 5/7 口径）；
+      折叠块明示榜单日期/validity/最高分/Alpha verdict/IR_OOS。当晚实测 validity=degraded/max=4.2/缺2维
+      ⇒ 判定位输出「不买（榜单无效：榜单降级/低分辨/缺维度）」。
+      ② IC 报告用 --split-date 2026-09-15 重跑为真 OOS：OOS total_score IC T+5 -0.132 / T+10 -0.320，
+      T+5 均益 -4.80%、胜率 30.1%；apply_ic_gate.py 加「IC 报告 >30 天自动失效，ic_weight 回中性 1.0」。
+      ③ 高手强势股补 IS/OOS 分段（复用 K 线缓存、零新抓取）：IS T+20 胜率 74.5%/均益 +12.0%(n=102)，
+      但 OOS 仅 2 个可回测信号 ⇒ insufficient_data，不具备进最终推荐的证据，不接入。
+      ④ 最终推荐页在 validity≠ok 或 max_score<10 时只出「候选观察」，不摆 4.3/4.2 伪 Top5。
+      ⑤ 商品涨价弹性榜确认早已在「已下架」页（11-18），本批只清掉看板旧登记与盘后页冗余渲染触发。
+      ⑥ 重挂说明：本批基于远端真身重建 index.html（保留远端 histAll.sort 修复与最新缓存戳）与
+      IMA_STRONG_BACKTEST.js（保留远端 22:31 重算结果，仅追加 OOS 分段）。
+      ⑦ 算法链 18:55 run：job 19:49 上机、算法步 159.8 分钟、update_v8 24 分钟，23:10 时仍在唯一推送步；
+      19:26 run 因并发组排队 pending —— 不是卡死，不自行 dispatch，按双机协议交阿狸咪复核。
+      ⚠️ 以上为「截至 2026-11-26 23:45 CST 本地实测」；线上生效以 verify_how 现取命令为准。
+    note_to: 阿狸咪的工程师
+    verify_how: >-
+      ① 现取 main 的 data/V8_VERDICT.js，断言 buy.answer_short 含「榜单无效」且存在顶层 list_check；
+      ② 现取 raw_data/factor_ic_report.json，断言 config.split_date=2026-09-15 且存在 out_of_sample；
+      ③ 现取 data/IMA_STRONG_BACKTEST.js，断言 oos_segment.verdict 含 insufficient_data；
+      ④ 现取线上 index.html，断言「今日只出「候选观察」」存在且 histAll.sort 修复仍在；
+      ⑤ 明日盘中按北京时间复核 09:30-15:00 每档 cancelled 与单档耗时。
+    updated: "2026-11-27 00:19"
+    updated_by: 小九的工程师
