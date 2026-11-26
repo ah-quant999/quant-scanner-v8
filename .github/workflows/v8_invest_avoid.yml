@@ -35,6 +35,25 @@ concurrency:
 
 jobs:
   invest-avoid:
+    # ⏰ 2026-11-26 主人令「盘后链不许在盘前/盘中浪费资源」：避雷针读 6 源 consolidate，
+    #   其中收盘价/公告/停牌口径只在盘后定型 ⇒ 盘中重算没有意义。
+    #   原实现：workflow_run 无任何时间闸门 ⇒ 今日实测 09:05/09:14/09:24/09:39/09:46/10:13 连跑 6 次纯浪费。
+    #   修法：workflow_run 只在 UTC 07:00-15:59（CST 15:00-23:59 盘后窗）放行；
+    #   自有 cron(15:35 盘后定稿 / 07:55 盘前微调) 与手动 dispatch 不受影响。
+    if: |
+      github.event_name != 'workflow_run' || (
+        github.event.workflow_run.conclusion == 'success' && (
+          contains(github.event.workflow_run.created_at, 'T07:') ||
+          contains(github.event.workflow_run.created_at, 'T08:') ||
+          contains(github.event.workflow_run.created_at, 'T09:') ||
+          contains(github.event.workflow_run.created_at, 'T10:') ||
+          contains(github.event.workflow_run.created_at, 'T11:') ||
+          contains(github.event.workflow_run.created_at, 'T12:') ||
+          contains(github.event.workflow_run.created_at, 'T13:') ||
+          contains(github.event.workflow_run.created_at, 'T14:') ||
+          contains(github.event.workflow_run.created_at, 'T15:')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
