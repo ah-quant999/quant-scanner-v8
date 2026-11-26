@@ -1,20 +1,20 @@
 {
   "runner": "v8_peer_monitor",
   "host": "LEMONCAT",
-  "run_time": "2026-11-26 17:06:53",
+  "run_time": "2026-11-26 21:52:20",
   "threshold_min": 180,
   "interval_min": 63,
   "xiaoju": {
     "alive": true,
-    "silent_min": 94.1,
-    "last_time": "2026-11-26 15:32:42",
-    "detail": "远端权威 origin/main:data/HB_XIAOJIU.js · last_time=2026-11-26 15:32:42 · machine=lemoncat-cn · 沉默 94min"
+    "silent_min": 39.8,
+    "last_time": "2026-11-26 21:12:24",
+    "detail": "远端权威 origin/main:data/HB_XIAOJIU.js · last_time=2026-11-26 21:12:24 · machine=lemoncat-cn · 沉默 40min"
   },
   "alimi": {
     "alive": true,
-    "silent_min": 189.4,
-    "last_time": "2026-11-26 13:57:28",
-    "detail": "data/HB_ALIMI.js · last_time=2026-11-26 13:57:28 · machine=alimi-cn · 沉默 189min"
+    "silent_min": 36.3,
+    "last_time": "2026-11-26 21:15:56",
+    "detail": "data/HB_ALIMI.js · last_time=2026-11-26 21:15:56 · machine=alimi-cn · 沉默 36min"
   },
   "verdict": "xj=alive/al=alive",
   "note": "本文件由 v8_peer_monitor 每轮运行覆盖写 ⇒ 「没告警」与「监控没在跑」可区分"
