@@ -126,7 +126,7 @@ window.__domReadyFns=[];
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-    <script src="data/ETF_INTRADAY_HEAT.js?v=0f28b555a5" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=d96646a508" defer></script>
     <!-- 🆕 2026-11-23 主人拍板：ETF 量能配速+局部异动灯（gen_etf_pace.py，盘中链重算；口径见逻辑详解页） -->
     <script src="data/ETF_PACE.js?v=7016b16a17" defer></script>
     <!-- 🆕 2026-11-24 主人拍板：市场攻防档位·五信号合成（gen_market_regime.py，实验卡链重算；口径见逻辑详解页）。
@@ -158,7 +158,7 @@ window.__domReadyFns=[];
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=44d6ce4067" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=ef7a7e7ec1" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=6dd1358bf7" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=c053fe1197" defer></script>
@@ -196,7 +196,7 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261124） -->
     <!-- 🔴 2026-10-03 CN runner2号机更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
-    <script src="data/maharo_insights.js?v=2ff29941b6" defer></script>
+    <script src="data/maharo_insights.js?v=29db7d185e" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -213,7 +213,7 @@ window.__domReadyFns=[];
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
     <script src="data/FRESHNESS_STATUS.js?v=93a841ec1f" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=b7945e5eb1" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=071b0b2b50" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=348f937bfb" defer></script>
     <!-- 🆕 2026-11-21 主人令「因子审计·一劳永逸」：backtest_expectancy 回测产物发布为 data/*.js，
@@ -1364,7 +1364,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_CYCLE_ARCHIVE.js?v=37ae80e3a2" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=6465c776f0" defer></script>
 <script src="data/VOLATILITY.js?v=1ddf12b21f" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=dc873bc6a4" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=6fea78b268" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=9a0ee8aba3" defer></script>
 <script src="data/CANDIDATE.js?v=c402db8964" defer></script>
 
@@ -1387,7 +1387,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=ec8a3ccf6f" defer></script>
 <!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
-<script src="data/ETF_PULSE.js?v=299d83ea30" defer></script>
+<script src="data/ETF_PULSE.js?v=826a7eadd8" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=fc5762dcf6" defer></script>
 <script src="data/TOP10_DAILY.js?v=f45aef8100" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
