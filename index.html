@@ -20684,14 +20684,26 @@ window.__renderV8CalToday();
     }
 
     var h='';
-    /* ── ① 判定位：一行说清「什么档位 / 上限几成 / 今天做不做」──
-       🔴 2026-11-26 主人令（第三轮）：「简洁明了但要覆盖全部」。
-          档位与上限不再单开一块，与今日动作压在同一行 —— 这三件事本来就是同一个判断。 */
-    h+='<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:'+col+'12;border:1px solid '+col+'44;border-radius:10px;padding:10px 14px">'
-     +  '<span style="font-size:17px;font-weight:800;color:'+col+'">'+E(H.icon||'')+' '+E(H.label||'')+'</span>'
-     +  '<span style="font-size:12px;color:'+SUB+'">仓位上限 <b style="font-size:14px;color:'+TXT+'">'+E(cap)+'%</b></span>'
-     +  '<span style="font-size:12px;color:'+SUB+'">加仓条件 <b style="font-size:14px;color:'+(hitN>=5?GLD:TXT)+'">'+hitN+'/'+hitT+'</b></span>'
-     +  '<span style="margin-left:auto;font-size:19px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+'">'+E(ans)+'</span>'
+    /* ── ① 判定位：左「今天到底做不做」最前最大，右「档位/上限/加仓」做依据 ──
+       🔴 2026-11-26 主人令（第四轮）：「这个是最主要的，放左侧」。
+          今日动作（买/不买）是主人一眼要的结论 ⇒ 压在整张卡最左、字号最大，
+          括号里的理由拆成小字贴同一行；档位/上限/加仓条件退到最右端做依据。
+       🔴 同日第三轮令「简洁明了但要覆盖全部」⇒ 仍同一行，不加高、不新开块。 */
+    var _mA=ans.match(/^([^（(]+)[（(]([^）)]+)[）)]\s*$/);
+    var ansMain=_mA?_mA[1]:ans, ansWhy=_mA?_mA[2]:'';
+    h+='<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:'+col+'12;border:1px solid '+col+'44;border-radius:10px;padding:10px 14px">'
+     +  '<div style="flex:0 0 auto;min-width:0">'
+     +    '<div style="font-size:10.5px;color:'+DIM+';letter-spacing:.5px;line-height:1.3">今日动作</div>'
+     +    '<div style="display:flex;align-items:baseline;gap:7px;line-height:1.15">'
+     +      '<span style="font-size:23px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+'">'+E(ansMain)+'</span>'
+     +      (ansWhy?'<span style="font-size:11.5px;color:'+SUB+'">'+E(ansWhy)+'</span>':'')
+     +    '</div>'
+     +  '</div>'
+     +  '<div style="margin-left:auto;display:flex;gap:16px;align-items:center;flex-wrap:wrap">'
+     +    '<span style="font-size:13px;font-weight:700;color:'+col+'">'+E(H.icon||'')+' '+E(H.label||'')+'</span>'
+     +    '<span style="font-size:11.5px;color:'+SUB+'">仓位上限 <b style="font-size:13.5px;color:'+TXT+'">'+E(cap)+'%</b></span>'
+     +    '<span style="font-size:11.5px;color:'+SUB+'">加仓条件 <b style="font-size:13.5px;color:'+(hitN>=5?GLD:TXT)+'">'+hitN+'/'+hitT+'</b></span>'
+     +  '</div>'
      + '</div>';
 
     /* ── ② 盘面一句：为什么是这个结论（只讲成因，不重复档位、不重复买什么）── */
