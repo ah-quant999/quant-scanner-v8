@@ -12091,15 +12091,38 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
   window.renderEtfDaily=renderEtfDaily;
 
   /* ---- 6. 宏观观测（2026-08-16 已下架，保留空位防行号偏移） ---- */
+/* ===== 2026-11-26 主人令：成交额/涨跌家数 升级为两融卡模式（区间切换+统计块+解读框） ===== */
+var V8_AMOUNT_RANGE = 20;   // 近1月=20交易日，近3月=60，近6月=120，全部=99999
+var V8_UPDOWN_RANGE = 20;
+function v8RangeBar(barId, cur, onChange){
+  var bar=document.getElementById(barId); if(!bar) return;
+  var RS=[{k:20,label:'近1月'},{k:60,label:'近3月'},{k:120,label:'近6月'},{k:99999,label:'全部'}];
+  var bh='<span style="font-size:11px;color:var(--dim)">区间:</span>';
+  RS.forEach(function(r){
+    var on=(r.k===cur);
+    bh+='<button class="v8-range-btn" data-k="'+r.k+'" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid '+(on?'#41c9ff':'var(--border)')+';background:'+(on?'rgba(65,201,255,.12)':'var(--bg2)')+';color:'+(on?'#41c9ff':'var(--sub)')+';font-weight:'+(on?'600':'400')+'">'+r.label+'</button>';
+  });
+  bh+='<span style="font-size:11px;color:var(--dim);margin-left:auto">日频 · 交易日</span>';
+  bar.innerHTML=bh;
+  var bs=bar.querySelectorAll('.v8-range-btn');
+  for(var i=0;i<bs.length;i++){ bs[i].onclick=function(){ onChange(parseInt(this.getAttribute('data-k'),10)); }; }
+}
+function v8StatBlock(title,val,unit,sub,color){
+  return '<div style="padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.02)">'
+    +'<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px">'+title+'</div>'
+    +'<div style="font-size:19px;font-weight:700;color:'+(color||'var(--txt)')+';line-height:1.15">'+val+'<span style="font-size:11px;font-weight:600;color:var(--dim);margin-left:2px">'+unit+'</span></div>'
+    +'<div style="font-size:10.5px;color:'+(color||'var(--dim)')+';margin-top:3px">'+sub+'</div></div>';
+}
+
 function drawAmountChart(){
   const data = window.SH_SZ_HISTORY || {};
-  const hist = data.amount_history || [];
-  if(!hist.length) return;
+  const histAll = data.amount_history || [];
+  if(!histAll.length) return;
 
   // 盘前清空检测：data.premarket_cleared 或最后一条日期不是今天，都按盘前占位处理
   const todayMD = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric'});
   const todayMD2 = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'});
-  const premarketCleared = data.premarket_cleared || (hist.length && hist[hist.length-1].date !== todayMD && hist[hist.length-1].date !== todayMD2);
+  const premarketCleared = data.premarket_cleared || (histAll.length && histAll[histAll.length-1].date !== todayMD && histAll[histAll.length-1].date !== todayMD2);
 
   // 时间标签先更新（不依赖 SVG 尺寸，避免无宽度时提前 return 导致标签空白）
   const tm = document.getElementById('amountUpdateTime');
@@ -12124,8 +12147,27 @@ function drawAmountChart(){
     return ap[1]-bp[1];
   });
 
+  // 区间切换按钮 + 切片
+  v8RangeBar('amountRangeBar', V8_AMOUNT_RANGE, function(k){ V8_AMOUNT_RANGE=k; drawAmountChart(); });
+  var hist = histAll.slice(Math.max(0, histAll.length - (V8_AMOUNT_RANGE>=99999?histAll.length:V8_AMOUNT_RANGE)));
+  if(hist.length<2) hist = histAll.slice(-2);
+
   let maxV = 0; hist.forEach(d=>{ if(d.total>maxV) maxV=d.total; });
   maxV = Math.ceil(maxV/5000)*5000;
+
+  // 统计块（当前区间）
+  var _aSt=document.getElementById('amountStats');
+  if(_aSt){
+    var lastAll=histAll[histAll.length-1], prevAll=histAll[histAll.length-2];
+    var dayChg=prevAll&&prevAll.total ? (lastAll.total-prevAll.total)/prevAll.total*100 : 0;
+    var avg=0; hist.forEach(function(d){avg+=d.total;}); avg=avg/hist.length;
+    var peak=0,peakD=''; hist.forEach(function(d){ if(d.total>peak){peak=d.total;peakD=d.date;} });
+    var cA=function(v){return v>0?'#ef5350':(v<0?'#26a69a':'var(--sub)');};
+    _aSt.innerHTML = v8StatBlock('今日两市合计',lastAll.total.toFixed(0),'亿','沪 '+lastAll.sh_amount.toFixed(0)+' + 深 '+lastAll.sz_amount.toFixed(0),'')
+      + v8StatBlock('较前一日',(dayChg>=0?'+':'')+dayChg.toFixed(1),'%','前日 '+(prevAll?prevAll.total.toFixed(0):'—')+'亿',cA(dayChg))
+      + v8StatBlock('区间日均',avg.toFixed(0),'亿','近 '+hist.length+' 个交易日','')
+      + v8StatBlock('区间峰值',peak.toFixed(0),'亿',peakD+' · 当日','#ffd024');
+  }
 
   let html='';
   for(let i=0;i<=5;i++){
@@ -12174,21 +12216,22 @@ function drawAmountChart(){
   makePath('sz_amount','#4fc3f7');
   makePath('total','#ffd54f');
 
-  // 底部说明
+  // 解读框（对大盘判断）
   const note = document.getElementById('amountNote');
   if(note){
     if(premarketCleared){
-      note.textContent = '⏳ 盘前数据待刷新，开盘后自动更新。';
-    }else if(hist.length>=2){
-      const prev = hist[hist.length-2];
-      const chg = prev.total ? ((last.total-prev.total)/prev.total*100) : 0;
-      const chgStr = (chg>=0?'+':'')+chg.toFixed(1)+'%';
-      let desc = '温和波动';
-      if(chg>=15) desc = '明显放量';
-      else if(chg>=8) desc = '温和放大';
-      else if(chg<=-15) desc = '明显缩量';
-      else if(chg<=-8) desc = '成交萎缩';
-      note.textContent = '今日两市合计 '+last.total.toFixed(0)+' 亿元，较前日 '+chgStr+'，'+desc+'。';
+      note.innerHTML = '⏳ 盘前数据待刷新，开盘后自动更新。';
+    }else if(histAll.length>=2){
+      const lastAll=histAll[histAll.length-1], prevAll=histAll[histAll.length-2];
+      const chg = prevAll.total ? (lastAll.total-prevAll.total)/prevAll.total*100 : 0;
+      const chgS = (chg>=0?'+':'')+chg.toFixed(1)+'%';
+      var avg=0; hist.forEach(function(d){avg+=d.total;}); avg/=hist.length;
+      var tag,tone,body;
+      if(chg>=8){ tag='放量（活跃度回升）'; tone='#ef5350'; body='今日两市合计 '+lastAll.total.toFixed(0)+' 亿元，较前日 '+chgS+'，量能明显放大 —— 交投转活跃，通常对应分歧加大或趋势加速阶段，需结合指数方向辨别。'; }
+      else if(chg<=-8){ tag='缩量（观望情绪）'; tone='#26a69a'; body='今日两市合计 '+lastAll.total.toFixed(0)+' 亿元，较前日 '+chgS+'，量能萎缩 —— 资金观望、参与意愿下降，突破持续性存疑。'; }
+      else { tag='平量（温和波动）'; tone='#ffd024'; body='今日两市合计 '+lastAll.total.toFixed(0)+' 亿元，较前日 '+chgS+'，成交温和 —— 量能未见显著变化，市场维持常态化交投。'; }
+      body+=' 区间（近 '+hist.length+' 日）日均 '+avg.toFixed(0)+' 亿元，今日'+(lastAll.total>=avg?'高于':'低于')+'均值 '+Math.abs((lastAll.total/avg-1)*100).toFixed(1)+'%。';
+      note.innerHTML='<b style="color:'+tone+'">📌 '+tag+'</b>：'+body;
     }
   }
 }
@@ -12196,13 +12239,13 @@ function drawAmountChart(){
 /* ===== 近一月涨跌家数 SVG 柱状图（v6 风格 · 深色主题适配） ===== */
 function drawUpDownChart(){
   const data = window.SH_SZ_HISTORY || {};
-  const stats = data.daily_stats || [];
-  if(!stats.length) return;
+  const statsAll = data.daily_stats || [];
+  if(!statsAll.length) return;
 
   // 盘前清空检测
   const todayMDu = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric'});
   const todayMDu2 = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'});
-  const udPremarket = data.premarket_cleared || (stats.length && stats[stats.length-1].date !== todayMDu && stats[stats.length-1].date !== todayMDu2);
+  const udPremarket = data.premarket_cleared || (statsAll.length && statsAll[statsAll.length-1].date !== todayMDu && statsAll[statsAll.length-1].date !== todayMDu2);
 
   // 时间标签先更新（不依赖 SVG 尺寸）
   const tm = document.getElementById('upDownUpdateTime');
@@ -12221,15 +12264,34 @@ function drawUpDownChart(){
       }
     });
   }catch(e){}
-  var filtered = stats.filter(function(d){ return !holidayDates[d.date]; });
-  if(!filtered.length) filtered = stats;
+  var filteredBase = statsAll.filter(function(d){ return !holidayDates[d.date]; });
+  if(!filteredBase.length) filteredBase = statsAll;
 
   // 按日期排序，防止 x 轴日期错乱
-  filtered.sort(function(a,b){
+  filteredBase.sort(function(a,b){
     var ap=a.date.split('/').map(Number), bp=b.date.split('/').map(Number);
     if(ap[0]!==bp[0]) return ap[0]-bp[0];
     return ap[1]-bp[1];
   });
+
+  // 区间切换按钮 + 切片
+  v8RangeBar('upDownRangeBar', V8_UPDOWN_RANGE, function(k){ V8_UPDOWN_RANGE=k; drawUpDownChart(); });
+  var filtered = filteredBase.slice(Math.max(0, filteredBase.length - (V8_UPDOWN_RANGE>=99999?filteredBase.length:V8_UPDOWN_RANGE)));
+  if(filtered.length<2) filtered = filteredBase.slice(-2);
+
+  // 统计块（当前区间）
+  var _uSt=document.getElementById('upDownStats');
+  if(_uSt){
+    var lj=filtered[filtered.length-1]||{up:0,down:0,flat:0};
+    var upSum=0,downSum=0; filtered.forEach(function(d){upSum+=d.up;downSum+=d.down;});
+    var ratio=downSum?upSum/downSum:0;
+    var cum=upSum-downSum;
+    var cU=function(v){return v>0?'#ef5350':(v<0?'#26a69a':'var(--sub)');};
+    _uSt.innerHTML = v8StatBlock('今日涨/跌',lj.up+' / '+lj.down,'家','平盘 '+(lj.flat||0)+' 家',lj.up>lj.down?'#ef5350':'#26a69a')
+      + v8StatBlock('今日涨跌比',(lj.down?(lj.up/lj.down).toFixed(2):'—'),'','>1 偏多 · <1 偏空',lj.up>lj.down?'#ef5350':'#26a69a')
+      + v8StatBlock('区间累计净宽度',(cum>=0?'+':'')+cum,'家','近 '+filtered.length+' 日 (涨−跌)',cU(cum))
+      + v8StatBlock('区间涨跌比',ratio.toFixed(2),'','日均宽度 '+(cum/filtered.length).toFixed(0),cU(cum));
+  }
 
   const svg = document.getElementById('upDownChart');
   if(!svg) return;
@@ -12304,14 +12366,20 @@ function drawUpDownChart(){
 
   svg.innerHTML = html;
 
-  // 底部说明
+  // 解读框（对大盘判断）
   const note = document.getElementById('upDownNote');
   if(note){
     if(udPremarket){
-      note.textContent = '⏳ 盘前数据待刷新，开盘后自动更新。';
+      note.innerHTML = '⏳ 盘前数据待刷新，开盘后自动更新。';
     }else if(udLast){
       var _cum = cumNet.length ? cumNet[cumNet.length-1] : 0;
-      note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。累计净宽度 '+( _cum>=0?'+':'')+_cum+'（近'+filtered.length+'日 running sum，黄线）。';
+      var _ratio = udLast.down ? udLast.up/udLast.down : 0;
+      var tag,tone,body;
+      if(_ratio>=1.5){ tag='普涨（赚钱效应强）'; tone='#ef5350'; body='今日涨 '+udLast.up+' / 跌 '+udLast.down+'，涨跌比 '+_ratio.toFixed(2)+' —— 上涨家数显著占优，普涨格局，赚钱效应强。'; }
+      else if(_ratio<=0.6){ tag='普跌（避险情绪）'; tone='#26a69a'; body='今日涨 '+udLast.up+' / 跌 '+udLast.down+'，涨跌比 '+_ratio.toFixed(2)+' —— 下跌家数显著占优，普跌格局，避险情绪浓。'; }
+      else { tag='分化（结构行情）'; tone='#ffd024'; body='今日涨 '+udLast.up+' / 跌 '+udLast.down+'，涨跌比 '+_ratio.toFixed(2)+' —— 涨跌家数接近，结构性分化，指数参考性下降。'; }
+      body+=' 区间（近 '+filtered.length+' 日）累计净宽度 '+(_cum>=0?'+':'')+_cum+'（黄线），'+( _cum>=0?'宽度偏多、市场重心上移':'宽度偏空、市场重心下移')+'。';
+      note.innerHTML='<b style="color:'+tone+'">📌 '+tag+'</b>：'+body;
     }
   }
 }
@@ -12332,6 +12400,36 @@ function drawUpDownChart(){
     // 2026-08-08 统一成全站「更新于」胶囊：直接复用 _uBadge/_fmtAshareRel，
     // 不再自定义 hm + 数据截至子文本，与大家保持一致。
     return _uBadge('盘后','中长线', ts);
+  }
+  function renderMffStatsAndVerdict(){
+    var d=window.MARKET_FUND_FLOW_DATA||{};
+    var daily=d.daily||[]; if(!daily.length) return;
+    var rng=__MFF_CURRENT_RANGE;
+    var seg=(rng!=='all'&&rng<daily.length)?daily.slice(daily.length-rng):daily;
+    var last=seg[seg.length-1]||{}, prev=seg[seg.length-2]||{};
+    var cumAll=d.cumulative||[];
+    function cumAt(date){ var v=0; for(var i=0;i<cumAll.length;i++){ if(cumAll[i].date<=date) v=cumAll[i].cum_yi; else break; } return v; }
+    var cumLast=cumAt(last.date), cumPrev=cumAt(prev.date);
+    var cumChg=cumLast-cumPrev;
+    var posDays=0,negDays=0,netSum=0;
+    seg.forEach(function(x){ netSum+=x.net_yi; if(x.net_yi>0)posDays++; else if(x.net_yi<0)negDays++; });
+    var C=function(v){return v>0?'#ef5350':(v<0?'#26a69a':'var(--sub)');};
+    var st=document.getElementById('mffStats');
+    if(st){
+      st.innerHTML = v8StatBlock('最新单日净流入',(last.net_yi>=0?'+':'')+last.net_yi.toFixed(0),'亿','主力净额 · '+last.date.slice(4,6)+'/'+last.date.slice(6,8),C(last.net_yi))
+        + v8StatBlock('区间净买天数',posDays+' / '+negDays,'','近 '+seg.length+' 日 买/卖',posDays>=negDays?'#ef5350':'#26a69a')
+        + v8StatBlock('区间累计净额',(netSum>=0?'+':'')+(netSum/10000).toFixed(2),'万亿','近 '+seg.length+' 日合计',C(netSum))
+        + v8StatBlock('全期累计',(cumLast/10000).toFixed(2),'万亿','自 '+cumAll[0].date.slice(0,4)+' 起',C(cumLast));
+    }
+    var vd=document.getElementById('mffVerdict');
+    if(vd){
+      var tag,tone,body;
+      if(last.net_yi>0&&cumChg>0){ tag='主力回流（短期改善）'; tone='#ef5350'; body='最新交易日主力净流入 '+last.net_yi.toFixed(0)+' 亿、累计净额较前日回升 '+cumChg.toFixed(0)+' 亿 —— 主力资金短期回流，观望情绪缓和。'; }
+      else if(last.net_yi<0&&cumChg<0){ tag='主力流出（承压）'; tone='#26a69a'; body='最新交易日主力净流出 '+Math.abs(last.net_yi).toFixed(0)+' 亿、累计净额继续回落 '+Math.abs(cumChg).toFixed(0)+' 亿 —— 主力资金仍在流出，资金面承压。'; }
+      else { tag='资金分歧（方向不明）'; tone='#ffd024'; body='最新交易日主力净额 '+last.net_yi.toFixed(0)+' 亿、累计变动 '+cumChg.toFixed(0)+' 亿 —— 单日与累计方向不一致，主力资金分歧，暂难定性。'; }
+      body+=' 区间（近 '+seg.length+' 日）净买 '+posDays+' 天 / 净卖 '+negDays+' 天，累计净额 '+(netSum>=0?'+':'')+(netSum/10000).toFixed(2)+' 万亿；全期自 '+cumAll[0].date.slice(0,4)+' 起累计 '+(cumLast/10000).toFixed(2)+' 万亿。';
+      vd.innerHTML='<b style="color:'+tone+'">📌 '+tag+'</b>：'+body;
+    }
   }
   function renderMarketFundFlow(mff){
     var d = mff || {};
@@ -12371,6 +12469,7 @@ function drawUpDownChart(){
       var staleHint = daysOld > 1 ? ' · <span style="color:var(--gold)">数据 ' + (window._fmtAshareRel ? window._fmtAshareRel(lastDateStr + ' 15:00:00') : (daysOld+' 天前')) + '</span>' : '';
       sumEl.innerHTML = '当前 <b style="color:var(--txt)">'+cnt+'</b> 天总览 · 最新 <b style="color:'+(last.net_yi>=0?'var(--up)':'var(--down)')+'">'+last.net_yi.toFixed(0)+'</b>亿 · 累计 <b style="color:'+(cumLast>=0?'var(--up)':'var(--down)')+'">'+(cumLast/10000).toFixed(2)+'</b>万亿' + staleHint;
     }
+    renderMffStatsAndVerdict();
     renderMffChart();
     // 绑定时间范围按钮
     document.querySelectorAll('.mff-range-btn').forEach(function(btn){
@@ -12380,6 +12479,7 @@ function drawUpDownChart(){
           b.style.background='var(--bg2)'; b.style.color='var(--sub)'; b.style.borderColor='var(--border)'; b.style.fontWeight='400';
         });
         btn.style.background='var(--up)'; btn.style.color='#fff'; btn.style.borderColor='var(--up)'; btn.style.fontWeight='600';
+        renderMffStatsAndVerdict();
         renderMffChart();
       };
     });
@@ -18736,21 +18836,31 @@ h+='</div>';
 
     /* ===== 📊 盘中 ===== */
 h+='<div style="padding:8px 14px;font-size:13px;font-weight:700;color:#41c9ff;border-radius:8px;margin:16px 0 10px 0">📊 盘中（实时页指标）</div>';
-h+='    <!-- 📈 上证+深证 每日成交金额（实时页最下面 · 2026-08-14 主人令迁移） -->';
-h+='    <div class="card" style="margin-bottom:16px">';
-h+='      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元）<span class="fresh" id="amountUpdateTime">—</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400"></span></h3>';
-h+='      <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible">';
-h+='        <svg id="amountChart" width="100%" height="260" style="overflow:visible" overflow="visible"></svg>';
+h+='    <!-- 📈 上证+深证 每日成交金额（2026-11-26 主人令：升级为两融卡模式=区间切换+统计块+图+解读框） -->';
+h+='    <div class="card" style="margin-bottom:16px;border-left:4px solid #1976d2">';
+h+=v8CardHeader('📈','上证+深证 每日成交金额（亿元）','','update_time',{update_time:(window.SH_SZ_HISTORY||{}).update_time,slot:'盘中',horizon:'短线'},!((window.SH_SZ_HISTORY||{}).amount_history||[]).length);
+h+='      <div style="padding:12px 14px">';
+h+='        <div id="amountRangeBar" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap"></div>';
+h+='        <div id="amountStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px"></div>';
+h+='        <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible">';
+h+='          <svg id="amountChart" width="100%" height="260" style="overflow:visible" overflow="visible"></svg>';
+h+='        </div>';
+h+='        <div class="note note-insight" id="amountNote" style="margin-top:12px;line-height:1.8">今日两市合计 -- 亿元，较前日 --%，--。</div>';
+h+='        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.6">📌 口径：沪市 + 深市每日成交金额合计（亿元），日频；红涨绿跌仅用于「较前日变化」方向标注，成交额绝对值不代表涨跌。</div>';
 h+='      </div>';
-h+='      <div class="note note-insight" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>';
 h+='    </div>';
-h+='    <!-- 🏘️ 近一月 涨跌家数统计（实时页最下面 · 2026-08-14 主人令迁移） -->';
-h+='    <div class="card" style="margin-bottom:16px">';
-h+='      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计<span class="fresh" id="upDownUpdateTime">—</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400"></span></h3>';
-h+='      <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible">';
-h+='        <svg id="upDownChart" width="100%" height="260" style="overflow:visible" overflow="visible"></svg>';
+h+='    <!-- 🏘️ 涨跌家数统计（2026-11-26 主人令：升级为两融卡模式=区间切换+统计块+图+解读框） -->';
+h+='    <div class="card" style="margin-bottom:16px;border-left:4px solid #26a69a">';
+h+=v8CardHeader('🏘️','涨跌家数统计 · 市场宽度','','update_time',{update_time:(window.SH_SZ_HISTORY||{}).update_time,slot:'盘中',horizon:'短线'},!((window.SH_SZ_HISTORY||{}).daily_stats||[]).length);
+h+='      <div style="padding:12px 14px">';
+h+='        <div id="upDownRangeBar" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap"></div>';
+h+='        <div id="upDownStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px"></div>';
+h+='        <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible">';
+h+='          <svg id="upDownChart" width="100%" height="260" style="overflow:visible" overflow="visible"></svg>';
+h+='        </div>';
+h+='        <div class="note note-insight" id="upDownNote" style="margin-top:12px;line-height:1.8">红=上涨家数，绿=下跌家数。今日涨 -- / 跌 -- / 平 --。</div>';
+h+='        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.6">📌 口径：全市场每日上涨/下跌/平盘家数；累计净宽度 = (上涨−下跌) 逐日累加（黄线），衡量市场宽度趋势。红涨绿跌。</div>';
 h+='      </div>';
-h+='      <div class="note note-insight" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>';
 h+='    </div>';
 
       // 旧四类（ph-crisis-index / -cats / -row / -bar）已随 2026-09-17 胶囊化改造全量删除 ——
@@ -18771,8 +18881,8 @@ h+='</div>';
     /* 🛡 2026-08-19 主人令恢复：资金流时间轴卡（v6 一年样式）
        数据 window.MARKET_FUND_FLOW_DATA 一直加载；render 函数 renderMarketFundFlow/renderMffChart 一直在；
        仅 HTML 容器缺失 → 把容器挂回 renderDelisted 函数「盘后」分组（仅切「已下架」Tab 才显示） */
-    h+='<div class="card" id="marketFundFlowCard" style="margin-bottom:14px">'
-      +'<h3><span class="ic">📊</span>资金流时间轴<span class="fresh" id="mffTime">—</span></h3>'
+    h+='<div class="card" id="marketFundFlowCard" style="margin-bottom:14px;border-left:4px solid #1976d2">'
+      +v8CardHeader('📊','资金流时间轴 · 主力资金','','update_time',{update_time:(window.MARKET_FUND_FLOW_DATA||{}).update_time,slot:'盘后',horizon:'中长线'},!((window.MARKET_FUND_FLOW_DATA||{}).daily||[]).length)
       +'<div style="padding:10px 14px">'
       +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">'
       +'<span style="font-size:11px;color:var(--dim)">时间范围:</span>'
@@ -18787,8 +18897,10 @@ h+='</div>';
       +'<button class="mff-series-btn" data-series="cum" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub)">累计</button>'
       +'<span id="mffSummary" style="font-size:11px;color:var(--dim);margin-left:auto"></span>'
       +'</div>'
+      +'<div id="mffStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:4px 0 10px"></div>'
       +'<div id="mffChart" style="width:100%;height:420px"></div>'
-      +'<div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5">📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。</div>'
+      +'<div id="mffVerdict" class="note note-insight" style="margin-top:12px;line-height:1.8"></div>'
+      +'<div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5">📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。红涨绿跌。</div>'
       +'</div></div>';
 
     /* 5. 两融动向（2026-11-26 主人令：只要「近1/3月增减动向 + 对大盘判断帮助」，原位留在「🔒 已下架」）
