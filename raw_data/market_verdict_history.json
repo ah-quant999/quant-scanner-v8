@@ -29,14 +29,14 @@
   {
    "date": "2026-11-26",
    "stance": "defense",
-   "score_norm": -0.531,
-   "crisis": 36.4,
-   "zt": 77,
-   "zt_ratio": 0.81,
+   "score_norm": -0.5,
+   "crisis": 35.8,
+   "zt": 60,
+   "zt_ratio": 0.63,
    "sh_net5": -1090.0,
-   "tactic_score": -4,
-   "pace_hot": 1,
-   "pace_cool": 24,
+   "tactic_score": -3,
+   "pace_hot": 8,
+   "pace_cool": 7,
    "res_win": 41.9
   }
  ]
