@@ -12140,7 +12140,7 @@ function drawAmountChart(){
   const gh = H - PAD.top - PAD.bottom;
 
   // 按日期排序，防止数据源顺序错乱导致 x 轴时间乱跳（如 9/24 跑到 8/12 前）
-  hist.sort(function(a,b){
+  histAll.sort(function(a,b){
     var ap=a.date.split('/').map(Number), bp=b.date.split('/').map(Number);
     if(ap[0]!==bp[0]) return ap[0]-bp[0];
     return ap[1]-bp[1];
