@@ -136,7 +136,7 @@ CHAINS = [
     {
         "wf": "v8_intraday_snapshot.yml",
         "name": "板块资金日内快照",
-        "cron_desc": "每 10 分（09:00-15:50）",
+        "cron_desc": "每 20 分（09:22-16:42）",
         "due_min": 10 * 60 + 30,       # ⚠ 该链实测被 GitHub 降频（每天仅 2 次），
                                        #   故判定时刻压到 10:30，避免早盘误报
         "gate_mode": "intraday",
