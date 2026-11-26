@@ -2187,15 +2187,6 @@ window.STRATEGY_WALKFORWARD = {
          数据源：window.V8_VERDICT（algorithms/gen_verdict.py 产出，口径见 logic.html）
          仓位口径：min(攻防档位, 情绪闸门, 风控系数) —— 取最小、不取平均，任一维度否决即生效。
          ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="card" id="verdictCard" style="margin-bottom:16px;border-left:4px solid #c084fc">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span style="font-size:15px;font-weight:700;color:#c084fc">&#x1F3AF; 今日作战指令</span>
-        <span id="verdictFresh" style="display:inline-flex;align-items:center">&#x2014;</span>
-        <span style="font-size:12px;color:var(--dim)">全站信号收敛成一张卡 · 只回答「今天做什么 / 买什么 / 别碰什么」· 不涉及你的持仓与资金</span>
-      </div>
-      <div id="verdictBody"><div class="note">汇总中&#x2026;</div></div>
-    </div>
-
 
     <!-- 子 Tab 导航 -->
     <div class="final-tabs" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
@@ -2215,11 +2206,8 @@ window.STRATEGY_WALKFORWARD = {
         <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🏆</span>最终推荐 · Top<span id="finalTopN">5</span>
           <span id="finalStatusBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap"></span>
         </h3>
-        <!-- 🗣 2026-11-26 主人令「说人话」：这张卡只负责「选哪几只」，不代表现在就买。
-             买不买、买多少，看最上面的「今日作战指令」—— 那才是唯一裁决。 -->
         <div style="font-size:11.5px;line-height:1.65;color:var(--sub);background:rgba(255,208,36,.06);border-left:3px solid #ffd02466;border-radius:0 6px 6px 0;padding:6px 9px;margin:0 2px 8px">
           <b style="color:#ffd024">这 5 只是「候选」，不是「买入信号」。</b>
-          <span id="finalRecVerdictHint">买不买、买多少，看最上面的「🎯 今日作战指令」。</span>
         </div>
         <div id="finalRecBody" style="padding:4px 2px 2px"><div class="note">加载中…</div></div>
       </div>
@@ -17365,6 +17353,18 @@ h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-
 //    最终推荐页只回答「我该做什么」（买什么/别碰什么/什么信号变），
 //    档位/上限/三档拆解属于「大盘现在什么环境」，归观测。
 //    数据 window.V8_VERDICT.head + .position（gen_verdict.py 同一份，零新源）。
+// 🎯 2026-11-26 主人令（第二轮）：「今日作战指令」整卡自「🏆 最终推荐」页迁入本卡。
+//   原话：「这卡不要放在最终推荐页，只能我看，移到暂未上架页，和综合研判合并，有重复的啰嗦的直接删除」。
+//   ⇒ 最终推荐页恢复原样（Top5/候选池/因子实验室），本页 = 我自己的研判台：
+//      第一步「今天该做什么」→ 第二步「为什么给这个上限」→ 第三步「买什么/别碰」→ 底部多源解析。
+//   ⇒ 去重：仓位上限/加仓条件只在档位块说一次；「所以」「怎么做」两段与档位块、买什么三层重复，已删。
+h += '<div id="verdictSection" style="margin:12px 0 0">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+   + '<span style="font-size:13.5px;font-weight:700;color:#c084fc">&#x1F3AF; 今日作战指令</span>'
+   + '<span id="verdictFresh" style="display:inline-flex;align-items:center">&#x2014;</span>'
+   + '<span style="font-size:11px;color:var(--dim)">只回答今天做什么 / 买什么 / 别碰什么</span>'
+   + '</div>'
+   + '<div id="verdictBody"><div class="note">汇总中&#x2026;</div></div></div>';
 h += '<div id="stanceBody" style="margin:12px 0 0"><div class="note">档位读取中&#x2026;</div></div>';
 // ── 2026-10-28 主人令：综合解析（不是把卡移到一起，是综合各卡数据给解析结论）──
 h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;border-radius:9px;padding:10px 12px">'
@@ -18068,7 +18068,8 @@ window.__renderComprehensiveSynthesis = function(){
     }
   }catch(e){}
   host.innerHTML = html;
-  // 🏛 同卡兄弟块：档位天花板与本块同一数据节奏，一起刷新（避免切页只刷一半）
+  // 🏛 同卡兄弟块：作战指令 + 档位天花板与本块同一数据节奏，一起刷新（避免切页只刷一半）
+  try{ if(window.renderVerdict) window.renderVerdict(); }catch(e){}
   try{ if(window.__renderStanceBlock) window.__renderStanceBlock(); }catch(e){}
 };
 
@@ -20794,23 +20795,21 @@ window.__renderV8CalToday();
     h+='<div style="background:'+col+'16;border:1px solid '+col+'55;border-radius:10px;padding:13px 15px">'
      +  '<div style="font-size:11.5px;color:'+DIM+';margin-bottom:3px">今天该做什么</div>'
      +  '<div style="font-size:24px;font-weight:800;color:'+(isNo?'#94a3b8':GLD)+';line-height:1.2">'+E(ans)+'</div>'
-     +  '<div style="margin-top:7px;font-size:12.5px;line-height:1.7;color:'+SUB+'">'
-     +    '仓位上限 <b style="color:'+TXT+'">'+E(PH.cap_pct)+'%</b>'
-     +    '<span style="color:'+DIM+';margin:0 6px">·</span>'
-     +    '加仓条件 <b style="color:'+(_hitN>=5?GLD:TXT)+'">'+_hitN+'/'+_hitT+'</b>'
-     +    '<span style="color:'+DIM+'">（≥5 条才加仓）</span>'
-     +  '</div></div>';
+     +  (BU.answer ? '<div style="margin-top:7px;font-size:12.5px;line-height:1.75;color:'+SUB+'">'+B(BU.answer)+'</div>' : '')
+     +  '</div>';
 
-    /* ── ② 人话三段：局面 → 所以 → 怎么做 ── */
-    var seg=[['读今天',P['读今天'],BLU],['所以',P['所以'],GLD],['怎么做',P['怎么做'],PUR]];
-    h+='<div style="margin-top:12px">';
-    seg.forEach(function(s){
-      if(!s[1]) return;
-      h+='<div style="border-left:3px solid '+s[2]+'66;padding:2px 0 2px 10px;margin-bottom:9px">'
-       +   '<div style="font-size:11.5px;font-weight:700;color:'+s[2]+';margin-bottom:1px">'+s[0]+'</div>'
-       +   '<div style="font-size:13px;line-height:1.75;color:'+TXT+'">'+B(s[1])+'</div></div>';
-    });
-    h+='</div>';
+    /* ── ② 只留「盘面」一段 ──
+       🔴 2026-11-26 主人令「有重复的啰嗦的直接删除」：
+          原三段「读今天 / 所以 / 怎么做」里，「所以」说的就是档位块的仓位上限与加仓条件、
+          「怎么做」说的就是买什么三层的结论 —— 同一件事讲三遍。
+          现在只保留「盘面」（解释今天为什么是这个结论），其余交给下面的买什么三层与档位块。 */
+    if(P['读今天']){
+      h+='<div style="margin-top:12px">'
+       +   '<div style="border-left:3px solid '+BLU+'66;padding:2px 0 2px 10px">'
+       +   '<div style="font-size:11.5px;font-weight:700;color:'+BLU+';margin-bottom:1px">盘面</div>'
+       +   '<div style="font-size:12.5px;line-height:1.75;color:'+TXT+'">'+B(P['读今天'])+'</div></div>'
+       + '</div>';
+    }
 
     /* ── ③ 三层买什么 + 别碰什么 ── */
     function vehicle(c){
@@ -20858,6 +20857,12 @@ window.__renderV8CalToday();
       h+='<div style="font-size:11px;color:'+DIM+';margin-top:4px">★ = 与 L1 资金主线同向，这种才是「共振」，可以优先；没有 ★ 就说明两条线打架，<b>以资金为准</b>。</div>';
     } else { h+='<div style="font-size:12px;color:'+DIM+'">今日无因子榜数据</div>'; }
     h+='</div>';
+    // 额度（sizing 此前只在被删掉的 Top5 提示里用过，卡面没有出口）
+    if(V.sizing && V.sizing.per_stock_pct!=null){
+      h+='<div style="margin-top:7px;font-size:11.5px;line-height:1.7;color:'+SUB+'">'
+       + '<span style="color:'+DIM+'">额度：</span>单票不超过总资产 <b style="color:'+GLD+'">'+E(V.sizing.per_stock_pct)+'%</b>'
+       + ' · 首批只用一半（'+E(V.sizing.first_batch_pct)+'%）· 最多 '+E(V.sizing.max_positions)+' 只</div>';
+    }
     // 别碰
     if((V.avoid||[]).length){
       h+='<div style="margin-top:9px;background:rgba(239,83,80,.07);border:1px solid rgba(239,83,80,.22);border-radius:8px;padding:8px 10px">'
@@ -20927,18 +20932,7 @@ window.__renderV8CalToday();
      + ' · 资金 '+E(st.flow||'--')+'</div>';
 
     el.innerHTML=h;
-    // 🗣 把结论同步给 Top5 卡的那句提示，避免「上面说不买、下面列5只票」互相打架
-    try{
-      var hint=document.getElementById('finalRecVerdictHint');
-      if(hint){
-        if(isNo){
-          hint.innerHTML='<b style="color:#94a3b8">今天结论是「'+E(ans)+'」—— 这 5 只先看着，别动手。</b>';
-        }else{
-          var _ps=(V.sizing&&V.sizing.per_stock_pct)||'';
-          hint.innerHTML='<b style="color:#ffd024">今天可以买</b>，从这 5 只里挑，单票起步不超过总资产 '+E(_ps)+'%。';
-        }
-      }
-    }catch(e){}
+    // 🗣 2026-11-26 主人令：作战指令卡已迁到「暂未上架→综合研判」，本页不再跨卡指路
     try{
       var f=document.getElementById('verdictFresh');
       if(f&&st.tactic&&typeof _uBadge==='function') f.innerHTML=_uBadge('auto','',st.tactic,'','盘后');
@@ -21464,9 +21458,8 @@ window.__renderV8CalToday();
   })();
 
   window.__renderFinalSec=function(){
-    // 🎯 2026-11-26 主人令：今日作战指令卡（唯一裁决）先渲染 —— 本页是默认落地页，
-    //   主人一进来第一眼必须是「今天买不买、几成仓」，不能被 Top5 列表抢在前面。
-    try{ renderVerdict(); }catch(e){ console.error('[renderVerdict]', e); }
+    // 🎯 2026-11-26 主人令（第二轮）：作战指令卡已迁至「暂未上架 → 综合研判」，
+    //   本页（最终推荐/默认落地页）恢复原样，不再渲染它。渲染入口见 __renderComprehensiveSynthesis。
     // 🔴 2026-08-13 修复: renderFinalRec/renderFinalCand 内部已有 try/catch,
     //   这里只做调用(错误显示也由内部函数负责),不再 console.warn 吞错
     renderFinalRec();
