@@ -44,9 +44,10 @@ VARS = [
     "AVG_PRICE_DATA", "MARKET_FUND_FLOW_DATA", "CANDIDATE_QUOTES",
 ]
 MARKER = "raw_data/local_tick.json"   # 心跳标记，供云端链判断「本机已接管」
-MIN_GAP_MIN = 6      # 距上次成功推送不足 N 分钟则跳过（防 schtasks 抖动重复跑）
+MIN_GAP_MIN = 11     # 距上次成功推送不足 N 分钟则跳过（tick 一档 ≈ 5-7 分钟，11 分钟节拍不重叠）
 FETCH_TIMEOUT = 260  # 单模块超时（秒）
 MAX_WORKERS = 6
+GEN_TIMEOUT = 150    # update_v8 生成上限（秒）；超时即推已完成部分，不许拖住节拍
 
 
 # ---------------------------------------------------------------- 基础工具
@@ -170,6 +171,26 @@ def fetch_round():
 
 
 # ---------------------------------------------------------------- 原子推送
+def valid_js(fp):
+    """半截文件绝不推上线：必须是完整 window.X = {...}; 且带 update_time"""
+    try:
+        with open(fp, "rb") as f:
+            head = f.read(80)
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 40))
+            tail = f.read()
+        if b"window." not in head:
+            return False
+        if not tail.rstrip().endswith(b"};"):
+            return False
+        with open(fp, "rb") as f:
+            mid = f.read()
+        return b'"update_time"' in mid
+    except Exception:
+        return False
+
+
 def collect_candidates(since_ts, wide=False):
     """本轮抓取写过的文件。
     常规 tick：只推盘中核心卡（15 个模块 data/*.js + 日内快照 + 新鲜度）——
@@ -183,7 +204,8 @@ def collect_candidates(since_ts, wide=False):
                 continue
             fp = os.path.join(REPO_DIR, "data", fn)
             try:
-                if os.path.getmtime(fp) >= since_ts and 200 < os.path.getsize(fp) <= 1_500_000:
+                if (os.path.getmtime(fp) >= since_ts and 200 < os.path.getsize(fp) <= 1_500_000
+                        and valid_js(fp)):
                     out.append("data/" + fn)
             except OSError:
                 pass
@@ -191,7 +213,7 @@ def collect_candidates(since_ts, wide=False):
         for fn in [v + ".js" for v in VARS] + ["SECTOR_FUND_FLOW_INTRADAY.js", "FRESHNESS_STATUS.js"]:
             fp = os.path.join(REPO_DIR, "data", fn)
             try:
-                if os.path.getmtime(fp) >= since_ts and os.path.getsize(fp) > 200:
+                if os.path.getmtime(fp) >= since_ts and valid_js(fp):
                     out.append("data/" + fn)
             except OSError:
                 pass
@@ -344,11 +366,27 @@ def run_tick(a, dt0=None):
     if not a.push_only:
         spent = fetch_round()
         try:
-            env = {**os.environ, "PYTHONPATH": PYLIBS, "V8_SKIP_EXPERIMENT_CARDS": "1"}
-            p = subprocess.run([sys.executable, "update_v8.py", "--category", "intraday"], cwd=REPO_DIR,
-                               capture_output=True, text=True, timeout=240, env=env,
-                               encoding="utf-8", errors="ignore")
-            log(f"生成 data/*.js rc={p.returncode} {(p.stderr or '')[-100:] if p.returncode else 'ok'}")
+            # V8_SKIP_WS_GUARD=1：跳过 update_v8 开头的「工作区 vs 远端一致性守卫」——该守卫会
+            #   跑 git fetch，本机 DNS 间歇性解析失败时会挂 5-10 分钟（16:12 实测卡死 7 分钟），
+            #   盘中 tick 不能有这个不确定性；本机工作区就是数据源，一致性由推送比对兜底。
+            env = {**os.environ, "PYTHONPATH": PYLIBS,
+                   "V8_SKIP_EXPERIMENT_CARDS": "1", "V8_SKIP_WS_GUARD": "1"}
+            # 🔴 绝不 capture_output：update_v8 会再派生子进程，子进程继承管道 ⇒ 超时 kill 后
+            #   communicate() 仍会阻塞（16:28 实测卡死）。改为落日志文件 + 轮询 poll，超时不等它。
+            gfp = open(os.path.join(LOG_DIR, "gen.log"), "a", encoding="utf-8")
+            gfp.write(f"\n===== {now():%m-%d %H:%M:%S} update_v8 --category intraday =====\n")
+            gfp.flush()
+            proc = subprocess.Popen([sys.executable, "v8/intraday_build.py"],
+                                    cwd=REPO_DIR, env=env, stdout=gfp, stderr=subprocess.STDOUT)
+            t_end = time.time() + GEN_TIMEOUT
+            while time.time() < t_end and proc.poll() is None:
+                time.sleep(2)
+            if proc.poll() is None:
+                log(f"生成未在 {GEN_TIMEOUT}s 内完成 → 先推已完整写出的卡（子进程继续跑，下轮再推它的产出）")
+            else:
+                log(f"生成 data/*.js rc={proc.returncode}")
+        except Exception as e:
+            log(f"生成异常 {repr(e)[:100]}")
         except Exception as e:
             log(f"生成异常 {repr(e)[:100]}")
 
@@ -387,6 +425,10 @@ def main():
                 pass
             time.sleep(60)
     run_tick(a)
+    try:
+        os.remove(LOCK)
+    except OSError:
+        pass
     return 0
 
 
