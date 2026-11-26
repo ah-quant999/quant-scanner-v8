@@ -1,12 +1,12 @@
 {
-  "data_date": "2026-11-25",
-  "update_time": "2026-11-26 08:57:43",
-  "ratio_max": 1.918,
-  "ratio_etf": "华夏上证50ETF",
-  "amount_max_yi": 72.96,
-  "down_day": true,
-  "index_chg_pct": -2.03,
-  "ok_count": 4,
+  "data_date": "2026-11-26",
+  "update_time": "2026-11-26 09:40:06",
+  "ratio_max": 0.122,
+  "ratio_etf": "易方达创业板ETF",
+  "amount_max_yi": 16.04,
+  "down_day": false,
+  "index_chg_pct": 0.01,
+  "ok_count": 6,
   "source": "东方财富 push2his K线（6只头部宽基ETF 当日成交额/前20日均额）",
   "note": "下跌日放量计护盘分；非下跌日中性50。D 路为护盘公开指纹，详见 gen_national_team.py 文档头。"
 }
