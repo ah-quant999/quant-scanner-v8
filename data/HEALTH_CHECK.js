@@ -4,11 +4,11 @@ window.HEALTH_CHECK = {
   "summary": {
     "ok": 144,
     "warn": 0,
-    "fail": 1,
+    "fail": 0,
     "limited": 0,
     "info": 0,
     "other": 0,
-    "total": 145
+    "total": 144
   },
   "items": [
     {
@@ -1442,18 +1442,6 @@ window.HEALTH_CHECK = {
       "heal_cat": "algo_run",
       "message": "SECTOR_RS.js 更新于 今日 21:37",
       "order": 124
-    },
-    {
-      "id": "all_SECTOR_YEAR_FLOW",
-      "name": "SECTOR_YEAR_FLOW",
-      "page": "全量数据",
-      "freq": "—",
-      "status": "fail",
-      "last_update": "2026-11-23 01:39:56",
-      "age_min": 5585.5,
-      "heal_cat": "algo_run",
-      "message": "SECTOR_YEAR_FLOW.js 更新于 11-23 01:39；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
-      "order": 125
     },
     {
       "id": "all_SENTIMENT_CYCLE",

@@ -1395,6 +1395,45 @@ def check_logic_html_cache_busters():
     return True, "logic.html %d 个带?v data 引用戳均与数据内容哈希一致" % checked
 
 
+def check_intraday_gate_drift():
+    """🛡 2026-11-26 主人令「闸门一劳永逸」：盘中派发源 vs workflow gate 漂移守卫。
+
+    防止「workflow 已挪档、精准调度器还在旧时刻派发」这类改一半事故；
+    任何一处口径分叉 → 门禁失败，不允许带病上线。
+    """
+    def _rd(rel_path):
+        return (ROOT / rel_path).read_text(encoding="utf-8", errors="replace")
+    errs = []
+    try:
+        sched = _rd(".github/scripts/v8_intraday_precise_sched.py")
+        marker = '"v8_stock_quote_refresh.yml": {'
+        i = sched.find(marker)
+        if i < 0:
+            errs.append("调度器缺个股报价条目")
+        else:
+            blk = sched[i:sched.find("},", i) + 2]
+            if 'range(9, 17)' in blk or '"09:05", "16:30"' in blk:
+                errs.append("个股报价仍在盘中档/旧窗")
+            if '"16:02", "20:02"' not in blk:
+                errs.append("个股报价盘后双档未登记")
+        if 'range(16, 20) for m in ("02", "32")' not in sched:
+            errs.append("国债期货兜底档未挪到盘后")
+        if '"08:50"' not in sched:
+            errs.append("凭证巡检未前移到 08:50")
+        cloud = _rd(".github/workflows/v8_cn_fetch_cloud.yml")
+        if '"*/20 0,2-3,5-6 * * 1-5"' in cloud:
+            errs.append("云端 relay case 仍留失效盘中种子串")
+        quote = _rd(".github/workflows/v8_stock_quote_refresh_cloud.yml")
+        if '930 <= hm <= 1290' not in quote:
+            errs.append("个股报价云端 gate 非 15:30-21:30")
+        bond = _rd(".github/workflows/v8_bond_futures.yml")
+        if "'2,32 8-11 * * 1-5'" not in bond:
+            errs.append("国债期货盘后兜底 cron 缺失")
+    except Exception as e:
+        errs.append("读取失败 " + str(e)[:120])
+    return (not errs, "盘中派发源与 workflow gate 口径一致" if not errs else "；".join(errs))
+
+
 def main():
     checks = [
         ("[1/8] py_compile", check_py_compile),
@@ -1412,6 +1451,7 @@ def main():
         ("[13/13] 交接状态源守卫", check_handoff_ledger),
         ("[14/14] AI 入口在位守卫", check_ai_entry_files),
         ("[15/15] logic.html 缓存戳守卫", check_logic_html_cache_busters),
+        ("[16/16] 三时段闸门漂移守卫", check_intraday_gate_drift),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
@@ -1421,7 +1461,8 @@ def main():
           "2026-09-21 扩至 12 项（[12/12] 调用点定义守卫·防删函数连带删邻函数致 ReferenceError）；"
           "同日扩至 13 项（[13/13] 交接状态源守卫·外部锚 ledger 防旧版本静默回滚）；"
           "同日扩至 14 项（[14/14] AI 入口在位守卫·防「协议存在但没人会读」）；"
-          "2026-10-02 扩至 15 项（[15/15] logic.html 缓存戳守卫·防两页戳漂移/旧格式回潮））")
+          "2026-10-02 扩至 15 项（[15/15] logic.html 缓存戳守卫·防两页戳漂移/旧格式回潮）；"
+          "2026-11-26 扩至 16 项（[16/16] 三时段闸门漂移守卫·防派发源与 workflow gate 改一半））")
     print("=" * 60)
     fails = 0
     results = []

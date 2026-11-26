@@ -12,7 +12,8 @@ intraday_first_batch_gate.py —— 「9:30 / 13:30 第一批盘中数据必须�
 本脚本 = 准点守门（可在 WorkBuddy 本地 automation 触发，不依赖 GitHub cron）：
     1) 硬 HTTP 抓 GitHub Pages 主站 data/*.js 的 update_time（以主站实际吐出为准，不看 raw）
     2) 判定「第一批必需卡」是否全部 ≥ 当日 09:25（13:30 档则 ≥ 13:25）
-    3) 不达标 → 调 GitHub API dispatch：重抓取(云端·hosted) + 板块资金日内快照 + STOCK_QUOTE 轻量刷新
+    3) 不达标 → 调 GitHub API dispatch：重抓取(云端·hosted) + 板块资金日内快照
+       （2026-11-26 起 STOCK_QUOTE 已退出盘中闸门，不再派发）
     4) 复检（默认 3 轮 × 4 分钟），达标即绿
     5) 输出中文摘要（短，不刷屏）
 

@@ -64,10 +64,6 @@ MUST_HAVE_CRON = {
     #   工作日 09:00-15:30 每30分；intraday_slot+cn_fetch_cloud 近90分无 success 开 issue、
     #   恢复自动关闭）。当晚推 HANDOFF 未同批刷新 ledger + 漏双登记 ⇒ [13/13]/[4/8] 连拦 build。
     "v8_intraday_liveness_guard": "盘中链路存活监控(工作日09:00-15:30每30分·停滞开issue)",
-    # 🏔 2026-11-26 补登记：本链 2026-11-20 建链（cn 专链，东财 fflow 中国 IP 硬依赖）时漏双登记，
-    #   ⇒ 门禁「[4/8] 双登记校验」自 11-20 起每轮红（本次 92b4aea4 亲测复现）。
-    #   只产出 raw_data/sector_year_flow.json + data/SECTOR_YEAR_FLOW.js，单一职责。
-    "v8_sector_year_flow": "板块年度主力净流入(cn专链·15:45/16:20 幂等双档)",
     "v8_t1_guard": "周六 T+1 兜底",
     "v8_weekend_light": "周末轻量维护(周六/日)",
     # 2026-09-10 阿狸咪补登记：板块资金日内快照（独立高频·根治上午空白）

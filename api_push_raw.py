@@ -485,6 +485,11 @@ def _is_cache_path(rel):
 #     · 与 v8_health_check.py 的 _RETIRED_FILES 同源维护（两处口径须一致）。
 # ═══════════════════════════════════════════════════════════════════════════
 _RETIRED_ARTIFACTS = {
+    # 🗑 2026-11-26 主人令：SECTOR_YEAR_FLOW 整链退役（产物停更 11-23 01:39、前端零引用、
+    #   生产 workflow 已删除）。与 v8_health_check._RETIRED_FILES 同源维护；
+    #   NOLOST_IGNORE 同步登记，防 nolost_guard 从基线把删掉的产物复活。
+    "data/SECTOR_YEAR_FLOW.js",
+    "raw_data/sector_year_flow.json",
     # 🗑 2026-09-19 主人令「强势突破全站删除」(commit 07d9690eb4，理由：胜率 14.4% 破红线)。
     #   生产方 algorithms/strong_breakout.py 已从 run_algorithms.py 的 ORDER/STAGES 摘除；
     #   前端 index.html 对 window.STRONG_BREAKOUT / STRONG_BREAKOUT_BACKTEST **0 引用**（实测）。

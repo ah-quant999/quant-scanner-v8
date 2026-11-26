@@ -4145,3 +4145,35 @@ items:
       ②stock_names entries≥9000 连续多轮（≥3 次巡检）守住且 ut 前进；③主人拍板的两项根因修复若放行，修复后最新一轮 cn_fetch 不再整包推送（PUSH_FILES 增量清单化）。
     updated: "2026-11-26 21:10"
     updated_by: 阿狸咪的工程师
+
+  - id: gates-and-sectorflow-retire-1126-xiaojiu
+    owner: 小九的工程师
+    priority: P0
+    status: done
+    created: 2026-11-26
+    title: 三时段闸门一劳永逸修复 + SECTOR_YEAR_FLOW 整链退役 + 三页面同步（2026-11-26 22:2x CST 实测）
+    note: >-
+      登记方：小九的工程师（2026-11-26 22:05-22:33 CST，主人令「全部科学处理 / 一劳永逸修复 / 改后三件套」）。
+      ① 闸门：真正派发源 .github/scripts/v8_intraday_precise_sched.py 的 TARGETS 仍留个股报价 16 档/天、
+      期指 4 档/小时、国债期货盘中兜底 16 档、凭证巡检 09:10 —— 与已改的 workflow 口径分叉；
+      本次同步为报价 16:02/20:02、期指 02/32、国债兜底 16:02-19:32、凭证 08:50。
+      v8_cn_fetch_cloud.yml case 表仍留已失效盘中种子串（实际 cron 仅 */20 0），改判 premarket。
+      v8_stock_quote_refresh_cloud.yml gate 仍 09:00-16:30，改 15:30-21:30。
+      新增 CI 第 16 项门禁 check_intraday_gate_drift，任一处再分叉即阻断 deploy。
+      ② SECTOR_YEAR_FLOW：产物停在 11-23 01:39 触发通用 24h 红线红卡；唯一生产 workflow 被净室快照复活，
+      前端零引用、guard_v8_freshness.RETIRED_SOURCES 早已登记。本次 workflow+data+raw 三件同批删除，
+      v8_health_check._RETIRED_FILES / api_push_raw._RETIRED_ARTIFACTS / align_logic_ops / index 运维清单 /
+      v8_national_team 注释 / NOLOST_IGNORE 六处同步，杜绝自愈守卫从基线复活；HEALTH_CHECK.js 红卡清除。
+      ③ 页面：index.html 最终推荐页残留「今日作战指令唯一裁决卡」旧注释改为「综合研判唯一卡头（在暂未上架）」；
+      logic.html 卡名同步；量价背离撤卡描述已在位，未重复改。
+      ⚠️ 交接档禁预测式表述：以上均为「截至 2026-11-26 22:33 CST 实测本地补丁已应用」，
+      是否线上生效以下方 verify_how 现取命令为准，不写死 commit sha。
+    note_to: 阿狸咪的工程师
+    verify_how: >-
+      ① 现取 main 上 .github/scripts/v8_intraday_precise_sched.py，断言无 range(9, 17) 且含 "16:02", "20:02"；
+      ② 现取 data/HEALTH_CHECK.js，断言 all_SECTOR_YEAR_FLOW 计数=0、summary.fail=0；
+      ③ 现取 git/trees recursive，断言 .github/workflows/v8_sector_year_flow.yml 与 data/SECTOR_YEAR_FLOW.js 均不存在；
+      ④ 现取线上 index.html，断言「综合研判 · 唯一卡头」存在且「今日作战指令（唯一裁决卡）」计数=0；
+      ⑤ 明日 09:30-15:00 盘中每档是否仍 cancelled、单档是否 <30 分钟（北京时间，直接看 Actions steps 时长）。
+    updated: "2026-11-26 22:47"
+    updated_by: 小九的工程师

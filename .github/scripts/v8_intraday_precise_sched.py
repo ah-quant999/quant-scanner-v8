@@ -29,25 +29,34 @@ TARGETS = {
         "slots": ["09:32", "09:42", "10:02", "10:22", "10:42", "11:02", "11:22",
                   "11:42", "13:02", "13:22", "13:42", "14:02", "14:22", "14:42", "15:02"],
         "fresh_window": ("09:32", "15:05"), "fresh_thresh": 25},
+    # 🛡 2026-11-26 主人令「个股报价盘后跑就好」：撤出全部盘中档。
+    #   原 range(9,17) 16 档/天 是最大盘中空转源，且与 workflow 自身 15:30-21:30 gate
+    #   冲突 ⇒ 判红→派发→被 gate 拦掉闭环。只留 16:02/20:02 两档盘后接力。
     "v8_stock_quote_refresh.yml": {
-        "slots": [f"{h:02d}:{m}" for h in range(9, 17) for m in ("02", "32")],
-        "fresh_window": ("09:05", "16:30"), "fresh_thresh": 25},
+        "slots": ["16:02", "20:02"],
+        "fresh_window": ("15:30", "21:30"), "fresh_thresh": 25},
     "v8_futures_realtime.yml": {
-        "slots": [f"{h:02d}:{m}" for h in range(9, 16) for m in ("02", "17", "32", "47")] + ["16:02"],
+        # 🛡 2026-11-26：国债期货实时链自身 cron 已改 30 分钟；派发源同步降频，
+        #   避免 :17/:47 空转档被判红后重复派发（与 workflow gate 对齐）。
+        "slots": [f"{h:02d}:{m}" for h in range(9, 16) for m in ("02", "32")] + ["16:02"],
         "fresh_window": ("09:05", "15:45"), "fresh_thresh": 25},
     # 2026-11-19 14:35 小九：v8_bond_futures 又一条 schedule 日间失灵漏网链（最近 run 停在
     #   11-18 16:55, 今天全天零投递 -> 罗盘卡显示昨日数据）。收编进调度器逐档 dispatch。
+    # 🛡 2026-11-26：本链整点主档（09:00-16:00 CST）是盘中真数据，保留；
+    #   「防注册丢失」兜底档已从盘中挪到盘后 16:02-19:32，派发源同步改到该窗，
+    #   盘中不再与高频主力抢自托管单机。
     "v8_bond_futures.yml": {
-        "slots": [f"{h:02d}:{m}" for h in range(9, 17) for m in ("02", "32")],
-        "fresh_window": ("09:02", "16:35"), "fresh_thresh": 35},
+        "slots": [f"{h:02d}:{m}" for h in range(16, 20) for m in ("02", "32")],
+        "fresh_window": ("16:02", "19:35"), "fresh_thresh": 35},
     # 2026-11-19 14:40 小九：全仓扫描再揪出两条今天零投递漏网链，一并收编：
-    #   liveness_guard(盘中存活监控守卫) / cred_expiry_watch(凭证巡检每日 09:10 单档)。
+    #   liveness_guard(盘中存活监控守卫) / cred_expiry_watch(凭证巡检每日 08:50 单档·
+    #   2026-11-26 从 09:10 前移，避开 09:15 写仓窗口/盘中高峰)。
     "v8_intraday_liveness_guard.yml": {
         "slots": [f"{h:02d}:{m}" for h in range(9, 16) for m in ("02", "32")] + ["15:32"],
         "fresh_window": ("09:02", "15:35"), "fresh_thresh": 35},
     "v8_cred_expiry_watch.yml": {
-        "slots": ["09:10"],
-        "fresh_window": ("09:05", "09:40"), "fresh_thresh": 40},
+        "slots": ["08:50"],
+        "fresh_window": ("08:45", "09:20"), "fresh_thresh": 40},
     # 2026-11-20 10:10 小九：🩺 健康巡检 patrol 本身也中 GitHub schedule 日间失灵（实测
     #   今日仅 09:10 一档，09:38/10:08 零投递 → 看板状态灯日间不刷新，正是主人「很晚才刷
     #   出来」观感的看板侧根因）。收编进调度器 30 分逐档 dispatch（patrol 自带去抖锁，
