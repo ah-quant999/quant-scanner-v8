@@ -28,15 +28,28 @@
   },
   {
    "date": "2026-11-26",
-   "stance": "defense",
-   "score_norm": -0.323,
+   "stance": "watch",
+   "score_norm": -0.24,
+   "crisis": 35.7,
+   "zt": 76,
+   "zt_ratio": 0.8,
+   "sh_net5": -1090.0,
+   "tactic_score": -1,
+   "pace_hot": 0,
+   "pace_cool": 0,
+   "res_win": 41.3
+  },
+  {
+   "date": "2026-11-27",
+   "stance": "watch",
+   "score_norm": -0.083,
    "crisis": 35.7,
    "zt": 76,
    "zt_ratio": 0.8,
    "sh_net5": -770.6,
-   "tactic_score": -2,
-   "pace_hot": 3,
-   "pace_cool": 8,
+   "tactic_score": -1,
+   "pace_hot": 0,
+   "pace_cool": 0,
    "res_win": 42.0
   }
  ]
