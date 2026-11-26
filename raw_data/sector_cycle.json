@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-26 10:05:52",
+  "update_time": "2026-11-26 10:26:25",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "11/26"
   ],
   "columns": 30,
-  "cycle_count": 14,
+  "cycle_count": 15,
   "cycles": [
     {
       "sector": "AI算力",
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 83,
       "peak_date": "11/04",
-      "total": 1442,
+      "total": 1444,
       "ongoing": true
     },
     {
@@ -193,7 +193,20 @@
       "hot_days": 2,
       "peak": 6,
       "peak_date": "11/25",
-      "total": 10,
+      "total": 11,
+      "ongoing": true
+    },
+    {
+      "sector": "半导体",
+      "start": "11/26",
+      "end": "11/26",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 4,
+      "peak_date": "11/26",
+      "total": 4,
       "ongoing": true
     }
   ]
