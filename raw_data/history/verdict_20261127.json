@@ -1,6 +1,6 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 04:47:39",
+ "generated": "2026-11-27 07:16:32",
  "verdict": {
   "cap_pct": 30,
   "label": "观"
@@ -19,7 +19,7 @@
   "sh_close": 3476.88,
   "sh_chg": 0.01,
   "zz1000_close": 5531.84,
-  "flow_in_cnt": 40,
+  "flow_in_cnt": 14,
   "top_sectors": [
    "同花顺漂亮100",
    "高股息精选",

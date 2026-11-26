@@ -28,15 +28,15 @@
   },
   {
    "date": "2026-11-26",
-   "stance": "watch",
-   "score_norm": -0.24,
+   "stance": "defense",
+   "score_norm": -0.323,
    "crisis": 35.7,
    "zt": 76,
    "zt_ratio": 0.8,
-   "sh_net5": -1090.0,
-   "tactic_score": -1,
-   "pace_hot": 0,
-   "pace_cool": 0,
+   "sh_net5": -770.6,
+   "tactic_score": -2,
+   "pace_hot": 3,
+   "pace_cool": 7,
    "res_win": 41.3
   },
   {

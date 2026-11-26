@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-11-27 02:46",
-  "republish_time": "2026-11-27 04:50:34",
+  "update_time": "2026-11-27 05:02",
+  "republish_time": "2026-11-27 07:19:49",
   "data_date": "2026-11-26",
   "rule_ver": 2,
   "top_n": 5,
@@ -532,7 +532,7 @@
     {
       "name": "机器人",
       "today": 9,
-      "sum5": 41,
+      "sum5": 42,
       "cons_count": 360,
       "leaders": [
         {
@@ -577,7 +577,7 @@
     {
       "name": "新能源车",
       "today": 8,
-      "sum5": 43,
+      "sum5": 42,
       "cons_count": 105,
       "leaders": [
         {

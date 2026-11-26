@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-27 04:47:35",
+ "update_time": "2026-11-27 07:16:30",
  "data_date": "2026-11-23",
  "universe": {
   "total": 983,
@@ -38,21 +38,6 @@
    }
   },
   {
-   "code": "301261",
-   "name": "恒工精密",
-   "case": false,
-   "price": 76.28,
-   "above_ma20": true,
-   "vol_ratio": 0.983,
-   "off_high20": 0.0,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-24",
-    "days_ago": 1,
-    "vol_ratio": 0.763
-   }
-  },
-  {
    "code": "000400",
    "name": "许继电气",
    "case": false,
@@ -83,6 +68,21 @@
    }
   },
   {
+   "code": "301261",
+   "name": "恒工精密",
+   "case": false,
+   "price": 75.06,
+   "above_ma20": true,
+   "vol_ratio": 1.186,
+   "off_high20": -1.6,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-24",
+    "days_ago": 2,
+    "vol_ratio": 0.763
+   }
+  },
+  {
    "code": "603766",
    "name": "隆鑫通用",
    "case": false,
@@ -110,21 +110,6 @@
     "date": "2026-11-19",
     "days_ago": 4,
     "vol_ratio": 0.811
-   }
-  },
-  {
-   "code": "300760",
-   "name": "迈瑞医疗",
-   "case": false,
-   "price": 183.5,
-   "above_ma20": true,
-   "vol_ratio": 0.799,
-   "off_high20": -1.01,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-17",
-    "days_ago": 4,
-    "vol_ratio": 0.735
    }
   },
   {
