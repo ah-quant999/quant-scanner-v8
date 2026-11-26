@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-26 17:33:02",
+  "update_time": "2026-11-26 19:33:21",
   "count": 20,
   "date_range": "2026-11-25 ~ 2026-11-26",
   "reports": [
@@ -10,7 +10,7 @@
       "date": "2026-11-26",
       "stocks": [
         {
-          "name": "翰森制药集团",
+          "name": "翰森制药",
           "code": "3692",
           "full_code": "3692.HK",
           "exchange": "HK",
@@ -137,6 +137,13 @@
       "title": "中国 AI 药物研发",
       "date": "2026-11-26",
       "stocks": [
+        {
+          "name": "金斯瑞生物科技",
+          "code": "01548",
+          "full_code": "01548.HK",
+          "exchange": "HK",
+          "market": "港股"
+        },
         {
           "name": "英矽智能",
           "code": "03696",
@@ -290,6 +297,13 @@
           "name": "伟创电气",
           "code": "688698",
           "full_code": "sh688698",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "宇树科技",
+          "code": "688836",
+          "full_code": "sh688836",
           "exchange": "SH",
           "market": "沪市"
         },
