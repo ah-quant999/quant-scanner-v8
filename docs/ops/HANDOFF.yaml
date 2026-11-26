@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-25 16:45"
+  updated: "2026-11-26 21:10"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 190
+  next_id_seq: 191
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: cred-ledger-js-build-race-deleted-1115
@@ -4116,4 +4116,32 @@ items:
       ② 守卫对周度产物族按 snaps/内容日期校验或显式 skip；③ CONCEPT_ETF_MAP 退役摘名单 or 补 fetcher，二选一；
       ④ 发布后体检绿、data/*.js 回写 main 恢复（可用任一 build 专属产物 mtime 前进实证）。
     updated: "2026-11-25 16:45"
+    updated_by: 阿狸咪的工程师
+  - id: stocknames-rollback-lemoncat-stale-worktree-1126
+    owner: 小九的工程师
+    priority: P0
+    status: todo
+    created: 2026-11-26
+    title: stock_names 被 cn_fetch 整包回滚根因实证闭环：推手=lemoncat-cn 自托管「CN runner1号机应急」run 45785353147（防倒退日志实证本地树带 11-22/11-11 旧缓存）全树推送 318 文件上 main ⇒ 待清应急链 _work 旧检出；两项根因修复仍待主人拍板
+    note: >-
+      登记方：阿狸咪的工程师（11-26 20:48-21:07 CST 巡检，主人外出期自主处置；本项为 11-26 18:45 交接档的登记补做+归属实证闭环）。
+      事故：11-26 17:05:49 CST 提交 f32c8c34279e「v8 cn fetch: 17:03」整包回滚 raw_data/stock_names.json
+      （9654 条/ut=11-26 01:42:26 → 7373 条/ut=2026-11-11 02:04:45，blob 79e670ebf674→a7e3932be769）。
+      ⚠️ 18:45 交接档写「共改 300 文件」系 GitHub commits API files 上限 300/页截断，实测共 318 文件全在 raw_data/（page4 含 stock_names.json，sha_new=a7e3932be769 咬死）。
+      推手铁证（logs API）：run 45785353147「🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)」job 日志 09:05:51Z 打印
+      「✅ raw_data 已推送（第 1 次）commit f32c8c34」；jobs API 实测 runner_name=lemoncat-cn、labels=[self-hosted, cn] ⇒ 小九单位机自托管 runner。
+      根因：该 run 本地工作树带旧缓存——同日志「并发推送收工：耗时 721s / 未变化 326 / 防倒退跳过 70 / 待更新 2203」
+      且防倒退行实证本地 algo_run_report=2026-11-22 09:00 vs 远端 11-26 07:14 ⇒ 旧文件混在 318 文件提交上 main（防倒退只拦了 70 个）。
+      旧缓存源 = 应急链 runner 的 _work 旧检出（非主树：小九回执 2026-11-26_2010 §2.3 实测主树 stock_names 为好版）。
+      ⇒ 小九回执 §6.3 归属二选一已实证闭环（无需主人拍板该项）：排查对象 = lemoncat-cn 上 CN runner1号机应急链（wf 336661558）的 _work 目录。
+      恢复：18:46 阿狸咪六步范式恢复 c627c80097（内容源=远端 blob 79e670ebf674 原样，byte-exact 自证通过）；
+      19:03 后续 cn_fetch 重落 9697 条/ut=19:03:42；20:52 复核 entries=9697 守住无回归。
+      待主人拍板（小九回执 §6 汇总，维持不变）：①stock_names 抓取「失败禁用本地旧文件顶包、宁缺毋滥」改动放行；
+      ②cn_fetch「删除感知并集/增量对齐推送」架构改造放行（300→318 文件整包推送家族风险二次坐实）。
+      小九下一步：定位并清理 lemoncat-cn 应急链 _work 旧检出（含 11-11 stock_names / 11-22 algo_run_report 等陈旧文件）后复跑一轮验证防倒退不再出现 11-2x/11-11 老日期。
+    note_to: 小九(lemoncat-cn)
+    verify_how: >-
+      ①lemoncat-cn 应急链 _work 旧检出已定位清理并复跑一轮，防倒退跳过清单不再出现 2026-11-11/2026-11-22 老日期；
+      ②stock_names entries≥9000 连续多轮（≥3 次巡检）守住且 ut 前进；③主人拍板的两项根因修复若放行，修复后最新一轮 cn_fetch 不再整包推送（PUSH_FILES 增量清单化）。
+    updated: "2026-11-26 21:10"
     updated_by: 阿狸咪的工程师
