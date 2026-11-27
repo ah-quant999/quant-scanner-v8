@@ -1,0 +1,42 @@
+{
+ "date": "2026-11-28",
+ "generated": "2026-11-28 00:59:31",
+ "verdict": {
+  "cap_pct": 50,
+  "label": "观"
+ },
+ "inputs": {
+  "tactic_score": 1,
+  "tactic_exposure": 0.5,
+  "senti_phase": "狂热",
+  "senti_score": 85.0,
+  "zt": 97,
+  "max_ladder": 6,
+  "up": 2227,
+  "down": 118,
+  "breadth": 0.949680170575693,
+  "crisis": 34.6,
+  "sh_close": 3606.49,
+  "sh_chg": 3.73,
+  "zz1000_close": 5982.91,
+  "flow_in_cnt": 33,
+  "top_sectors": [
+   "基金减仓",
+   "通信技术",
+   "5G概念"
+  ],
+  "top_stocks": [
+   "哔哩哔哩-W",
+   "创世纪",
+   "上海九百"
+  ]
+ },
+ "checks_hit": 7,
+ "checks_total": 8,
+ "list_gate_ok": false,
+ "list_gate_why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
+ "forward_ref": {
+  "sh_close": 3606.49,
+  "date": "2026-11-28"
+ }
+}

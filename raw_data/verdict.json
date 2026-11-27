@@ -1,15 +1,15 @@
 {
- "update_time": "2026-11-27 22:44:29",
- "data_date": "2026-11-27",
+ "update_time": "2026-11-28 00:59:31",
+ "data_date": "2026-11-28",
  "head": {
-  "label": "攻 · 5 成",
-  "stance": "attack",
-  "icon": "⚔️",
-  "color": "#ef5350",
+  "label": "观 · 5 成",
+  "stance": "watch",
+  "icon": "👁️",
+  "color": "#ffd024",
   "cap_pct": 50
  },
  "plain": {
-  "读今天": "今天涨停 97 家、情绪 狂热（85 分），上涨 2227 家、下跌 118 家 —— 个股是普涨的。五个攻防信号合起来 +2 分，档位是「攻」。",
+  "读今天": "今天涨停 97 家、情绪 狂热（85 分），上涨 2227 家、下跌 118 家 —— 个股是普涨的。五个攻防信号合起来 +1 分，档位是「观」。",
   "所以": "所以今天不用动：仓位上限是 50%，但加仓条件只满足 7/7 条，**不加仓**。上限是天花板，不是让你必须用满 —— 空仓也是一种仓位。",
   "怎么做": "今天不买，只观察 —— 榜单无效（榜单降级/低分辨/缺维度）。 今天的可买额度就是 0，别手痒；明天开仓前先看「加仓检查表」，凑够 5 条再动手。仓位上限 50% 是天花板，不是目标。"
  },
@@ -18,9 +18,9 @@
   "parts": [
    {
     "k": "攻防档位",
-    "v": "95%",
-    "raw": 0.95,
-    "plain": "趋势/宽度/涨停/量能/危机五个信号合起来 +2 分 → 「攻」，允许仓位 95%"
+    "v": "50%",
+    "raw": 0.5,
+    "plain": "趋势/宽度/涨停/量能/危机五个信号合起来 +1 分 → 「观」，允许仓位 50%"
    },
    {
     "k": "情绪闸门",
@@ -41,11 +41,31 @@
  "buy": {
   "sectors": [
    {
-    "name": "5G",
-    "type": "行业",
+    "name": "基金减仓",
+    "type": "概念",
+    "net_5d": 589.5,
+    "days": 3,
+    "net_today": 703.5,
+    "leaders": [],
+    "lead_src": "",
+    "etf": null
+   },
+   {
+    "name": "通信技术",
+    "type": "概念",
+    "net_5d": 552.5,
+    "days": 3,
+    "net_today": 426.9,
+    "leaders": [],
+    "lead_src": "",
+    "etf": null
+   },
+   {
+    "name": "5G概念",
+    "type": "概念",
     "net_5d": 522.1,
-    "days": 17,
-    "net_today": 57.0,
+    "days": 3,
+    "net_today": 374.1,
     "leaders": [],
     "lead_src": "",
     "etf": null
@@ -155,14 +175,14 @@
   "list_gate": {
    "name": "榜单有效",
    "gate": true,
-   "need": "update_time=2026-11-27 / validity=ok / max_score≥10 / 无缺失维度",
-   "now": "榜单2026-11-27 · validity=degraded · max=6.1 · 缺2维",
+   "need": "update_time=2026-11-28 / validity=ok / max_score≥10 / 无缺失维度",
+   "now": "榜单2026-11-27 · validity=degraded · max=6.5 · 缺2维",
    "met": false,
-   "why": "validity=degraded、无分辨度max=6.1、缺维度inst_w52/inst_analyst",
+   "why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
    "date": "2026-11-27",
-   "expect_date": "2026-11-27",
+   "expect_date": "2026-11-28",
    "status": "degraded",
-   "max_score": 6.1,
+   "max_score": 6.5,
    "data_missing": [
     "inst_w52",
     "inst_analyst"
@@ -203,7 +223,7 @@
     {
      "name": "攻防不否决",
      "need": "五信号 ≥ 0 分（中性以上）",
-     "now": "+2 分 · 攻",
+     "now": "+1 分 · 观",
      "met": true
     },
     {
@@ -233,14 +253,14 @@
     {
      "name": "榜单有效",
      "gate": true,
-     "need": "update_time=2026-11-27 / validity=ok / max_score≥10 / 无缺失维度",
-     "now": "榜单2026-11-27 · validity=degraded · max=6.1 · 缺2维",
+     "need": "update_time=2026-11-28 / validity=ok / max_score≥10 / 无缺失维度",
+     "now": "榜单2026-11-27 · validity=degraded · max=6.5 · 缺2维",
      "met": false,
-     "why": "validity=degraded、无分辨度max=6.1、缺维度inst_w52/inst_analyst",
+     "why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
      "date": "2026-11-27",
-     "expect_date": "2026-11-27",
+     "expect_date": "2026-11-28",
      "status": "degraded",
-     "max_score": 6.1,
+     "max_score": 6.5,
      "data_missing": [
       "inst_w52",
       "inst_analyst"
@@ -289,26 +309,26 @@
  },
  "list_check": {
   "date": "2026-11-27",
-  "expect_date": "2026-11-27",
+  "expect_date": "2026-11-28",
   "status": "degraded",
-  "max_score": 6.1,
+  "max_score": 6.5,
   "data_missing": [
    "inst_w52",
    "inst_analyst"
   ],
   "met": false,
-  "why": "validity=degraded、无分辨度max=6.1、缺维度inst_w52/inst_analyst"
+  "why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst"
  },
  "alpha": {
   "verdict": "FAIL",
-  "ir_oos": 0.237,
-  "update_time": "2026-11-27 21:00:35"
+  "ir_oos": 0.233,
+  "update_time": "2026-11-27 23:47:20"
  },
  "evidence": [
   {
    "name": "攻防档位",
-   "plain": "五个信号打分：趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1，合计 +2",
-   "value": "+2"
+   "plain": "五个信号打分：趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1，合计 +1",
+   "value": "+1"
   },
   {
    "name": "个股宽度",
@@ -327,16 +347,16 @@
   },
   {
    "name": "资金主线",
-   "plain": "今日净流入 33 个板块、净流出 47 个；主线是 5G",
-   "value": "5G"
+   "plain": "今日净流入 33 个板块、净流出 47 个；主线是 基金减仓",
+   "value": "基金减仓"
   }
  ],
  "caveat": "本卡是「把已有 9 个信号收敛成一个动作」的纪律工具，**不是**预测模型。其中「情绪周期当仓位闸门」这条规则**还没有样本外验证**（涨停热力历史只有 30 天），从今天起每天留痕，攒够 3-6 个月再回测。在此之前它只约束你别乱来，不代表能提高收益。",
  "sources": {
-  "tactic": "2026-11-27 22:39:51",
-  "verdict": "2026-11-27 22:39:51",
-  "senti": "2026-11-27 22:39:16",
+  "tactic": "2026-11-28 00:59:30",
+  "verdict": "2026-11-28 00:59:30",
+  "senti": "2026-11-28 00:58:58",
   "flow": "2026-11-27 16:30:50",
-  "trend": "2026-11-27 21:31"
+  "trend": "2026-11-28 00:18"
  }
 }
