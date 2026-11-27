@@ -12743,7 +12743,7 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'机构研究·AI解析', source:'MAHORO_INSIGHTS', freq:'盘中+每日3档', slots:['08:50','12:30','15:10'], note:'AI 洞察对比同源'},
+          {name:'机构研究·AI解析', source:'MAHORO_INSIGHTS', freq:'每日1档', slots:['15:00'], note:'盘后出稿（11-27 起三档收一档）'},
 
           {name:'指数观测·四框架', source:'INDEX_VALUE_FRAMEWORK', freq:'每日盘前', slots:['07:10'], note:'宏观观测'},
 
@@ -18018,7 +18018,7 @@ window.__renderComprehensiveSynthesis = function(){
          + '</details>';
     });
     if(!anyIns){
-      h += '<div class="note" style="padding:12px;text-align:center">\u89e3\u6790\u5f85\u751f\u6210\uff08\u6bcf\u65e5 08:30 \u81ea\u52a8\u5316\u9605\u8bfb\u540e\u64b0\u5199\uff09</div>';
+      h += '<div class="note" style="padding:12px;text-align:center">\u89e3\u6790\u5f85\u751f\u6210\uff08\u6bcf\u65e5 15:00 \u76d8\u540e\u51fa\u7a3f\uff09</div>';
     }
     /* 2026-10-04 maharo_macro 孤儿 UI 退役：原 d.sources 来源徽章块与 d.watched/core/all_lite
        原始条目录 details 块已随 maharo_macro 数据源一并删除（d 未定义曾致整卡降级）。 */
@@ -19802,14 +19802,14 @@ h+=`</div>`;
        + '<span style="font-size:15px;line-height:1;flex:0 0 auto">📚</span>'
        + '<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap">机构研究 · AI 解析建议</span>'
        + '<span style="flex:0 0 auto" id="maharoFresh">—</span>'
-       // 2026-09-13 主人令：频率标注（日频 · 每日 08:50 出稿 / 08:30 更新正文）
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#22c55e;border:1px solid rgba(52,211,153,.4);letter-spacing:.5px">📆 日更 · 盘前 08:50 / 午间 12:30 / 盘后 15:10</span>'
+       // 2026-09-13 主人令：频率标注（2026-11-27 起：日频 · 每日 15:00 出稿，原三档收为一档）
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#22c55e;border:1px solid rgba(52,211,153,.4);letter-spacing:.5px">📆 日更 · 每日 15:00 出稿</span>'
        + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px">观澜台/金斧头/逻辑与思考/树枝报告/180K Research/智堡 Wisburg/Vito行研札记 · AI 阅读后撰写</span></div>'
        // ── ② 分析块（卡名下方）：核心 / 用法 / 限制；与下方两卡版式统一 ──
        + '<div style="padding:0 14px"><div style="border:1px solid rgba(52,211,153,.25);border-radius:8px;padding:10px 12px;margin:10px 0;line-height:1.7;font-size:12px;color:var(--txt)">'
        + '<b style="color:#22c55e">&#x1F4CC; 核心：</b>把机构研报原文交给 AI 阅读后写成可执行要点。<br>'
        + '<b style="color:#22c55e">&#x1F4A1; 用法：</b>盘前 5 分钟掌握机构共识与分歧，落到本日操作。<br>'
-       + '<b style="color:#22c55e">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；盘前 08:50 / 午间 12:30 / 盘后 15:10 三档出稿。</div></div>'
+       + '<b style="color:#22c55e">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；每日盘后 15:00 出稿一稿。</div></div>'
        + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
 
     hm += '</div>'; // /obsPaneMacro
@@ -19882,7 +19882,7 @@ h+=`</div>`;
     }catch(e){}
     // 🔴 2026-09-12 补漏：机构研究·AI 解析卡的填充函数 _fillMahoroCard 原先全局
     //   只在 renderUnlisted 里被调用；宿主迁到本页后无任何触发 → 卡永久「加载中」。
-    //   数据源 window.MAHORO_INSIGHTS（云端/CN runner1号机每日 08:50 拉取）；MAHORO_MACRO 已废弃（见 renderMahoroCard 内注释）。
+    //   数据源 window.MAHORO_INSIGHTS（每日盘后 15:00 出稿（11-27 起单档））；MAHORO_MACRO 已废弃（见 renderMahoroCard 内注释）。
     //   defer 数据可能晚于首渲到达，故 3 次退避重试（0/600/1800ms），成功即止。
     try{
       var _mh = function(){ try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); } };
@@ -20295,6 +20295,24 @@ window.__renderV8CalToday = function(){
     html += '<div style="color:#9aa7b8;padding:8px 0">📅 今日日历无标注事件</div>';
   }
   box.innerHTML = html || '<div style="color:#9aa7b8;padding:12px">加载中…</div>';
+  /* 2026-11-27 第二批结论行：本卡只列事件清单、不给动作，此处补一句。
+     口径全部由 todayEvents 现有字段（cls / released）现算，零新增抓取。
+     注：本文件上方另有一份同渲染器的旧 IIFE 版本，已被本函数覆盖，不重复插。 */
+  try{
+    if(todayEvents && todayEvents.length && window.v8Concl){
+      var _cc = {}, _pend = 0;
+      todayEvents.forEach(function(e){ var c = e.cls || 'data'; _cc[c] = (_cc[c] || 0) + 1; if(!e.released) _pend++; });
+      var _risk = [];
+      if(_cc.fomc) _risk.push('FOMC 日隔夜风险');
+      if(_cc.option || _cc.a50) _risk.push('交割日尾盘波动放大');
+      if(_cc.imp) _risk.push('重要政策落地需留意主线切换');
+      if(_cc.cb) _risk.push('央行操作关注流动性');
+      var _hd = '今日 ' + todayEvents.length + ' 项事件' + (_pend ? '（' + _pend + ' 项待发布）' : '（已全部发布）');
+      var _bd = _risk.length ? (' → ' + _risk.join('、') + '；不追高、不重仓过夜')
+                             : ' → 无波动型事件，按既定仓位执行，不因单日事件加减仓';
+      window.v8Concl('v8TodayAll', _hd + _bd, _risk.length ? 'gold' : 'up');
+    }
+  }catch(e){}
 };
 window.__renderV8CalToday();
 </script>
