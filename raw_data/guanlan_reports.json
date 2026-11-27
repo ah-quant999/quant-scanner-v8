@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 17:06:47",
+  "update_time": "2026-11-27 17:45:00",
   "count": 20,
   "date_range": "2026-11-26 ~ 2026-11-27",
   "reports": [
@@ -9,6 +9,13 @@
       "title": "中国消费行业：继续起舞，但要选对舞伴——上调贵州茅台至超配，首次覆盖康师傅与统一给予中性评级（China Consumer: Keep dancing – but choose who you dance with: upgrade Moutai to OW; initiate on Tingyi and UPC at Neutral）",
       "date": "2026-11-27",
       "stocks": [
+        {
+          "name": "贵州茅台",
+          "code": "600519",
+          "full_code": "sh600519",
+          "exchange": "SH",
+          "market": "沪市"
+        },
         {
           "name": "美的集团",
           "code": "000333",
@@ -51,6 +58,34 @@
       "date": "2026-11-27",
       "stocks": [
         {
+          "name": "宏发股份",
+          "code": "600885",
+          "full_code": "sh600885",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "东航物流",
+          "code": "601156",
+          "full_code": "sh601156",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "东方电缆",
+          "code": "603606",
+          "full_code": "sh603606",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "石头科技",
+          "code": "688169",
+          "full_code": "sh688169",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
           "name": "北方华创",
           "code": "002371",
           "full_code": "sz002371",
@@ -79,6 +114,13 @@
           "market": "深市"
         },
         {
+          "name": "寒武纪",
+          "code": "688256",
+          "full_code": "sh688256",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
           "name": "科达利",
           "code": "002850",
           "full_code": "sz002850",
@@ -97,7 +139,15 @@
       "rating": "未评级",
       "title": "花旗",
       "date": "2026-11-27",
-      "stocks": [],
+      "stocks": [
+        {
+          "name": "中国医药",
+          "code": "600056",
+          "full_code": "sh600056",
+          "exchange": "SH",
+          "market": "沪市"
+        }
+      ],
       "topic_id": 82258444142224112,
       "author": "西湖西子西窗烛",
       "source": "外资研投",
@@ -131,6 +181,41 @@
       "date": "2026-11-27",
       "stocks": [
         {
+          "name": "海澜之家",
+          "code": "600398",
+          "full_code": "sh600398",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "渝农商行",
+          "code": "601077",
+          "full_code": "sh601077",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "中微公司",
+          "code": "688012",
+          "full_code": "sh688012",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "华峰测控",
+          "code": "688200",
+          "full_code": "sh688200",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "中芯国际",
+          "code": "688981",
+          "full_code": "sh688981",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
           "name": "北方华创",
           "code": "002371",
           "full_code": "sz002371",
@@ -143,6 +228,13 @@
           "full_code": "sz002563",
           "exchange": "SZ",
           "market": "深市"
+        },
+        {
+          "name": "珀莱雅",
+          "code": "603605",
+          "full_code": "sh603605",
+          "exchange": "SH",
+          "market": "沪市"
         },
         {
           "name": "贝泰妮",
@@ -196,6 +288,76 @@
           "market": "港股"
         },
         {
+          "name": "中国医药",
+          "code": "600056",
+          "full_code": "sh600056",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "江西铜业",
+          "code": "600362",
+          "full_code": "sh600362",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "宁沪高速",
+          "code": "600377",
+          "full_code": "sh600377",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "国电南瑞",
+          "code": "600406",
+          "full_code": "sh600406",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "隆基绿能",
+          "code": "601012",
+          "full_code": "sh601012",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "中国平安",
+          "code": "601318",
+          "full_code": "sh601318",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "交通银行",
+          "code": "601328",
+          "full_code": "sh601328",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "建设银行",
+          "code": "601939",
+          "full_code": "sh601939",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "松发股份",
+          "code": "603268",
+          "full_code": "sh603268",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "华峰测控",
+          "code": "688200",
+          "full_code": "sh688200",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
           "name": "美的集团",
           "code": "000333",
           "full_code": "sz000333",
@@ -217,18 +379,18 @@
           "market": "深市"
         },
         {
-          "name": "江西铜业",
-          "code": "00358",
-          "full_code": "00358.HK",
-          "exchange": "HK",
-          "market": "港股"
+          "name": "科沃斯",
+          "code": "603486",
+          "full_code": "sh603486",
+          "exchange": "SH",
+          "market": "沪市"
         },
         {
-          "name": "交通银行",
-          "code": "03328",
-          "full_code": "03328.HK",
-          "exchange": "HK",
-          "market": "港股"
+          "name": "数据港",
+          "code": "603881",
+          "full_code": "sh603881",
+          "exchange": "SH",
+          "market": "沪市"
         },
         {
           "name": "比亚迪",
@@ -257,6 +419,48 @@
       "title": "中国股票策略：2026年第三季度业绩——疲弱消费与股市表现构成拖累（China Equity Strategy: 3Q26 earnings – weak consumption and equity markets dragged）",
       "date": "2026-11-27",
       "stocks": [
+        {
+          "name": "贵州茅台",
+          "code": "600519",
+          "full_code": "sh600519",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "长城汽车",
+          "code": "601633",
+          "full_code": "sh601633",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "澜起科技",
+          "code": "688008",
+          "full_code": "sh688008",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "中微公司",
+          "code": "688012",
+          "full_code": "sh688012",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "长鑫科技",
+          "code": "688825",
+          "full_code": "sh688825",
+          "exchange": "SH",
+          "market": "沪市"
+        },
+        {
+          "name": "中芯国际",
+          "code": "688981",
+          "full_code": "sh688981",
+          "exchange": "SH",
+          "market": "沪市"
+        },
         {
           "name": "美的集团",
           "code": "000333",
@@ -298,6 +502,13 @@
           "full_code": "09988.HK",
           "exchange": "HK",
           "market": "港股"
+        },
+        {
+          "name": "阿特斯",
+          "code": "688472",
+          "full_code": "sh688472",
+          "exchange": "SH",
+          "market": "沪市"
         },
         {
           "name": "比亚迪",
@@ -385,6 +596,13 @@
           "full_code": "3696.HK",
           "exchange": "HK",
           "market": "港股"
+        },
+        {
+          "name": "百奥赛图",
+          "code": "688796",
+          "full_code": "sh688796",
+          "exchange": "SH",
+          "market": "沪市"
         },
         {
           "name": "晶泰科技",
