@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-26 21:10"
-  updated_by: 阿狸咪的工程师
+  updated: "2026-11-27 08:20"
+  updated_by: 小九的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 191
+  next_id_seq: 192
   # 🔴 2026-11-06 瘦身：done/dropped 共 192 项归档至 docs/ops/HANDOFF.archive.yaml；活跃项仅留 68 项。同提交刷新 ledger.ids。
 items:
   - id: cred-ledger-js-build-race-deleted-1115
@@ -4238,4 +4238,58 @@ items:
       ③ 现取 logic.html 断言「龙虎榜三通道」存在；
       ④ Pages 主站切「盘后数据」页，龙虎榜三通道卡有当日 TOP5 与近7日/本月汇总。
     updated: "2026-11-27 01:01"
+    updated_by: 小九的工程师
+
+  - id: ic-oos-gate-idle-dispatch-sector-order-1127-xiaojiu
+    owner: 小九的工程师
+    priority: P0
+    status: pending-verify
+    created: 2026-11-27
+    title: IC 门禁改读真样本外 OOS + 取消盘中空转派发 + 强势板块去字母序（2026-11-27 主人令「全部按你建议，科学处置」）
+    note: >-
+      登记方：小九的工程师。commit cb7451031fba（parent ffb773e4），8 文件 force=false 逐字节自证 ALL-OK。
+      ① IC 门禁改用真 OOS：scripts/apply_ic_gate.py 原只读 in_sample/fixed_sample，样本内 T1 胜率 48.5% 判 warn；
+      同一份 raw_data/factor_ic_report.json 的 out_of_sample（config.split_date=2026-09-15、n=1222）
+      T1 仅 38.5%、T5 均值 -4.804%、T20 均值 -19.485%。现取样优先级改为
+      out_of_sample > fixed_sample > in_sample；产物新增 sample_used 与 oos_disclosure；
+      algorithms/generate_top10.py 日志两处披露样本口径（ic_sample）。
+      本机实跑结果：overall_action warn -> fail，reason 为「样本外T1胜率38.5<45.0」。
+      ⚠️ 实盘出票行为不变：ic_weight 仍 0.5（触底），下游 generate_top10 侧 max(0.85, min(1.0, ic_weight))
+      floor 未动 ⇒ 本次是门禁口径诚实化，不是让策略停手。若要让 gate=fail 真正阻断出票，需改该 floor，待主人拍板。
+      ② 取消盘中空转派发：.github/workflows/v8_cn_fetch_intraday_lemoncat.yml 退出自动调度
+      （仅保留 workflow_dispatch 作人工排障）；.github/scripts/v8_intraday_precise_sched.py 改为直派真正的
+      cn 数据链 v8_cn_fetch_cloud_selfhosted.yml（9 档 09:32-15:02）；align_logic_ops.py 文案同步；
+      index.html 运维页该行状态 s-ok -> s-dead。门禁前移（[16/16] 三时段闸门漂移守卫）在本 commit 上 success。
+      ③ 强势板块去字母序：algorithms/final_recommend.py 的 strong_sectors 原为 sorted(rel_set)，
+      而 rel_set 是 set ⇒ sorted 只能按字面排，输出是拼音字典序，却被前端当「强势板块（相对强度 TOP）」展示
+      并标「同源同序」。现改为按 score_map.relative_5d 真实降序、缺值殿后（不伪造 0）。
+      前端两处措辞如实标注：与 regime_summary.recommended_sectors 属两条独立链、不互相冒充。
+      ⚠️ 未合并到单一口径的原因：SECTOR_LEADERS.fr_sectors 的 name 键空间取自 strong_sectors，
+      前端直接换读 regime_summary 会全 no_match、整卡变空 ⇒ 统口径须改生成端，待拍板。
+      ④ 措辞诚实化（审计 P1）：OOS T+10 胜率 24.7%/均益 -8.221%（n=1029）未过门槛，故「预期前瞻收益」
+      5 处全清零，统一为「因子综合分（11 维因子加总，非收益预测）」；卡头明确为「因子榜镜像」；
+      exp_ret ±15 明标为分值权重而非收益百分比（实测 top10 项 20/20 无 exp_ret 字段）。
+      ⑤ 审计 P0-1「前端改读后端起最终推荐」未采纳，依据：审计论据「高手 T+5 +2.11% 优于因子榜 -2.79%」
+      在 raw_data/final_recommend_backtest.json 与 data/FINAL_RECOMMEND_BACKTEST.js 中查无实据
+      （「高手」0 次、无 by_source 分层、2.11/-2.79 均 0 次）；后端 stocks 实测仅 2 只、sources 全为
+      ["因子榜"]、action 全「观察」、close/pct_chg 全 null；且 11-22 主人令已裁定唯一真源 = TOP10_DAILY.top10。
+      改走审计给的第二选项（卡头写实为因子榜镜像）。真根因在数据层：final_recommend.py 明写
+      「进最终推荐仍须先入因子榜池」，当日 ima_intake.new_selected=6 未入池 ⇒ 竞位开关在位但未生效，另案处理。
+      ⑥ 本轮未推：v8/intraday_tick_local.py 为本地 CRLF 对仓库 LF 的假脏（436 增 436 删、内容零变化），
+      按主人 2026-11-27 08:10 令不推；同批推的 .github/workflows/v8_algo_intraday_lite.yml(+9) 与
+      scripts/intraday_first_batch_gate.py(+8/-3) 属 11-26 遗留修复，经主人令「2推」一并纳入。
+      ⚠️ 以上为「截至 2026-11-27 08:20 CST 本地实测」；线上生效以 verify_how 现取命令为准。
+    note_to: 阿狸咪的工程师
+    verify_how: >-
+      ① 现取 main 的 raw_data/ic_gate.json，断言 factors.ge3.sample_used=out_of_sample、
+      T1_win=38.5、gate=fail、overall_action=fail，且存在顶层 oos_disclosure.split_date=2026-09-15；
+      ② 现取 main 的 .github/workflows/v8_cn_fetch_intraday_lemoncat.yml，断言其 on 段无 schedule
+      （仅 workflow_dispatch）；现取 .github/scripts/v8_intraday_precise_sched.py，断言 TARGETS 含
+      v8_cn_fetch_cloud_selfhosted.yml 且不含 v8_cn_fetch_intraday_lemoncat.yml；
+      ③ 现取线上 index.html，断言「今日只出「候选观察」」与 lhbThreeChannelCard 均存在、
+      histAll.sort 仍在、「预期前瞻收益」为 0、「因子榜镜像」为 1；
+      ④ 下一次算法链跑完后现取 final_recommend 产物的 strong_sectors，断言按 relative_5d 降序（非拼音序）；
+      ⑤ 交易日盘中按北京时间复核 09:30-15:00：v8_cn_fetch_intraday_lemoncat 应零自动 run，
+      cn 数据链每档应不再成批 cancelled。
+    updated: "2026-11-27 08:20"
     updated_by: 小九的工程师
