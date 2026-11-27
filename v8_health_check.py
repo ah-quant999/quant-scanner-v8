@@ -138,13 +138,15 @@ CARD_DEFS = [
     #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
     # 🔴 2026-11-27 主人令（一劳永逸·「看板绿但数据旧」）：
     #   post_close_required = 每交易日在盘后**必须产出一次**的卡，不适用「非盘中就豁免」。
-    #   post_close_deadline=20.0 = 盘后档**判死线（本地 20:00）**，与实测产出分布对齐：
-    #   盘后批落地时刻 16:41 / 18:18~19:29 / 20:33（GitHub cron 延迟 1~2h 是常态，
-    #   v8_stock_quote_refresh 11-26 的 16:00 档实际 17:44 才开跑）。
-    #   · 15:30~20:00 = 「批未跑完」的合法等待窗 ⇒ 放行（只留 24h 兜底防多日停摆）
-    #   · 过 20:00 要求数据晚于「今日收盘 15:30 −60min」⇒ 当日盘后档丢了就当天亮红，
+    #   post_close_deadline=21.0 = 盘后档**判死线（本地 21:00）**。取值依据（全部实测）：
+    #     · 本卡调度两档 UTC 8/12 = CST 16:00 / 20:00；GitHub cron 延迟 1~2h 是常态
+    #       （v8_stock_quote_refresh 11-26 的 16:00 档实际 17:44 才开跑）；
+    #     · 判死线 = 最后一档 20:00 + 1h 余量 = 21:00；21:08 / 21:38 还有两轮巡检，
+    #       保证「当天发现、当天可修」，不必等次日。
+    #   · 15:30~21:00 = 「批未跑完」的合法等待窗 ⇒ 放行（只留 24h 兜底防多日停摆）
+    #   · 过 21:00 要求数据晚于「今日收盘 15:30 −60min」⇒ 当日盘后档整个丢了就当天亮红，
     #     不再拖到次日 24h 窗口（旧口径 07:00 的数到次日 07:00 前都算新鲜 = 停更一天无人知）
-    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后两档 16:00/20:00", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "post_close_required": True, "post_close_deadline": 20.0, "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
+    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后两档 16:00/20:00", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "post_close_required": True, "post_close_deadline": 21.0, "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
     # 🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：FUTURES_REALTIME（期指实时）此前
     #   CARD_DEFS 完全漏登记 ⇒ 健康面板不监控 + 自愈链够不到 ⇒ 断更只能靠主人肉眼发现
     #   （11-13 实测：cron 静默失联 + 缓存戳不同步双重故障，两处均已修，本条补上监控盲区）。
@@ -389,9 +391,9 @@ CARD_DEFS = [
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     # 🔴 2026-11-27 同 STOCK_QUOTE：每交易日盘后必须产出一次 ⇒ post_close_required，
-    #   盘后按 post_close_deadline(20:00) 判死线（实测该链 15:48 前后出数，但同批 cn_fetch
-    #   盘后链有 18:18~19:29 才落地的日子，死线定 20:00 才不会天天假红）。
-    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次(15:50前后)", "max_age": 1440, "key_fields": ["phase", "sector_count"], "post_close_required": True, "post_close_deadline": 20.0, "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
+    #   盘后按 post_close_deadline(21:00) 判死线（实测该链 15:48 前后出数，但同批 cn_fetch
+    #   盘后链 17:20/18:20/19:20 三档有拖到 18:18~19:29 落地的日子，21:00 = 末档 + 1h 才不假红）。
+    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次(15:50前后)", "max_age": 1440, "key_fields": ["phase", "sector_count"], "post_close_required": True, "post_close_deadline": 21.0, "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
     # 🔴 2026-11-27 主人令（图2「RUNNER_STATUS_HEALTH 停在 11-26 22:35 却判 ✓」根治）：
     #   本项此前**完全不在体检清单**（_LOW_FREQ_FILES 里只留一句「另有专门检查」，而那个检查
     #   只负责开 Issue，不看陈旧度）⇒ 「小九机离线」这条最关键的运维事实，只能由看板按 isToday
