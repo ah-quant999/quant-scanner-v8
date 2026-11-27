@@ -20649,18 +20649,26 @@ window.__renderV8CalToday();
     /* ── ② 盘面解读：大盘定性 / 情绪 / 所以 / 怎么做 / 分歧点 ──
        🔴 2026-11-27 主人令：「这些也要加倒 v8」「情绪你都没解析」。
        v9 早已把 V8_VERDICT 的 plain.读今天 / plain.所以 / plain.怎么做 /
-       position.diverge 四段全渲染出来，v8 只渲染了 plain.读今天 一句，
-       其余三段一直丢着 ⇒ 本块补齐。
-       情绪：verdict 只给了分数与阶段（80 分·狂热），没给「所以呢」⇒ 这里用
-       已有 evidence[情绪周期] + LIMIT_UP_HEATMAP 的今日/昨日家数与最高连板现算，
-       零新增抓取、不改生成器、不新增 data 文件。数据缺失就只显示已有部分，不瞎编。 */
+       position.diverge 四段全渲染，v8 只渲染了 plain.读今天 一句 ⇒ 本块补齐。
+       情绪：verdict 只给分数与阶段，没给「所以呢」⇒ 用已有 evidence + LIMIT_UP_HEATMAP 现算。
+       🔴 上一版曾犯错（实测捕获）：只看涨停家数环比就写「赚钱效应外溢」，
+          而当日涨停 76 家、下跌 1488 家、上涨只占 35% —— 热的是少数题材不是大盘；
+          且该行给出「可跟主线」，与同卡「今天不买」「背离日不许按热加仓」相矛。
+          ⇒ 现强制并入市场宽度：上涨占比 <45% 且情绪热 = 「局部热·假热」，
+             结论固定为「不许追板」，与总裁决同向；只有占比≥峰值才能叫「加速·可跟主线」。 */
     function _sentiLine(){
-      var ev=(V.evidence||[]), s=null;
-      for(var i=0;i<ev.length;i++){ if(String(ev[i].name||'').indexOf('情绪')>=0){ s=ev[i]; break; } }
+      var ev=(V.evidence||[]), s=null, w=null;
+      for(var i=0;i<ev.length;i++){
+        var _nm=String(ev[i].name||'');
+        if(!s && _nm.indexOf('情绪')>=0) s=ev[i];
+        if(!w && _nm.indexOf('宽度')>=0) w=ev[i];
+      }
       var ph=s?String(s.value||''):'';
       var pl=s?String(s.plain||''):'';
       var _sc=pl.match(/(\d+)\s*分/), _lb=pl.match(/最高\s*(\d+)\s*板/);
       var score=_sc?_sc[1]:'', maxLb=_lb?_lb[1]:'';
+      var upPct=null;
+      if(w){ var _u=String(w.value||'').match(/(\d+(?:\.\d+)?)\s*%/); if(_u) upPct=Number(_u[1]); }
       var H2=window.LIMIT_UP_HEATMAP||{};
       var zt=Number(H2.today_total), pz=Number(H2.prev_total);
       var dlt=(isFinite(zt)&&isFinite(pz))?(zt-pz):null;
@@ -20669,26 +20677,36 @@ window.__renderV8CalToday();
         + (dlt===null?'':'<span style="color:'+(dlt>=0?RED:GRN)+'">（昨日 '+pz+'，'+(dlt>0?'+':'')+dlt+'）</span>'));
       if(maxLb) bits.push('最高 <b style="color:'+TXT+'">'+maxLb+'</b> 板');
       if(score) bits.push('<b style="color:'+TXT+'">'+score+' 分</b>「'+E(ph||'—')+'」');
+      if(upPct!==null) bits.push((upPct<45?'上涨只占 ':'上涨占 ')+'<b style="color:'+TXT+'">'+upPct+'%</b>');
       if(!bits.length) return '';
       var hot=(/狂热|高潮/.test(ph)), cold=(/退潮|冰点/.test(ph));
-      var act, tag='';
+      var narrow=(upPct!==null && upPct<45);
+      var tag,act;
       if(cold){
-        act='<b style="color:'+GRN+'">退潮期不接力</b>：等止跌信号，别抢反弹第一波。';
+        tag='退潮';
+        act='情绪在退 → <b style="color:'+GRN+'">不接力、不抢反弹第一波</b>，等涨停家数止跌回升再说。';
+      }else if(hot && narrow){
+        tag='局部热·假热';
+        act='<b style="color:'+TXT+'">'+score+' 分</b>喊热，但上涨只占 '+upPct+'% —— <b style="color:'+GLD+'">热的是少数题材，不是大盘</b>；'
+           +'这种日子按热加仓就是接最后一棒，<b style="color:'+GLD+'">只许做主线回调，不许追板</b>。';
+      }else if(hot && upPct!==null && upPct>=60 && dlt!==null && dlt<=-5){
+        tag='普涨分化';
+        act='涨停从 '+pz+' 家缩到 '+zt+' 家，但面上在普涨 —— <b style="color:'+GLD+'">赚钱效应在扩散、连板在分化</b>，'
+           +'属高位分歧：<b style="color:'+GLD+'">不打板，跟着普涨做主线</b>。';
       }else if(hot && dlt!==null && dlt<=-5){
-        tag='<b style="color:'+GLD+'">高位钝化</b>：';
-        act='分数还在'+E(ph)+'档，但<b style="color:'+GLD+'">家数已经在退</b>，'
-           +'热度靠少数连板撑着 → <b style="color:'+GLD+'">不追板，只做主线回调</b>。';
+        tag='高位钝化';
+        act='分数还在'+E(ph)+'档，但<b style="color:'+GLD+'">家数已在退</b>，热度靠少数连板撑着 → <b style="color:'+GLD+'">不追板，只做主线回调</b>。';
       }else if(hot && dlt!==null && dlt>=5){
-        tag='<b style="color:'+RED+'">情绪加速</b>：';
-        act='家数在扩、赚钱效应外溢 → 可跟主线，'
-           +'<b style="color:'+GLD+'">但第 4 板以上不接</b>。';
+        tag='加速';
+        act='家数在扩、上涨面也在跟 → 可跟主线，<b style="color:'+GLD+'">但第 4 板以上不接</b>。';
       }else if(hot){
-        tag='<b style="color:'+GLD+'">高位持续</b>：';
+        tag='高位持续';
         act='热度没继续扩散 → <b style="color:'+GLD+'">按既定仓位做主线，不额外加码</b>。';
       }else{
-        act='情绪'+E(ph||'中性')+'，不构成加减仓理由 → <b style="color:'+SUB+'">按攻防档位执行</b>。';
+        tag='中性';
+        act='不构成加减仓理由 → <b style="color:'+SUB+'">按攻防档位执行</b>。';
       }
-      return '<span style="color:'+SUB+'">'+bits.join(' · ')+'</span> → '+tag+act;
+      return '<span style="color:'+SUB+'">'+bits.join(' · ')+'</span> → <b style="color:'+GLD+'">'+tag+'</b>：'+act;
     }
 
     /* 段落行：左标签 + 右内容（v9 同款形态，标签统一灰、仅分歧点金色警示） */
