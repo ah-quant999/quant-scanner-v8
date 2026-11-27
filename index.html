@@ -128,15 +128,15 @@ window.__domReadyFns=[];
 
     <script src="data/ETF_INTRADAY_HEAT.js?v=6b840b0545" defer></script>
     <!-- 🆕 2026-11-23 主人拍板：ETF 量能配速+局部异动灯（gen_etf_pace.py，盘中链重算；口径见逻辑详解页） -->
-    <script src="data/ETF_PACE.js?v=4980a311af" defer></script>
+    <script src="data/ETF_PACE.js?v=ab2b4c86b2" defer></script>
     <!-- 🆕 2026-11-24 主人拍板：市场攻防档位·五信号合成（gen_market_regime.py，实验卡链重算；口径见逻辑详解页）。
          ⚠️ 命名=MARKET_TACTIC：MARKET_REGIME 已被利率板块推荐框架占用（gen_invest_avoid.py），勿撞。 -->
-    <script src="data/MARKET_TACTIC.js?v=1ab72d9b2a" defer></script>
+    <script src="data/MARKET_TACTIC.js?v=9726862948" defer></script>
     <!-- 🔍 2026-11-24 主人拍板：全站综合解析·15源加权合成（gen_market_verdict.py，实验卡链重算；口径见逻辑详解页） -->
-    <script src="data/MARKET_VERDICT.js?v=316efa3ab5" defer></script>
+    <script src="data/MARKET_VERDICT.js?v=6c94497a56" defer></script>
     <!-- 🎯 2026-11-26 主人拍板：今日作战指令·唯一裁决卡（gen_verdict.py，纯合成器零新预测；
          仓位 = min(攻防档位, 情绪闸门, 风控系数)；数据落 raw_data/verdict.json，口径见逻辑详解页） -->
-    <script src="data/V8_VERDICT.js?v=1b306b1108" defer></script>
+    <script src="data/V8_VERDICT.js?v=2d4a2f49ff" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=9f98abdad3" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=1c534105d3" defer></script>
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=6874e36f19" defer></script>
@@ -167,7 +167,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=68e447e6c3" defer></script>
 <script src="data/MARGIN_DATA.js?v=f59ffd2d07" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=ccaa4c2e78" defer></script>
-<script src="data/FUTURES_REALTIME.js?v=acb6052d99" defer></script>
+<script src="data/FUTURES_REALTIME.js?v=5247de771b" defer></script>
 <script src="data/BOND_FUTURES.js?v=cd9e138c89" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=8c2979c9eb" defer></script>
 <script src="data/IPO_DATA.js?v=37e8c3389e" defer></script>
@@ -215,7 +215,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=14f24d32f0" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=b2cf8290bf" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=4eb96150f9" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=348f937bfb" defer></script>
@@ -1394,7 +1394,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_DAILY_MONITOR.js?v=e4f24d79d2" defer></script>
 <script src="data/TOP10_DAILY.js?v=5cfae2aa10" defer></script>
 <!-- 🆕 2026-11-07 主人令①：做T空间（数据源 STOCK_QUOTE 今日high/low，真实日内空间） -->
-<script src="data/DO_T_SPACE.js?v=bc836758a8" defer></script>
+<script src="data/DO_T_SPACE.js?v=1cd922aa19" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=c59a1a1a03" defer></script>
 <script src="data/WEEKEND_RUN.js?v=a1da7bec5a" defer></script>
@@ -1407,11 +1407,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EQBOND_ATTRACTION.js?v=d09748bf82" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=4a2d079714" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=4c1f9da77c" defer></script>
-<script src="data/HB_XIAOJIU.js?v=bbaa5d6b0f" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=f065b806dd" defer></script>
-<script src="data/HEALTH_CHECK.js?v=019dfe0331" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=c16c947dee" defer></script>
+<script src="data/RUNNER_STATUS.js?v=456faa7dc0" defer></script>
+<script src="data/HB_XIAOJIU.js?v=ad42d312b7" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=4da327f567" defer></script>
+<script src="data/HEALTH_CHECK.js?v=f8203cf74e" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=73625f0877" defer></script>
     <!-- 🌊 2026-11-22 主人令：康波周期观测卡（中国经济 × A股）数据源，gen_kondratiev.py 真实计算；2026-11-22 二次令迁至「观测平台>未来预测」第③层 -->
     <script src="data/KONDRATIEV.js?v=3f6bea8c42" defer></script>
     <!-- 💰 2026-11-22 主人令：A股现金流质量榜数据源，gen_cashflow_quality.py 真实计算；放板块技术研判卡下方 -->
@@ -1421,7 +1421,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 📊 2026-11-23 10:00 主人打包令·任务B：现金流质量榜回测数据源，gen_cashflow_quality_backtest.py 点位重建 2023Q1~2026Q3 真实回测；卡位任务A下方 -->
     <script src="data/CASHFLOW_QUALITY_BACKTEST.js?v=a50d25988f" defer></script>
     <!-- 🔬 2026-11-23 主人令：分型×共振回测观测卡数据源，gen_fractal_confluence.py 2005→今真实回测；放暂未上架·观测类（现金流质量榜卡下方） -->
-    <script src="data/FRACTAL_CONFLUENCE.js?v=cf2a51d52a" defer></script>
+    <script src="data/FRACTAL_CONFLUENCE.js?v=f5fabfcf6c" defer></script>
     <!-- ⚠️ 2026-11-26 主人令：量价背离独立卡已删（信号并入「综合研判 → 别碰」行），
          前端不再注入 data/VOLUME_DIVERGENCE.js；raw_data/volume_divergence.json 仍由算法链产出，
          供 algorithms/gen_verdict.py 合成「别碰」提示。 -->
@@ -2130,7 +2130,7 @@ window.STRATEGY_WALKFORWARD = {
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=2ba5409ab6" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=283edca7c5" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=73f24a60b8" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=cb57c0541a" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=68ce8186fd" defer></script>
