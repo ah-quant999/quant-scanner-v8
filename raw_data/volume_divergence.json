@@ -1,9 +1,9 @@
 {
- "update_time": "2026-11-27 10:30:52",
+ "update_time": "2026-11-27 11:44:35",
  "data_date": "2026-11-23",
  "universe": {
-  "total": 820,
-  "scanned": 798
+  "total": 980,
+  "scanned": 954
  },
  "signal": "收盘创20日新高 且 5日均量<0.85×20日均量（量价背离·缩量新高）",
  "hits": [
@@ -83,6 +83,21 @@
    }
   },
   {
+   "code": "001206",
+   "name": "依依股份",
+   "case": false,
+   "price": 17.17,
+   "above_ma20": true,
+   "vol_ratio": 0.839,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-09-21",
+    "days_ago": 0,
+    "vol_ratio": 0.839
+   }
+  },
+  {
    "code": "300747",
    "name": "锐科激光",
    "case": false,
@@ -125,6 +140,21 @@
     "date": "2026-11-18",
     "days_ago": 3,
     "vol_ratio": 0.824
+   }
+  },
+  {
+   "code": "002862",
+   "name": "实丰文化",
+   "case": false,
+   "price": 15.06,
+   "above_ma20": true,
+   "vol_ratio": 1.949,
+   "off_high20": -1.63,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-08-28",
+    "days_ago": 3,
+    "vol_ratio": 0.754
    }
   },
   {
@@ -188,6 +218,36 @@
    }
   },
   {
+   "code": "601601",
+   "name": "中国太保",
+   "case": false,
+   "price": 32.98,
+   "above_ma20": true,
+   "vol_ratio": 0.955,
+   "off_high20": 0.0,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-16",
+    "days_ago": 4,
+    "vol_ratio": 0.806
+   }
+  },
+  {
+   "code": "605499",
+   "name": "东鹏饮料",
+   "case": false,
+   "price": 112.6,
+   "above_ma20": true,
+   "vol_ratio": 0.97,
+   "off_high20": -4.08,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.774
+   }
+  },
+  {
    "code": "600887",
    "name": "伊利股份",
    "case": false,
@@ -233,6 +293,21 @@
    }
   },
   {
+   "code": "600660",
+   "name": "福耀玻璃",
+   "case": false,
+   "price": 57.08,
+   "above_ma20": true,
+   "vol_ratio": 1.163,
+   "off_high20": -1.92,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.828
+   }
+  },
+  {
    "code": "300703",
    "name": "创源股份",
    "case": false,
@@ -260,6 +335,21 @@
     "date": "2026-10-21",
     "days_ago": 4,
     "vol_ratio": 0.85
+   }
+  },
+  {
+   "code": "002626",
+   "name": "金达威",
+   "case": false,
+   "price": 16.7,
+   "above_ma20": true,
+   "vol_ratio": 0.531,
+   "off_high20": -1.53,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-08-28",
+    "days_ago": 5,
+    "vol_ratio": 0.699
    }
   },
   {
