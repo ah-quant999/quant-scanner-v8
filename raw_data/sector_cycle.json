@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 05:56:13",
+  "update_time": "2026-11-27 09:30:38",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 24,
       "peak": 25,
       "peak_date": "10/26",
-      "total": 185,
+      "total": 184,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 83,
       "peak_date": "11/04",
-      "total": 1442,
+      "total": 1427,
       "ongoing": true
     },
     {
@@ -63,7 +63,7 @@
       "hot_days": 27,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 306,
+      "total": 301,
       "ongoing": true
     },
     {
@@ -76,20 +76,20 @@
       "hot_days": 28,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 470,
+      "total": 465,
       "ongoing": true
     },
     {
       "sector": "消费电子",
       "start": "10/19",
-      "end": "11/27",
+      "end": "11/26",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 29,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 28,
       "peak": 19,
       "peak_date": "11/10",
-      "total": 279,
+      "total": 274,
       "ongoing": true
     },
     {
@@ -186,27 +186,27 @@
     {
       "sector": "白酒消费",
       "start": "11/25",
-      "end": "11/27",
+      "end": "11/26",
       "start_idx": 27,
-      "end_idx": 29,
-      "days": 3,
-      "hot_days": 3,
+      "end_idx": 28,
+      "days": 2,
+      "hot_days": 2,
       "peak": 6,
       "peak_date": "11/25",
-      "total": 16,
+      "total": 11,
       "ongoing": true
     },
     {
       "sector": "半导体",
       "start": "11/26",
-      "end": "11/27",
+      "end": "11/26",
       "start_idx": 28,
-      "end_idx": 29,
-      "days": 2,
-      "hot_days": 2,
+      "end_idx": 28,
+      "days": 1,
+      "hot_days": 1,
       "peak": 3,
       "peak_date": "11/26",
-      "total": 6,
+      "total": 3,
       "ongoing": true
     }
   ]
