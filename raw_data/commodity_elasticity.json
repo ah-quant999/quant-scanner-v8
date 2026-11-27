@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 16:41:22",
+  "update_time": "2026-11-27 16:41:16",
   "data_date": "2026-11-27",
   "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + Sina免费外盘期货(LME/NYMEX/CBOT共15个，westock-mcp不可用/缓存陈旧时兜底) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 3,
@@ -134,15 +134,15 @@
       "unit": "$/oz",
       "exchange": "NYMEX",
       "available": true,
-      "current_price": 1349.56,
-      "price_date": "2026-11-27 16:41:15",
+      "current_price": 1350.5,
+      "price_date": "2026-11-27 16:40:52",
       "source": "sina-futures(纽约铂金)",
       "baseline_30d": 1281.083,
       "baseline_label": "30日z-score",
-      "dev_pct": 5.35,
+      "dev_pct": 5.42,
       "is_hot": false,
-      "hot_basis": "z-score=1.78(σ=38.481, μ=1281.083)",
-      "z_score": 1.78,
+      "hot_basis": "z-score=1.804(σ=38.481, μ=1281.083)",
+      "z_score": 1.804,
       "ma30": 1281.083,
       "std30": 38.481,
       "use_zscore": true,
@@ -151,21 +151,21 @@
           "code": "600459",
           "name": "贵研铂业",
           "business_pct": 0.7,
-          "elasticity_pct": 186.9,
+          "elasticity_pct": 189.42,
           "note": "铂系材料龙头"
         },
         {
           "code": "601168",
           "name": "西部矿业",
           "business_pct": 0.15,
-          "elasticity_pct": 40.05,
+          "elasticity_pct": 40.59,
           "note": "铂族金属伴生"
         },
         {
           "code": "002340",
           "name": "格林美",
           "business_pct": 0.1,
-          "elasticity_pct": 26.7,
+          "elasticity_pct": 27.06,
           "note": "贵金属回收含铂"
         }
       ]
@@ -316,15 +316,15 @@
       "unit": "$/吨",
       "exchange": "LME",
       "available": true,
-      "current_price": 2864.15,
-      "price_date": "2026-11-27 16:41:17",
+      "current_price": 2863.7,
+      "price_date": "2026-11-27 16:40:52",
       "source": "sina-futures(伦铝)",
       "baseline_30d": 2794.372,
       "baseline_label": "30日z-score",
-      "dev_pct": 2.5,
+      "dev_pct": 2.48,
       "is_hot": false,
-      "hot_basis": "z-score=1.629(σ=42.83, μ=2794.372)",
-      "z_score": 1.629,
+      "hot_basis": "z-score=1.619(σ=42.83, μ=2794.372)",
+      "z_score": 1.619,
       "ma30": 2794.372,
       "std30": 42.83,
       "use_zscore": true,
@@ -333,28 +333,28 @@
           "code": "000807",
           "name": "云铝股份",
           "business_pct": 0.9,
-          "elasticity_pct": 219.92,
+          "elasticity_pct": 218.56,
           "note": "水电铝低碳"
         },
         {
           "code": "601600",
           "name": "中国铝业",
           "business_pct": 0.85,
-          "elasticity_pct": 207.7,
+          "elasticity_pct": 206.42,
           "note": "央企电解铝龙头"
         },
         {
           "code": "000933",
           "name": "神火股份",
           "business_pct": 0.65,
-          "elasticity_pct": 158.83,
+          "elasticity_pct": 157.85,
           "note": "煤电铝一体"
         },
         {
           "code": "600219",
           "name": "南山铝业",
           "business_pct": 0.55,
-          "elasticity_pct": 134.39,
+          "elasticity_pct": 133.57,
           "note": "高端铝加工"
         }
       ]
@@ -365,15 +365,15 @@
       "unit": "$/吨",
       "exchange": "LME",
       "available": true,
-      "current_price": 1880.9,
-      "price_date": "2026-11-27 16:41:17",
+      "current_price": 1880.86,
+      "price_date": "2026-11-27 16:40:53",
       "source": "sina-futures(伦铅)",
       "baseline_30d": 1847.956,
       "baseline_label": "30日z-score",
       "dev_pct": 1.78,
       "is_hot": false,
-      "hot_basis": "z-score=1.464(σ=22.51, μ=1847.956)",
-      "z_score": 1.464,
+      "hot_basis": "z-score=1.462(σ=22.51, μ=1847.956)",
+      "z_score": 1.462,
       "ma30": 1847.956,
       "std30": 22.51,
       "use_zscore": true,
@@ -382,14 +382,14 @@
           "code": "600497",
           "name": "驰宏锌锗",
           "business_pct": 0.3,
-          "elasticity_pct": 65.88,
+          "elasticity_pct": 65.79,
           "note": "铅锌冶炼"
         },
         {
           "code": "000603",
           "name": "盛达资源",
           "business_pct": 0.25,
-          "elasticity_pct": 54.9,
+          "elasticity_pct": 54.82,
           "note": "铅锌银多金属"
         }
       ]
