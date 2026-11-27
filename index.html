@@ -8427,7 +8427,7 @@ window.__renderIndexObserve = function(){
         <tr><td>v8_cn_fetch_cloud_selfhosted</td><td>工作日 08:25 / 17:20</td><td><span class="status-dot s-ok"></span>self-hosted cn</td><td>中国数据抓取 cn-IP 硬约束兜底（盘前/盘后各一档 · 东财 push2delay 系）</td></tr>
         <tr><td>v8_cn_fetch_cloud_hosted</td><td>工作日 20:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取（云端 hosted 兜底）</td></tr>
         <tr><td>v8_cn_fetch_experiments</td><td>工作日 16:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>实验卡数据抓取（暂未上架区）</td></tr>
-        <tr><td>v8_stock_quote_refresh</td><td>工作日 15:30-21:30 每10分（盘后档）</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>个股行情轻量刷新（STOCK_QUOTE·2026-11-26 已退出盘中）</td></tr>
+        <tr><td>v8_stock_quote_refresh</td><td>工作日 16:00 / 20:00 两档（盘后）</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>个股行情轻量刷新（STOCK_QUOTE·2026-11-26 已退出盘中）</td></tr>
         <tr><td>v8_risk_gauge</td><td>工作日 盘中每30分+盘后每小时</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>实时风险温度计（RISK_GAUGE）</td></tr>
         <tr><td>v8_daily_audit</td><td>每日 22:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>每日全站审核（22:30 备份前）</td></tr>
         <tr><td>v8_t1_guard</td><td>周六 08:30/09:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>T+1 守门（8:30 兜底 + 9:30 巡检）</td></tr>
@@ -8435,7 +8435,7 @@ window.__renderIndexObserve = function(){
         <tr><td>v8_cache_buster_reconcile</td><td>每 15 分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>缓存戳实时对齐（防覆盖对账）</td></tr>
         <tr><td>v8_cleanup</td><td>周日 23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>云端周日清理</td></tr>
         <tr><td>cloud_weekly_cleanup</td><td>周六 21:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>云端每周清理</td></tr>
-        <tr><td>runner_health_alert</td><td>工作日 13/15/17/19/21 点 · 周末 08-20 点每 2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
+        <tr><td>runner_health_alert</td><td>每 3 小时（单条 cron · 2026-11-27 合并）</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>v8_intraday_liveness_guard</td><td>工作日 09:00-15:30 每 30 分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>盘中链路存活监控（intraday_slot+cn_fetch_cloud 近90分无 success 开 Issue，恢复自动关闭）</td></tr>
         <tr><td>CN runner1号机-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
         
@@ -12907,7 +12907,7 @@ function drawUpDownChart(){
 
           {name:'行业树图·细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', maturity:'盘中实时', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'行业涨跌 treemap'},
           {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时(每30分)', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'盘中预警信号'},
-          {name:'个股行情', source:'STOCK_QUOTE', freq:'盘后15:30-21:30', slots:['15:30'], note:'个股报价·盘后每10分（2026-11-26 主人令退出盘中）'},
+          {name:'个股行情', source:'STOCK_QUOTE', freq:'盘后两档 16:00/20:00', slots:['16:00','20:00'], note:'个股报价·2026-11-26 主人令退出盘中，只留盘后两档'},
           {name:'ETF资金热度', source:'ETF_INTRADAY_HEAT', freq:'盘中实时 T+0', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'ETF 资金热度'},
           {name:'平均股价(880003口径)', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A算术平均·均线'},
 
@@ -18096,11 +18096,32 @@ window.__renderComprehensiveSynthesis = function(){
   try{
     var _cf = document.getElementById('comprehensiveFresh');
     if(_cf){
-      var _tsc = [];
-      if(JD && JD.update_time) _tsc.push(JD.update_time);
-      if(IA && IA.update_time) _tsc.push(IA.update_time);
-      var _cts = _tsc.slice().sort().reverse()[0] || '';
-      if(_cts && typeof _uBadge === 'function'){ _cf.innerHTML = _uBadge('auto','',_cts,'','盘后'); }
+      // 🔴 2026-11-27 主人令（图1「更新于 今日 14:45 · 盘后档数据，盘中不刷新」自相矛盾）根治：
+      //   ① 删写死的第 5 参 pageSlot='盘后'。本卡数据链并非盘后专属：
+      //      JUDGMENT_DATA 在 cloud_fetch_v8.py 登记为 "premarket,intraday,post_close" 三档，
+      //      V8_VERDICT 由 update_v8.py→gen_verdict.py 每次重建（盘中每 2h 一轮），
+      //      14:45 这批就是 v8_intraday_precise_sched 的午后档 cron（UTC 6:45）。数据是盘中的，
+      //      标签却写「盘后档数据，盘中不刷新」⇒ 主人无法判断这卡到底几点更新。改成 'auto'，
+      //      由 _slotByTs 按真实时点判（14:45→盘中 / 15:30~17:00→盘后 / 17:00 后→今日盘后）。
+      //   ② 主时间取 V8_VERDICT（卡面「今天做什么/仓位上限/加仓条件」的唯一来源），
+      //      判定(JD)/避雷(IA) 改用 sub 小字分列 —— 原实现取 max() 会让胶囊比最旧那块更新，
+      //      属时间虚高（盘中 V8_VERDICT 还是上一轮 2h 档，胶囊却显示判定链的 14:45）。
+      var _VD = window.V8_VERDICT || null;
+      var _vTs = (_VD && _VD.update_time) ? String(_VD.update_time) : '';
+      var _jTs = (JD && JD.update_time) ? String(JD.update_time) : '';
+      var _iTs = (IA && IA.update_time) ? String(IA.update_time) : '';
+      var _cts = _vTs || _jTs || _iTs || '';
+      var _subs = [];
+      function _shortTs(x, base){
+        if(!x) return '';
+        try{
+          if(x.slice(0,10) === String(base).slice(0,10)) return x.slice(11,16);
+          return x.slice(5,16);
+        }catch(e){ return x; }
+      }
+      if(_jTs && _jTs !== _cts) _subs.push('判定 ' + _shortTs(_jTs, _cts));
+      if(_iTs && _iTs !== _cts) _subs.push('避雷 ' + _shortTs(_iTs, _cts));
+      if(_cts && typeof _uBadge === 'function'){ _cf.innerHTML = _uBadge('auto','',_cts, _subs.join(' &#183; '), ''); }
       else { _cf.innerHTML = '&#x2014;'; }
     }
   }catch(e){}
