@@ -217,9 +217,7 @@ window.__domReadyFns=[];
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
     <script src="data/FRESHNESS_STATUS.js?v=679ff6e0dc" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=75cb7a4769" defer></script>
-    <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
-    <script src="data/CONCEPT_ETF_MAP.js?v=348f937bfb" defer></script>
-    <!-- 🆕 2026-11-21 主人令「因子审计·一劳永逸」：backtest_expectancy 回测产物发布为 data/*.js，
+    <!-- 🗑 2026-11-27：CONCEPT_ETF_MAP 注入已停（卡片下线，前端无消费方）；data/CONCEPT_ETF_MAP.js 文件保留备查。 -->    <!-- 🆕 2026-11-21 主人令「因子审计·一劳永逸」：backtest_expectancy 回测产物发布为 data/*.js，
          消除因子计分卡 P2 显示层硬表镜像滞后（09-20 镜像 vs 11-21 实测：机构变红/上涨趋势方向翻转+异号弃用）；
          ?v=0 由 cache-bot/链尾缓存戳步骤接管 -->
     <script src="data/BACKTEST_EXPECTANCY.js?v=cd89b6008e" defer></script>
@@ -2428,16 +2426,7 @@ window.STRATEGY_WALKFORWARD = {
     </div>
 
     <!-- 今日解禁（2026-08-30：移到今日事件，当日无解禁也展示） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔓</span>今日解禁 · <span class="fresh" id="todayEventRestrictedTime">—</span></h3>
-      <div id="todayEventRestrictedBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-    </div>
-
-    <!-- 今日业绩预告（2026-08-30：移到今日事件，当日无预告也展示） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>今日业绩预告 · <span class="fresh" id="todayEventForecastTime">—</span></h3>
-      <div id="todayEventForecastBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-    </div>
+    
     <script>
     /* 注册渲染函数：v8CardHeader 与 _buildJudgmentEnvHTML 定义在后面脚本块，
        此处只注册、不执行，由末尾 initCardBadges / switchSec-td 统一触发。 */
@@ -2550,14 +2539,29 @@ window.STRATEGY_WALKFORWARD = {
 
     <!-- 投资避雷针·新闻语料量化（2026-11-05 主人令：自「暂未上架·综合研判」区迁入今日事件页，置于打新速览卡下方；
          渲染仍走 window.__renderInvestAvoid（数据缺失时 600ms×40 自愈重试），switchSec('td') 进入时触发） -->
-    <div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #ff5252">
-      <h3><span class="ic">&#x1F6AB;</span>投资避雷针 &#183; 新闻语料量化（轻量） · <span class="fresh" id="investAvoidFresh">&#x2014;</span></h3>
+        <div class="card v8grp" id="grpRisk" style="border-left:4px solid #f59e0b;margin-bottom:16px">
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">⚠️</span>今日风险清单 · 盘前扫雷 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d">折叠 4 张 · 开盘前过一遍</span></h3>
+      <div class="grp-tabs">
+        <button class="grp-tab active" onclick="v8GrpTab('grpRisk',0)">🔓 今日解禁</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpRisk',1)">📈 业绩预告</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpRisk',2)">🚫 投资避雷针</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpRisk',3)">📅 重要事件日历</button>
+      </div>
+      <div class="grp-pane active">
+        <h3><span class="ic">🔓</span>今日解禁 · <span class="fresh" id="todayEventRestrictedTime">—</span></h3>
+      <div id="todayEventRestrictedBody" style="font-size:13px;color:var(--txt)">加载中…</div>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">📈</span>今日业绩预告 · <span class="fresh" id="todayEventForecastTime">—</span></h3>
+      <div id="todayEventForecastBody" style="font-size:13px;color:var(--txt)">加载中…</div>
+      </div>
+      <div class="grp-pane">
+              <div id="investAvoidCard"><h3><span class="ic">&#x1F6AB;</span>投资避雷针 &#183; 新闻语料量化（轻量） · <span class="fresh" id="investAvoidFresh">&#x2014;</span></h3>
       <div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div>
-    </div>
-
-    <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
-    <div class="card">
-      <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
+      </div>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
       <!-- 🛡 2026-08-31 月份回看：◀ 看旧月（归档）/ ▶ 回本月 -->
       <div class="cal-meta" style="display:flex;align-items:center;gap:10px;margin:4px 0 10px;flex-wrap:wrap">
         <button class="cal-nav-btn" id="v8calPrevBtn" onclick="__v8calPrev()" title="上个月（回看归档）">◀</button>
@@ -2569,6 +2573,7 @@ window.STRATEGY_WALKFORWARD = {
       <div style="margin-top:20px">
         <div style="font-weight:800;margin-bottom:14px;font-size:15px">🎨 色块标注说明</div>
         <div class="v8cal-legend-grid" id="v8callegend"></div>
+      </div>
       </div>
     </div>
   </section>
@@ -3035,24 +3040,49 @@ window.STRATEGY_WALKFORWARD = {
           </div>
 
           <!-- 亚太市场概览（2026-08-30：实时数据补位） -->
-          <div class="card" style="margin-bottom:16px">
-            <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
+              <div class="card v8grp" id="grpEnv" style="border-left:4px solid #41c9ff;margin-bottom:16px">
+      <style>
+        /* 🗂 2026-11-27 主人令：折叠组沿用「因子中心」tab 范式——同页同时段、同用途的确认级卡片叠成一张卡 */
+        .v8grp .grp-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px}
+        .v8grp .grp-tab{font-size:12px;font-weight:600;color:var(--sub);background:transparent;border:1px solid transparent;border-radius:8px;padding:5px 11px;cursor:pointer;transition:all .15s}
+        .v8grp .grp-tab:hover{color:var(--txt);background:var(--bg2)}
+        .v8grp .grp-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+        .v8grp .grp-pane{display:none}
+        .v8grp .grp-pane.active{display:block}
+        .v8grp .grp-pane>h3{margin-top:0}
+      </style>
+      <script>
+      /* 🗂 2026-11-27：折叠组 tab 切换（通用；切换后广播 resize 供图表重排） */
+      window.v8GrpTab = function(gid, idx){
+        var g = document.getElementById(gid); if(!g) return;
+        var tabs = g.querySelectorAll(':scope > .grp-tabs > .grp-tab');
+        var panes = g.querySelectorAll(':scope > .grp-pane');
+        for(var i=0;i<tabs.length;i++){ if(i===idx) tabs[i].classList.add('active'); else tabs[i].classList.remove('active'); }
+        for(var j=0;j<panes.length;j++){ if(j===idx) panes[j].classList.add('active'); else panes[j].classList.remove('active'); }
+        try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+      };
+      </script>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌏</span>环境确认 · 外盘与利率 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#41c9ff22;color:#41c9ff;border:1px solid #41c9ff4d">折叠 3 张 · 只确认环境</span></h3>
+      <div class="grp-tabs">
+        <button class="grp-tab active" onclick="v8GrpTab('grpEnv',0)">🌏 亚太市场概览</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpEnv',1)">📈 期指主力</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpEnv',2)">🏦 国债期货 · 利率</button>
+      </div>
+      <div class="grp-pane active">
+        <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
             <div id="overseasBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-          </div>
-
-          <!-- 期指主力合约 · 情绪方向（2026-08-31：移回实时数据页，盘中每30分刷新） -->
-          <div class="card" style="margin-bottom:16px">
-            <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
             <div id="futuresMainBody" style="font-size:13px;color:var(--txt)">加载中…</div>
             <div class="note note-insight">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
-          </div>
-
-          <!-- 🏦 国债期货 · 利率预期罗盘（2026-11-17 主人令「TL 要接入，结合给判断」；盘中每30分 cn runner） -->
-          <div class="card" style="margin-bottom:16px">
-            <h3><span class="ic">🏦</span>国债期货 · 利率预期罗盘 · <span class="fresh" id="bondFutTime">—</span></h3>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">🏦</span>国债期货 · 利率预期罗盘 · <span class="fresh" id="bondFutTime">—</span></h3>
             <div id="bondFutBody" style="font-size:13px;color:var(--txt);">加载中…</div>
             <div class="note note-insight">📌 国债期货 = 长端利率 / 避险情绪代理（TL=30年期）。价涨=收益率下行=宽松/避险预期升温 → 权益风险偏好趋于谨慎（股债跷跷板）。四品种 TL(30Y)/T(10Y)/TF(5Y)/TS(2Y) 用实时行情；长短端涨跌差看收益率曲线牛陡/熊平。仅宏观环境研判，不直接改选股排序。红涨绿跌。</div>
-          </div>
+      </div>
+    </div>
     </details>
 
     <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
@@ -3134,8 +3164,14 @@ window.STRATEGY_WALKFORWARD = {
           卡壳现由 renderDelisted 顶部生成，见该函数 2026-11-18 插入点。） -->
 
     <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🗺️</span>概念资金热力图 · <span class="fresh" id="conceptMapTime">—</span></h3>
+        <div class="card v8grp" id="grpMap" style="border-left:4px solid #c084fc;margin-bottom:16px">
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🗺️</span>资金地图 · 概念 / 行业 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#c084fc22;color:#c084fc;border:1px solid #c084fc4d">折叠 2 张 · 同一份资金两个视角</span></h3>
+      <div class="grp-tabs">
+        <button class="grp-tab active" onclick="v8GrpTab('grpMap',0)">🗺️ 概念资金热力</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpMap',1)">🏭 行业树图</button>
+      </div>
+      <div class="grp-pane active">
+        <h3><span class="ic">🗺️</span>概念资金热力图 · <span class="fresh" id="conceptMapTime">—</span></h3>
       <div id="conceptTreemap" style="min-height:260px;overflow:visible"><div class="ipo-empty">加载中…</div></div>
       <div style="display:flex;gap:12px;font-size:11px;color:var(--dim);margin-top:8px;align-items:center;flex-wrap:wrap">
         <span>方块大小随 |主力净流入|（估算值）递增</span>
@@ -3143,150 +3179,14 @@ window.STRATEGY_WALKFORWARD = {
         <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:var(--down);border-radius:2px"></span> 跌</span>
       </div>
       <!-- 2026-11-08 主人令：口径/数据来源披露已从前端移除，统一记入逻辑详解页（对应章节：主力净额·资金流类） -->
-    </div>
-
-    <script>
-    /* 概念资金热力图渲染（CONCEPT_RANKING.js → 行业树图同款 Treemap 方块） */
-    (function(){
-      const $=id=>document.getElementById(id);
-      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
-          // 2026-09-14 owner: unified sign writer (single source of truth).
-          //   format abs value first, then prepend sign once => structurally impossible to emit "++".
-          function fmtSigned(v){
-            if(v==null||isNaN(v)) return '--';
-            var n=Number(v), a=Math.abs(n).toFixed(2);
-            return (n>0?'+':(n<0?'-':''))+a;
-          }
-      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-      function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-      function renderConceptTreemap(){
-        const d=window.CONCEPT_RANKING;
-        const el=$('conceptTreemap');
-        if(!el) return;
-        // 🛡 2026-08-26 一劳永逸根因修复：原逻辑按"访客本地时钟<09:25"就清空显示，
-        //   等于从午夜起每个访客各自清空 → 与"开盘前和大家一起清空"彻底脱钩。
-        //   现改为【事件驱动】：只在后端真正做了盘前清空(premarket_cleared/no_data)或数据为空时才显示占位；
-        //   清空时机完全由后端在开盘前集合竞价窗口(09:15–09:30)统一触发一次，全站访客看到的状态完全一致。
-        var _cleared = !!(d && (d.premarket_cleared===true || d.no_data===true));
-        if(_cleared || !d || !d.items || !d.items.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 概念资金热力图（'+( _cleared ? '盘前清空，开盘后更新' : '暂无数据' )+'）</div>';
-          const _mt=$('conceptMapTime');
-          if(_mt) _mt.innerHTML = '<span style="font-size:11px;color:var(--dim)">'+( _cleared ? '盘前 · 数据待刷新' : '—' )+'</span>';
-          return;
-        }
-        // 过滤掉资金为0的无效项，避免全部等高
-        const items=d.items.filter(it=>Math.abs(it.net)>0.001||Math.abs(it.chg)>0.001)
-                           .sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
-        if(!items.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 概念板块资金数据待更新（盘前自动清空，开盘后刷新）</div>';
-          return;
-        }
-        const maxNet=Math.abs(items[0].net)||1; // 2026-09-15 主人令：压缩标度（幂 0.35），小块不再缩成 44px，整体大气如行业树图
-        let h='<div style="display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;padding:4px">';
-        items.forEach(it=>{
-          const pct=it.chg||0;
-          const up=pct>0, down=pct<0;
-          const bg=up?'#FF5C70':down?'#16C784':'var(--dim)';
-          const txt=(up||down)?'#fff':'var(--txt)';
-          const area=Math.pow(Math.abs(it.net)/maxNet, 0.35); // 2026-09-15 主人令：幂 0.35 压缩标度，块块都大气
-          const px=Math.max(64, Math.round(area*130)); // 最小64（原44）·最大130
-          // 2026-09-14 owner: match the industry treemap font sizes (was 2px smaller overall)
-          let fz=12, titleFz=13;
-          if(px>110){ fz=13; titleFz=15; }
-          else if(px>80){ fz=11; titleFz=13; }
-          else if(px>55){ fz=10; titleFz=12; }
-          else { fz=9; titleFz=11; }
-          const netTxt=fmtSigned(it.net);   // 2026-09-14 single-source sign writer
-          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt+';border-radius:10px;padding:8px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;line-height:1.25;box-shadow:0 1px 5px rgba(0,0,0,.35);overflow:hidden;cursor:default">';
-          h+='<div style="font-weight:700;font-size:'+titleFz+'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">'+esc(it.name)+'</div>';
-          h+='<div style="font-size:'+fz+'px;opacity:.85;white-space:nowrap">'+fmtSigned(pct)+'%</div>';   // 2026-09-14 nowrap + fmtSigned
-          if(px>=55){
-            h+='<div style="font-size:'+(fz-1)+'px;opacity:.75;white-space:nowrap;max-width:100%">'+netTxt+'</div>';   // 2026-09-14 nowrap: fixes magnitude clipping
-          }
-          h+='</div>';
-        });
-        h+='</div>';
-        el.innerHTML=h;
-        const mt=$('conceptMapTime');
-        // 2026-09-13 主人令：概念资金热力图 freq='盘中每30分'，时段固定「盘中」。
-        if(mt) mt.innerHTML = _uBadge('盘中','短线',d.update_time);
-      }
-      if(document.readyState==='loading')
-        document.addEventListener('DOMContentLoaded', renderConceptTreemap);
-      else renderConceptTreemap();
-      window._renderConceptTreemap=renderConceptTreemap;
-    })();
-    </script>
-
-    <!-- 2026-08-30 删除：renderMonthCal / renderHistoryBar 等旧 LHB 视图脚本；DOM 容器已不存在，sec-rc 下新日历接管。 -->
-
-    <!-- 2026-08-30 删除：旧 LHB 历史条/分析卡脚本；DOM 容器已不存在，由 sec-rc 新日历接管。 -->
-
-    <script>
-    /* ===== 共振日历 · 公共数据源（LHB_HISTORY 优先，降级 LHB_DATA 当日） ===== */
-    (function(){
-      function toIso(d){
-        d=String(d||'');
-        return d.length===8 ? (d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)) : d;
-      }
-      // 返回 [{iso, stocks, summary}]，按日期升序
-      // 按日期合并 LHB_HISTORY + LHB_DATA；LHB_DATA（当日最新）优先级更高，解决某日在 HISTORY 里空/缺失时"时有时无"。
-      window._rcDays=function(){
-        var map={};
-        var H=window.LHB_HISTORY;
-        if(H && typeof H==='object'){
-          Object.keys(H).filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).forEach(function(k){
-            var d=H[k];
-            if(!d || d.trading===false) return;
-            map[k]={iso:k, stocks:d.stocks||[], summary:d.summary||{}};
-          });
-        }
-        var L=window.LHB_DATA;
-        if(L && L.stocks && L.stocks.length){
-          var iso=toIso(L.date);
-          map[iso]={iso:iso, stocks:L.stocks, summary:L.summary||{}};
-        }
-        return Object.keys(map).sort().map(function(k){ return map[k]; });
-      };
-      // 抽取某日北向席位明细
-      window._rcNorthOf=function(stocks){
-        var arr=[];
-        (stocks||[]).forEach(function(s){
-          var seat=s.seats && s.seats['北向'];
-          if(!seat) return;
-          var b=seat.buy||0, sl=seat.sell||0;
-          if(!b && !sl) return;
-          arr.push({code:s.code, name:s.name, buy:b, sell:sl, net:b-sl, pct:s.pct||0, inst:s.inst_net_万||0});
-        });
-        return arr;
-      };
-
-      // 🛡 2026-09-17 一劳永逸：共振日历时间胶囊改显示「数据日期」（最新有数据的交易日），
-      //   不再用 _uBadge 的「抓取时刻」(LHB_DATA.update_time)。
-      //   旧逻辑：badge 用 LHB_DATA.update_time（=今日 16:18 抓取时刻），但当日龙虎榜 ~17:30 才发布
-      //   → 抓到的是昨日数据，于是出现「写着今天16点多却没(今天)数据」的悖论（主人 09-17 实锤）。
-      //   2026-09-04 曾删过同名函数（因带「今日未发布」措辞误导）；此处仅保留「数据日期」纯事实标签，
-      //   不含任何「未发布」暗示——LHB 当日 17:30 后才发布本属正常，标签只陈述最新数据落在哪天。
-      window._rcDataDateBadge=function(){
-        var days=window._rcDays()||[];
-        if(!days.length) return '<span style="font-size:11px;color:var(--dim)">数据待加载</span>';
-        var last=String(days[days.length-1].iso); // "2026-09-16" 或 "20260916"
-        var disp = last.length===10 ? last
-                 : (last.length===8 ? (last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8)) : last);
-        return '<span title="龙虎榜数据最新交易日（非文件抓取时间）" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#41c9ff;border:1px solid rgba(65,201,255,0.63);white-space:nowrap">📅 数据日期 '+disp+'</span>';
-      };
-    })();
-    </script>
-
-    <!-- 2026-08-30 删除：旧 LHB 历史条/分析卡脚本（含已下线大牛股猎手 LHB 视图）；DOM 容器已不存在，由选股策略/已下架区域新实现接管。 -->
-
-    <!-- 行业树图 · 细分赛道（盘中实时数据源 SECTOR_FUND_FLOW，置于实时数据页最下方） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
       <div id="industryTreemap" style="min-height:260px;overflow:visible"></div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center">
         <span>方块=行业/概念板块</span>
         <span>颜色=涨跌（红涨绿跌）&nbsp; 面积≈|当日涨幅%|</span>
+      </div>
       </div>
     </div>
 
@@ -3405,7 +3305,6 @@ function fmtSigned(v){
               行业/概念净额榜与 AI市场速览重复，已改由「AI市场速览」承载
               （概念行前 5 + 新建「行业资金」行，见 algorithms/gen_market_brief.py），此处不再重复展示。
               注意：renderSector() 已同步删除 Block1 渲染与 sfBlock1 依赖，勿再引入。 -->
-    <div class="card" style="margin-bottom:16px">
     <div class="card" id="sectorFundTrendCard" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>板块资金趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
 
@@ -3462,22 +3361,7 @@ function fmtSigned(v){
     </div>
 
     <!-- 🆕 2026-11-08 主人令：股东增减持·结构化监控（全市场法定披露，东财 RPT_SHARE_HOLDER_INCREASE；与重要公告速览互补，非公告标题级） -->
-    <div class="card" id="shareholderChangeCard" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span style="font-size:15px;font-weight:700;color:#ef5350">&#x1F4C8; 股东增减持·结构化监控</span>
-        <span id="shcFresh" style="display:inline-flex;align-items:center">&#x2014;</span></div>
-      <div id="shareholderChangeBody"><div class="note">加载中&#x2026;</div></div>
-      <div class="note">口径：按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。增持红 / 减持绿（红涨绿跌铁律）；增持股默认仅显示前 3 只，可展开其余。</div>
-    </div>
-
-    <!-- 🆕 2026-11-08 主人令：严重异动雷达 自「暂未上架·观测类」迁入盘后数据，置于股东增减持·结构化监控卡下方（卡 DOM + __renderSevereSwing 派发见 sec-ph） -->
-    <div class="card" id="severeSwingCard" style="display:none;margin-bottom:16px;border-left:4px solid #ff5252">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span style="font-size:15px;font-weight:700;color:#ff5252">&#x1F4A5; 严重异动雷达</span>
-        <span id="severeSwingFresh" style="display:inline-flex;align-items:center">&#x2014;</span>
-        <span style="font-size:12px;color:var(--dim)">观测类 · 连板≥2 已触发 / 池内涨幅≥15% 逼近</span></div>
-      <div id="severeSwingBody"><div class="note">加载中&#x2026;</div></div>
-    </div>
+    
 
 
     <!-- 🆕 2026-11-27 主人令「把每日洞察和三通表合并，放盘后数据页；共振日历 TAB 页删除干净」：
@@ -3500,26 +3384,47 @@ function fmtSigned(v){
         <div class="note">口径：仅龙虎榜上榜个股；北向=龙虎榜北向席位，非全市场北向资金流。红涨绿跌。只做事实汇总与同向/分歧判断，不构成投资建议。</div>
       </div>
     </div>
-    </div>
 
     <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
-      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
-    </div>
-
-    <!-- 市场宽度：52周新高广度 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
+        <div class="card v8grp" id="grpObs" style="border-left:4px solid #94a3b8;margin-bottom:16px">
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌙</span>盘后观测 · 风险与位置 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:#94a3b8;border:1px solid #94a3b84d">折叠 5 张 · 状态确认级</span></h3>
+      <div class="grp-tabs">
+        <button class="grp-tab active" onclick="v8GrpTab('grpObs',0)">📊 市场宽度</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpObs',1)">⚖️ 股债性价比</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpObs',2)">🧭 IF会员持仓</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpObs',3)">🌊 严重异动</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpObs',4)">🏛 股东增减持</button>
+      </div>
+      <div class="grp-pane active">
+        <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-
-    <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（同 IF 持仓/市场宽度卡风格） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
       <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
       <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
+      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
+      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
+      </div>
+      <div class="grp-pane">
+              <div id="severeSwingCard"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:15px;font-weight:700;color:#ff5252">&#x1F4A5; 严重异动雷达</span>
+        <span id="severeSwingFresh" style="display:inline-flex;align-items:center">&#x2014;</span>
+        <span style="font-size:12px;color:var(--dim)">观测类 · 连板≥2 已触发 / 池内涨幅≥15% 逼近</span></div>
+      <div id="severeSwingBody"><div class="note">加载中&#x2026;</div></div>
+      </div>
+      </div>
+      <div class="grp-pane">
+              <div id="shareholderChangeCard"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:15px;font-weight:700;color:#ef5350">&#x1F4C8; 股东增减持·结构化监控</span>
+        <span id="shcFresh" style="display:inline-flex;align-items:center">&#x2014;</span></div>
+      <div id="shareholderChangeBody"><div class="note">加载中&#x2026;</div></div>
+      <div class="note">口径：按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。增持红 / 减持绿（红涨绿跌铁律）；增持股默认仅显示前 3 只，可展开其余。</div>
+      </div>
+      </div>
     </div>
 
 
@@ -15421,86 +15326,14 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 
   // 🛡 2026-09-02 主人令：ETF·龙头参考 独立函数 + 自愈重试（独立函数+轮询补填范式）
   //   根因：原内联在 renderUnlisted，data/*.js 为 defer 脚本，首渲时未注入即永久空卡。现抽独立函数并轮询补填。
+  // 🗑 2026-11-27 主人令：ETF·龙头参考卡已下线（证据：CONCEPT_ETF_MAP 仅 59 个冷门概念键、
+  //   matched 56/150；今日 100 个概念里只有 1 个命中映射（大数据，净流入第 56 名），行业 0/100 命中
+  //   ⇒ 卡片每天恒显示「ETF暂无映射」，属零输出卡）。数据文件保留不删（无引用即无请求）。
+  //   本函数仅保留为「自愈触发点」：板块龙头 / 涨停龙头 / 最终推荐龙头 三张卡仍靠它兜底重填。
   window._fillEtfMap = function(){
-    var cEl = document.getElementById('dbgEtfMapBody');
-    if(!cEl) return;
-    var cr = window.CONCEPT_RANKING || {};
-    var sff = window.SECTOR_FUND_FLOW || {};
-    var emap = window.CONCEPT_ETF_MAP || {};
-    var ready = ((cr.items&&cr.items.length) || (sff.sectors_in&&sff.sectors_in.length));
-    if(!ready){
-      // 🛡 自愈：数据源未就绪 → 占位 + 轮询补填（覆盖 defer 加载窗口）
-      if(!window.__etfRetryTimer){
-        window.__etfRetryN = 0;
-        window.__etfRetryTimer = setInterval(function(){
-          window.__etfRetryN++;
-          var r2 = ((window.CONCEPT_RANKING&&(window.CONCEPT_RANKING.items||[]).length) || (window.SECTOR_FUND_FLOW&&(window.SECTOR_FUND_FLOW.sectors_in||[]).length));
-          if(r2){
-            clearInterval(window.__etfRetryTimer); window.__etfRetryTimer=null; window.__etfRetryN=0;
-            try{ window._fillEtfMap(); }catch(e){}
-          } else if(window.__etfRetryN > 30){
-            clearInterval(window.__etfRetryTimer); window.__etfRetryTimer=null; window.__etfRetryN=0;
-            var dd=document.getElementById('dbgEtfMapBody'); if(dd) dd.innerHTML='<div class="ipo-empty">热点板块数据暂不可用</div>';
-          }
-        }, 600);
-      }
-      return;
-    }
-    if(window.__etfRetryTimer){ clearInterval(window.__etfRetryTimer); window.__etfRetryTimer=null; window.__etfRetryN=0; }
-    try{
-      var crItems = (cr.items||[]).slice(0,8);
-      var sffIn = (sff.sectors_in||[]).filter(function(s){return s && s.type==='行业';}).slice(0,6);
-      var rows = [];
-      var seen = {};
-      function _emapLookup(name){
-        if(!name) return null;
-        if(emap[name]) return emap[name];
-        for(var k in emap){ if(k==='update_time') continue; if(name.indexOf(k)>=0) return emap[k]; }
-        for(var k2 in emap){ if(k2==='update_time') continue; if(k2.indexOf(name)>=0) return emap[k2]; }
-        return null;
-      }
-      (crItems||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,8).forEach(function(it){
-        if(!it || !it.name) return; seen[it.name]=1;
-        rows.push({ name:it.name, net:it.net||0, chg:it.chg||0, type:'概念', map: _emapLookup(it.name) });
-      });
-      (sffIn||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,6).forEach(function(s){
-        if(!s || !s.name || seen[s.name]) return; seen[s.name]=1;
-        rows.push({ name:s.name, net:s.net||0, chg:s.chg||0, type:'行业', map: _emapLookup(s.name) });
-      });
-      if(!rows.length){ cEl.innerHTML='<div class="ipo-empty">暂无热点板块数据</div>'; }
-      else {
-        var hh='<div style="display:flex;flex-direction:column;gap:8px">';
-        rows.forEach(function(r){
-          var netCol = (r.net>=0)?'var(--up)':'var(--down)';
-          hh+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);font-size:13px;flex-wrap:wrap">';
-          hh+='  <span style="font-weight:700;color:var(--txt);min-width:96px">'+r.name+'</span>';
-          hh+='  <span style="color:'+netCol+';font-weight:700;min-width:78px">'+((r.net>=0?'+':'')+r.net.toFixed(2))+'亿</span>';
-          if(r.map && r.map.etf){ hh+='  <span style="color:var(--cyan);font-weight:600">🎯 '+r.map.etf.code+' '+r.map.etf.name+'</span>'; }
-          else { hh+='  <span style="color:var(--dim)">🎯 ETF暂无映射</span>'; }
-          if(r.map && r.map.leaders && r.map.leaders.length){ hh+='  <span style="color:var(--sub)">龙头：'+r.map.leaders.map(function(l){return l.code+' '+l.name;}).join(' / ')+'</span>'; }
-          hh+='</div>';
-        });
-        hh+='</div>';
-        var _emapTs = emap.update_time || '—';
-        hh += '<div style="margin-top:8px;font-size:10.5px;color:var(--dim);line-height:1.5">🎯 ETF映射为<span style="color:var(--gold)">每周刷新的参考映射（生成于 '+_emapTs+'，板块名↔ETF真名匹配，非实时）</span>；板块净额/涨跌为实时口径。</div>';
-        cEl.innerHTML = hh;
-      }
-      // 🚀 2026-09-18 主人令：已升为独立卡 #sectorLeadersCard（置于本卡上方）。
-      // 🎯 2026-09-19 主人令·单一真源：板块清单/phase/涨跌幅现算自 window.SECTOR_RS
-      //   （与「板块资金趋势」卡同一数组、同一个 __phaseOfSec）；window.SECTOR_LEADERS
-      //   （data/SECTOR_LEADERS.js，生成器 scripts/fetch_sector_leaders.py）降级为
-      //   「板块名 → 龙头股」字典。此处保留一次调用，作为独立卡的自愈触发点之一。
-      _fillSectorLeaders();
-      /* 🌡️ 2026-11-26 主人令：涨停热力·板块龙头股 独立卡（自愈触发点之一） */
-      try{ window._fillLuLeaders(); }catch(e2lu){}
-      /* 📊 2026-10-19 主人令：最终推荐·强势板块龙头股 独立卡（自愈触发点之一） */
-      try{ window._fillFrLeaders(); }catch(e2f){}
-      var em = window.CONCEPT_ETF_MAP || {};
-      var tm=document.getElementById('prEtfFresh');
-      var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
-      var _etfBadge = _uBadge('auto','短线',_etfSrcTs);
-      if(tm) tm.innerHTML = _etfBadge;
-    }catch(e){ console.warn('ETF龙头渲染失败',e); }
+    try{ _fillSectorLeaders(); }catch(e){}
+    try{ window._fillLuLeaders(); }catch(e){}
+    try{ window._fillFrLeaders(); }catch(e){}
   };
 
   /* 🚀 2026-09-18 主人令：主升/启动 板块 → 龙头股（实时）· 独立卡（观测类首卡）
@@ -16956,20 +16789,7 @@ h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom
    + '<div id="sectorLeadersBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px">&#x26A0;&#xFE0F; 「主升/启动」判定与「板块资金趋势」卡<b style="color:#ff5252">同源同规则</b>（同一份 SECTOR_RS 数据 + 同一个判定函数）&#8658; 两卡板块计数一致（主升 5日&gt;3%且20日&gt;5%；启动 5日&gt;1.5%且20日&gt;-8%）；个股为板块内当日涨幅排序，<b style="color:#ffd024">非推荐信号，不构成投资建议</b>。</div></div>';
 
-// 📌 概念/行业 → ETF·龙头 参考（个股类第 2 卡；卡壳 id dbgEtfMapBody 未变）
-h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #41c9ff">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-   + '<span style="font-size:15px;font-weight:700;color:#41c9ff">&#x1F4CC; 概念/行业 &#x2192; ETF·龙头 参考</span>'
-   + '<span class="fresh" id="prEtfFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim)">个股类 · 板块/行业映射</span></div>'
-   + '<div style="border:1px solid rgba(65,201,255,0.63);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt)">'
-   + '<b style="color:#41c9ff">&#x1F4CC; 核心：</b>把当日热点板块/概念翻译成可交易的 ETF 与龙头股。<br>'
-   + '<b style="color:#41c9ff">&#x1F4A1; 用法：</b>辅助理解资金去向，不是选股信号。<br>'
-   + '<b style="color:#41c9ff">&#x26A0; 限制：</b>ETF/龙头与板块的映射关系偏静态（人工维护），<b style="color:#ffd024">热度实时、映射不实时</b>；需结合资金数据与回测交叉验证。</div>'
-   + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px">&#x26A0;&#xFE0F; 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#ffd024">不构成投资建议</b>。</div>'
-   + '<div id="dbgEtfMapBody"><div class="note">加载中&#x2026;</div></div>'
-   + '<hr style="border:none;border-top:1px dashed rgba(65,201,255,0.63);margin:12px 0">'
-   + '<div style="border:1px solid rgba(65,201,255,0.63);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub)">研究信号，未纳入推荐链路。</div></div>';
+// 🗑 2026-11-27 主人令：原「概念/行业 → ETF·龙头 参考」卡（dbgEtfMapBody）整卡删除，见 _fillEtfMap 处说明。
 
 // 📊 最终推荐 · 强势板块龙头股（个股类第 3 卡；卡壳 id frLeadersCard 未变，填充 _fillFrLeaders）
 h += '<div class="card" id="frLeadersCard" style="display:none;margin-bottom:16px;border-left:4px solid #ffd024">'
