@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-27 09:07:19",
+ "generated": "2026-11-26 14:52:51",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -68,16 +68,16 @@
    "bench_days": 57
   },
   "2d": {
-   "samples": 155,
+   "samples": 154,
    "immature": false,
    "win": 76,
-   "loss": 79,
-   "win_rate": 49.0,
-   "avg_return": 1.29,
-   "median_return": -0.3,
+   "loss": 78,
+   "win_rate": 49.4,
+   "avg_return": 1.37,
+   "median_return": -0.19,
    "best_return": 31.46,
    "worst_return": -22.68,
-   "max_drawdown": -3.03,
+   "max_drawdown": -2.98,
    "bench_avg_return": -0.3629,
    "bench_win_rate": 45.3,
    "bench_days": 56
@@ -158,46 +158,46 @@
    "bench_days": 54
   },
   "45d": {
-   "samples": 64,
+   "samples": 63,
    "immature": false,
-   "win": 57,
+   "win": 56,
    "loss": 7,
-   "win_rate": 89.1,
-   "avg_return": 24.27,
-   "median_return": 15.09,
+   "win_rate": 88.9,
+   "avg_return": 24.13,
+   "median_return": 14.98,
    "best_return": 202.43,
    "worst_return": -7.57,
-   "max_drawdown": -18.79,
+   "max_drawdown": -18.94,
    "bench_avg_return": -3.8313,
    "bench_win_rate": 36.86,
    "bench_days": 44
   },
   "60d": {
-   "samples": 38,
+   "samples": 37,
    "immature": false,
-   "win": 31,
+   "win": 30,
    "loss": 7,
-   "win_rate": 81.6,
-   "avg_return": 25.01,
-   "median_return": 16.2,
+   "win_rate": 81.1,
+   "avg_return": 25.1,
+   "median_return": 15.63,
    "best_return": 104.44,
    "worst_return": -25.49,
-   "max_drawdown": -23.66,
+   "max_drawdown": -23.54,
    "bench_avg_return": -6.5945,
    "bench_win_rate": 31.41,
    "bench_days": 41
   },
   "75d": {
-   "samples": 19,
+   "samples": 18,
    "immature": false,
-   "win": 14,
+   "win": 13,
    "loss": 5,
-   "win_rate": 73.7,
-   "avg_return": 21.52,
-   "median_return": 7.23,
+   "win_rate": 72.2,
+   "avg_return": 20.51,
+   "median_return": 7.22,
    "best_return": 105.63,
    "worst_return": -27.07,
-   "max_drawdown": -28.91,
+   "max_drawdown": -28.5,
    "bench_avg_return": -7.7544,
    "bench_win_rate": 30.41,
    "bench_days": 28
@@ -241,60 +241,5 @@
    "worst_return": null,
    "max_drawdown": null
   }
- },
- "oos_segment": {
-  "generated": "2026-11-27 09:07 CST",
-  "method": "信号日次一交易日开盘买入，T+5/T+10/T+20 收盘卖出，扣双边 0.30%",
-  "split_rule": "按信号日时间顺序取 60% 分位为切点；first_selected < split = 样本内，>= split = 样本外；不在 OOS 重拟合",
-  "min_oos_required": 30,
-  "horizons": [
-   5,
-   10,
-   20
-  ],
-  "split_date": "2026-08-17",
-  "in_sample": {
-   "5": {
-    "n": 90,
-    "win_rate": 55.6,
-    "avg_return": 3.8
-   },
-   "10": {
-    "n": 90,
-    "win_rate": 62.2,
-    "avg_return": 7.44
-   },
-   "20": {
-    "n": 90,
-    "win_rate": 74.4,
-    "avg_return": 11.83
-   }
-  },
-  "out_of_sample": {
-   "5": {
-    "n": 59,
-    "win_rate": 45.8,
-    "avg_return": -0.27
-   },
-   "10": {
-    "n": 49,
-    "win_rate": 49.0,
-    "avg_return": 2.71
-   },
-   "20": {
-    "n": 23,
-    "win_rate": 65.2,
-    "avg_return": 16.79
-   }
-  },
-  "sample_decay": {
-   "raw_signals": 188,
-   "signal_days": 57,
-   "split_day_index": 34,
-   "in_sample_signals": 91,
-   "out_of_sample_signals": 97,
-   "note": "全量信号按 first_selected 时间顺序切；各档 n 随持有期成熟度自然衰减"
-  },
-  "verdict": "fail：OOS T+5 胜率 45.8%/均益 -0.27%（n=59）未达门槛"
  }
 }
