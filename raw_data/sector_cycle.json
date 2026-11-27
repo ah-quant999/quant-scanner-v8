@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 13:45:35",
+  "update_time": "2026-11-27 14:03:59",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 83,
       "peak_date": "11/04",
-      "total": 1443,
+      "total": 1445,
       "ongoing": true
     },
     {
@@ -76,7 +76,7 @@
       "hot_days": 28,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 468,
+      "total": 469,
       "ongoing": true
     },
     {
@@ -173,15 +173,15 @@
     {
       "sector": "医药",
       "start": "11/25",
-      "end": "11/25",
+      "end": "11/27",
       "start_idx": 27,
-      "end_idx": 27,
-      "days": 1,
-      "hot_days": 1,
+      "end_idx": 29,
+      "days": 3,
+      "hot_days": 2,
       "peak": 4,
       "peak_date": "11/25",
-      "total": 4,
-      "ongoing": false
+      "total": 8,
+      "ongoing": true
     },
     {
       "sector": "白酒消费",
@@ -204,9 +204,9 @@
       "end_idx": 29,
       "days": 2,
       "hot_days": 2,
-      "peak": 6,
+      "peak": 7,
       "peak_date": "11/27",
-      "total": 9,
+      "total": 10,
       "ongoing": true
     },
     {
