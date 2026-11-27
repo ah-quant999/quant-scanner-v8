@@ -1,0 +1,130 @@
+# 🧲 v8 板块共振度 · absorb ratio 刷新
+#   v8/gen_sector_resonance.py → data/SECTOR_RESONANCE.js
+#
+# 指标口径（2026-11-27 主人提供）：
+#   十几个板块日收益率的协方差矩阵 → 第一主成分解释占比（PC1）；
+#   该占比相对自身近 60 日均值越强（z 越高）⇒ 板块越同涨同跌 ⇒ 下跌中即系统性杀跌。
+#   方向必须显式结合：共振高+跌=减仓 / 共振高+涨=一致做多 / 共振低=轮动。
+#
+# 双路取数：
+#   A. kline —— akshare 抓东财行业板块日线，一次拿满窗口（首选）
+#   B. accumulate —— 读仓库内 data/SECTOR_RS.js 当日快照逐日累积，够 20 天自动出值（兜底）
+#   A 失败不影响 B；两路都失败则保留旧文件不覆盖（绝不把页面打成空）。
+name: "🧲 v8 板块共振度 absorb ratio refresh"
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 18:40 CST = UTC 10:40 —— 盘后 SECTOR_RS（17:29 定稿）+ 龙虎榜都已落地，当日矩阵稳定
+    - cron: '40 10 * * 1-5'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-sector-resonance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      TZ: Asia/Shanghai
+      PYTHONIOENCODING: utf-8
+    steps:
+      - name: "📥 checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🐍 setup python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: "📦 install（akshare 装不上也继续，脚本会自动走累积路径）"
+        run: |
+          python -m pip install --quiet numpy 2>/dev/null || true
+          python -m pip install --quiet "akshare==1.20.42" pandas 2>/dev/null \
+            && echo "✅ akshare 就绪（走 kline 路径）" \
+            || echo "⚠️ akshare 安装失败 → 本轮回退累积路径（不阻断）"
+
+      - name: "🧮 生成 SECTOR_RESONANCE.js"
+        run: |
+          set -o pipefail
+          python v8/gen_sector_resonance.py | tee run.log
+          # 失败保护：脚本本身已保证"两路全败不覆盖"，此处再校验一次文件有效性
+          test -s data/SECTOR_RESONANCE.js || { echo "::error::产物为空"; exit 1; }
+          grep -q "window.SECTOR_RESONANCE" data/SECTOR_RESONANCE.js || { echo "::error::产物格式异常"; exit 1; }
+          echo "✅ $(wc -c < data/SECTOR_RESONANCE.js) bytes"
+
+      - name: "📤 推送数据 + 同步 index.html 缓存戳"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, json, base64, hashlib, time, urllib.request, urllib.error
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          API = "https://api.github.com/repos/" + REPO
+          H = {"Authorization": "Bearer " + TOK, "Content-Type": "application/json",
+               "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              with urllib.request.urlopen(req, timeout=90) as r:
+                  return json.load(r)
+
+          raw = open("data/SECTOR_RESONANCE.js", "rb").read()
+          if not raw:
+              raise SystemExit("empty data refuse push")
+          sha10 = hashlib.sha1(raw).hexdigest()[:10]
+
+          def put_file(path, payload, retries=5):
+              url = API + "/contents/" + path
+              for i in range(retries):
+                  try:
+                      cur = api("GET", url)
+                      payload["sha"] = cur["sha"]
+                      if base64.b64decode(cur["content"]) == raw and path.endswith(".js") and path.startswith("data/"):
+                          return "same"
+                      api("PUT", url, payload)
+                      return "ok"
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409, 422) and i < retries - 1:
+                          time.sleep(2 + i)
+                          continue
+                      raise
+              return "fail"
+
+          st = put_file("data/SECTOR_RESONANCE.js", {
+              "message": "v8 SECTOR_RESONANCE: 板块共振度刷新 %s" % sha10,
+              "content": base64.b64encode(raw).decode(),
+              "branch": "main",
+          })
+          print("data/SECTOR_RESONANCE.js →", st, sha10)
+
+          # 同步 index.html 里的 ?v=（防 CDN 旧缓存）
+          ex = api("GET", API + "/contents/index.html")
+          if ex.get("encoding") == "base64":
+              html = base64.b64decode(ex["content"]).decode("utf-8")
+          else:
+              blob = api("GET", API + "/git/blobs/" + ex["sha"])
+              html = base64.b64decode(blob["content"]).decode("utf-8")
+          new_html, n = re.subn(r'(data/SECTOR_RESONANCE\.js\?v=)([a-f0-9]+)',
+                                lambda m: m.group(1) + sha10, html)
+          if n == 0:
+              print("WARN index.html 未找到 SECTOR_RESONANCE.js?v= 引用")
+          elif new_html == html:
+              print("index.html ?v 已是", sha10)
+          else:
+              api("PUT", API + "/contents/index.html", {
+                  "message": "chore(cache): SECTOR_RESONANCE.js?v=%s" % sha10,
+                  "content": base64.b64encode(new_html.encode("utf-8")).decode(),
+                  "branch": "main",
+                  "sha": ex["sha"],
+              })
+              print("index.html ?v →", sha10)
+          PY
