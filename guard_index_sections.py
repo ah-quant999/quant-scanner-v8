@@ -32,7 +32,6 @@ INDEX = "index.html"
 REQUIRED_SECTIONS = {
     "sec-st": 3000,   # 🎯 选股策略
     "sec-ph": 1200,   # 🌙 盘后数据（2026-08-29 轻量化后仅保留板块资金三合一）
-    "sec-rc": 250,    # 📊 共振日历（2026-10-22 重标：style 外置后为容器型板块）
 }
 
 # 必须存在的独立容器 id（非整段 section，仅校验 id 存在）。

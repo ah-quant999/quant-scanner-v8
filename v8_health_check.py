@@ -2657,7 +2657,7 @@ _LOW_FREQ_FILES = {
     # 2026-10-29 一劳永逸：HUIJIN_HOLDINGS（汇金持仓季报，v8_national_team.yml D胶囊 best-effort 兜底）
     #   + RESONANCE_TRACK（龙虎榜共振回测研究集，track_resonance.py 手动/周期重算，index.html 有真实卡片渲染）
     #   二者均为**低频/研究型产物**，被 all_ 通用 24h 红线误杀。进白名单跳过 24h，并由 _LOW_FREQ_MAX_AGE 按节拍给红线。
-    "HUIJIN_HOLDINGS", "RESONANCE_TRACK", "HUIJIN_ETF_DRILL",
+    "HUIJIN_HOLDINGS", "HUIJIN_ETF_DRILL",
     # 🛡 2026-11-16 主人令「运维失败的一劳永逸修复」：SHAREHOLDER_CHANGE（股东增减持监控）
     #   由 v8_shareholder_change_fetch.yml 工作日 20:30 CST 产出，周末不跑、当日 20:30 前未产出
     #   属设计预期。此前无 CARD_DEFS 登记 ⇒ 落入 all_ 通用 24h/T+1 红线（当日 cap=4500min）
@@ -2819,7 +2819,6 @@ _LOW_FREQ_MAX_AGE = {
     "US_HK_MAP": 3 * 24 * 60,     # 美股港股地图（v8_us_hk_map.yml 双种子盘前批；3天红线容忍偶发漏跑）
     "HUIJIN_HOLDINGS": 90 * 24 * 60,   # 汇金持仓季报披露（季度级更新，底层数据为季报；90天红线容忍季报空窗，超季未更仍报真故障）
     "HUIJIN_ETF_DRILL": 90 * 24 * 60,  # 汇金ETF下钻（公开披露季报级，静态研究型，与HUIJIN_HOLDINGS同族；此前被通用1620min红线误杀为fail，现进低频白名单+90天红线，超季未更仍报真故障）
-    "RESONANCE_TRACK": 30 * 24 * 60,   # 龙虎榜共振回测研究集（手动/周期重算，无自动调度；30天红线，超月未重算即告警）
     "MAHORO_INSIGHTS": 7 * 24 * 60,    # 机构研究·AI解析（本机 cookie 拉取，云端无权限；小九离线即无法刷新）→ 7天容忍仅告警，超 7 天仍 fail 保留真故障可见性（2026-11-13 一劳永逸：原仅入白名单未给红线，致 CARD_DEFS 按 24h 误判 fail）
     "maharo_insights": 7 * 24 * 60,    # 同上；all_ 通用扫描以文件名小写 vid 命中，补小写键使白名单+红线对 all_maharo_insights 生效（原大小写不匹配→白名单失效→落通用 24h 红线 fail）
     "maharo_wm": 7 * 24 * 60,          # 机构研究·周/月解析种子库（本机 cookie 低频拉取，与 maharo_insights 同族）→ 7天容忍，超7天仍 fail（2026-11-16 一劳永逸）

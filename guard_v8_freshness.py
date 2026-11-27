@@ -258,7 +258,6 @@ WARN_SOURCES = {
     #   🔴 量纲不同，切勿「对齐数值」：本处单位 = **小时**（90*24=2160h=90天 / 30*24=720h=30天）；
     #      健康检查处单位 = **分钟**（90*24*60=129600min / 30*24*60=43200min）。数值不同、语义等价。
     "HUIJIN_HOLDINGS": 90 * 24,      # 汇金持仓季报（季度级）· 同源 health_check::_LOW_FREQ_MAX_AGE
-    "RESONANCE_TRACK": 30 * 24,      # 龙虎榜共振回测研究集（无自动调度手动重算）· 同源 health_check::_LOW_FREQ_MAX_AGE
     # 🛡 2026-08-27 主人令：SECTOR_FUND_FLOW_TREND 资金验证数据源（fetch_orphan 盘后产出），
     #   此前完全不在审计清单 → "资金验证60日夸张/陈旧"无人发现。纳入 WARN 48h。
     "SECTOR_FUND_FLOW_TREND": 48,

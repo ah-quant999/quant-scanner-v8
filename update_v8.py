@@ -59,10 +59,6 @@ DATA_SOURCES = {
     "nt_data.json":                "NT_DATA",
     "lhb_data.json":               "LHB_DATA",
     "lhb_history.json":           "LHB_HISTORY",
-    # 🆕 2026-10-21 主人令「要」：最强共振(机构+游资)信号 T+1→T+250 持久回测跟踪
-    #   （真源 track_resonance.py 每日重算 raw_data/resonance_track.json；
-    #    前端每日洞察卡·「最强共振·回测跟踪」区块消费）
-    "resonance_track.json":        "RESONANCE_TRACK",
     "concept_ranking.json":        "CONCEPT_RANKING",
     "margin_data.json":            "MARGIN_DATA",
     "cffex_data.json":             "CFFEX_HOLDINGS",
@@ -269,7 +265,6 @@ CATEGORY_MAP = {
     # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
     "CFFEX_HOLDINGS": "intraday,post_close",
     "CFFEX_POSITION": "post_close",  # 🆕 2026-10-15 与 cloud_fetch 同步：持仓排名16:30后公布
-    "RESONANCE_TRACK": "post_close",  # 🆕 2026-10-21 最强共振回测跟踪：信号源自龙虎榜(17:30后)，归盘后档
     "NATIONAL_TEAM": "post_close",            # 🆕 2026-11-06 主人令：国家队活跃度卡（v8_national_team.yml 工作日20:50 产出 data/NATIONAL_TEAM.js，4 子信号加权）
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
@@ -2007,24 +2002,6 @@ def run_experiment_cards():
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_market_verdict.py，跳过")
 
-    # 🔧 2026-11-23 部署拦截事故根治：algorithms/track_resonance.py 是零调度孤儿（11-11 后无人跑），
-    #   raw_data/resonance_track.json 陈旧 9 个交易日 → 跨层一致性闸门拦部署（本轮 CI failure 根因）。
-    #   纯本地计算（lhb_history + kline_cache，~2s）。失败隔离。
-    reso_py = Path(__file__).resolve().parent / "algorithms" / "track_resonance.py"
-    if reso_py.exists():
-        print(f"[experiment] ▶ track_resonance.py ({datetime.now():%H:%M:%S})")
-        try:
-            r = subprocess.run([sys.executable, str(reso_py)],
-                               capture_output=True, text=True, timeout=300)
-            if r.returncode == 0:
-                print(f"[experiment]   ✅ resonance_track 已重算")
-            else:
-                print(f"[experiment]   ⚠️ track_resonance 退出码 {r.returncode}")
-                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
-        except Exception as e:
-            print(f"[experiment]   ⚠️ track_resonance 异常: {e}")
-    else:
-        print("[experiment] ⚠️ 缺失 algorithms/track_resonance.py，跳过")
 
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
     #   停止调用 algo_backtest_compare.py 生成该死数据。
