@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 06:01",
+  "update_time": "2026-11-27 15:48",
   "data_date": "2026-11-26",
   "data_date_source": "kline",
   "fetch_date": "2026-11-27",
@@ -185,24 +185,6 @@
       "relative_90d": -20.9,
       "relative_180d": -37.96,
       "relative_52w": -26.53
-    },
-    {
-      "name": "多元金融",
-      "pct_day": -0.2,
-      "pct_5d": -5.74,
-      "pct_20d": -10.17,
-      "pct_30d": -14.23,
-      "pct_60d": -19.82,
-      "pct_90d": -15.73,
-      "pct_180d": -30.53,
-      "pct_52w": -28.51,
-      "relative_5d": -5.74,
-      "relative_20d": -10.17,
-      "relative_30d": -14.23,
-      "relative_60d": -19.82,
-      "relative_90d": -15.73,
-      "relative_180d": -30.53,
-      "relative_52w": -28.51
     },
     {
       "name": "电子化学品",
