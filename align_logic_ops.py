@@ -188,6 +188,12 @@ MUST_HAVE_CRON = {
     #   此前两生成器孤儿化 ⇒ index 引用线上 404 ⇒ pre_deploy_audit [6/8] 连红
     #   11-24 12:53 起 58 笔、全站部署冻结约 20h（含 11-25 全部早盘）。
     "v8_backtest_weekly": "回测产物周度再生(现金流质量+股东增持·cn每周六09:00)",
+    # 2026-11-27 小九补登记（建链当轮双登记教训·第 N 次收口）：
+    #   🧭 板块共振度日频链（cron '40 10 * * 1-5' = 交易日 18:40 CST，[ubuntu-latest]，
+    #   跑 v8/gen_sector_resonance.py：申万一级 31 行业日收益矩阵 → 协方差 → 第一主成分
+    #   解释占比 PC1 + 60 日均 z 分位，产 data/SECTOR_RESONANCE.js，并进「市场宽度」卡）。
+    #   建链时漏本名单 ⇒ build_deploy [4/8] 判「有 cron 但未登记」红。
+    "v8_sector_resonance": "板块共振度(申万一级31·PC1吸收率+z分位·云端18:40)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
