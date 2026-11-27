@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-27 17:54:48",
+ "update_time": "2026-11-27 21:00:21",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -23394,6 +23394,72 @@
    "rank": 378
   },
   {
+   "code": "300037",
+   "name": "新宙邦",
+   "n_signals": 30,
+   "kinds": [
+    "final",
+    "top10"
+   ],
+   "first_seen": "2026-09-08",
+   "last_seen": "2026-11-01",
+   "is_final": true,
+   "horizons": {
+    "1": {
+     "n": 30,
+     "win": 30.0,
+     "avg": -2.19,
+     "med": -2.57,
+     "best": 5.23,
+     "worst": -9.76,
+     "win_shrunk": 35.0,
+     "avg_shrunk": -1.64
+    },
+    "3": {
+     "n": 30,
+     "win": 26.7,
+     "avg": -3.28,
+     "med": -5.27,
+     "best": 16.53,
+     "worst": -13.21,
+     "win_shrunk": 32.5,
+     "avg_shrunk": -2.46
+    },
+    "5": {
+     "n": 30,
+     "win": 26.7,
+     "avg": -5.55,
+     "med": -9.23,
+     "best": 13.72,
+     "worst": -16.79,
+     "win_shrunk": 32.5,
+     "avg_shrunk": -4.16
+    },
+    "10": {
+     "n": 30,
+     "win": 36.7,
+     "avg": -9.77,
+     "med": -17.83,
+     "best": 9.74,
+     "worst": -23.74,
+     "win_shrunk": 40.0,
+     "avg_shrunk": -7.33
+    },
+    "20": {
+     "n": 27,
+     "win": 7.4,
+     "avg": -16.24,
+     "med": -13.66,
+     "best": 2.24,
+     "worst": -33.83,
+     "win_shrunk": 18.9,
+     "avg_shrunk": -11.85
+    }
+   },
+   "winrate_score": -43.25,
+   "rank": 379
+  },
+  {
    "code": "605117",
    "name": "德业股份",
    "n_signals": 19,
@@ -23457,72 +23523,6 @@
     }
    },
    "winrate_score": -47.46,
-   "rank": 379
-  },
-  {
-   "code": "300037",
-   "name": "新宙邦",
-   "n_signals": 30,
-   "kinds": [
-    "final",
-    "top10"
-   ],
-   "first_seen": "2026-09-08",
-   "last_seen": "2026-11-01",
-   "is_final": true,
-   "horizons": {
-    "1": {
-     "n": 30,
-     "win": 30.0,
-     "avg": -2.19,
-     "med": -2.57,
-     "best": 5.23,
-     "worst": -9.76,
-     "win_shrunk": 35.0,
-     "avg_shrunk": -1.64
-    },
-    "3": {
-     "n": 30,
-     "win": 26.7,
-     "avg": -3.28,
-     "med": -5.27,
-     "best": 16.53,
-     "worst": -13.21,
-     "win_shrunk": 32.5,
-     "avg_shrunk": -2.46
-    },
-    "5": {
-     "n": 30,
-     "win": 26.7,
-     "avg": -5.55,
-     "med": -9.23,
-     "best": 13.72,
-     "worst": -16.79,
-     "win_shrunk": 32.5,
-     "avg_shrunk": -4.16
-    },
-    "10": {
-     "n": 24,
-     "win": 20.8,
-     "avg": -13.84,
-     "med": -17.83,
-     "best": 8.38,
-     "worst": -23.74,
-     "win_shrunk": 29.4,
-     "avg_shrunk": -9.77
-    },
-    "20": {
-     "n": 19,
-     "win": 0.0,
-     "avg": -20.95,
-     "med": -18.57,
-     "best": -10.17,
-     "worst": -33.83,
-     "win_shrunk": 17.2,
-     "avg_shrunk": -13.72
-    }
-   },
-   "winrate_score": -49.19,
    "rank": 380
   },
   {
