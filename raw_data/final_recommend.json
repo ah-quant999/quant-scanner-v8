@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 21:54:51",
+  "update_time": "2026-11-28 00:47:11",
   "crisis_score": 34.6,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,13 +7,13 @@
   "top_n": 2,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-27 20:57:37",
+    "source": "backtest_expectancy@2026-11-27 23:42:11",
     "degraded": false,
     "effective": {
-      "jinzuan": -0.407,
-      "chan": 0.301,
-      "trend": 0.528,
-      "jigou": 0.567
+      "jinzuan": -0.412,
+      "chan": 0.309,
+      "trend": 0.523,
+      "jigou": 0.57
     },
     "hardcoded_default": {
       "jinzuan": -0.522,
@@ -23,23 +23,23 @@
     },
     "n_on10": {
       "jinzuan": 589,
-      "chan": 818,
+      "chan": 822,
       "trend": 279,
-      "jigou": 542
+      "jigou": 548
     },
     "consistent": {
-      "jinzuan": true,
+      "jinzuan": false,
       "chan": true,
       "trend": false,
       "jigou": false
     },
     "loaded": {
-      "generated": "2026-11-27 20:57:37",
+      "generated": "2026-11-27 23:42:11",
       "hit": 4,
-      "n_snapshots": 118,
+      "n_snapshots": 119,
       "date_range": [
         "2026-06-06",
-        "2026-11-26"
+        "2026-11-27"
       ]
     },
     "alpha_select": {
@@ -77,16 +77,16 @@
     "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"
   },
   "strong_sectors": [
-    "计算机设备",
     "元件",
-    "银行",
-    "文化传媒",
-    "种植业与林业",
-    "养殖业",
-    "保险",
-    "零售",
-    "农产品加工",
-    "煤炭开采加工",
+    "通信设备",
+    "自动化设备",
+    "电子化学品",
+    "消费电子",
+    "半导体",
+    "IT服务",
+    "通用设备",
+    "其他电子",
+    "通信服务",
     "贵金属",
     "小金属"
   ],
@@ -94,7 +94,7 @@
   "consensus_stocks": [],
   "all_candidates": [],
   "factor_chain": {
-    "update_time": "2026-11-27 21:54:51",
+    "update_time": "2026-11-28 00:47:11",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
@@ -146,6 +146,6 @@
     "reason": "观澜台/IMA 候选池为空（zsxq token 可能过期，强势跟踪源不可用）",
     "ima_data_date": "2026-11-24",
     "ima_pool_total": 0,
-    "assessed_at": "2026-11-27 21:54:51"
+    "assessed_at": "2026-11-28 00:47:11"
   }
 }

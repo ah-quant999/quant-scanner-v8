@@ -1,34 +1,22 @@
 {
-  "update_time": "2026-11-27 21:29:49",
+  "update_time": "2026-11-28 00:17:37",
   "suspended": [
     {
       "code": "688496",
       "name": "*ST清越",
-      "days": 77,
+      "days": 78,
       "reason": "刊登重要公告"
     },
     {
       "code": "002717",
       "name": "*ST岭南",
-      "days": 45,
+      "days": 46,
       "reason": "刊登重要公告"
     },
     {
       "code": "688121",
       "name": "*ST卓然",
-      "days": 29,
-      "reason": "刊登重要公告"
-    },
-    {
-      "code": "603398",
-      "name": "*ST沐邦",
-      "days": 0,
-      "reason": "刊登重要公告"
-    },
-    {
-      "code": "600381",
-      "name": "*ST春天",
-      "days": 0,
+      "days": 30,
       "reason": "刊登重要公告"
     }
   ],
