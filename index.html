@@ -2133,7 +2133,8 @@ window.STRATEGY_WALKFORWARD = {
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=2ba5409ab6" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=a207f3d172" defer></script>
-    <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
+    <!-- 2026-11-27 恢复注入：📐政策事件路径卡需上证日线长历史（1186根）；gzip 后约 20KB，非膨胀（原删因「前端零引用」） -->
+    <script src="data/INDEX_HISTORY.js?v=9c1f7a3b5d" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=aa4341ec10" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=15e5a0bcbd" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=b7b3a89b3d" defer></script>
@@ -11894,6 +11895,182 @@ function v8StatBlock(title,val,unit,sub,color){
     +'<div style="font-size:10.5px;color:'+(color||'var(--dim)')+';margin-top:3px">'+sub+'</div></div>';
 }
 
+/* ===== 📐 政策事件路径 · 锚定对比（2026-11-27 主人令）=====
+   把当前市场按「政策事件 T=0」归一化，与历史同类事件前后轨迹叠加。
+   事件表只收录有据可查的真实事件；非交易日自动顺延到其后第一个交易日。
+   ⚠ 单事件类比、样本 3、非统计显著 —— 只作情景参照。 */
+var V8_EV_PATH_BASE = '2026-11-27';        /* 本轮国常会（T=0） */
+var V8_EV_PATH_SPAN = 60;                  /* 前后各 60 个交易日 */
+var V8_EV_PATH_EVENTS = [
+  {date:'2024-01-22', label:'2024国常会（政策底）',      color:'#5b8ff9'},
+  {date:'2024-02-05', label:'二次探底·汇金扩围（市场底）', color:'#5ad8a6'},
+  {date:'2024-04-12', label:'新「国九条」落地（制度底）',  color:'#f6bd16'}
+];
+
+function _evFindIdx(kl, dateStr){
+  for(var i=0;i<kl.length;i++){ if(kl[i].d>=dateStr) return i; }
+  return -1;
+}
+function _evNorm(kl, idx){
+  var lo=Math.max(0, idx-V8_EV_PATH_SPAN), hi=Math.min(kl.length-1, idx+V8_EV_PATH_SPAN);
+  var base=kl[idx].c, out=[];
+  for(var i=lo;i<=hi;i++){ out.push({t:i-idx, v:kl[i].c/base*100, c:kl[i].c, d:kl[i].d}); }
+  return out;
+}
+function _evRets(path){
+  var r=[];
+  for(var i=1;i<path.length;i++){ r.push(path[i].v/path[i-1].v-1); }
+  return r;
+}
+function _evCorr(a,b){
+  var n=Math.min(a.length,b.length); if(n<5) return NaN;
+  var ma=0,mb=0,i;
+  for(i=0;i<n;i++){ ma+=a[i]; mb+=b[i]; }
+  ma/=n; mb/=n;
+  var sa=0,sb=0,sab=0;
+  for(i=0;i<n;i++){ var da=a[i]-ma, db=b[i]-mb; sa+=da*da; sb+=db*db; sab+=da*db; }
+  if(sa<=0||sb<=0) return NaN;
+  return sab/Math.sqrt(sa*sb);
+}
+function _evPoly(path,color,width,opacity,X,Y){
+  var d='';
+  for(var i=0;i<path.length;i++){ d+=(i?' L':'M')+X(path[i].t).toFixed(1)+' '+Y(path[i].v).toFixed(1); }
+  return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+width+'" opacity="'+opacity+'" stroke-linejoin="round" stroke-linecap="round"/>';
+}
+
+function renderPolicyEventPath(){
+  var box=document.getElementById('evPathChart');
+  if(!box) return;
+  var IH=window.INDEX_HISTORY||{}, kl=IH.klines||[];
+  var stEl=document.getElementById('evPathStats'), vdEl=document.getElementById('evPathVerdict');
+  if(!kl.length){ box.innerHTML='<div class="note" style="text-align:center">指数历史数据暂不可用</div>'; return; }
+
+  /* 基准事件：事件日或其后第一个交易日；当日未入库则退回最后一根 */
+  var baseIdx=_evFindIdx(kl, V8_EV_PATH_BASE), baseLag=false;
+  if(baseIdx<0){ baseIdx=kl.length-1; baseLag=true; }
+  var cur=_evNorm(kl, baseIdx);
+  if(cur.length<10){ box.innerHTML='<div class="note" style="text-align:center">基准事件附近历史不足以计算路径</div>'; return; }
+
+  /* 历史参照路径 */
+  var hists=[];
+  for(var e=0;e<V8_EV_PATH_EVENTS.length;e++){
+    var ev=V8_EV_PATH_EVENTS[e], hi2=_evFindIdx(kl, ev.date);
+    if(hi2<0) continue;
+    var hp=_evNorm(kl, hi2);
+    if(hp.length<20) continue;
+    hists.push({label:ev.label, color:ev.color, t0date:kl[hi2].d, path:hp});
+  }
+
+  /* 指标1：事件前 60 日涨跌 */
+  var t0v=cur[cur.length-1].v, preChg=t0v-cur[0].v;
+  /* 指标2：日收益相关性最高的历史路径 */
+  var curR=_evRets(cur), best=null;
+  for(var b2=0;b2<hists.length;b2++){
+    var preOnly=hists[b2].path.filter(function(p){return p.t<=0;});
+    var c=_evCorr(curR, _evRets(preOnly));
+    if(!isNaN(c) && (!best || c>best.r)) best={label:hists[b2].label, r:c, t0:hists[b2].t0date};
+  }
+  /* 指标3：历史路径 T+20 收益分布 */
+  var p20=[];
+  for(var h3=0;h3<hists.length;h3++){
+    var pth=hists[h3].path;
+    for(var j=0;j<pth.length;j++){ if(pth[j].t===20){ p20.push(pth[j].v-100); break; } }
+  }
+  var med=NaN, lo20=NaN, hi20=NaN, posCnt=0;
+  if(p20.length){
+    var s20=p20.slice().sort(function(a,b){return a-b;});
+    med=s20[Math.floor((s20.length-1)/2)];
+    lo20=s20[0]; hi20=s20[s20.length-1];
+    posCnt=p20.filter(function(x){return x>0;}).length;
+  }
+  var _cUp='#ef5350', _cDn='#26a69a';
+  function _pct(x){ return (x>=0?'+':'')+x.toFixed(1)+'%'; }
+
+  /* 统计块 */
+  if(stEl){
+    var h='';
+    h+=v8StatBlock('事件前 60 日', _pct(preChg), '', 'T-60 '+cur[0].c.toFixed(0)+' → '+kl[baseIdx].c.toFixed(0)+' 点', preChg>=0?_cUp:_cDn);
+    var _simTxt=best?((best.r>=0.5)?best.label.replace(/（.*/,''):((best.r>=0.3)?'弱相似 '+best.label.replace(/（.*/,''):'无显著相似')):'—';
+    h+=v8StatBlock('路径相似度', _simTxt, '', best?('最高 r='+best.r.toFixed(2)+' · 阈值 0.5'):'样本不足', (best&&best.r>=0.3)?'var(--gold)':'var(--dim)');
+    h+=v8StatBlock('历史 T+20 参照', isNaN(med)?'—':_pct(med), '', p20.length?(('区间 '+_pct(lo20)+'~'+_pct(hi20)+' · '+p20.length+'例中'+posCnt+'正')):'样本不足', isNaN(med)?'var(--dim)':(med>=0?_cUp:_cDn));
+    stEl.innerHTML=h;
+  }
+
+  /* 绘图 */
+  var W=box.clientWidth||0;
+  if(!W){ setTimeout(renderPolicyEventPath,200); return; }
+  var H=330, PL=44, PR=54, PT=26, PB=30;
+  var gw=W-PL-PR, gh=H-PT-PB;
+  var all=[];
+  for(var a1=0;a1<cur.length;a1++) all.push(cur[a1].v);
+  for(var a2=0;a2<hists.length;a2++) for(var a3=0;a3<hists[a2].path.length;a3++) all.push(hists[a2].path[a3].v);
+  var mn=Math.min.apply(null,all), mx=Math.max.apply(null,all);
+  var pad=(mx-mn)*0.10 || 2;
+  mn=Math.floor(mn-pad); mx=Math.ceil(mx+pad);
+  if(mx-mn<4){ mx=mn+4; }
+  var X=function(t){ return PL+(t+V8_EV_PATH_SPAN)/(V8_EV_PATH_SPAN*2)*gw; };
+  var Y=function(v){ return PT+gh*(1-(v-mn)/(mx-mn)); };
+
+  var s='<svg width="'+W+'" height="'+H+'" style="display:block">';
+  /* 横向网格 */
+  for(var gy=0;gy<=4;gy++){
+    var vv=mn+(mx-mn)*gy/4, yy=Y(vv);
+    s+='<line x1="'+PL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+yy.toFixed(1)+'" stroke="#2a3242" stroke-width="1"/>';
+    s+='<text x="'+(PL-6)+'" y="'+(yy+3.5).toFixed(1)+'" fill="#8b93a7" font-size="9.5" text-anchor="end">'+vv.toFixed(0)+'</text>';
+  }
+  /* 100 基准线 + T=0 竖线 */
+  s+='<line x1="'+PL+'" y1="'+Y(100).toFixed(1)+'" x2="'+(W-PR)+'" y2="'+Y(100).toFixed(1)+'" stroke="#6b7280" stroke-dasharray="4 4" stroke-width="1" opacity="0.8"/>';
+  s+='<line x1="'+X(0).toFixed(1)+'" y1="'+PT+'" x2="'+X(0).toFixed(1)+'" y2="'+(PT+gh)+'" stroke="#f6bd16" stroke-dasharray="5 3" stroke-width="1.2" opacity="0.85"/>';
+  s+='<text x="'+(X(0)+4).toFixed(1)+'" y="'+(PT-8)+'" fill="#f6bd16" font-size="10">T=0</text>';
+  /* 历史路径（淡） */
+  for(var p1=0;p1<hists.length;p1++){
+    s+=_evPoly(hists[p1].path, hists[p1].color, 1.6, 0.6, X, Y);
+  }
+  /* 当前路径（粗） */
+  s+=_evPoly(cur, '#ef5350', 2.6, 1, X, Y);
+  /* 当前末端标记 */
+  var last=cur[cur.length-1];
+  s+='<circle cx="'+X(last.t).toFixed(1)+'" cy="'+Y(last.v).toFixed(1)+'" r="3.6" fill="#ef5350"/>';
+  s+='<text x="'+(X(last.t)+7).toFixed(1)+'" y="'+(Y(last.v)+3.5).toFixed(1)+'" fill="#ef5350" font-size="10.5" font-weight="700">'+last.v.toFixed(1)+'</text>';
+  /* x 轴刻度 */
+  var xt=[-60,-40,-20,0,20,40,60];
+  for(var x1=0;x1<xt.length;x1++){
+    var lab=(xt[x1]===0?'T=0':(xt[x1]>0?'T+'+xt[x1]:'T'+xt[x1]));
+    s+='<text x="'+X(xt[x1]).toFixed(1)+'" y="'+(PT+gh+16)+'" fill="#8b93a7" font-size="9.5" text-anchor="middle">'+lab+'</text>';
+  }
+  /* 右侧图例 */
+  var lgY=PT+4;
+  s+='<rect x="'+(W-PR+2)+'" y="'+(lgY-4)+'" width="8" height="3" fill="#ef5350"/>';
+  s+='<text x="'+(W-PR+13)+'" y="'+(lgY+1)+'" fill="#c9d1e2" font-size="9.5">本轮</text>';
+  lgY+=13;
+  for(var l1=0;l1<hists.length;l1++){
+    s+='<rect x="'+(W-PR+2)+'" y="'+(lgY-4)+'" width="8" height="3" fill="'+hists[l1].color+'" opacity="0.75"/>';
+    s+='<text x="'+(W-PR+13)+'" y="'+(lgY+1)+'" fill="#8b93a7" font-size="9">'+hists[l1].t0date.slice(5)+'</text>';
+    lgY+=12;
+  }
+  s+='</svg>';
+  box.innerHTML=s;
+
+  /* 解读框 */
+  if(vdEl){
+    var t0Date=kl[baseIdx].d;
+    var vs='';
+    vs+='<b>基准事件</b> 2026-11-27 国常会 · 数据截至 '+t0Date+(baseLag?'（当日收盘待入库）':'');
+    if(best){
+      if(best.r>=0.5){
+        vs+=' ｜ <b>路径相似</b> '+best.label+'（'+best.t0+' 起，日收益相关性 '+best.r.toFixed(2)+'）';
+      }else{
+        vs+=' ｜ <b>路径相似度低</b> 最高仅 r='+best.r.toFixed(2)+'（'+best.label+'）——本轮节奏与历史三轮均不同，<b>不宜直接套用历史路径</b>（相似度低本身就是有效信息）';
+      }
+    }
+    if(p20.length){
+      vs+='<br><b>历史 T+20 参照</b> 中位 '+_pct(med)+'（区间 '+_pct(lo20)+'~'+_pct(hi20)+'，'+p20.length+' 例中 '+posCnt+' 例正收益）——仅为少数样本的路径参照，不作概率估计。';
+    }
+    vs+='<br><span style="color:var(--gold)">⚠ 单事件类比 · 样本 '+hists.length+' · 非统计显著 · 历史不预示未来</span>';
+    vdEl.innerHTML=vs;
+  }
+}
+
 function drawAmountChart(){
   const data = window.SH_SZ_HISTORY || {};
   const histAll = data.amount_history || [];
@@ -19066,6 +19243,23 @@ h+='</div>';
       h+='<div class="note" style="text-align:center">两融数据暂不可用</div>';
     }
     h+='</div></div>';
+
+    /* 📐 政策事件路径（2026-11-27 主人令：锚定政策事件做历史路径对比）
+       ⚠ 护栏：单事件类比、样本 3、非统计显著，仅情景参照，严禁当信号/预测用。 */
+    var _evIH=window.INDEX_HISTORY||{}, _evKL=_evIH.klines||[];
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7e57c2">';
+    h+=v8CardHeader('📐','政策事件路径 · 锚定对比','','update_time',{update_time:_evIH.update_time,slot:'盘后',horizon:'中长线'},!_evKL.length);
+    h+='<div style="padding:12px 14px">';
+    if(_evKL.length){
+      h+='<div id="evPathStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px"></div>';
+      h+='<div id="evPathChart" style="width:100%;height:330px"></div>';
+      h+='<div id="evPathVerdict" class="note note-insight" style="margin-top:12px;line-height:1.8"></div>';
+      h+='<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.6">📌 口径：上证指数以基准事件日 T=0 归一化为 100，横轴为相对交易日 T-60~T+60；历史路径取同类政策事件前后各 60 个交易日真实收盘（INDEX_HISTORY 上证日线，非拼凑）。⚠ 单事件类比、样本量小、非统计显著，只作情景参照，不构成信号或预测。</div>';
+    } else {
+      h+='<div class="note" style="text-align:center">指数历史数据暂不可用</div>';
+    }
+    h+='</div></div>';
+
     /* 2026-09-02 主人令：已下架选股模块整体删除（大牛股猎手/全站精选与选股策略高度重复；
        四量终极迁回「选股策略」子页面）。星级表 __MODULE_STARS 已提前到全局作用域。 */
 
@@ -19085,6 +19279,7 @@ h+='</div>';
     try{ if(window.renderMarketFundFlow) window.renderMarketFundFlow(window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·资金流时间轴渲染失败",e);}
     try{ if(window.drawAmountChart) window.drawAmountChart(); }catch(e){console.warn("已下架·成交额渲染失败",e);}
     try{ if(window.drawUpDownChart) window.drawUpDownChart(); }catch(e){console.warn("已下架·涨跌家数渲染失败",e);}
+    try{ if(window.renderPolicyEventPath) window.renderPolicyEventPath(); }catch(e){console.warn("已下架·政策事件路径渲染失败",e);}
 
     /* 🚚 2026-09-15 主人令：斐波那契观测窗 整卡迁往「🌍 观测平台 > 📊 大盘观测」，
        renderFib 一并删除（其目标元素 phFibDays / phFibPct / phFibPoints / phFibNext / phFibNextLbl /
