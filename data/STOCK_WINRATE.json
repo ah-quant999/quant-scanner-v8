@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-27 23:47:05",
+ "update_time": "2026-11-28 02:51:26",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -2496,12 +2496,12 @@
   {
    "code": "300613",
    "name": "富瀚微",
-   "n_signals": 9,
+   "n_signals": 8,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-11-27",
+   "last_seen": "2026-11-10",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3277,12 +3277,12 @@
   {
    "code": "000823",
    "name": "超声电子",
-   "n_signals": 5,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-10-29",
-   "last_seen": "2026-11-27",
+   "last_seen": "2026-11-01",
    "is_final": false,
    "horizons": {
     "1": {
@@ -5459,12 +5459,12 @@
   {
    "code": "688728",
    "name": "格科微",
-   "n_signals": 1,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-11-19",
-   "last_seen": "2026-11-19",
+   "last_seen": "2026-11-27",
    "is_final": false,
    "horizons": {
     "1": {
@@ -5764,12 +5764,12 @@
   {
    "code": "000063",
    "name": "中兴通讯",
-   "n_signals": 7,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-11-19",
-   "last_seen": "2026-11-27",
+   "last_seen": "2026-11-26",
    "is_final": false,
    "horizons": {
     "1": {
@@ -6833,12 +6833,12 @@
   {
    "code": "603799",
    "name": "华友钴业",
-   "n_signals": 2,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-11-24",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-27",
    "is_final": false,
    "horizons": {
     "1": {
@@ -11116,12 +11116,12 @@
   {
    "code": "601318",
    "name": "中国平安",
-   "n_signals": 5,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-09-02",
-   "last_seen": "2026-11-27",
+   "last_seen": "2026-11-23",
    "is_final": false,
    "horizons": {
     "1": {
