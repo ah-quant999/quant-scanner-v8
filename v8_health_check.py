@@ -122,14 +122,21 @@ CARD_DEFS = [
     #   补 STOCK_QUOTE 卡级盘中判据。背景（09-22 实测）：个股行情盘中停更 1h53m（11:15→13:51），
     #   HEALTH_CHECK 122 项里**无 STOCK_QUOTE 卡级盘中项**，只有通用项 all_STOCK_QUOTE
     #   （freq:"—"、通用 24h 红线、heal_cat 一律 "algo_run" 错配）⇒ 53 分钟冻结**结构性不会报红**。
-    #   · page="实时数据" + max_age=40 —— 该链设计节律 30min/轮，40min=1.3 轮即报，早于 45min 族。
+    #   · page="实时数据" + max_age=1440 —— 🔴 2026-11-27 主人令「一劳永逸修复」：
+    #     生产端已于 2026-11-26 按主人令【退出盘中】，铁证 = v8_stock_quote_refresh_cloud.yml
+    #     的时间 gate 原文 `ok = 930 <= hm <= 1290  # 15:30..21:30（2026-11-26 主人令：个股报价退出盘中）`。
+    #     旧配置仍按「盘中每30分 / max_age=40」判 ⇒ 每个交易日 09:30-15:30 结构性必红：
+    #       11-27 实测 fail「最后更新 今日 07:00 · 超过阈值 40 分钟」，而同期云端链 4 次 success
+    #       全部被该 gate 跳过 —— 不是漏跑，是**判龄口径与生产节律打架**。
+    #     新口径按真实节律：盘后 15:30-21:30 由哨兵每 10 分派发 ⇒ 每交易日必更至少一轮 ⇒ 24h 红线足够；
+    #     整段盘后窗口都没跑仍会 fail，不放宽到掩盖真停摆。
     #   · premarket_keep=True —— 09:00-09:30 开盘前沿用上一交易日收盘档不误报（与 ETF_DAILY_MONITOR 同型）。
-    #   · heal_cat="intraday" —— 自愈经 cn_fetch 盘中链 relay② 「主链优先」门控派发专用主链
-    #     v8_stock_quote_refresh（[self-hosted,cn]·双源），主链排队超时才由 relay 改派 _cloud 兜底；
-    #     自愈不再派错 algo_run（算法链根本没有本产物环节）。
+    #   · weekend_update=False —— 周末无盘后窗口，免检；长假由 T+1 18:30 分支兜。
+    #   · heal_cat="intraday" 保留不改 —— 自愈经 cn_fetch 盘中链 relay② 派发专用主链；盘中派发会被上述
+    #     盘后 gate 直接跳过（打印「⏸️ 不在交易时间」），真实补数靠哨兵每 10 分自动派发，故不必改派发源。
     #   · raw_file 交叉校验有效：raw_data/stock_quote.json 与 data/STOCK_QUOTE.js 同由专用链产出。
     #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
-    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘中每30分", "max_age": 40, "key_fields": ["update_time"], "premarket_keep": True, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
+    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后15:30-21:30", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
     # 🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：FUTURES_REALTIME（期指实时）此前
     #   CARD_DEFS 完全漏登记 ⇒ 健康面板不监控 + 自愈链够不到 ⇒ 断更只能靠主人肉眼发现
     #   （11-13 实测：cron 静默失联 + 缓存戳不同步双重故障，两处均已修，本条补上监控盲区）。
@@ -2728,6 +2735,15 @@ _LOW_FREQ_MAX_AGE = {
     "KONDRATIEV": 35 * 24 * 60,         # 康波长波：每月10日18:00专链月更（v8_kondratiev_monthly.yml），+5天缓冲跨节假日→35天红线（2026-11-24 一劳永逸）
     "CASHFLOW_QUALITY_BACKTEST": 9 * 24 * 60,     # 现金流质量榜回测：v8_backtest_weekly.yml 每周六09:00产出，7天节拍+2天缓冲=9天红线（2026-11-25 一劳永逸，超期仍 fail）
     "SHAREHOLDER_INCREASE_BACKTEST": 9 * 24 * 60,  # 股东增持榜回测：同周更链，9天红线（2026-11-25 一劳永逸，超期仍 fail）
+    # 🔴 2026-11-27 主人令「一劳永逸修复」：PULLBACK_TRACK（回调池前瞻跟踪台账）此前未登记，
+    #   掉进 check_all_data_files 的**通用 1620min（27h）红线** ⇒ 每个交易日都报假红。
+    #   实证（11-27 线上告警原文）：「文件 all_PULLBACK_TRACK 失败：最后更新 昨日 01:07 ·
+    #   超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）」。
+    #   真实节律：gen_pullback_pool.py 只挂在盘后算法链（run_algorithms.py 第 261 项，
+    #   v8_algo_cloud cron 19:15 每交易日一轮）；昨日链实测延迟到凌晨 01:07 才落盘，
+    #   今日链 19:15 才跑 ⇒ 最长天然间隔 ≈42h，任何 <42h 的红线都会每日误报。
+    #   故红线给 48h（2880min）覆盖「昨链延迟 + 今链正常」最坏组合；超 48h 仍 fail，真停摆照样可见。
+    "PULLBACK_TRACK": 48 * 60,
 }
 
 
