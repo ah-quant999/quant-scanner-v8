@@ -13844,6 +13844,13 @@ function drawUpDownChart(){
        故判共振必须用「离散度 / 平均幅度」比值，单看 σ 会把普跌日误判成低共振。
        方向不可省：共振+跌=系统性杀跌(减仓) / 共振+涨=一致做多(可跟别加杠杆) / 低共振=轮动(只做最强主线)。 */
     (function(){
+      /* ⚠️ 口径优先级（2026-11-27 本地实测抓到的真矛盾）：
+         SECTOR_RS 的 data_date 是 **T-1**（昨日收盘定稿），而 absorb ratio 的 kline 路径拿的是**当日**数据。
+         实测 11-26 σ比值 3.04（分化）而 11-27 PC1 z=3.47（共振）——两个都对，是日期差一天，
+         并列展示会让人以为「指标打架」。故定此优先级：
+           ① 有真 PC1（absorb ratio，当日数据）→ 只显示它，不再列 σ；
+           ② 没有（累积不足 / 数据未就绪）→ 才退回 σ 代理，并标注 T-1 日期。 */
+      var _ar=window.SECTOR_RESONANCE||{};
       var _ss=((window.SECTOR_RS||{}).sectors)||[];
       var _ps=_ss.map(function(x){ return Number(x.pct_day); }).filter(function(v){ return isFinite(v); });
       if(_ps.length<20) return;
@@ -13852,29 +13859,34 @@ function drawUpDownChart(){
       var _mu=_sum/_n;
       var _sd=Math.sqrt(_ps.reduce(function(a,v){ return a+(v-_mu)*(v-_mu); },0)/_n);
       var _upPct=_up/_n*100;
+      var _sdText='σ='+_sd.toFixed(2)+'% / 均'+_mu.toFixed(2)+'%（'+_n+' 板块上涨 '+_up+' 个）';
+      /* ① 真 PC1 优先 */
+      if(_ar && _ar.pc1_pct!=null){
+        var _lv=_ar.level;
+        var _tone=_lv==='high'?'var(--up)':(_lv==='low'?'var(--gold)':'var(--sub)');
+        var _name=_lv==='high'?'共振偏高':(_lv==='low'?'共振偏低':'共振正常');
+        var _act=_lv==='high'?'<b style="color:var(--up)">板块同涨同跌，不是健康轮动；追高易套，仓位别加</b>'
+               :(_lv==='low'?'<b style="color:var(--gold)">各走各的，只做最强主线</b>'
+               :'<b style="color:var(--txt)">结构正常，按各自信号做</b>');
+        h+='<div style="font-size:11.5px;line-height:1.7;color:var(--txt);border-left:2px solid '+_tone+';padding:2px 0 2px 8px;margin-bottom:8px">'
+          +'<b style="color:'+_tone+'">板块共振度 '+_name+'</b>'
+          +' · absorb <b>'+(+_ar.pc1_pct).toFixed(1)+'%</b>（近60日均'+(+(_ar.pc1_ma||0)).toFixed(1)+'%，z='+(+(_ar.z||0)).toFixed(2)+'）'
+          +' · T-1 快照参考 '+_sdText+' ⇒ '+_act+'</div>';
+        return;
+      }
+      /* ② 无 PC1 → σ 代理（必须标注 T-1） */
       var _ratio=_sd/Math.max(Math.abs(_mu),0.30);
       var _k=_ratio<1.2?'res':(_ratio>2.5?'div':'mid');
-      var _tone=_k==='res'?(_mu<0?'var(--down)':'var(--up)'):(_k==='div'?'var(--gold)':'var(--sub)');
-      var _name=_k==='res'?(_mu<0?'板块一致下跌':'板块一致上涨'):(_k==='div'?'强分化·轮动':'正常分化');
-      var _act=_k==='res'?(_mu<0?'<b style="color:var(--down)">系统性杀跌，减仓</b>':'<b style="color:var(--up)">一致做多，可跟但别加杠杆</b>')
+      var _tone2=_k==='res'?(_mu<0?'var(--down)':'var(--up)'):(_k==='div'?'var(--gold)':'var(--sub)');
+      var _name2=_k==='res'?(_mu<0?'板块一致下跌':'板块一致上涨'):(_k==='div'?'强分化·轮动':'正常分化');
+      var _act2=_k==='res'?(_mu<0?'<b style="color:var(--down)">系统性杀跌，减仓</b>':'<b style="color:var(--up)">一致做多，可跟但别加杠杆</b>')
               :(_k==='div'?'<b style="color:var(--gold)">只做最强主线，别指望普涨</b>':'<b style="color:var(--txt)">按各自信号做</b>');
-      /* absorb ratio（真 PC1 解释占比）：数据端 v8/gen_sector_resonance.py 产出。
-         未就绪时如实显示「累积中 N/M 天」，绝不拿 σ 代理冒充 PC1。 */
-      var _arText='';
-      try{
-        var _ar=window.SECTOR_RESONANCE||{};
-        if(_ar && _ar.pc1_pct!=null){
-          var _arCol=_ar.level==='high'?'var(--up)':(_ar.level==='low'?'var(--gold)':'var(--sub)');
-          _arText=' · <b style="color:'+_arCol+'">absorb '+(+_ar.pc1_pct).toFixed(1)+'%</b>'
-            +'（60日均'+(+(_ar.pc1_ma||0)).toFixed(1)+'%，z='+(+(_ar.z||0)).toFixed(2)+'）';
-        } else if(_ar && _ar.accumulated_days!=null){
-          _arText=' · absorb ratio 累积中 '+_ar.accumulated_days+'/'+(_ar.min_window||20)+' 天';
-        }
-      }catch(e){}
-      h+='<div style="font-size:11.5px;line-height:1.7;color:var(--txt);border-left:2px solid '+_tone+';padding:2px 0 2px 8px;margin-bottom:8px">'
-        +'<b style="color:'+_tone+'">板块共振度 '+_name+'</b>'
-        +' · σ='+_sd.toFixed(2)+'% / 平均'+(Math.abs(_mu)<0.005?'0.00':_mu.toFixed(2))+'%（比值 '+_ratio.toFixed(2)+'）'
-        +' · '+_n+' 个板块上涨 <b>'+_up+'</b> 个（'+_upPct.toFixed(0)+'%）⇒ '+_act+_arText+'</div>';
+      var _acc=(_ar && _ar.accumulated_days!=null)?('（absorb 累积中 '+_ar.accumulated_days+'/'+(_ar.min_window||20)+' 天）'):'';
+      h+='<div style="font-size:11.5px;line-height:1.7;color:var(--txt);border-left:2px solid '+_tone2+';padding:2px 0 2px 8px;margin-bottom:8px">'
+        +'<b style="color:'+_tone2+'">板块共振度 '+_name2+'</b>'
+        +' · σ='+_sd.toFixed(2)+'% / 均'+_mu.toFixed(2)+'%（比值 '+_ratio.toFixed(2)+'）'
+        +' · '+_n+' 个板块上涨 <b>'+_up+'</b> 个（'+_upPct.toFixed(0)+'%）⇒ '+_act2+_acc
+        +'<span style="font-size:10px;color:var(--dim)"> · 取自 SECTOR_RS T-1 快照</span></div>';
     })();
     // 行动解读（档位判定 → 仓位建议，口径与逻辑详解页一致）
     // 🔴 2026-11-18 主人令：解读改为「结论先行 + 三句话」，补近期区间位置与边际变化（原版只报档位+建议，太干巴）
