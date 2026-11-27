@@ -1,8 +1,8 @@
 window.NATIONAL_TEAM = {
   "data_date": "2026-11-26",
-  "update_time": "2026-11-27 21:53:37",
-  "source_time": "2026-11-27 21:53:22",
-  "score": 48.8,
+  "update_time": "2026-11-27 22:43:12",
+  "source_time": "2026-11-27 22:42:58",
+  "score": 54.0,
   "verdict": "中性",
   "verdict_color": "#38bdf8",
   "ready_count": 4,
@@ -24,10 +24,10 @@ window.NATIONAL_TEAM = {
       "weight": 30,
       "ready": true,
       "freq": "盘后",
-      "value": -2.78,
+      "value": 1.52,
       "unit": "%",
-      "detail": "大金融 relative_5d 均值 -2.78%（保险/多元金融/银行/证券）",
-      "status": "❌弱势"
+      "detail": "大金融 relative_5d 均值 1.52%（保险/多元金融/银行/证券）",
+      "status": "✅强势"
     },
     {
       "key": "C",
@@ -61,5 +61,5 @@ window.NATIONAL_TEAM = {
     "D": "盘中（成交额实时，当日盘后亦可复核）"
   },
   "lag_summary": "盘中可用 1 路（D 25%）· 盘后 2 路（B30+C15=45%）· T+1 1 路（A 30%）",
-  "oneline": "综合 48.8（中性）：宽基ETF净申购 26.2 亿＝托盘力度中性，大金融弱势，大金融资金净流出 35.5 亿，非下跌日·放量信号中性 2.19×。"
+  "oneline": "综合 54.0（中性）：宽基ETF净申购 26.2 亿＝托盘力度中性，大金融强势，大金融资金净流出 35.5 亿，非下跌日·放量信号中性 2.19×。"
 };
