@@ -1,6 +1,6 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 14:36:35",
+ "generated": "2026-11-27 16:46:32",
  "verdict": {
   "cap_pct": 50,
   "label": "攻"
@@ -10,14 +10,14 @@
   "tactic_exposure": 0.95,
   "senti_phase": "狂热",
   "senti_score": 85.0,
-  "zt": 90,
+  "zt": 97,
   "max_ladder": 6,
-  "up": 2215,
-  "down": 132,
-  "breadth": 0.9437579889220281,
-  "crisis": 35.9,
-  "sh_close": 3584.84,
-  "sh_chg": 3.11,
+  "up": 2230,
+  "down": 116,
+  "breadth": 0.9505541346973572,
+  "crisis": 35.7,
+  "sh_close": 3606.49,
+  "sh_chg": 3.73,
   "zz1000_close": 5531.84,
   "flow_in_cnt": 14,
   "top_sectors": [
@@ -31,12 +31,12 @@
    "上海九百"
   ]
  },
- "checks_hit": 6,
+ "checks_hit": 7,
  "checks_total": 8,
  "list_gate_ok": false,
  "list_gate_why": "榜单陈旧11-26、validity=degraded、无分辨度max=4.1、缺维度inst_w52/inst_analyst",
  "forward_ref": {
-  "sh_close": 3584.84,
+  "sh_close": 3606.49,
   "date": "2026-11-27"
  }
 }

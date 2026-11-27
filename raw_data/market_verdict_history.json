@@ -42,13 +42,13 @@
   {
    "date": "2026-11-27",
    "stance": "watch",
-   "score_norm": 0.208,
-   "crisis": 35.9,
-   "zt": 90,
-   "zt_ratio": 0.99,
-   "sh_net5": -770.6,
+   "score_norm": 0.281,
+   "crisis": 35.7,
+   "zt": 97,
+   "zt_ratio": 1.06,
+   "sh_net5": 809.3,
    "tactic_score": 2,
-   "pace_hot": 27,
+   "pace_hot": 25,
    "pace_cool": 0,
    "res_win": 41.3
   }
