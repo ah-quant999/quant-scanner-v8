@@ -26,8 +26,8 @@
 # ============================================================================
 
 meta:
-  updated: "2026-11-27 08:20"
-  updated_by: 小九的工程师
+  updated: "2026-11-27 21:52"
+  updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
@@ -3619,6 +3619,12 @@ items:
       raw_data/top10_daily.json 是否被旧数据覆盖」），data/FINAL_RECOMMEND_DATA.js
       data_date 卡 2026-11-03 —— 两故障疑同源（因子榜/Top10 快照某列 None 污染）。
       第 1 轮的 factor_lab_gen 退出1 第 2 轮已消失（偶发），walkforward 两轮均在（非偶发）。
+      复判补充（2026-11-27 21:50 CST 阿狸咪的工程师夜巡）：11-27 全天 algo_run_report 连续
+      3 轮（ut 07:11:56 / 18:56:24）fail=2 同因复现；错误签名已演变：
+      unsupported operand +: 'float' and 'NoneType' → bad operand type for unary -: 'NoneType'
+      （同根 None 污染，炸点更靠后一跳，可按 unary 减号直接定位因子列）；
+      另一 fail=refresh_kline_freshness 超时>40min 属软闸基线（已知非问题，不并入本件）。
+      item 挂 22 天仍未认领，请白天主力尽快按新签名落码根因修复。
     fix: >
       根因层修 algorithms/factor_walkforward.py：定位 float + None 相加点，对上游因子
       缺值做显式 None 过滤/缺值策略（禁裸 try 吞错），并回溯定位哪一因子列自何时混入 None；
@@ -3628,7 +3634,7 @@ items:
       且 data/FACTOR_WALKFORWARD.js / raw_data/factor_walkforward.json 的 update_time 前进；
       转 done 需附新 report 证据（verified_at）。
     updated_by: 阿狸咪的工程师
-    updated: "2026-11-05 02:11"
+    updated: "2026-11-27 21:52"
   - id: national-team-4th-sub-1105
     owner: 小九机AI
     priority: P1
