@@ -203,6 +203,89 @@ def build_periods(signals, horizons=HORIZONS):
     return periods
 
 
+def build_oos_segment(signals, horizons=(5, 10, 20), ratio=0.6, min_oos=30):
+    """真样本外分段（按信号日**时间顺序**取 ratio 分位，同日不拆）。
+
+    🔴 2026-11-27 主人令「把 OOS 分段做进生成器」（原为手工追加，重跑即蒸发）：
+      旧版 split_date 写死 2026-10-01 却宣称「时间顺序 60/40」，
+      实测 188 信号 ⇒ IS 111 / OOS 2（98%/2%），OOS 样本形同没有。
+      现按真实时间切，切点写进产物便于对账；仍**不在 OOS 上重拟合**。
+
+    判据（保守，宁缺毋滥）：
+      OOS 的 T+5 样本 < min_oos(30) ⇒ insufficient_data，不得据此进最终推荐；
+      ≥ 30 时再看 胜率≥50% 且 均益>0 ⇒ pass，否则 fail。
+      即便 pass 也只是「可申请接入」，实际进 Top 仍须与因子榜同口径对比（另一道闸）。
+    """
+    days = sorted({d for _, d in signals})
+    base = {
+        "generated": datetime.now(CST).strftime("%Y-%m-%d %H:%M CST"),
+        "method": "信号日次一交易日开盘买入，T+5/T+10/T+20 收盘卖出，扣双边 %.2f%%" % COST_PCT,
+        "split_rule": "按信号日时间顺序取 %.0f%% 分位为切点；first_selected < split = 样本内，>= split = 样本外；不在 OOS 重拟合"
+                      % (ratio * 100),
+        "min_oos_required": min_oos,
+        "horizons": list(horizons),
+    }
+    if len(days) < 6:
+        base.update({"split_date": None, "in_sample": {}, "out_of_sample": {},
+                     "sample_decay": {"raw_signals": len(signals), "signal_days": len(days)},
+                     "verdict": "insufficient_data：信号日不足 6 个，无法分段"})
+        return base
+
+    # 切点 = 第 round(len(days)*ratio) 个信号日（该日及之后算 OOS）
+    _idx = max(1, min(len(days) - 1, int(round(len(days) * ratio))))
+    split_date = days[_idx]
+    is_sigs = [(c, d) for c, d in signals if d < split_date]
+    oos_sigs = [(c, d) for c, d in signals if d >= split_date]
+
+    def _calc(sig_list, n):
+        rets = []
+        for code, d in sig_list:
+            r = one_trade(bars_of(code), d, n)
+            if r is None:
+                continue
+            rets.append(r[0])
+        if not rets:
+            return {"n": 0, "win_rate": None, "avg_return": None}
+        win = sum(1 for x in rets if x > 0)
+        return {"n": len(rets),
+                "win_rate": round(win / len(rets) * 100.0, 1),
+                "avg_return": round(sum(rets) / len(rets), 2)}
+
+    res_is = {str(n): _calc(is_sigs, n) for n in horizons}
+    res_oos = {str(n): _calc(oos_sigs, n) for n in horizons}
+
+    _o5 = res_oos.get("5") or {}
+    _n5 = _o5.get("n") or 0
+    if _n5 < min_oos:
+        verdict = ("insufficient_data：OOS T+5 仅 %d 个可回测信号（门槛 %d），"
+                   "不可据此进最终推荐" % (_n5, min_oos))
+    else:
+        _wr = _o5.get("win_rate") or 0
+        _ar = _o5.get("avg_return") or 0
+        if _wr >= 50.0 and _ar > 0:
+            verdict = ("pass：OOS T+5 胜率 %.1f%%/均益 %+.2f%%（n=%d）达门槛，"
+                       "可申请接入（仍须与因子榜同口径对比后方可进 Top）" % (_wr, _ar, _n5))
+        else:
+            verdict = ("fail：OOS T+5 胜率 %.1f%%/均益 %+.2f%%（n=%d）未达门槛"
+                       % (_wr, _ar, _n5))
+
+    base.update({
+        "split_date": split_date,
+        "in_sample": res_is,
+        "out_of_sample": res_oos,
+        "sample_decay": {
+            "raw_signals": len(signals),
+            "signal_days": len(days),
+            "split_day_index": _idx,
+            "in_sample_signals": len(is_sigs),
+            "out_of_sample_signals": len(oos_sigs),
+            "note": "全量信号按 first_selected 时间顺序切；各档 n 随持有期成熟度自然衰减",
+        },
+        "verdict": verdict,
+    })
+    return base
+
+
 def _emit(name: str, payload: dict):
     p = RAW / name
     p.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -374,6 +457,8 @@ def run_ima_strong():
         ima_update_time=obj.get("update_time"),
         **_qf,
         periods=build_periods(sigs),
+        # 🔴 2026-11-27 主人令「OOS 分段做进生成器」：原为手工追加，重跑即蒸发
+        oos_segment=build_oos_segment(sigs),
     ))
 
 
