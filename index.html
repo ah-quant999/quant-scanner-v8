@@ -8882,7 +8882,7 @@ function switchSec(sec,el){
         _slSelfInjected = true;
         try{
           var _sc = document.createElement('script');
-          _sc.src = (_v8ResUrl('STOCK_LIST') || 'data/STOCK_LIST.js?v=0e449559c4'); _sc.async = true;
+          _sc.src = ((window._v8ResUrl&&window._v8ResUrl('STOCK_LIST')) || 'data/STOCK_LIST.js?v=0e449559c4'); _sc.async = true;
           document.head.appendChild(_sc);
         }catch(e){}
       }
@@ -17054,7 +17054,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=cb57c0541a');
+      _smsScript.src=((window._v8ResUrl&&window._v8ResUrl('STOCK_MOMENTUM_STATE')) || 'data/STOCK_MOMENTUM_STATE.js?v=cb57c0541a');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -17063,7 +17063,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=68ce8186fd');
+      _smeScript.src=((window._v8ResUrl&&window._v8ResUrl('STOCK_MOMENTUM_STATE_V2')) || 'data/STOCK_MOMENTUM_STATE_V2.js?v=68ce8186fd');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -21426,6 +21426,7 @@ window.__renderV8CalToday();
     }catch(e){}
     return null;
   }
+  try{ window._v8ResUrl = _v8ResUrl; }catch(e){}
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=0e449559c4', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=0e7e36dd8d', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
