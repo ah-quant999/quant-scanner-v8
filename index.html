@@ -9943,44 +9943,6 @@ function renderLimitUpHeatmap(){
   var _startIdx=Math.max(0, _displayDates.length-SHOW_DAYS);
   contentEl.innerHTML=buildTable(_startIdx)+_legend;
   card.style.display='block';
-  /* 🎯 结论行（2026-11-27）：把「今日 vs 昨日涨停家数」翻成动作。
-     容器 limitUpHeatAnalysis 是 2026-09 就预留的结论位，一直 display:none 未填充，此处正式启用。 */
-  if(analysisEl){
-    (function(){
-      if(!window.v8Concl) return;
-      analysisEl.style.display = 'block';
-      /* 盘前：末列为今日占位已剔除 ⇒ 只能谈上一交易日，必须明示，不许冒充当日 */
-      if(_premkt){
-        var _pd = _displayDates.length ? _displayDates[_displayDates.length-1] : '—';
-        window.v8Concl('limitUpHeatAnalysis',
-          '盘前时段，今日列尚为占位已剔除；以上为上一交易日 <b>' + _pd + '</b> 的真实口径 → 开盘后再看当日温度。',
-          'dim');
-        return;
-      }
-      var _tt = Number(data.today_total), _pt = Number(data.prev_total);
-      if(!isFinite(_tt) || !isFinite(_pt) || _tt<=0 || _pt<=0) return;
-      /* 陈旧闸：拿 update_time 的日期和今天比，T-1 必须显式标注，禁止拿昨日冒充今日 */
-      var _ut = String(data.update_time||'').slice(0,10);
-      var _today = _cstLuh ? (_cstLuh.y + '-' + String(_cstLuh.m).padStart(2,'0') + '-' + String(_cstLuh.d).padStart(2,'0')) : '';
-      var _staleTag = (_ut && _today && _ut !== _today) ? '（数据 ' + _ut.slice(5) + '，非当日）' : '';
-      var _dd = _tt - _pt, _r = _pt ? (_dd/_pt*100) : 0, _sgn = (_dd>0?'+':'') + _dd;
-      var _txt, _tone;
-      if(_r >= 20){
-        _tone = 'up';
-        _txt = '今日涨停 <b>' + _tt + '</b> 家 vs 昨日 <b>' + _pt + '</b> 家（' + _sgn + '，+' + _r.toFixed(0) + '%）'
-             + _staleTag + ' → <b>情绪在升温</b>，可参与，但只做主线首板，不追高位连板。';
-      }else if(_r <= -20){
-        _tone = 'down';
-        _txt = '今日涨停 <b>' + _tt + '</b> 家 vs 昨日 <b>' + _pt + '</b> 家（-' + Math.abs(_dd) + '，' + _r.toFixed(0) + '%）'
-             + _staleTag + ' → <b>情绪在退潮</b>，不追高、不加仓，等止跌再加。';
-      }else{
-        _tone = 'gold';
-        _txt = '今日涨停 <b>' + _tt + '</b> 家 vs 昨日 <b>' + _pt + '</b> 家（' + _sgn + '）'
-             + _staleTag + ' → <b>情绪平稳</b>，按既定仓位做主线，不因单日波动加减仓。';
-      }
-      window.v8Concl('limitUpHeatAnalysis', _txt, _tone);
-    })();
-  }
 
   /* ③ 卡底「板块周期档案」折叠区（2026-09-16 主人令：原「历史矩阵 + 周期档案」两折叠区合并为一个；
         2026-09-16 追加令：历史矩阵整张大表不再前端展示，仅后台 data/LIMIT_UP_HEATMAP.js 累积记录，历史不丢）
@@ -10226,6 +10188,41 @@ function renderLimitUpHeatmap(){
   }
   analysisEl.innerHTML=analysis.map(function(a){return '<div>'+a+'</div>';}).join('');
   analysisEl.style.display='block';
+  /* 🎯 结论行（2026-11-27 主人令「都要有结论」）：把「今日 vs 昨日涨停家数」提到最顶部，先给动作。
+     ⚠️ 必须放在上面 analysisEl.innerHTML 赋值之后 —— 该处会整体重写容器，放前面会被覆盖。
+     两条防伪：盘前末列已剔除时只谈上一交易日并明示；update_time 非当日时强制标「（数据 MM-DD，非当日）」，
+     绝不让昨日冒充今日。明细（持续热点/退潮/今日最强/全局）仍保留在结论行下方，不删原有内容。 */
+  (function(){
+    if(!window.v8Concl) return;
+    if(_premkt){
+      var _pd = _displayDates.length ? _displayDates[_displayDates.length-1] : '—';
+      window.v8Concl('limitUpHeatAnalysis',
+        '盘前时段，今日列尚为占位已剔除；以下为上一交易日 <b>' + _pd + '</b> 的真实口径 → 开盘后再看当日温度。',
+        'dim');
+      return;
+    }
+    var _tt = Number(data.today_total), _pt = Number(data.prev_total);
+    if(!isFinite(_tt) || !isFinite(_pt) || _tt<=0 || _pt<=0) return;
+    var _ut = String(data.update_time||'').slice(0,10);
+    var _today = _cstLuh ? (_cstLuh.y + '-' + String(_cstLuh.m).padStart(2,'0') + '-' + String(_cstLuh.d).padStart(2,'0')) : '';
+    var _stale = (_ut && _today && _ut !== _today) ? '（数据 ' + _ut.slice(5) + '，非当日）' : '';
+    var _dd = _tt - _pt, _r = _pt ? (_dd/_pt*100) : 0, _sgn = (_dd>0?'+':'') + _dd;
+    var _txt, _tone;
+    if(_r >= 20){
+      _tone = 'up';
+      _txt = '今日涨停 <b>' + _tt + '</b> 家 vs 昨日 <b>' + _pt + '</b> 家（' + _sgn + '，+' + _r.toFixed(0) + '%）'
+           + _stale + ' → <b>情绪在升温</b>，可参与，但只做主线首板，不追高位连板。';
+    }else if(_r <= -20){
+      _tone = 'down';
+      _txt = '今日涨停 <b>' + _tt + '</b> 家 vs 昨日 <b>' + _pt + '</b> 家（-' + Math.abs(_dd) + '，' + _r.toFixed(0) + '%）'
+           + _stale + ' → <b>情绪在退潮</b>，不追高、不加仓，等止跌再加。';
+    }else{
+      _tone = 'gold';
+      _txt = '今日涨停 <b>' + _tt + '</b> 家 vs 昨日 <b>' + _pt + '</b> 家（' + _sgn + '）'
+           + _stale + ' → <b>情绪平稳</b>，按既定仓位做主线，不因单日波动加减仓。';
+    }
+    window.v8Concl('limitUpHeatAnalysis', _txt, _tone);
+  })();
 }
 
 
