@@ -1607,6 +1607,40 @@ def build():
                     v["metrics"] = {"price": 0.0, "pct_chg": 0.0,
                                     "volume_ratio": 0.0, "amount": 0.0, "date": today_date}
 
+    # 🛡 2026-11-27 主人令（一劳永逸）：候选池只收「个股」。
+    #   实证：588170 科创半导体ETF华夏 以 market='sz' / board_label='主板' 混进「全市场流动性溢出」，
+    #   metrics 全 0 —— 它既是 ETF（根本不该进选股池），市场还记错（sh 记成 sz），
+    #   前端个股查询因此把它显示成「选股策略命中·候选池」，属双重错误。
+    #   收口在写盘前统一清洗：非 A 股个股代码 / 非 5 位港股 → 剔除；A 股按代码前缀重算 market/board。
+    _a_prefix = ("60", "68", "00", "30", "8", "4", "92")
+    _rejected = []
+    for _k in list(members.keys()):
+        _v = members[_k]
+        _c = str(_v.get("code") or "").strip()
+        if _v.get("market") == "hk":
+            if not (_c.isdigit() and len(_c) == 5):
+                _rejected.append((_c, "非5位港股"))
+                for _src in _v.get("sources", []):
+                    dist[_src] = max(0, dist.get(_src, 0) - 1)
+                members.pop(_k, None)
+            continue
+        if not (_c.isdigit() and len(_c) == 6 and _c.startswith(_a_prefix)):
+            _rejected.append((_c, _v.get("name", "")))
+            for _src in _v.get("sources", []):
+                dist[_src] = max(0, dist.get(_src, 0) - 1)
+            members.pop(_k, None)
+            continue
+        _m, _b = _norm(_c, _v.get("name", ""), "A股", "")[2], _norm(_c, _v.get("name", ""), "A股", "")[3]
+        if _m and _v.get("market") != _m:
+            _v["market"] = _m
+        if _b and (_v.get("board_label") != _b or _v.get("board") != _b):
+            _v["board_label"] = _b
+            _v["board"] = _b
+    if _rejected:
+        out["total"] = len(members)
+        out["source_dist"] = dict(dist)
+        print(f"  🧹 剔除非个股代码 {len(_rejected)} 个（ETF/指数/市场错位）: {_rejected[:8]}")
+
     # 7) 落盘：慢变成员表（纯成员基线，不含每日指标）→ out/ + 持久 raw_data/
     _members_out = {
         "update_time": time.strftime("%Y-%m-%d %H:%M:%S"),

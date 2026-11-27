@@ -289,16 +289,97 @@ def fetch_hk_spot():
     return out
 
 
-def fetch_etf_spot():
-    """ETF 实时行情（akshare 东财接口，约 1500 只）。"""
+def _carry_etf_from_prev():
+    """ETF 双源都失败时，承接上一份 data/STOCK_QUOTE.js 里的 ETF 条目（打 stale 标），
+    而不是把 1600+ 只 ETF 从行情表里直接抹掉。
+
+    2026-11-27 实证：东财 push2 限流 → fund_etf_spot_em 抛 Push2RateLimitError →
+    旧逻辑 return {} 静默继续，写出的 STOCK_QUOTE meta.etf_count=0，
+    前端个股查询对每只 ETF 都显示「未收录」，主人以为站点坏了（图6）。
+    """
+    p = os.path.join(DATA_DIR, 'STOCK_QUOTE.js')
+    if not os.path.isfile(p):
+        return {}
     try:
-        df = ak.fund_etf_spot_em()
+        with open(p, 'r', encoding='utf-8') as f:
+            txt = f.read()
+        i = txt.find('{')
+        obj = json.loads(txt[i:].rstrip().rstrip(';'))
     except Exception as e:
-        print(f"⚠️ ETF 行情获取失败: {type(e).__name__} {str(e)[:60]}")
+        print(f"⚠️ ETF 承接：读上一份失败 {type(e).__name__} {str(e)[:60]}")
         return {}
+    out = {}
+    for k, v in (obj.get('stocks') or {}).items():
+        if isinstance(v, dict) and v.get('board') == 'ETF':
+            vv = dict(v)
+            vv['stale'] = True          # 前端据此标注「上次快照」，不冒充实时
+            out[k] = vv
+    print(f"♻️ ETF 承接上一份 {len(out)} 只（行情为上次快照，已标 stale）")
+    return out
+
+
+def _fetch_etf_spot_sina():
+    """ETF 备源：新浪基金分类行情（ak.fund_etf_category_sina）。
+    与东财 push2 不同主机，限流不共享；列名容错，缺列按 None 落盘。"""
+    try:
+        df = ak.fund_etf_category_sina(symbol="ETF基金")
+    except Exception as e:
+        print(f"⚠️ ETF 备源(新浪)失败: {type(e).__name__} {str(e)[:80]}")
+        return {}
+    if df is None or getattr(df, 'empty', True):
+        print("⚠️ ETF 备源(新浪)返回空")
+        return {}
+    cols = set(map(str, df.columns))
+    def pick(row, *names):
+        for n in names:
+            if n in cols:
+                v = row.get(n)
+                if v not in (None, '', '-'):
+                    return v
+        return None
+    out = {}
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%H:%M:%S')
+    for _, r in df.iterrows():
+        raw = str(pick(r, '代码', 'symbol', 'code') or '').strip()
+        name = str(pick(r, '名称', 'name') or '').strip()
+        code = ''.join(ch for ch in raw if ch.isdigit())
+        if len(code) != 6 or not name:
+            continue
+        prefix = raw[:2].lower() if raw[:2].lower() in ('sh', 'sz') else ('sh' if code.startswith('5') else 'sz')
+        out[prefix + code] = {
+            'name': name,
+            'price': _safe_float(pick(r, '最新价', '现价')),
+            'change': _safe_float(pick(r, '涨跌额')),
+            'pct': _safe_float(pick(r, '涨跌幅')),
+            'prev_close': _safe_float(pick(r, '昨收', '昨收盘')),
+            'open': _safe_float(pick(r, '今开', '开盘价')),
+            'high': _safe_float(pick(r, '最高', '最高价')),
+            'low': _safe_float(pick(r, '最低', '最低价')),
+            'volume': _safe_float(pick(r, '成交量')),
+            'amount': _safe_float(pick(r, '成交额')),
+            'snapshot_time': now,
+            'board': 'ETF',
+            'industry': '',
+            'concepts': [],
+        }
+    print(f"✅ ETF 行情(备源·新浪)：{len(out)} 只")
+    return out
+
+
+def fetch_etf_spot():
+    """ETF 实时行情（东财 push2 主源，约 1500 只；失败重试 3 次后切新浪备源）。"""
+    df = None
+    for attempt in range(3):
+        try:
+            df = ak.fund_etf_spot_em()
+            if df is not None and not df.empty:
+                break
+        except Exception as e:
+            print(f"⚠️ ETF 行情获取失败(第{attempt + 1}/3 次): {type(e).__name__} {str(e)[:80]}")
+            df = None
+        time.sleep(4)
     if df is None or df.empty:
-        print("⚠️ ETF 行情返回空")
-        return {}
+        return _fetch_etf_spot_sina()
     out = {}
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%H:%M:%S')
     for _, r in df.iterrows():
@@ -581,8 +662,11 @@ def write_outputs(data):
         'a_count': a_count,
         'hk_count': hk_count,
         'etf_count': etf_count,
+        'etf_degraded': etf_count == 0,
         'fields': ['name','price','change','pct','prev_close','open','high','low','volume','amount','snapshot_time','board','industry','concepts'],
     }
+    if etf_count == 0:
+        print("⚠️⚠️ ETF 行情缺口：本轮 etf_count=0（双源均失败且无可承接旧值）→ 前端个股查询会走「ETF 行情缺失」说明卡")
     # raw_data/stock_quote.json（云端抓取落盘位置）
     raw_path = os.path.join(RAW_DIR, 'stock_quote.json')
     out = {'update_time': meta['update_time'], 'meta': meta, 'stocks': data}  # 🛡 顶层 update_time 供 freshness SLA 读取（持久化，不被 cron 覆盖）
@@ -702,6 +786,10 @@ def main():
         return 1
     hk_data = fetch_hk_spot()
     etf_data = fetch_etf_spot()
+    if not etf_data:
+        # 🛡 2026-11-27 主人令（图6「查不了了？」）一劳永逸：
+        #   双源都空时承接上一份 ETF 快照（stale 标），绝不把 1600+ 只 ETF 从行情表抹掉。
+        etf_data = _carry_etf_from_prev()
     # 合并：A 股为基础，港股/ETF 补充（不覆盖 A 股）
     for k, v in hk_data.items():
         if k not in data:

@@ -407,7 +407,15 @@ CARD_DEFS = [
     #   GitHub 直接丢弃。故本项按「6 小时 deadline」判灰：cron 已合并为单条每 3 小时，
     #   正常 3h 内必有新值，超 6h = 连丢两轮，必须让主人看见，而不是伪装成 ✓。
     #   不设 heal_cat：产物由云端 GitHub cron 写，本机自愈派发够不着，避免无效派发风暴。
-    {"id": "RUNNER_STATUS_HEALTH", "name": "小九 runner 心跳", "page": "全量数据", "freq": "每3小时(云端GitHub cron)", "max_age": 2160, "soft_age": 360, "key_fields": ["state", "update_time"], "weekend_update": True},
+    # 🛡 2026-11-27 夜间主人令（图9「小九 runner 心跳 超6小时未更新（疑似丢跑）」一劳永逸）：
+    #   根因不是 runner 掉线，而是**判据选错了源**：
+    #     · 本项原读 data/RUNNER_STATUS_HEALTH.js（云端 runner_health_alert.yml 每 3h 写一次）；
+    #     · 但 GitHub schedule 对该仓长期丢跑（实测 11-16~11-27 每天只跑 1 次，11-27 全天 0 次），
+    #       文件停在 11-26 22:35，而机端直报的 RUNNER_STATUS/HB_XIAOJIU 明明是 21:19/21:33 在线；
+    #   ⇒ 卡片把「告警链自己的发布节奏」误当成「runner 是否在线」，天天假红。
+    #   修法：改读 RUNNER_STATUS（小九机内 v8_runner_guard 直写、随心跳一起 commit，不依赖 GitHub cron）。
+    #   语义不变：机端停了 → RUNNER_STATUS 停更 → 6h 转灰、24h 转红，真离线照样报。
+    {"id": "RUNNER_STATUS_HEALTH", "name": "小九 runner 心跳", "page": "全量数据", "freq": "机端守护 v8_runner_guard 直写(随心跳提交)", "max_age": 2160, "soft_age": 360, "key_fields": ["update_time"], "_source_file": "RUNNER_STATUS", "_window_var": "RUNNER_STATUS", "weekend_update": True},
     {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "heal_cat": "dajijin", "key_fields": ["update_time"], "cycle": (3, 30)},
     # 🛡 2026-11-02 一劳永逸（九宝令）：此二卡纯本地生成（零网络、不需 cn IP），此前完全漏登记 →
     #   掉进通用扫描 1440 红线判 fail 却无 heal_cat ⇒ 自愈链够不到、且定时 workflow 跳步骤 → 永久停更。

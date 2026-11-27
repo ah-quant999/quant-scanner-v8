@@ -757,8 +757,13 @@ function _uBadge(slot, horizon, ts, sub, pageSlot, staleGuard){
   //   update_time 停在今早盘前批次 —— 数据本身是新鲜的，但按「实时」标准看像卡住了。
   //   此处按胶囊已有的 slot 如实标注（slot 由 pageSlot / _slotByTs 归一，与标签同源），
   //   让「本就不该盘中刷新」与「真的刷新失败」一眼可分。零数据语义改动。
+  /* 🗂 2026-11-27 夜间：季报档（现金流质量榜等）不是「盘中不刷新」，而是「随财报披露更新」，
+     避免主人把季度快照误读成日频卡断更（图7）。 */
+  var _cadText = (slot && slot.indexOf('季') >= 0)
+    ? '季报档数据，随财报披露更新（非日频）'
+    : (slot ? slot+'档数据，盘中不刷新' : '');
   var _cadNote = (!_isLive && slot && slot !== 'auto')
-    ? ' <span style="font-size:10px;color:var(--dim);font-weight:400;opacity:.9">\u00b7 '+slot+'档数据，盘中不刷新</span>'
+    ? ' <span style="font-size:10px;color:var(--dim);font-weight:400;opacity:.9">\u00b7 '+_cadText+'</span>'
     : '';
   var _okTitle = '数据更新于 ' + t;
   if(_pageSlot && _realSlot && _realSlot !== _pageSlot){
@@ -2540,7 +2545,7 @@ window.STRATEGY_WALKFORWARD = {
     <!-- 投资避雷针·新闻语料量化（2026-11-05 主人令：自「暂未上架·综合研判」区迁入今日事件页，置于打新速览卡下方；
          渲染仍走 window.__renderInvestAvoid（数据缺失时 600ms×40 自愈重试），switchSec('td') 进入时触发） -->
         <div class="card v8grp" id="grpRisk" style="border-left:4px solid #f59e0b;margin-bottom:16px">
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">⚠️</span>今日风险清单 · 盘前扫雷 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d">折叠 4 张 · 开盘前过一遍</span></h3>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">⚠️</span>今日风险清单 · 盘前扫雷 <span class="v8grp-badge org">🗂 折叠 4 张 · 点标签切换 · 开盘前过一遍</span></h3>
       <div class="grp-tabs">
         <button class="grp-tab active" onclick="v8GrpTab('grpRisk',0)">🔓 今日解禁</button>
         <button class="grp-tab" onclick="v8GrpTab('grpRisk',1)">📈 业绩预告</button>
@@ -3018,7 +3023,7 @@ window.STRATEGY_WALKFORWARD = {
     </script>
 
     <details open class="v8-fold v8-fold-defopen" style="margin:14px 0;border:1px solid var(--border2,#2d3743);border-radius:8px;background:var(--card2,#1a2129)">
-      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--dim);list-style:none;user-select:none"><span class="v8fold-arrow">▸</span> 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11px;opacity:.7">（点击收起）</span></summary>
+      <summary style="cursor:pointer;padding:11px 14px;font-size:13.5px;font-weight:800;color:#e6edf7;list-style:none;user-select:none;background:rgba(65,201,255,.07);border-left:3px solid #41c9ff;border-radius:6px"><span class="v8fold-arrow" style="color:#41c9ff">▸</span> 🌍 外围行情与宏观观测（指数 · 亚太 · 期指 · 国债期货） <span style="font-size:11.5px;font-weight:600;color:#8ad9ff">（点击收起）</span></summary>
 
     <script>
     /* 🟢 2026-11-26 主人令「外围行情与宏观观测」默认展开（不再默认收起）：
@@ -3043,13 +3048,20 @@ window.STRATEGY_WALKFORWARD = {
               <div class="card v8grp" id="grpEnv" style="border-left:4px solid #41c9ff;margin-bottom:16px">
       <style>
         /* 🗂 2026-11-27 主人令：折叠组沿用「因子中心」tab 范式——同页同时段、同用途的确认级卡片叠成一张卡 */
-        .v8grp .grp-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px}
-        .v8grp .grp-tab{font-size:12px;font-weight:600;color:var(--sub);background:transparent;border:1px solid transparent;border-radius:8px;padding:5px 11px;cursor:pointer;transition:all .15s}
-        .v8grp .grp-tab:hover{color:var(--txt);background:var(--bg2)}
-        .v8grp .grp-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+        /* 🎨 2026-11-27 夜间主人令（图5「折叠的都要明显标注，现在颜色和字体很容易看不到」）：
+           未选中 tab 由 var(--sub) 提到 #c7d5e6 + 实底描边，选中态改为青底深字（对比度最高）；
+           徽章统一 .v8grp-badge（11.5px/800/实底/描边），不再各卡各写一套 10px 淡色。 */
+        .v8grp .grp-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:9px}
+        .v8grp .grp-tab{font-size:13px;font-weight:700;color:#c7d5e6;background:rgba(148,163,184,.13);border:1px solid rgba(148,163,184,.34);border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .15s}
+        .v8grp .grp-tab:hover{color:#fff;background:rgba(65,201,255,.16);border-color:rgba(65,201,255,.55)}
+        .v8grp .grp-tab.active{color:#08121d;background:#41c9ff;border-color:#41c9ff;font-weight:800;box-shadow:0 2px 10px rgba(65,201,255,.38)}
+        .v8grp .grp-tab.active::before{content:"▸ "}
         .v8grp .grp-pane{display:none}
         .v8grp .grp-pane.active{display:block}
         .v8grp .grp-pane>h3{margin-top:0}
+        .v8grp-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.2px;white-space:nowrap;background:rgba(65,201,255,.18);color:#8ad9ff;border:1px solid rgba(65,201,255,.6)}
+        .v8grp-badge.amb{background:rgba(251,191,36,.18);color:#fcd34d;border-color:rgba(251,191,36,.6)}
+        .v8grp-badge.org{background:rgba(245,158,11,.18);color:#fbbf24;border-color:rgba(245,158,11,.6)}
       </style>
       <script>
       /* 🗂 2026-11-27：折叠组 tab 切换（通用；切换后广播 resize 供图表重排） */
@@ -3062,20 +3074,20 @@ window.STRATEGY_WALKFORWARD = {
         try{ window.dispatchEvent(new Event('resize')); }catch(e){}
       };
       </script>
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌏</span>环境确认 · 外盘与利率 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#41c9ff22;color:#41c9ff;border:1px solid #41c9ff4d">折叠 3 张 · 只确认环境</span></h3>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌏</span>环境确认 · 外盘与利率 <span class="v8grp-badge">🗂 折叠 3 张 · 点标签切换 · 默认看期指</span></h3>
       <div class="grp-tabs">
-        <button class="grp-tab active" onclick="v8GrpTab('grpEnv',0)">🌏 亚太市场概览</button>
-        <button class="grp-tab" onclick="v8GrpTab('grpEnv',1)">📈 期指主力</button>
+        <button class="grp-tab active" onclick="v8GrpTab('grpEnv',0)">📈 期指主力</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpEnv',1)">🌏 亚太市场概览</button>
         <button class="grp-tab" onclick="v8GrpTab('grpEnv',2)">🏦 国债期货 · 利率</button>
       </div>
       <div class="grp-pane active">
-        <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
-            <div id="overseasBody" style="font-size:13px;color:var(--txt)">加载中…</div>
-      </div>
-      <div class="grp-pane">
         <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
             <div id="futuresMainBody" style="font-size:13px;color:var(--txt)">加载中…</div>
             <div class="note note-insight">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
+      </div>
+      <div class="grp-pane">
+        <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
+            <div id="overseasBody" style="font-size:13px;color:var(--txt)">加载中…</div>
       </div>
       <div class="grp-pane">
         <h3><span class="ic">🏦</span>国债期货 · 利率预期罗盘 · <span class="fresh" id="bondFutTime">—</span></h3>
@@ -3244,6 +3256,19 @@ window.STRATEGY_WALKFORWARD = {
       if(document.readyState==='loading')
         document.addEventListener('DOMContentLoaded', renderConceptTreemap);
       else renderConceptTreemap();
+      /* 🛡 2026-11-27 主人令（图1「概念资金热力只有加载中…」）：
+         首渲时若 window.CONCEPT_RANKING 尚未就位（defer 迟到/被限流），原逻辑会把「加载中…」当终态。
+         现改为数据到位即重渲（幂等），最多等 30s；页面 load 后再补一次，彻底消灭永久空卡。 */
+      (function(){
+        var n = 0;
+        var tm = setInterval(function(){
+          n++;
+          var d = window.CONCEPT_RANKING;
+          if(d && d.items && d.items.length){ clearInterval(tm); try{ renderConceptTreemap(); }catch(e){} }
+          else if(n > 60){ clearInterval(tm); }
+        }, 500);
+        window.addEventListener('load', function(){ try{ renderConceptTreemap(); }catch(e){} });
+      })();
       window._renderConceptTreemap=renderConceptTreemap;
     })();
     </script>
@@ -3455,15 +3480,20 @@ function fmtSigned(v){
 
     <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
         <div class="card v8grp" id="grpObs" style="border-left:4px solid #94a3b8;margin-bottom:16px">
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌙</span>盘后观测 · 风险与位置 <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:#94a3b8;border:1px solid #94a3b84d">折叠 5 张 · 状态确认级</span></h3>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌙</span>盘后观测 · 风险与位置 <span class="v8grp-badge amb">🗂 折叠 5 张 · 点标签切换 · 默认看IF持仓</span></h3>
       <div class="grp-tabs">
-        <button class="grp-tab active" onclick="v8GrpTab('grpObs',0)">📊 市场宽度</button>
-        <button class="grp-tab" onclick="v8GrpTab('grpObs',1)">⚖️ 股债性价比</button>
-        <button class="grp-tab" onclick="v8GrpTab('grpObs',2)">🧭 IF会员持仓</button>
+        <button class="grp-tab active" onclick="v8GrpTab('grpObs',0)">🧭 IF会员持仓</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpObs',1)">📊 市场宽度</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpObs',2)">⚖️ 股债性价比</button>
         <button class="grp-tab" onclick="v8GrpTab('grpObs',3)">🌊 严重异动</button>
         <button class="grp-tab" onclick="v8GrpTab('grpObs',4)">🏛 股东增减持</button>
       </div>
       <div class="grp-pane active">
+        <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
+      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
+      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
+      </div>
+      <div class="grp-pane">
         <h3><span class="ic">📊</span>市场宽度 · 新高家数 · <span class="fresh" id="breadthTime">—</span></h3>
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
       </div>
@@ -3471,11 +3501,6 @@ function fmtSigned(v){
         <h3><span class="ic">⚖️</span>股债性价比 · 温度计 · <span class="fresh" id="eqbondTime">—</span></h3>
       <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
       <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
-      </div>
-      <div class="grp-pane">
-        <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
-      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。</div>
       </div>
       <div class="grp-pane">
               <div id="severeSwingCard"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
@@ -7744,6 +7769,8 @@ window.__renderIndexObserve = function(){
          📌 实测判据：本轮 T-60 至今 3913→3477（-12.5%），与历史三轮同类事件日收益相关性最高仅 r=0.11
          （阈值 0.5）⇒ 卡面自判「无显著相似」，对当日动作零指导；历史 3 例 T+20 中位 +9.4% 属少数样本。
          保留价值＝事件台账可查 + 下次真出现高相似路径时才可能有用，故不删、只降级。 -->
+    <!-- 🗂 2026-11-27 夜间主人令（图8「这卡在研判和个股页都有」）：静态卡挂在两子页之外，切到「个股类」也照样显示 ⇒ 现用 #ulPolicyPane 包住，跟随子页显隐。 -->
+    <div id="ulPolicyPane">
     <div class="card" id="policyEventPathCard" style="margin-top:16px;border-left:4px solid #7e57c2">
       <div id="evPathHead2"></div>
       <div style="padding:2px 14px 12px">
@@ -7756,6 +7783,7 @@ window.__renderIndexObserve = function(){
         <div id="evPathVerdict" class="note note-insight" style="margin-top:12px;line-height:1.8"></div>
         <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.6">📌 口径：上证指数以基准事件日 T=0 归一化为 100，横轴为相对交易日 T-60~T+60；历史路径取同类政策事件前后各 60 个交易日真实收盘（INDEX_HISTORY 上证日线，非拼凑）。⚠ 单事件类比、样本量小、非统计显著，只作情景参照，<b>不构成信号或预测，不参与选股与仓位</b>。</div>
       </div>
+    </div>
     </div>
   </section>
 
@@ -8884,6 +8912,63 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
      统一走 window.v8SectorFlow（修复原 3 处硬 bug：CONCEPT_RANKING 键名错配 / industry 贪婪替换错配 / net 单位亿元被 fmtYi 缩 1e4）。
      doV8Query 网格不再单独调用。 */
 
+  /* 🔍 2026-11-27 主人令（图6「查不了了？」）一劳永逸：
+     ETF 走独立面板，不再套个股那套（止盈止损/算法评分/龙虎榜/停牌对 ETF 无意义）。
+     背景：STOCK_QUOTE 的 ETF 腿来自 akshare fund_etf_spot_em（东财 push2），
+     2026-11-27 16:48 那批被东财限流 ⇒ meta.etf_count=0 —— 1666 只 ETF 在「清单」里却不在「行情」里，
+     旧逻辑对每只 ETF 都吐四张「未收录」，主人看到的就是「什么都查不了」。
+     现口径：有行情 → 出行情卡；无行情 → 出一张说明卡（含清单信息 + 当日 ETF 活跃榜命中），
+     绝不拿 0 值冒充行情，也不堆四张空盒。 */
+  function _etfPulseHit(code){
+    try{
+      var P = (window.ETF_PULSE && window.ETF_PULSE.etfs) || [];
+      for(var i=0;i<P.length;i++){ if(String(P[i].code)===String(code)) return P[i]; }
+    }catch(e){}
+    return null;
+  }
+  function renderEtfPanel(item, full, hasQuote){
+    var code = item.code || '', nm = item.name || code;
+    var SQ = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) || {};
+    var q = SQ[full] || SQ[code] || null;
+    var hit = _etfPulseHit(code);
+    var meta = (window.STOCK_QUOTE && window.STOCK_QUOTE.meta) || {};
+    var h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px">';
+    if(hasQuote && q){
+      var pc = (q.pct==null?NaN:Number(q.pct));
+      var col = (pc>=0) ? 'var(--up)' : 'var(--down)';
+      h += '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">'
+         + '<div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px">📊 实时行情（ETF）</div>'
+         + '<div style="font-size:23px;font-weight:800;color:'+col+'">'+(q.price==null?'—':Number(q.price).toFixed(3))+'</div>'
+         + '<div style="font-size:12.5px;font-weight:700;color:'+col+';margin:2px 0 8px">'
+         + (q.change==null?'':((Number(q.change)>=0?'+':'')+Number(q.change).toFixed(3)))
+         + (isNaN(pc)?'':'  '+((pc>=0?'+':'')+pc.toFixed(2)+'%'))+'</div>'
+         + '<div style="font-size:11.5px;color:var(--sub);line-height:1.7">昨收 '+(q.prev_close==null?'-':q.prev_close)
+         + ' · 今开 '+(q.open==null?'-':q.open)+' · 高 '+(q.high==null?'-':q.high)+' · 低 '+(q.low==null?'-':q.low)
+         + '<br>成交额 '+(q.amount==null?'-':(Number(q.amount)/1e8).toFixed(2)+' 亿')+' · 快照 '+(q.snapshot_time||'—')+'</div></div>';
+    }
+    h += '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid '+(hasQuote?'var(--border)':'rgba(251,191,36,.55)')+'">'
+       + '<div style="font-size:13px;font-weight:700;color:'+(hasQuote?'var(--cyan)':'#fbbf24')+';margin-bottom:8px">'
+       + (hasQuote?'🏷 ETF 口径':'⚠ ETF 行情本轮缺失')+'</div>'
+       + '<div style="font-size:11.5px;color:var(--sub);line-height:1.8">'
+       + '标的 <b style="color:var(--txt)">'+nm+'</b> · 代码 <b>'+full+'</b> · 类别 <b>ETF</b>（场内基金，无行业/题材标签、不参与个股选股评分）';
+    if(!hasQuote){
+      h += '<br><span style="color:#fbbf24">本轮行情源未返回 ETF（东财 push2 限流，STOCK_QUOTE.meta.etf_count='+((meta.etf_count==null)?'?':meta.etf_count)
+         + '，快照 '+(meta.update_time||'—')+'）。清单能查到、报价查不到，是行情腿缺口，不是站点坏了。</span>';
+      h += '<br>备源（新浪 ETF 分类）已排入下一批抓取，恢复后此卡自动出行情。';
+    } else {
+      h += '<br>ETF 不适用个股的止盈止损 / 算法评分 / 龙虎榜 / 停牌识别，故本页只给行情与口径。';
+    }
+    if(hit){
+      var hc = (Number(hit.chg)>=0) ? 'var(--up)' : 'var(--down)';
+      h += '<br>当日 ETF 活跃榜命中：<b style="color:'+hc+'">'+(Number(hit.chg)>=0?'+':'')+Number(hit.chg).toFixed(2)+'%</b>'
+         + ' · 成交额 '+(hit.amount==null?'-':(Number(hit.amount)/1e4).toFixed(2)+' 亿')+'（按成交额取前 N，仅覆盖活跃品种）';
+    } else if(!hasQuote){
+      h += '<br>当日 ETF 活跃榜（按成交额）未收录该标的，属正常——榜单只覆盖成交最活跃的一档。';
+    }
+    h += '</div></div>';
+    return h;
+  }
+
   window.doV8Query = function(){
     const input = _q$('v8QueryInput');
     const res = _q$('v8QueryResult');
@@ -8922,17 +9007,26 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     //  - renderStrategyHits / Lhb：含"找不到就不渲染整张"守卫
     //  - 删除原 renderMulti(renderStrategyHits 已含)/ GoldPool(重复)/ Report / Mahoro / Inst / PriceTrend / Ema（事件型永远空）
     // ⚡ 操作信号置顶（2026-08-12 主人令：要的是买卖判断，不纯是数据 → 结论先行，数据在后）
-    h+=renderTradeSignals(item, code);
-    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px">';
-    h+=renderQuote(item, code);
-    h+=renderStopStop(item, code);
-    h+=renderProfile(item, code);
-    h+=renderStrategyHits(item, code);
-    h+=renderAlgoScore(item, code);
-    /* 💧 关联板块资金流向已并入 renderProfile 卡内（2026-09-18） */
-    h+=renderLhb(item, code);
-    h+='</div>';
-    h+=renderSuspension(item, code);
+    var _isEtf = (String(item.market||'').toLowerCase()==='etf') || /ETF/i.test(item.name||'');
+    if(_isEtf){
+      /* ETF 专用：只出「行情 + 口径」两卡（2026-11-27 主人令 图6） */
+      var _SQ0 = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) || {};
+      var _hk = _SQ0[full] ? full : (_SQ0[code] ? code : null);
+      var _hasQ = !!(_hk && _SQ0[_hk] && _SQ0[_hk].price != null);
+      h += renderEtfPanel(item, full, _hasQ);
+    } else {
+      h+=renderTradeSignals(item, code);
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px">';
+      h+=renderQuote(item, code);
+      h+=renderStopStop(item, code);
+      h+=renderProfile(item, code);
+      h+=renderStrategyHits(item, code);
+      h+=renderAlgoScore(item, code);
+      /* 💧 关联板块资金流向已并入 renderProfile 卡内（2026-09-18） */
+      h+=renderLhb(item, code);
+      h+='</div>';
+      h+=renderSuspension(item, code);
+    }
     res.innerHTML = h;
     try{ if(typeof window.renderDoTSpace==='function') window.renderDoTSpace(code); }catch(e){ console.warn('[doV8Query] renderDoTSpace', e); }
     } catch(e) {
@@ -16244,8 +16338,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var hd = document.getElementById('cashflowHeader');
     if(hd && typeof window.v8CardHeader === 'function'){
       hd.innerHTML = window.v8CardHeader('&#x1F4B0;', 'A股现金流质量榜',
-        (D.period_label||'—') + ' · 现金含量=每股经营现金流/每股收益',
-        'update_time', {update_time:D.calc_date, slot:'盘后', horizon:'中长线'})
+        (D.period_label||'—') + ' · 现金含量=每股经营现金流/每股收益 · 下次年报披露后刷新',
+        'update_time', {update_time:D.calc_date, slot:'季报', horizon:'中长线'})
         + '<div style="padding:0 14px 9px;margin-top:-2px"><span style="font-size:11px;color:#fbbf24;border:1px solid #fbbf2455;border-radius:4px;padding:1px 6px">观测 &#183; 不参与选股</span></div>';
     }
     try{
@@ -16626,6 +16720,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var pS=document.getElementById('ulPaneStock');
       if(pR) pR.style.display=(t==='research')?'block':'none';
       if(pS) pS.style.display=(t==='stock')?'block':'none';
+      var pP=document.getElementById('ulPolicyPane');
+      if(pP) pP.style.display=(t==='research')?'block':'none';   /* 2026-11-27：政策卡只在研判类 */
       var tabs=document.querySelectorAll('#sec-ul .ul-tab2');
       for(var j=0;j<tabs.length;j++){
         var on = tabs[j].id === ('ulTab'+(t==='research'?'Research':'Stock'));
@@ -21094,7 +21190,7 @@ window.__renderV8CalToday();
   try{ window._v8ResUrl = _v8ResUrl; }catch(e){}
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=b680b192d8', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=b042e6b1d7', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=07e87d3d32', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=072d49ecbb', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
