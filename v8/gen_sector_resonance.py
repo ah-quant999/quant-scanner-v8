@@ -44,11 +44,27 @@ OUT = ROOT / "data" / "SECTOR_RESONANCE.js"
 SRC = ROOT / "data" / "SECTOR_RS.js"          # 每日板块快照（90 个板块 pct_day）
 CST = timezone(timedelta(hours=8))
 
-TOP_N = 20            # 参与协方差的板块数（十几个到二十个，按成交额/市值取代表）
+TOP_N = 31            # 参与协方差的板块数上限（= 申万一级行业全量；截断会漏掉银行/非银/TMT 等主干）
 WINDOW = 60           # 滚动窗口交易日数（用户口径「过去多少天」取 60）
 MIN_WINDOW = 20       # 累积路径下开始出值的最小天数（低于此只记录不出结论）
 HIST_KEEP = 120       # history 最多保留天数（防文件膨胀）
 KLINE_DAYS = 180      # akshare 路径回看的自然日
+
+# 🔴 2026-11-27 一劳永逸（首跑实测踩坑）：akshare 的行业板块列表里混入了**三级嵌套**的
+#   同族板块 —— 实测首版取「成交额前 20」拿到的是
+#     银行 / 银行Ⅱ / 国有大型银行Ⅲ、电子 / 半导体 / 数字芯片设计、石油石化 / 炼化及贸易…
+#   同族板块日收益相关系数接近 1，等于把一个因子重复计入 3 次 ⇒ 第一主成分被人为抬高：
+#   首跑 PC1=82.43%（z=2.47），而当日实际是「科创50/半导体领涨、红利弱」的结构性行情，
+#   根本不可能是 82% 的共振。这就是「板块集合不干净 ⇒ 指标失真」。
+#   修法：改用**固定申万一级 31 个行业**白名单（无层级嵌套、跨期名单不变 ⇒ 可比），
+#   抓不到的就跳过，能抓到 ≥8 个即算。PC1 的高低依赖板块个数，只有名单固定才谈得上"相对自身历史"。
+SW_LEVEL1 = [
+    "农林牧渔", "基础化工", "钢铁", "有色金属", "电子", "家用电器", "食品饮料",
+    "纺织服饰", "轻工制造", "医药生物", "公用事业", "交通运输", "房地产", "商贸零售",
+    "社会服务", "综合", "建筑材料", "建筑装饰", "电力设备", "机械设备", "国防军工",
+    "汽车", "计算机", "传媒", "通信", "银行", "非银金融", "煤炭", "石油石化",
+    "环保", "美容护理",
+]
 
 
 def log(msg):
@@ -86,12 +102,6 @@ def fetch_kline(top_n=TOP_N, days=KLINE_DAYS):
         log("akshare/pandas 不可用，跳过 kline 路径：%s" % e)
         return None, None, None
 
-    try:
-        names_df = ak.stock_board_industry_name_em()
-    except Exception as e:
-        log("板块列表接口失败，跳过 kline 路径：%s" % e)
-        return None, None, None
-
     # 列名容错：不同 akshare 版本列名有差异
     def pick_col(df, cands):
         for c in df.columns:
@@ -100,18 +110,10 @@ def fetch_kline(top_n=TOP_N, days=KLINE_DAYS):
                     return c
         return None
 
-    name_col = pick_col(names_df, ["板块名称", "名称"])
-    amt_col = pick_col(names_df, ["成交额", "总市值", "换手率"])
-    if name_col is None:
-        log("板块列表缺名称列：%s" % list(names_df.columns))
-        return None, None, None
-
-    df = names_df.copy()
-    if amt_col is not None:
-        df["_rank"] = pd.to_numeric(df[amt_col], errors="coerce").fillna(0)
-        df = df.sort_values("_rank", ascending=False)
-    sectors = [str(x) for x in df[name_col].head(top_n).tolist()]
-    log("kline 路径取板块 %d 个：%s" % (len(sectors), "、".join(sectors[:8]) + "…"))
+    # 固定白名单（见文件头 SW_LEVEL1 注释：首跑实测「成交额前20」混入三级嵌套同族板块，
+    # 银行/银行Ⅱ/国有大型银行Ⅲ 等重复计入同一因子 ⇒ PC1 被人为抬到 82%，必须弃用该取法）
+    sectors = list(SW_LEVEL1)[:top_n] if top_n else list(SW_LEVEL1)
+    log("kline 路径使用固定申万一级白名单 %d 个行业（无层级嵌套，跨期可比）" % len(sectors))
 
     end = datetime.now(CST).strftime("%Y%m%d")
     beg = (datetime.now(CST) - timedelta(days=days)).strftime("%Y%m%d")
