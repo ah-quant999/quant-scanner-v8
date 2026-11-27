@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 04:54:58",
+  "update_time": "2026-11-27 16:39:52",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -10,53 +10,53 @@
   "sentiment_meta": {
     "phase": "狂热",
     "score": 85.0,
-    "delta_pct": 27.45,
+    "delta_pct": 300.0,
     "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
+        "name": "基金减仓",
+        "type": "概念",
+        "net": 703.46
+      },
+      {
+        "name": "电子",
+        "type": "行业",
+        "net": 461.9
+      },
+      {
+        "name": "2026中报预增",
+        "type": "概念",
+        "net": 461.6
+      },
+      {
         "name": "通信技术",
         "type": "概念",
-        "net": 79.17
+        "net": 426.93
       },
       {
-        "name": "5G概念",
+        "name": "华为概念",
         "type": "概念",
-        "net": 77.24
-      },
-      {
-        "name": "CPO概念",
-        "type": "概念",
-        "net": 64.67
-      },
-      {
-        "name": "光通信模块",
-        "type": "概念",
-        "net": 47.22
-      },
-      {
-        "name": "元件",
-        "type": "行业",
-        "net": 45.27
+        "net": 417.1
       }
     ],
     "top_out": [
       {
-        "name": "基建市政工程",
-        "type": "行业",
-        "net": -1.17
+        "name": "油气资源",
+        "type": "概念",
+        "net": -0.03
       },
       {
-        "name": "医院",
-        "type": "行业",
-        "net": -1.17
+        "name": "共享经济",
+        "type": "概念",
+        "net": -0.1
       },
       {
-        "name": "金属新材料",
-        "type": "行业",
-        "net": -1.17
+        "name": "粮食概念",
+        "type": "概念",
+        "net": -0.16
       }
     ]
   },
