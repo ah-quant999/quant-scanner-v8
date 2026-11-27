@@ -373,7 +373,11 @@ CARD_DEFS = [
     #   此前以下 16 项有真实前端卡但未登记 CARD_DEFS ⇒ 健康胶囊只能落到「全量数据」组（all_* 通用审计），
     #   本页组内无灯。补登后胶囊归位真实导航页组；max_age 一律宽松口径防误报红灯；producer 可考者才填（禁编造）。
     {"id": "OVERSEAS_MARKETS", "name": "亚太市场概览", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["indices"], "heal_cat": "intraday", "raw_file": "overseas_markets.json"},
-    {"id": "AI_MARKET_BRIEF", "name": "AI 市场速览", "page": "实时数据", "freq": "盘中+每日3档(08:50/12:30/15:10)", "max_age": 720, "key_fields": ["sentiment"]},
+    # 🔴 2026-11-27 主人令（遗留项收口）：原 freq 写「盘中+每日3档(08:50/12:30/15:10)」——
+    #   那 3 个时点是 v6 时代的手工档，v8 早已没有对应 cron（08:50/12:30/15:10 三档查无调度）。
+    #   真实链路：cloud_fetch_v8.py 在 category ∈ {intraday, post_close, all} 时调
+    #   algorithms/gen_market_brief.py ⇒ 盘中随抓取（每 20 分派发）+ 盘后 17:20/18:20/19:20 三档。
+    {"id": "AI_MARKET_BRIEF", "name": "AI 市场速览", "page": "实时数据", "freq": "盘中随抓取(每20分)+盘后3档", "max_age": 720, "key_fields": ["sentiment"]},
     {"id": "COMMODITY_ELASTICITY", "name": "商品涨价弹性榜", "page": "实时数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["hot_count"], "heal_cat": "post_close", "raw_file": "commodity_elasticity.json"},
     {"id": "ETF_NET_SUBSCRIPTION", "name": "资金热度·净申赎", "page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["total_net_amount_yi"], "heal_cat": "premarket", "raw_file": "etf_net_subscription.json"},
     {"id": "W52_HIGH", "name": "市场宽度·新高家数", "page": "盘后数据", "freq": "每交易日盘前(07:15~08:45)", "max_age": 1440, "key_fields": ["total", "top_gainers"], "heal_cat": "post_close", "raw_file": "w52_high.json", "cycle": (8, 45)},
