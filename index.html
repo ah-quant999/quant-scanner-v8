@@ -2231,7 +2231,28 @@ window.STRATEGY_WALKFORWARD = {
 
 
         <div id="final-pane-fa" class="final-pane">
-    <div class="card" style="border-left:4px solid #94a3b8;margin-bottom:14px">
+    <!-- 🗂 2026-11-27 主人令「v8 卡太多了，科学处置」：因子实验室子页 4 卡位 → 1 卡位（内嵌 4 tab）
+         原 4 卡：🧪因子实验室(纯静态口径说明) / 🧮每日因子计算 / 🏆当日因子计分榜 / 🎯因子榜Top10。
+         铁律：4 个 pane 保留全部原始 DOM id（dfcHost/dsbHost/stFinalSelList/stFinalSelTime/dfcBadge/
+               dsbBadge/dfcUpdSlot/dsbUpdSlot）⇒ 三个渲染函数一行未改；本改造纯 DOM 收口，零数据口径变动。 -->
+    <div class="card" id="factorHubCard" style="border-left:4px solid #26d9c2;margin-bottom:14px">
+      <style>
+        #factorHubCard .fa-tab{font-size:12px;font-weight:600;color:var(--sub);background:transparent;border:1px solid transparent;border-radius:8px;padding:5px 11px;cursor:pointer;transition:all .15s}
+        #factorHubCard .fa-tab:hover{color:var(--txt);background:var(--bg2)}
+        #factorHubCard .fa-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+        #factorHubCard .fa-pane{margin-top:2px}
+        #factorHubCard .fa-pane>h3{margin-top:0}
+      </style>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🧪</span>因子中心
+        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#26d9c222;color:#26d9c2;border:1px solid #26d9c24d">非选股策略 · 只加分不改池</span>
+      </h3>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px">
+        <button class="fa-tab active" data-fa="top10" onclick="switchFaTab('top10')">🎯 因子榜 Top10</button>
+        <button class="fa-tab" data-fa="dsb" onclick="switchFaTab('dsb')">🏆 当日计分榜</button>
+        <button class="fa-tab" data-fa="dfc" onclick="switchFaTab('dfc')">🧮 每日因子计算</button>
+        <button class="fa-tab" data-fa="lab" onclick="switchFaTab('lab')">📖 因子定位</button>
+      </div>
+      <div class="fa-pane" id="fa-pane-lab" style="display:none">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
     <span style="font-size:15px;font-weight:700;color:var(--txt)">🧪 因子实验室</span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d">非选股策略 · 不评星级</span>
@@ -2253,7 +2274,7 @@ window.STRATEGY_WALKFORWARD = {
          🔴 铁律：本卡是代码的**投影**，每个权重都必须能在源码里指到行；
                   凡「未回测/薄样本」证据，一律如实标注，不许美化（沿用 09-18 主人令）。
          ═══════════════════════════════════════════════════════════════ -->
-    <div class="card" id="dailyFactorCalcCard" style="border-left:4px solid #41c9ff;margin-top:16px">
+      <div class="fa-pane" id="fa-pane-dfc" style="display:none">
     <!-- 🔻 2026-09-19 主人令（图像取证）：①「更新于」徽章提到卡名正后方（全站规范：卡名置顶 + 更新于紧随，仍读产物真值不写死）
          ②、卡名行右侧「回测 时间」删除（不重复占卡头） ③「入选后打分全表 / 共 N 项」下移第二行 -->
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
@@ -2296,7 +2317,7 @@ window.STRATEGY_WALKFORWARD = {
          数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按「因子综合分」降序的子集，由 generate_top10.py 落盘，每票 11 维因子分 + 文字明细；历史实绩 winrate_score 仅作置信微调与展示，不再定排序（2026-11-18 主人令「测算未来收益最好的股」范式）
          🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码精确匹配）
          ═══════════════════════════════════════════════════════════════ -->
-    <div class="card" id="dailyScoreboardCard" style="border-left:4px solid #f59e0b;margin-top:16px">
+      <div class="fa-pane" id="fa-pane-dsb" style="display:none">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
     <span style="font-size:15px;font-weight:700;color:var(--txt)">🏆 当日因子计分榜</span>
     <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
@@ -2318,11 +2339,12 @@ window.STRATEGY_WALKFORWARD = {
             置于「🏆 当日因子计分榜」下方；只展示 Top10，避免与「最终推荐」混淆）
          数据源：TOP10_DAILY.top10（与计分榜同源），每日盘后随算法链刷新
          ═════════════════════════════════════════════════════════════════════════ -->
-    <div class="card" id="factorTop10Card" style="border-left:4px solid #26d9c2;margin-top:16px">
+      <div class="fa-pane active" id="fa-pane-top10">
       <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>因子榜 Top10 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
       <div id="stFinalSelSummary" class="tp-stocklist"></div>
       <div id="stFinalSelList" class="tp-stocklist"></div>
       <div class="note">口径：金股池按「因子综合分」降序的精选子集（selection_mode=top_by_expected_return 为历史字段名沿用；实为 11 维因子加总：前瞻期望项 ±15（分值权重，非收益百分比）+ 证据门控因子 + winrate 置信微调 ±5，历史实绩不再定排序）。⚠️ 2026-11-27 主人令：样本外 T+10 胜率 24.7%/均益 −8.22%（n=1029）未过门槛，故本榜不再以「收益预测」命名。本卡 = <b>因子榜 Top10（本榜前 10 名）</b>；🏷 Top5 = 本榜前 5 名。⚠️ 本榜 = 金股池内收益率排序榜，非独立另建池，非「最终推荐」（最终推荐为独立管线）。</div>
+    </div>
     </div>
     </div>  </section>
 
@@ -21803,6 +21825,26 @@ window.__renderV8CalToday();
   }
 
   // 子 Tab 切换
+  /* 🗂 2026-11-27 主人令：因子中心内嵌 tab 切换（4 卡收口为 1 卡位）。
+     显示控制全走 inline display，不依赖 CSS 是否加载；切 tab 时兜底重渲对应卡，
+     防「隐藏期渲染 → 切回来是空表」的老问题。 */
+  window.switchFaTab = function(name){
+    var card = document.getElementById('factorHubCard'); if(!card) return;
+    card.querySelectorAll('.fa-tab').forEach(function(b){
+      b.classList.toggle('active', b.dataset.fa === name);
+    });
+    card.querySelectorAll('.fa-pane').forEach(function(p){
+      var on = (p.id === 'fa-pane-' + name);
+      p.classList.toggle('active', on);
+      p.style.display = on ? 'block' : 'none';
+    });
+    try{
+      if(name==='dfc' && typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc();
+      else if(name==='dsb' && typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard();
+      else if(name==='top10' && typeof window.renderFinalSelection==='function') window.renderFinalSelection();
+    }catch(e){ console.warn('[switchFaTab]', name, e); }
+  };
+
   window.switchFinalTab = function(name){
     document.querySelectorAll('.final-tab').forEach(function(btn){
       var isActive = btn.dataset.final === name;
