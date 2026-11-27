@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 14:24:31",
+  "update_time": "2026-11-27 14:36:04",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "11/27"
   ],
   "columns": 30,
-  "cycle_count": 18,
+  "cycle_count": 17,
   "cycles": [
     {
       "sector": "AI算力",
@@ -22,9 +22,9 @@
       "end_idx": 29,
       "days": 30,
       "hot_days": 24,
-      "peak": 56,
-      "peak_date": "11/27",
-      "total": 234,
+      "peak": 25,
+      "peak_date": "10/26",
+      "total": 189,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 83,
       "peak_date": "11/04",
-      "total": 1463,
+      "total": 1448,
       "ongoing": true
     },
     {
@@ -63,7 +63,7 @@
       "hot_days": 27,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 322,
+      "total": 305,
       "ongoing": true
     },
     {
@@ -74,9 +74,9 @@
       "end_idx": 29,
       "days": 30,
       "hot_days": 28,
-      "peak": 46,
-      "peak_date": "11/27",
-      "total": 507,
+      "peak": 37,
+      "peak_date": "10/23",
+      "total": 468,
       "ongoing": true
     },
     {
@@ -87,9 +87,9 @@
       "end_idx": 29,
       "days": 30,
       "hot_days": 29,
-      "peak": 25,
-      "peak_date": "11/27",
-      "total": 299,
+      "peak": 19,
+      "peak_date": "11/10",
+      "total": 279,
       "ongoing": true
     },
     {
@@ -134,15 +134,15 @@
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "11/27",
+      "end": "11/24",
       "start_idx": 6,
-      "end_idx": 29,
-      "days": 24,
-      "hot_days": 20,
+      "end_idx": 26,
+      "days": 21,
+      "hot_days": 19,
       "peak": 18,
       "peak_date": "11/17",
-      "total": 135,
-      "ongoing": true
+      "total": 126,
+      "ongoing": false
     },
     {
       "sector": "通信设备",
@@ -178,9 +178,9 @@
       "end_idx": 29,
       "days": 3,
       "hot_days": 2,
-      "peak": 7,
-      "peak_date": "11/27",
-      "total": 12,
+      "peak": 4,
+      "peak_date": "11/25",
+      "total": 9,
       "ongoing": true
     },
     {
@@ -204,22 +204,9 @@
       "end_idx": 29,
       "days": 2,
       "hot_days": 2,
-      "peak": 75,
+      "peak": 7,
       "peak_date": "11/27",
-      "total": 78,
-      "ongoing": true
-    },
-    {
-      "sector": "军工",
-      "start": "11/27",
-      "end": "11/27",
-      "start_idx": 29,
-      "end_idx": 29,
-      "days": 1,
-      "hot_days": 1,
-      "peak": 9,
-      "peak_date": "11/27",
-      "total": 9,
+      "total": 10,
       "ongoing": true
     },
     {
@@ -230,9 +217,9 @@
       "end_idx": 29,
       "days": 1,
       "hot_days": 1,
-      "peak": 18,
+      "peak": 3,
       "peak_date": "11/27",
-      "total": 18,
+      "total": 3,
       "ongoing": true
     },
     {
@@ -243,9 +230,9 @@
       "end_idx": 29,
       "days": 1,
       "hot_days": 1,
-      "peak": 19,
+      "peak": 6,
       "peak_date": "11/27",
-      "total": 19,
+      "total": 6,
       "ongoing": true
     }
   ]
