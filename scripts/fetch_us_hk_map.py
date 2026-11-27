@@ -444,10 +444,27 @@ def _gate(us_name, hk_name):
 
 
 def _mom(row):
-    """提取多周期动量。"""
+    """提取多周期动量。
+
+    🛡 2026-11-27 主人令（一劳永逸·防「伪暴跌」）：长窗口动量做**连续性校验**。
+    实测病证：SOXX（半导体ETF-iShares）d10=-17.64 但 d20=-75.48、d60=-74.42，
+    而同类的 SMH 是 d20=-25.58 / d60=-22.52 —— 86 条里唯一断裂。
+    成因：东财 f110/f24 对**拆分/合股未复权**的标的分母仍是旧价（127.98 的价配 500+ 的旧价，
+    正好≈4:1 拆分的倒挂），算出来的 20/60 日跌幅是假数。
+    护栏（宁缺勿假）：|d20 − d10| > 40pp 视为断裂 ⇒ 该窗口置 None（前端显示「—」），
+    只保留连续可信的短窗口，并打 mom_suspect 供排查。绝不发布自相矛盾的假跌幅。
+    """
     m = {}
     for key, fld in MOM_FIELDS:
         m[key] = _f(row.get(fld))
+    d10, d20, d60 = m.get("d10"), m.get("d20"), m.get("d60")
+    if isinstance(d10, (int, float)) and isinstance(d20, (int, float)) and abs(d20 - d10) > 40:
+        m["d20"] = None
+        m["d60"] = None
+        m["mom_suspect"] = "d20/d60 与 d10 断裂（疑拆分未复权，已作废该窗口）"
+    elif isinstance(d20, (int, float)) and isinstance(d60, (int, float)) and abs(d60 - d20) > 90:
+        m["d60"] = None
+        m["mom_suspect"] = "d60 与 d20 断裂（疑拆分未复权，已作废该窗口）"
     return m
 
 
