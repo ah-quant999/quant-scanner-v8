@@ -136,7 +136,11 @@ CARD_DEFS = [
     #     盘后 gate 直接跳过（打印「⏸️ 不在交易时间」），真实补数靠哨兵每 10 分自动派发，故不必改派发源。
     #   · raw_file 交叉校验有效：raw_data/stock_quote.json 与 data/STOCK_QUOTE.js 同由专用链产出。
     #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
-    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后15:30-21:30", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
+    # 🔴 2026-11-27 主人令（一劳永逸·「看板绿但数据旧」）：
+    #   post_close_required = 每交易日在盘后**必须产出一次**的卡，不适用「非盘中就豁免」。
+    #   cycle=(16,30) = 盘后档真实产出锚点（cron 16:00 起抓 9915 只票约 5-10min + 部署推送）。
+    #   盘后「过了 16:30 + 3h 宽限仍未刷新」⇒ fail，当天可见，不再拖到次日 24h 窗口。
+    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后两档 16:00/20:00", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "post_close_required": True, "cycle": (16, 30), "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
     # 🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：FUTURES_REALTIME（期指实时）此前
     #   CARD_DEFS 完全漏登记 ⇒ 健康面板不监控 + 自愈链够不到 ⇒ 断更只能靠主人肉眼发现
     #   （11-13 实测：cron 静默失联 + 缓存戳不同步双重故障，两处均已修，本条补上监控盲区）。
@@ -380,7 +384,19 @@ CARD_DEFS = [
     {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "heal_cat": "experiments", "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
-    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
+    # 🔴 2026-11-27 同 STOCK_QUOTE：每交易日盘后必须产出一次 ⇒ post_close_required，
+    #   盘后按 cycle 收紧判龄（实测盘后链 15:48 前后出数，deadline 给到 16:30 留足余量）。
+    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次(15:50前后)", "max_age": 1440, "key_fields": ["phase", "sector_count"], "post_close_required": True, "cycle": (16, 30), "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
+    # 🔴 2026-11-27 主人令（图2「RUNNER_STATUS_HEALTH 停在 11-26 22:35 却判 ✓」根治）：
+    #   本项此前**完全不在体检清单**（_LOW_FREQ_FILES 里只留一句「另有专门检查」，而那个检查
+    #   只负责开 Issue，不看陈旧度）⇒ 「小九机离线」这条最关键的运维事实，只能由看板按 isToday
+    #   自己猜，猜错就绿。
+    #   实测（GitHub Actions API，11-16~11-26）：runner_health_alert 工作日声明 5 档 cron，
+    #   **实际每天只跑 1 次**，且全部落在 UTC 13~15 档（北京 21~23 点）—— UTC 5/7/9/11 四档被
+    #   GitHub 直接丢弃。故本项按「6 小时 deadline」判灰：cron 已合并为单条每 3 小时，
+    #   正常 3h 内必有新值，超 6h = 连丢两轮，必须让主人看见，而不是伪装成 ✓。
+    #   不设 heal_cat：产物由云端 GitHub cron 写，本机自愈派发够不着，避免无效派发风暴。
+    {"id": "RUNNER_STATUS_HEALTH", "name": "小九 runner 心跳", "page": "全量数据", "freq": "每3小时(云端GitHub cron)", "max_age": 2160, "soft_age": 360, "key_fields": ["state", "update_time"], "weekend_update": True},
     {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "heal_cat": "dajijin", "key_fields": ["update_time"], "cycle": (3, 30)},
     # 🛡 2026-11-02 一劳永逸（九宝令）：此二卡纯本地生成（零网络、不需 cn IP），此前完全漏登记 →
     #   掉进通用扫描 1440 红线判 fail 却无 heal_cat ⇒ 自愈链够不到、且定时 workflow 跳步骤 → 永久停更。
@@ -2228,6 +2244,11 @@ def check_data_cards():
         #   修法：凡带 republish_time 且晚于 update_time 的卡，一律取 republish_time 判龄
         #   （通用语义，非给某两张卡打补丁；LIMIT_UP_HEATMAP 等同类定稿卡一并受益）。
         #   真跳班（既无 republish_time、update_time 又早于定稿窗）仍照原逻辑判 fail，不丢真故障可见性。
+        # 🛡 2026-11-27：盘前窗口判定提到此处（原在下方 status 分支才定义，供 post_close_required
+        #   卡在 max_age 计算阶段就要用到）。口径：非交易日全天，或交易日 09:30 前。
+        _pm_now = now_cst()
+        _pm_h = _pm_now.hour + _pm_now.minute / 60.0
+        _prem_window = (not _is_trading_day(_pm_now.date())) or (_pm_h < 9.5)
         _ut = data.get("update_time")
         _rt = data.get("republish_time")
         ts = (_rt if (_rt and (not _ut or str(_rt) > str(_ut))) else _ut) \
@@ -2253,7 +2274,15 @@ def check_data_cards():
             if _cyc:
                 _n = now_cst()
                 _mk = _recent_trading_mark(_n, *_cyc)
-                max_age = max(max_age, int((_n - _mk).total_seconds() / 60) + _REG_GRACE_MIN)
+                _span = int((_n - _mk).total_seconds() / 60) + _REG_GRACE_MIN
+                # 🔴 2026-11-27 主人令（一劳永逸）：post_close_required 卡在**盘后**必须收紧（min），
+                #   不能用 max —— 它们原 max_age=1440，max() 只会抬高，cycle 等于白登记：
+                #   实测 07:00 出的数到次日 07:00 前都 <24h，⇒「今天盘后档整个没跑」也判 ok，
+                #   停更一整天无人知晓。盘后收紧后：过了当日产出点 + 3h 宽限仍未刷新即 fail。
+                if d.get("post_close_required") and not _prem_window and not is_intraday_session():
+                    max_age = min(max_age, _span)
+                else:
+                    max_age = max(max_age, _span)
 
             # 🛡 2026-11-03 一劳永逸（九宝令）：_LOW_FREQ_MAX_AGE 登记的低频产物（US_HK_MAP /
             #   MARKET_THERMO 等）按自身红线放宽，不被「今日事件」盘前 180min 紧 cap 误杀。
@@ -2445,7 +2474,17 @@ def check_data_cards():
         # 盘中被误清空的情况已由上方 prem_cleared + is_intraday_session() 分支判 fail，这里不重复。
         # 🛡 2026-08-19 修：ETF_DAILY_MONITOR 等 KEEP_VARS 卡盘前保留上一交易日(T+1)收盘值，
         #   盘前不刷新属设计行为（同 premarket_cleared 预期），盘前判 OK、开盘后由盘中刷新覆盖。
-        prem_cleared_expected = (prem_cleared or d.get("premarket_keep")) and not is_intraday_session()
+        # 🔴 2026-11-27 主人令（图2「远端停在今晨 07:00 却判 ✓」总根源）：
+        #   原判据 `and not is_intraday_session()` ⇒ **盘后 / 夜间 / 凌晨全部**落入本分支，
+        #   一律 status=ok + 文案「盘前已清空，等待开盘后刷新（预期行为）」。
+        #   实测 15:55 生成的 HEALTH_CHECK 里，STOCK_QUOTE 到下午 4 点还写着「等待开盘后刷新」，
+        #   而它的盘后档 16:00 就该出数 —— 只要盘后档没跑，这张卡永远绿，永不报警。
+        #   收窄：post_close_required 的卡（每交易日在收盘后必须产出一次）不再享受盘后豁免，
+        #   改由下方 cycle 节拍 + 盘后收紧判龄兜底（过了产出点没更新立刻 fail）。
+        _pcr = bool(d.get("post_close_required"))
+        prem_cleared_expected = ((prem_cleared or d.get("premarket_keep"))
+                                 and not is_intraday_session()
+                                 and not _pcr)
 
         # 空值检测
         empty_fields = []
@@ -2488,6 +2527,12 @@ def check_data_cards():
             status = "ok"
             phase = "盘后" if page in ("盘后数据", "选股策略") else "盘前"
             msg = f"休市不更新（数据为上一交易日{phase}）；{rel}"
+        elif _pcr and is_intraday_session():
+            # 盘后档专用卡（STOCK_QUOTE / SECTOR_LEADERS）：盘中不产出是**已定口径**
+            # （2026-11-26 主人令「个股报价盘后跑就好」），如实标 info 而不是 ok ——
+            # ok 会让人以为「盘中也在刷、而且是新的」，info 明确告知「本卡盘中不参与」。
+            status = "info"
+            msg = f"盘后档专用卡·盘中不产出（既定口径）；{rel}"
         elif prem_cleared_expected:
             status = "ok"
             msg = f"盘前已清空，等待开盘后刷新（预期行为）；{rel}"
@@ -2500,6 +2545,18 @@ def check_data_cards():
         #   仅在 algo_run 且非 manual_dep 且 raw_data 24h 内已更新时，把误报 fail/warn 翻回 ok。
         #   放在所有 status 重算分支之后、fail 消息追加之前，作为权威终裁（不掩盖真·管线缺口）。
         status, msg = _raw_fresh_override(d, status, msg)
+        # 🛡 2026-11-27 主人令（一劳永逸）：软阈值 soft_age —— 「轻度陈旧判灰、久停才判红」。
+        #   用途：产物由**外部调度**（GitHub cron）供给、丢跑可自愈的心跳类卡。
+        #   典型 = RUNNER_STATUS_HEALTH（soft_age=360 = 6h / max_age=2160 = 36h）：
+        #     · 6h 内有新值        → ok（正常，cron 每 3h 一轮）
+        #     · 6h~36h 未更新      → warn（灰，连丢两轮，提示但不谎报故障）
+        #     · >36h 未更新        → fail（红，两机协同都停了）
+        #   为什么不直接 fail：cron 丢跑是 GitHub 侧常态（实测 5 档只跑 1 档），
+        #   一律标红会制造噪声，反而让主人对这个红叉脱敏。
+        _soft = d.get("soft_age")
+        if _soft and status == "ok" and age_min is not None and age_min > _soft:
+            status = "warn"
+            msg = f"超 {round(_soft/60, 1)} 小时未更新（疑似丢跑）；{rel}"
         if status == "fail":
             if intentional_empty:
                 msg += "；占位符长期未刷新（抓取疑似持续失败）"
