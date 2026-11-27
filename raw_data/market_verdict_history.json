@@ -42,20 +42,20 @@
   {
    "date": "2026-11-27",
    "stance": "watch",
-   "score_norm": 0.177,
-   "crisis": 35.7,
-   "zt": 95,
-   "zt_ratio": 1.04,
-   "sh_net5": -770.6,
+   "score_norm": 0.297,
+   "crisis": 34.6,
+   "zt": 97,
+   "zt_ratio": 1.06,
+   "sh_net5": 827.0,
    "tactic_score": 2,
    "pace_hot": 25,
    "pace_cool": 0,
-   "res_win": 41.3
+   "res_win": null
   },
   {
    "date": "2026-11-28",
    "stance": "watch",
-   "score_norm": 0.042,
+   "score_norm": 0.044,
    "crisis": 34.6,
    "zt": 97,
    "zt_ratio": 1.06,
@@ -63,7 +63,7 @@
    "tactic_score": 1,
    "pace_hot": 0,
    "pace_cool": 0,
-   "res_win": 42.1
+   "res_win": null
   }
  ]
 }
