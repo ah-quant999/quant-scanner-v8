@@ -1,6 +1,6 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 11:44:39",
+ "generated": "2026-11-27 12:23:33",
  "verdict": {
   "cap_pct": 50,
   "label": "观"
@@ -10,14 +10,14 @@
   "tactic_exposure": 0.5,
   "senti_phase": "狂热",
   "senti_score": 80.0,
-  "zt": 54,
+  "zt": 57,
   "max_ladder": 4,
-  "up": 1765,
-  "down": 519,
-  "breadth": 0.7727670753064798,
+  "up": 1849,
+  "down": 446,
+  "breadth": 0.8056644880174292,
   "crisis": 35.7,
-  "sh_close": 3484.34,
-  "sh_chg": 0.21,
+  "sh_close": 3486.28,
+  "sh_chg": 0.27,
   "zz1000_close": 5531.84,
   "flow_in_cnt": 14,
   "top_sectors": [
@@ -36,7 +36,7 @@
  "list_gate_ok": false,
  "list_gate_why": "榜单陈旧11-26、validity=degraded、无分辨度max=4.1、缺维度inst_w52/inst_analyst",
  "forward_ref": {
-  "sh_close": 3484.34,
+  "sh_close": 3486.28,
   "date": "2026-11-27"
  }
 }
