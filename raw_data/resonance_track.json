@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-27 16:46:32",
- "window": "2026-06-10 ~ 2026-11-25",
+ "generated": "2026-11-27 16:36:30",
+ "window": "2026-06-10 ~ 2026-11-23",
  "criteria": "龙虎榜: inst_net>0 且 yz_net>0 且 (inst+yz)≥8000万; 转债剔除",
  "entry": "T+1 开盘买入, 单边成本0.15%, 净口径; 未成熟期限标 pending",
  "benchmark": "880003 平均股价(等权全A)·同成本口径",
- "n_signals": 409,
+ "n_signals": 407,
  "n_tracked": 358,
  "per_horizon": {
   "T+1": {
@@ -8757,28 +8757,6 @@
    "r120": null,
    "r180": null,
    "r250": null
-  },
-  {
-   "date": "2026-11-24",
-   "code": "301261",
-   "name": "恒工精密",
-   "pct": 14.026,
-   "inst_yi": 1.03,
-   "yz_yi": 0.145,
-   "sum_yi": 1.175,
-   "entry": null,
-   "status": "pending_t1"
-  },
-  {
-   "date": "2026-11-25",
-   "code": "002685",
-   "name": "华东重机",
-   "pct": 0.447,
-   "inst_yi": 0.223,
-   "yz_yi": 0.661,
-   "sum_yi": 0.883,
-   "entry": null,
-   "status": "pending_t1"
   }
  ]
 }
