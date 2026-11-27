@@ -79,12 +79,25 @@ jobs:
               url = API + "/contents/" + path
               for i in range(retries):
                   try:
-                      cur = api("GET", url)
+                      # 🔴 2026-11-28 一劳永逸：原此处无条件 GET，而 raw_data/kondratiev.json
+                      #   从未入过库（实测 404）⇒ GET 直接抛错 ⇒ 本 workflow 自建库以来从未成功
+                      #   推送过一次（11-22 那份数据是本机手跑后手工推的）。改为 404 视作新建。
+                      #   注：内层 except 用 _e404 而非 e —— 同名会覆盖外层 e，导致外层
+                      #   e.code 触发 NameError（Python 会在 except 块结束时删除 as 变量）。
+                      try:
+                          cur = api("GET", url)
+                      except urllib.error.HTTPError as _e404:
+                          if _e404.code == 404:
+                              cur = {}
+                          else:
+                              raise
                       if cur.get("sha") == git_sha(raw):
                           print("[skip] identical:", path)
                           return False
                       payload = {"message": msg, "content": base64.b64encode(raw).decode(),
-                                 "branch": "main", "sha": cur["sha"]}
+                                 "branch": "main"}
+                      if cur.get("sha"):
+                          payload["sha"] = cur["sha"]
                       api("PUT", url, payload)
                       print("pushed", path, len(raw))
                       return True
