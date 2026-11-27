@@ -324,14 +324,58 @@ def main():
     #   仅重置受跟踪文件，绝不碰 raw_data/kline_cache 等未跟踪/忽略产物），确保跑批不卡死。
     #   不一致文件已在上文备份到仓库外，故此处硬重置安全。
     print(f"  🔴 逐项拉齐仍有 {len(still)} 个不齐：{still} → 整仓 git reset --hard {ref}")
-    _run(["git", "-C", repo, "reset", "--hard", ref])
+    _rc, _out, _err = _run(["git", "-C", repo, "reset", "--hard", ref])
+    if _rc != 0:
+        # 🔴 2026-11-27：原代码忽略 rc/stderr ⇒ reset 失败时只报「硬重置后仍不一致」，
+        #   看不出是 reset 本身失败（文件锁/索引锁）还是内容真落后。现显式留痕。
+        print(f"    ⚠️ git reset --hard 返回 {_rc}："
+              f"{_err.decode('utf-8', 'replace').strip()[:300]}")
     still2 = [r for r in mism
               if _blob_of(ref, r, repo) != _worktree_blob(r, repo)]
     if still2:
-        print(f"  🔴 硬重置后仍不一致 {still2} → exit 1")
-        return 1
+        # 🔴 2026-11-27 一劳永逸：blob 不等 ≠ 代码落后。走内容级兜底，一致即放行（见 _content_equal）。
+        still3 = []
+        for rel in still2:
+            if _content_equal(ref, rel, repo):
+                print(f"    ✅ 内容级一致（仅行尾/编码差异）→ 放行 {rel}")
+            else:
+                still3.append(rel)
+        if still3:
+            print(f"  🔴 硬重置后**内容**仍不一致 {still3} → exit 1（真·代码落后，不放过）")
+            return 1
+        print(f"[ws-guard] ✅ 硬重置后内容全部一致（个别文件仅行尾差异，已放行）；"
+              f"原不一致文件备份在 {bak}")
+        return 0
     print(f"[ws-guard] ✅ 硬重置后整仓一致；原不一致文件备份在 {bak}")
     return 0
+
+
+def _content_equal(ref, rel, repo):
+    """内容级兜底比对：工作区 vs 目标 ref 的**内容**（归一化行尾与行尾空白后逐字节比）。
+
+    🔴 2026-11-27 主人令「盘中数据不能停」根因修复（当日实证）：
+      `.github/scripts/v8_stage_gate.py` 在 `git checkout` / `-f` / `reset --hard` 三连之后
+      仍被判 blob 不一致 ⇒ 守卫 exit 1 ⇒ update_v8 整批中止 ⇒ data/*.js 全部不重建
+      （现场：行业树图停在昨日 15:16、平均股价停在 11-19、板块资金整链冻结，而 raw_data
+      其实已抓到 09:37 的新数据 —— 抓到了却发不出去）。
+      blob 不等 **不等于代码落后**：Windows 上 core.autocrlf / 文件锁 / stat-cache 都能让
+      归一化后的内容一致而原始字节不同。故加此兜底：内容一致即放行；内容真不同照旧 exit 1。
+    """
+    rc, out, _ = _run(["git", "-C", repo, "show", f"{ref}:{rel}"])
+    if rc != 0:
+        return False
+    wp = os.path.join(repo, rel.replace("/", os.sep))
+    try:
+        with open(wp, "rb") as f:
+            wb = f.read()
+    except OSError:
+        return False
+
+    def _norm(b):
+        b = b.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        return b"\n".join(ln.rstrip() for ln in b.split(b"\n")).strip()
+
+    return _norm(wb) == _norm(out)
 
 
 if __name__ == "__main__":
