@@ -702,3 +702,32 @@
      表头与数据行同规则 —— 首列（持有期）左对齐，其余数字列全部右对齐，内边距统一 6px。 */
   #lqsqBack th,#lowvolBack th,#intradayBack th,#vcpBack th,#rotationBack th,#lhbBack th{padding:6px;text-align:right;color:var(--sub)}
   #lqsqBack th:first-child,#lowvolBack th:first-child,#intradayBack th:first-child,#vcpBack th:first-child,#rotationBack th:first-child,#lhbBack th:first-child{text-align:left}
+
+/* ── 🧭 大盘五维共振（2026-11-27 主人令） ─────────────────────────────
+   主人原话：「监控大户的指标好用，然后衡量共振程度的，在控制风险的时候好用」
+   设计意图：共振度 = 多路证据的**同向一致率**，不是涨跌预测。
+            同向 ⇒ 趋势可信（可进攻）；背离 ⇒ 分歧（必须降仓）。
+   只读既有数据源，不新增抓取、不新增 data 文件。 */
+.res-wrap{padding:2px 0 0}
+.res-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.res-num{font-size:32px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.res-num small{font-size:12px;font-weight:600;color:var(--dim);margin-left:2px}
+.res-lab{font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:20px;white-space:nowrap}
+.res-bar{flex:1;min-width:110px;height:8px;border-radius:4px;background:var(--card2);position:relative;overflow:hidden;border:1px solid var(--border)}
+.res-bar i{position:absolute;top:0;bottom:0;left:0;display:block;border-radius:4px}
+.res-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border2);z-index:1}
+.res-row{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed rgba(36,49,80,.65)}
+.res-row:last-of-type{border-bottom:none}
+.res-k{flex:0 0 44px;color:var(--sub);font-weight:700}
+.res-v{flex:1 1 auto;min-width:0;color:var(--txt);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res-s{flex:0 0 46px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.res-dot{flex:0 0 7px;height:7px;border-radius:50%}
+.res-w{flex:0 0 30px;text-align:right;font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums}
+.res-sum{margin-top:9px;padding:9px 11px;border-radius:9px;background:var(--card2);border:1px solid var(--border);font-size:13px;line-height:1.7;color:var(--txt)}
+.res-sum b{color:var(--gold)}
+@media(max-width:640px){
+  .res-num{font-size:26px}
+  .res-bar{min-width:70px}
+  .res-k{flex:0 0 38px}
+  .res-s{flex:0 0 40px}
+}
