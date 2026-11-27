@@ -1538,6 +1538,36 @@ def fetch_sector_flow():
         except Exception as _e:
             print("  ⚠️ [防覆写] 读取旧版失败: %s" % _e)
 
+    # 🆕 2026-11-27 主人令（图2/图3「我只要这种」）：半导体资金闸门
+    #   判据：A 股「半导体」板块**连续 3 日主力资金净流出 ⇒ 减一档**（不采用「碰 20 日线减仓」那类均线规则）。
+    #   口径：直接读本函数已在内存的 history（cloud_fetch_v8 每轮把当日 sectors_in/out 的 net 追加进去、
+    #        同日去重）⇒ 不新增任何抓取、不新增任何文件，零额外成本。
+    #   宁空勿假：历史不足 3 条或末条非今日时，hit 恒 false 并在 note 里写明，绝不编造连续天数。
+    try:
+        _semi_name = "半导体"
+        _semi_recs = [r for r in (history.get(_semi_name) or []) if isinstance(r.get("net"), (int, float))][-10:]
+        _semi_days, _semi_trend = calc_consecutive_days(_semi_recs)
+        _semi_last = _semi_recs[-1] if _semi_recs else {}
+        _semi_today_str = (datetime.utcnow() + timedelta(hours=8)).strftime("%Y-%m-%d")
+        _semi_today = str(_semi_last.get("date") or "") == _semi_today_str
+        result["semi_gate"] = {
+            "name": _semi_name,
+            "days": _semi_days,
+            "trend": _semi_trend,
+            "today_net": round(_semi_last["net"], 2) if _semi_recs else None,
+            "last_date": _semi_last.get("date"),
+            "is_today": _semi_today,
+            "series": [{"date": r["date"], "net": round(r["net"], 2)} for r in _semi_recs[-5:]],
+            "rule": "连续3日资金净流出 → 减一档",
+            "hit": bool(_semi_trend == "out" and _semi_days >= 3 and _semi_today),
+            "note": ("" if (_semi_recs and _semi_today)
+                     else "历史缺今日记录，连续天数仅供参考（不计命中）"),
+        }
+        print(f"   🎯 半导体资金闸门: 连{_semi_days}日{'净流出' if _semi_trend=='out' else ('净流入' if _semi_trend=='in' else '中性')}"
+              f" | 今日 {result['semi_gate']['today_net']} 亿 | 命中={result['semi_gate']['hit']}")
+    except Exception as _se:
+        print(f"  ⚠️ semi_gate 计算失败（不影响主数据）: {_se}")
+
     # 写文件
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
