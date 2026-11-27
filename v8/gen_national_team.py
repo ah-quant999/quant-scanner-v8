@@ -158,7 +158,13 @@ if not _sf_ok:
     print('⚠️ NATIONAL_TEAM: NT_FORCE=1 强制写盘（盘后资金流仍未就绪：%r）' % _sf_ut)
 
 # ── 权重重分 + 计分 ─────────────────────────────────────────────────
-W = {'A':40, 'B':30, 'C':15, 'D':15}  # 2026-11-05 主人令：接入 D 路（宽基ETF放量），A/B/C 各让 5 分
+W = {'A':30, 'B':30, 'C':15, 'D':25}
+# 2026-11-05 主人令：接入 D 路（宽基ETF放量），A/B/C 各让 5 分。
+# 2026-11-27 主人令「权重科学化」：A 40→30 / D 15→25（B30·C15 不变，合计100）。
+#   理由（深交所 2026-11-30 停 ETF 实时申赎四指标引发的复核）：
+#     A 路用上交所「基金份额日环比」= T+1 滞后 + 单点依赖（与所谓兜底老源同源，非真冗余）；
+#     D 路用头部宽基 ETF 成交额/20日均额 = 公开行情、盘中即可得、不可能被任何停供通知影响。
+#     故降低对滞后单点源的依赖、提高不可停源的权重。历史分不可直接横向对比（权重口径已变）。
 ready = {'A':a_ready, 'B':b_ready, 'C':c_ready, 'D':d_ready}
 base = {'A':50 + (a_val or 0)/2, 'B':50 + (b_val or 0)*4, 'C':50 + (c_val or 0)/3, 'D':(d_base if d_base is not None else 50)}
 # 仅对就绪项计分；缺失项权重按比例分给就绪项
@@ -213,23 +219,23 @@ def _oneline():
 
 subs = []
 subs.append({
-    'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,
+    'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,'freq':'T+1',
     'value':a_val,'unit':'亿','detail':a_detail or '宽基ETF数据源（东财/老源）均未就绪',
     'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪')))
 })
 subs.append({
-    'key':'B','name':'大金融相对强度','weight':W['B'],'ready':b_ready,
+    'key':'B','name':'大金融相对强度','weight':W['B'],'ready':b_ready,'freq':'盘后',
     'value':b_val,'unit':'%','detail':b_detail or 'SECTOR_RS.js 未就绪',
     'status':('✅强势' if (b_val is not None and b_val>1) else ('🟡中性' if (b_val is not None and b_val>=-1) else ('❌弱势' if b_val is not None else '—未就绪')))
 })
 subs.append({
-    'key':'C','name':'大金融资金净流入','weight':W['C'],'ready':c_ready,
+    'key':'C','name':'大金融资金净流入','weight':W['C'],'ready':c_ready,'freq':'盘后',
     'value':c_val,'unit':'亿','detail':c_detail or 'SECTOR_FUND_FLOW.js 未就绪',
     'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平')))
 })
 
 subs.append({
-    'key':'D','name':'宽基ETF放量异动','weight':W['D'],'ready':d_ready,
+    'key':'D','name':'宽基ETF放量异动','weight':W['D'],'ready':d_ready,'freq':'盘中',
     'value':d_val,'unit':'×','detail':d_detail or 'broad_etf_volume.json 缺失/过期（post_close 档未落盘）',
     # 2026-11-06 主人令·一劳永逸修复：下跌日 ratio∈[1.0,1.3) 原误标「❌缩量」——
     #   但 ratio>1 即「放量(扩张)」而非「缩量(萎缩)」，标签与真实数据/计分公式矛盾（伪造语义）。
@@ -253,8 +259,14 @@ out = {
     'verdict_color': vcol,
     'ready_count': sum(1 for k in ['A','B','C','D'] if ready[k]),
     'subs': subs,
-    'method': '4 子信号加权（缺失项权重重分）；宽基ETF净申购40% + 大金融相对强度30% + 大金融资金净流入15% + 宽基ETF放量异动15%（2026-11-05 主人令新接入：下跌日头部宽基ETF成交额/20日均额，护盘公开指纹）。汇金持仓环比胶囊已于 2026-11-04 移除（季报滞后约2年、权重0%、无增量信息）。',
-    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后，如实标注，不构成交易建议。',
+    'method': '4 子信号加权（缺失项权重重分）；宽基ETF净申购30%（T+1·上交所份额日环比） + 大金融相对强度30%（盘后） + 大金融资金净流入15%（盘后） + 宽基ETF放量异动25%（盘中·头部宽基成交额/20日均额，护盘公开指纹）。'
+              '2026-11-05 主人令新接入 D 路；2026-11-27 主人令权重科学化 A40→30 / D15→25（滞后单点源降权、不可停源升权，历史分不可横向对比）。'
+              '汇金持仓环比胶囊已于 2026-11-04 移除（季报滞后约2年、权重0%、无增量信息）。',
+    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，份额披露存 T+1 滞后，如实标注。'
+                  '盘中实时可得的只有 D 路（成交额口径），A 路须等次日份额披露——两者不同时点，勿混读。不构成交易建议。',
+    'lag_note': {'A': 'T+1（上交所份额次日披露）', 'B': '盘后（当日收盘后）',
+                 'C': '盘后（当日收盘后）', 'D': '盘中（成交额实时，当日盘后亦可复核）'},
+    'lag_summary': '盘中可用 1 路（D 25%）· 盘后 2 路（B30+C15=45%）· T+1 1 路（A 30%）',
     'oneline': _oneline()
 }
 
@@ -273,5 +285,5 @@ with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as
 
 print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/4' % (score, vtxt, out['ready_count']))
 for s in subs:
-    print('  [%s] %s w%s %s val=%s %s' % (s['key'], s['name'], s['weight'], s['status'], s['value'], s['detail']))
+    print('  [%s] %s w%s%% %s %s val=%s %s' % (s['key'], s['name'], s['weight'], s.get('freq','-'), s['status'], s['value'], s['detail']))
 

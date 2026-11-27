@@ -16965,7 +16965,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
            + '<div style="flex:1;min-width:240px;font-size:11.5px;color:var(--dim);line-height:1.7;border-left:2px solid ' + vc + ';padding-left:10px"><b style="color:#ffd024">&#x1F4CC; 解读：</b><span style="color:var(--txt)">' + _ntAna + '</span></div></div>'
         + '<div style="font-size:12px;color:var(--sub);line-height:1.85;margin:2px 0 8px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">'
         + '<div style="margin-bottom:4px"><b style="color:#ffd024">&#x1F4A1; 用法：</b>regime 参考非买点信号——国家队活跃 + 指数回调 ⇒ 系统性暴跌概率低、仓位可放宽；静默 + 高位 ⇒ 收紧防守。</div>'
-        + '<div><b style="color:#ffd024">&#x26A0; 限制：</b>' + _e(D.disclaimer) + '</div></div>';
+        + '<div><b style="color:#ffd024">&#x26A0; 限制：</b>' + _e(D.disclaimer) + '</div>'
+         + (D.lag_summary ? '<div style="margin-top:4px"><b style="color:#ffd024">&#x1F552; 时点分层：</b>' + _e(D.lag_summary) + '（盘中实时只有 D 路；A 路须等次日份额披露，两者不同时点、勿混读）</div>' : '')
+         + '</div>';
         /* 📐 2026-11-05 主人令：胶囊按实际子信号数平分整行宽度（旧固定4列在3子信号时右侧留白1/4列） */
         h += '<div style="display:grid;grid-template-columns:repeat(' + (D.subs?D.subs.length:3) + ',1fr);gap:10px">';
         for(var i=0;i<D.subs.length;i++){
@@ -16976,7 +16978,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
              + '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'
              + '<b style="font-size:12.5px;color:var(--sub)">' + _e(s.name) + '</b>'
              + '<span style="font-size:10.5px;color:var(--dim)">w' + s.weight + '%</span>'
-             + (s.freq ? '<span style="font-size:9.5px;color:#c084fc;border:1px solid rgba(192,132,252,0.63);border-radius:4px;padding:0 4px;line-height:1.4">' + _e(s.freq) + '</span>' : '')
+             + (s.freq ? (function(_f){var _v=String(_f), _isIn=(_v.indexOf('盘中')>=0), _isLag=(_v.indexOf('T+1')>=0);var _c=_isIn?'#26d9c2':(_isLag?'#f59e0b':'#c084fc');var _b=_isIn?'rgba(38,217,194,0.63)':(_isLag?'rgba(245,158,11,0.63)':'rgba(192,132,252,0.63)');return '<span title="数据可得时点（绿=盘中 / 紫=盘后 / 橙=T+1滞后）" style="font-size:9.5px;color:' + _c + ';border:1px solid ' + _b + ';border-radius:4px;padding:0 4px;line-height:1.4">' + _e(_v) + '</span>';})(s.freq) : '')
              + '<b style="font-size:12px;color:' + stCol + '">' + _e(st) + '</b></div>'
              + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:2px">' + _e(s.detail) + '</div></div>';
         }
