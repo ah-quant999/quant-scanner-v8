@@ -1,12 +1,27 @@
 {
- "update_time": "2026-11-28 00:59:24",
- "data_date": "2026-09-08",
+ "update_time": "2026-11-28 04:00:14",
+ "data_date": "2026-11-27",
  "universe": {
-  "total": 984,
-  "scanned": 954
+  "total": 1038,
+  "scanned": 1000
  },
  "signal": "收盘创20日新高 且 5日均量<0.85×20日均量（量价背离·缩量新高）",
  "hits": [
+  {
+   "code": "603268",
+   "name": "松发股份",
+   "case": false,
+   "price": 177.95,
+   "above_ma20": true,
+   "vol_ratio": 0.793,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-11-27",
+    "days_ago": 0,
+    "vol_ratio": 0.793
+   }
+  },
   {
    "code": "688309",
    "name": "恒誉科技",
