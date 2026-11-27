@@ -96,6 +96,11 @@ on:
       # 🛡 2026-11-16 期指卡断更根因：期指产物推送后不在白名单 ⇒ workflow_run 不触发 ⇒
       #   Pages 的 FUTURES_REALTIME.js 恒旧（spot:{}、无 basis_metrics）。补名后自动闭环。
       - "📈 v8 期指实时 refresh (cn)"
+      # 🛡 2026-11-27 主人令「盘中高频开始了，实时这两个还是旧数据」根因之二：
+      #   国债期货产物推送后**不在白名单** ⇒ workflow_run 不触发 ⇒ Pages 的 BOND_FUTURES.js 恒旧
+      #   （实测：仓库内已是 2026-11-27 09:52 的新数据，Pages 仍显示昨日 15:15）。
+      #   补名后本链一跑完即自动构建部署，不再等别的链顺带把 data/ 带上去。
+      - "🏦 v8 国债期货利率罗盘 refresh (cn)"
     types: [completed]
     branches: [main]
   workflow_dispatch:
