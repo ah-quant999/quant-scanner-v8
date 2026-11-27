@@ -1,21 +1,21 @@
 {
-  "update_time": "2026-11-27 13:26:35",
+  "update_time": "2026-11-27 14:36:17",
   "data_date": "2026-11-27",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "狂热",
   "color": "#ef4444",
   "score": 85.0,
-  "delta_pct": 155.38,
+  "delta_pct": 300.0,
   "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
   "metrics": {
-    "total_up": 166,
+    "total_up": 260,
     "max_ladder": 6,
     "high_ladder_count": 6,
-    "sectors_count": 10
+    "sectors_count": 11
   },
   "ladder_dist": {
-    "1": 145,
-    "2": 15,
+    "1": 236,
+    "2": 18,
     "3": 2,
     "4": 3,
     "6": 1
@@ -28,16 +28,16 @@
       "chg": 10.02
     },
     {
+      "code": "002651",
+      "name": "利君股份",
+      "lbc": 4,
+      "chg": 10.01
+    },
+    {
       "code": "002872",
       "name": "天圣制药",
       "lbc": 4,
       "chg": 9.99
-    },
-    {
-      "code": "603030",
-      "name": "全筑股份",
-      "lbc": 4,
-      "chg": 10.1
     }
   ],
   "prev_total": 65,
