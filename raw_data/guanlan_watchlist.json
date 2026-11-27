@@ -1,11 +1,22 @@
 {
   "version": "2.0",
-  "updated": "2026-11-27 19:30:51",
+  "updated": "2026-11-27 20:27:05",
   "sources": [
     "guanlan"
   ],
-  "total": 55,
+  "total": 56,
   "stocks": [
+    {
+      "name": "国信证券",
+      "code": "002736",
+      "full_code": "sz002736",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "未知机构",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-27"
+    },
     {
       "name": "贵州茅台",
       "code": "600519",
