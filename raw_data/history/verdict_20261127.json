@@ -1,6 +1,6 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 12:23:33",
+ "generated": "2026-11-27 11:27:53",
  "verdict": {
   "cap_pct": 50,
   "label": "观"
@@ -10,7 +10,7 @@
   "tactic_exposure": 0.5,
   "senti_phase": "狂热",
   "senti_score": 80.0,
-  "zt": 57,
+  "zt": 55,
   "max_ladder": 4,
   "up": 1849,
   "down": 446,
@@ -19,7 +19,7 @@
   "sh_close": 3486.28,
   "sh_chg": 0.27,
   "zz1000_close": 5531.84,
-  "flow_in_cnt": 14,
+  "flow_in_cnt": 35,
   "top_sectors": [
    "同花顺漂亮100",
    "高股息精选",
