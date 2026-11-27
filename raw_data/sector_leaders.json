@@ -1,13 +1,60 @@
 {
-  "update_time": "2026-11-27 18:16",
-  "republish_time": "2026-11-27 21:55:53",
+  "update_time": "2026-11-27 19:46",
+  "republish_time": "2026-11-27 22:19:51",
   "data_date": "2026-11-26",
   "rule_ver": 2,
   "top_n": 5,
   "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
   "phase": "主升+启动",
-  "sector_count": 0,
-  "sectors": [],
+  "sector_count": 1,
+  "sectors": [
+    {
+      "name": "计算机设备",
+      "bk": "BK0735",
+      "phase": "启动",
+      "pct_5d": 8.37,
+      "pct_20d": -2.24,
+      "cons_count": 89,
+      "leaders": [
+        {
+          "code": "300324",
+          "name": "旋极信息",
+          "price": 6.05,
+          "chg": 20.04,
+          "main_net": 23877504.0
+        },
+        {
+          "code": "301391",
+          "name": "卡莱特",
+          "price": 68.8,
+          "chg": 20.01,
+          "main_net": 110030459.0
+        },
+        {
+          "code": "300508",
+          "name": "维宏股份",
+          "price": 45.77,
+          "chg": 20.01,
+          "main_net": 76083663.0
+        },
+        {
+          "code": "920808",
+          "name": "曙光数创",
+          "price": 41.97,
+          "chg": 17.27,
+          "main_net": 11199118.0
+        },
+        {
+          "code": "300042",
+          "name": "朗科科技",
+          "price": 27.72,
+          "chg": 17.06,
+          "main_net": 15754017.0
+        }
+      ],
+      "match": "exact"
+    }
+  ],
   "fr_count": 12,
   "fr_sectors": [
     {
