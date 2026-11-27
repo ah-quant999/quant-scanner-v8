@@ -1,10 +1,10 @@
 {
   "version": "2.0",
-  "updated": "2026-11-27 17:45:00",
+  "updated": "2026-11-27 18:19:51",
   "sources": [
     "guanlan"
   ],
-  "total": 55,
+  "total": 53,
   "stocks": [
     {
       "name": "贵州茅台",
@@ -458,17 +458,6 @@
       "added_date": "2026-11-27"
     },
     {
-      "name": "长鑫科技",
-      "code": "688825",
-      "full_code": "sh688825",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "瑞银",
-      "rating": "未评级",
-      "source": "外资研投",
-      "added_date": "2026-11-27"
-    },
-    {
       "name": "大金重工",
       "code": "002487",
       "full_code": "sz002487",
@@ -573,17 +562,6 @@
       "full_code": "3696.HK",
       "exchange": "HK",
       "market": "港股",
-      "institution": "花旗",
-      "rating": "买入",
-      "source": "外资研投",
-      "added_date": "2026-11-27"
-    },
-    {
-      "name": "百奥赛图",
-      "code": "688796",
-      "full_code": "sh688796",
-      "exchange": "SH",
-      "market": "沪市",
       "institution": "花旗",
       "rating": "买入",
       "source": "外资研投",
