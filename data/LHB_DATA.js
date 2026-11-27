@@ -1,4 +1,4 @@
-window.LHB_DATA = {
+﻿window.LHB_DATA = {
   "date": "20261126",
   "update_time": "2026-11-27 11:22:33",
   "stocks": [
