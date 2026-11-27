@@ -66,6 +66,21 @@
 
 小九本机工作区仍保留整套改动（`index.html`/`v8_main.css`/`logic.html` + `backend.patch`/`frontend.patch`/`*.mine` 快照）。**阿狸咪不要试图拉取或合并它**——base 不同（小九基于 `53c0dff802`，你最远端已多 583 行），强行 rebase 必冲突。请按本单在自己最新 tip 上重做语义改动，本单第三节已给出全部锚点与代码，照抄即可。
 
+### ✅ 小九本地稿审计实测（2026-11-27 20:15，供你判断这套改法是否成立）
+
+| 审计项 | 结果 |
+|---|---|
+| 内联 `<script>` 全量 `node --check` | **32 块全过，0 失败** |
+| `guard_index_sections.py` | 通过（sec-st / sec-ph / conceptMapTime 齐全，1.5MB < 2.4MB 上限） |
+| `py_compile` 四文件 | v8_health_check / update_v8 / run_algorithms / guard_index_sections **全 OK** |
+| `id="sec-rc"` / `data-sec="rc"` | 均 **0**（删干净） |
+| `id="insightCard"` | **1**（合并卡已就位） |
+| `对次日开盘`（推荐表述） | **0**（已改事实披露） |
+| 必须保留项 | `window._rcDays` 6 处 / `_rcNorthOf` 2 / `_rcDataDateBadge` 5 / `insightContainer` 2 / `lhbThreeChannelBody` 3 —— **全在** |
+| 死引用 | 函数定义+调用点已双删；`grep` 仅命中注释里的历史说明，无真调用 |
+
+**结论**：这套改法**语法与结构层面已验证可成立**，差的是「在你最新 base 上重放 + 页面实测」。你可以直接照本单施工，风险主要在插入位置与她的政策事件卡相邻，已给出零冲突锚点。
+
 ---
 
 ## 三、施工单（锚点行号基于 `eab79fbb86`，每改一步先 `git pull` 确认没再漂）
@@ -314,9 +329,16 @@ python align_logic_ops.py                      # 门禁 8 项，[4/8] MUST 名�
 python -c "import py_compile; [py_compile.compile(f,doraise=True) for f in ['v8_health_check.py','update_v8.py','algorithms/run_algorithms.py','guard_index_sections.py']]"
 # 内联 JS 逐个 node --check（抽 <script> 无 src 块）
 node --check <每个内联块>
-# 死引用扫描：以下必须全 0
-for f in renderJyCalendar renderNorthCalendar switchRcTab renderResonanceTrack _rcJyDayListsHtml _rcWeekRangeOf _jyCalNav _northCalNav __rcRedrawBoth __rcActiveTab RESONANCE_TRACK rc-tabs; do echo "$f: $(grep -c "$f" index.html)"; done
+# 死引用扫描：**非注释行**必须全 0
+# ⚠️ 注意：注释里出现这些函数名是正常的（就是记录「删了什么」），不要当 bug 去清
+for f in renderJyCalendar renderNorthCalendar switchRcTab renderResonanceTrack _rcJyDayListsHtml _rcWeekRangeOf _jyCalNav _northCalNav __rcRedrawBoth __rcActiveTab RESONANCE_TRACK rc-tabs; do
+  echo "== $f"
+  grep -n "$f" index.html | grep -v '^\s*[0-9]*:\s*\(//\|/\*\|\*\|<!--\)' || echo "   ✅ 无非注释引用"
+done
+# 注释以行内形式跟在代码后时，人工看一眼即可
 ```
+
+**判据补充**：真正的失败信号不是 `grep -c` 非 0，而是**浏览器控制台报 `xxx is not defined`**。函数定义与调用点双删即安全，注释留名反而是资产。
 
 **② 净室推送**
 - `git fetch` 后 `git diff --stat origin/main` 逐文件核对，只推本单列出的文件
