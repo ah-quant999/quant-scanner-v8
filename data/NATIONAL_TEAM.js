@@ -1,10 +1,10 @@
 window.NATIONAL_TEAM = {
-  "data_date": "2026-11-26",
-  "update_time": "2026-11-27 22:43:12",
-  "source_time": "2026-11-27 22:42:58",
-  "score": 54.0,
-  "verdict": "中性",
-  "verdict_color": "#38bdf8",
+  "data_date": "2026-11-27",
+  "update_time": "2026-11-27 23:29:56",
+  "source_time": "2026-11-27 23:29:49",
+  "score": 65.0,
+  "verdict": "偏活跃",
+  "verdict_color": "#f59e0b",
   "ready_count": 4,
   "subs": [
     {
@@ -13,10 +13,10 @@ window.NATIONAL_TEAM = {
       "weight": 30,
       "ready": true,
       "freq": "T+1",
-      "value": 26.2,
+      "value": 117.1,
       "unit": "亿",
-      "detail": "宽基净申购 26.2 亿（3 只宽基ETF·东财五分类）",
-      "status": "🟡中性"
+      "detail": "宽基净申购 117.1 亿（5 只宽基ETF·东财五分类）",
+      "status": "✅活跃"
     },
     {
       "key": "B",
@@ -61,5 +61,5 @@ window.NATIONAL_TEAM = {
     "D": "盘中（成交额实时，当日盘后亦可复核）"
   },
   "lag_summary": "盘中可用 1 路（D 25%）· 盘后 2 路（B30+C15=45%）· T+1 1 路（A 30%）",
-  "oneline": "综合 54.0（中性）：宽基ETF净申购 26.2 亿＝托盘力度中性，大金融强势，大金融资金净流出 35.5 亿，非下跌日·放量信号中性 2.19×。"
+  "oneline": "综合 65.0（偏活跃）：宽基ETF净申购 117.1 亿＝国资托盘指纹明确，大金融强势，大金融资金净流出 35.5 亿，非下跌日·放量信号中性 2.19×——托盘与市场共振，风险偏好可适度放宽。"
 };
