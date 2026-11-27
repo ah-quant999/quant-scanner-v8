@@ -96,7 +96,7 @@
   "lhb3-merge-1126-xiaojiu",
   "ic-oos-gate-idle-dispatch-sector-order-1127-xiaojiu"
  ],
- "updated": "2026-11-27 08:17",
+ "updated": "2026-11-27 17:28",
  "generated_by": "阿狸咪的工程师",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -179,7 +179,7 @@
   "stale-index-landmine": "2328569f4a69e550",
   "stock-name-code-fallback": "a4bff9507756e455",
   "stock-universe-etf-silent-drop-0926": "c47594068f5cf75b",
-  "stocknames-rollback-lemoncat-stale-worktree-1126": "1e610359f4f1dcf3",
+  "stocknames-rollback-lemoncat-stale-worktree-1126": "c591f02ac21d6b2c",
   "stockquote-cachebuster-noop": "065c48b9ff9af2c4",
   "stockquote-noon-gap-relay-cancel": "fe9aece1cb325a94",
   "theme-value-concept-layer-zero": "a7b633079fe490d0",

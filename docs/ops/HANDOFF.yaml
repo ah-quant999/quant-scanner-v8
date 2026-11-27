@@ -4139,11 +4139,21 @@ items:
       待主人拍板（小九回执 §6 汇总，维持不变）：①stock_names 抓取「失败禁用本地旧文件顶包、宁缺毋滥」改动放行；
       ②cn_fetch「删除感知并集/增量对齐推送」架构改造放行（300→318 文件整包推送家族风险二次坐实）。
       小九下一步：定位并清理 lemoncat-cn 应急链 _work 旧检出（含 11-11 stock_names / 11-22 algo_run_report 等陈旧文件）后复跑一轮验证防倒退不再出现 11-2x/11-11 老日期。
+      11-27 复发追加（阿狸咪的工程师，主人外出期自主处置）：当日 stock_names 又三度被应急链旧缓存覆盖——
+      13:15 run 45943917202 runner=alimi-cn（9654 版/ut=11-26 01:42，提交 9e1420b59522）、
+      13:48 run 45946395593 runner=lemoncat-cn（7373 条/ut=11-11，再破 9000 红线，提交 e921d036d45a）、
+      14:38 run 45952551922 runner=alimi-cn（9654 版，提交 38bceb6fd7fd）。
+      恢复：65ac03f1ccc3（13:08）与 0a9c6ca5ec72（15:12），均 Git Data API 六步范式、基底=远端 blob 20f477b908c7
+      （2,094,678B/9697 条/ut=07:11:56），漂移断言通过、逐字节回读 byte_exact=True。
+      ⚠️ 归属修正/扩大：应急链 runs-on=[self-hosted,cn]，11-27 实锤 alimi-cn（家机）runner 在线也在捡该链、
+      其 _work 同样陈旧 ⇒ 根因面=两台 CN 机（非仅 lemoncat-cn），两机 _work 均须排查清理。
+      详情交接件：docs/ops/handover/2026-11-27_1517_阿狸咪的工程师给小九_stock_names应急链六度复发两台CN机都是推手已恢复升级.md。
+      17:22 复核：15:07 轮（45956279644/lemoncat-cn）未再覆盖，远端 sha 守 20f477b908c7。
     note_to: 小九(lemoncat-cn)
     verify_how: >-
       ①lemoncat-cn 应急链 _work 旧检出已定位清理并复跑一轮，防倒退跳过清单不再出现 2026-11-11/2026-11-22 老日期；
       ②stock_names entries≥9000 连续多轮（≥3 次巡检）守住且 ut 前进；③主人拍板的两项根因修复若放行，修复后最新一轮 cn_fetch 不再整包推送（PUSH_FILES 增量清单化）。
-    updated: "2026-11-26 21:10"
+    updated: "2026-11-27 17:25"
     updated_by: 阿狸咪的工程师
 
   - id: gates-and-sectorflow-retire-1126-xiaojiu
