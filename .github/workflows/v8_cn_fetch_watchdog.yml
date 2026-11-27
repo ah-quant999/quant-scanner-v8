@@ -93,3 +93,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/v8_sector_tech_fallback.py
+      # 🔴 2026-11-28 主人令「一劳永逸」：v8_ima_strong_stock.yml 的 cron
+      #   (UTC 07:45/13:00 = 北京 15:45/21:00) 在 11-27 全天两条全 0 run，
+      #   数据停在 11-27 06:16 → 前端红卡「超过阈值 694 分钟」。与 sector_tech 同一类
+      #   「GitHub schedule 整段漏触发」，故用同一范式兜底：判据取 **update_time 日期**
+      #   （≠data_date：update_time 能区分「workflow 没跑」与「源方没发新稿」两层，
+      #    用 data_date 会把后者当成漏跑反复空派）。
+      - name: 强势跟踪断更自愈（IMA_STRONG_STOCK 今日未产出即补派）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/v8_ima_fallback.py

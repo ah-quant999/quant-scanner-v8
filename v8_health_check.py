@@ -387,7 +387,13 @@ CARD_DEFS = [
     {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
     {"id": "US_HK_MAP", "name": "隔夜美股强势", "page": "今日事件", "freq": "盘前1次(专链cn)", "max_age": 1440, "key_fields": ["data_date", "items"], "heal_cat": "us_hk_map", "raw_file": "us_hk_map.json", "producer": "cloud_fetch_v8.py --only US_HK_MAP"},  # 🆕 2026-11-02 一劳永逸（九宝令）：此前 CARD_DEFS 漏登记 ⇒ 永久假死(实测卡 10-31)；已从 cloud_fetch premarket 注册表移除("":""),改专链 v8_us_hk_map.yml([self-hosted,cn]) 承接，需独立 heal_cat
     {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
-    {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
+    # 🔴 2026-11-28 主人令「一劳永逸」（截图红卡「超过阈值 694 分钟」）：
+    #   ① freq 补上真实的第二档 21:00（workflow cron 有 UTC 13:00 兜底档）；
+    #   ② weekend_update=False —— 源方「短线情绪选股」按**交易日**发稿，周末必然无新稿。
+    #      原缺该字段时靠下方「选股策略 + dt>=最近收盘」的通用放行，但本卡 11-27 只更新到
+    #      06:16（早于当日 15:00 收盘）⇒ 通用放行不成立 ⇒ 整个周末常驻红卡（假红）。
+    #      显式声明周末免检；周一开盘前仍会正常判红（真断更照报）。
+    {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45/21:00", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py", "weekend_update": False},
     {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "每日盘前1次(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
     {"id": "FINAL_RECOMMEND_DATA", "name": "最终推荐·强势板块龙头股", "page": "最终推荐", "freq": "每日盘后(算法链)", "max_age": 1440, "heal_cat": "algo_run", "key_fields": ["total_candidates", "market_regime"], "raw_file": "final_recommend.json", "producer": "algorithms/final_recommend.py"},  # 🆕 2026-11-02 一劳永逸（九宝令）：此前 CARD_DEFS 完全漏登记 ⇒ 不监控+自愈够不到 ⇒ 永久假死(实测卡 11-01)
     {"id": "MAHORO_INSIGHTS", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS", "_source_file": "maharo_insights"},

@@ -18693,7 +18693,32 @@ h+='</div>';
          未来任何新状态默认不进诊断区，需报警则显式点名。 */
       if(!it || it.status !== 'fail') return;
       // 2026-09-02 主人令:每个 HEALTH_CHECK fail 项附运维行动提示
-      var _hint = (it.id==='IMA_STRONG_STOCK' || it.id==='W52_HIGH' || /CN.?IP|_CN$|^CN_/i.test(it.id||'')) ? ' → CN-IP 自托管数据（需小九单位机/自托管 runner 在线抓取）；该机当前离线，开机后自动恢复，非代码故障'
+      // 🔴 2026-11-28 一劳永逸（主人令·截图「强势跟踪 超过阈值 694 分钟」误诊根治）：
+      //   原文案把 IMA_STRONG_STOCK / W52_HIGH / *_CN 一律归为「CN-IP 自托管 → 该机当前离线，
+      //   开机后自动恢复，非代码故障」。实测是**假话**：本机（阿狸咪机 Cat）当时在线、runner
+      //   在跑；真因是 ① 11-27 两条 cron 全部 0 run（GitHub schedule 漏触发）；
+      //   ② 本机 ima 快照正文错位（meta 标题 11-24 / 正文实为 11-02），被防回归守卫永久挡住
+      //   ⇒ 云端每次 retained-last，数据冻结在 11-24。**「等开机」永远不会自愈**。
+      //   现改为按数据字段真实归因，并指明唯一可执行动作（本机重抓快照 / 看门狗自动补派）。
+      var _v8ImaDiagHint = function(){
+        var D = window.IMA_STRONG_STOCK || {};
+        var dd = D.data_date || '?', sd = D.stale_days, st = D.source_stale;
+        var today = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+        var ranToday = String(D.update_time || '').slice(0, 10) === today;
+        if(D.snapshot_meta_mismatch){
+          return ' → 本机 ima 快照<b>正文错位</b>（列表标题 ' + (D.meta_title || '?') + ' / 正文 ' + (D.source_title || '?')
+               + '），被防回归守卫挡住，云端只能 retained-last 冻结在 ' + dd
+               + '。<b>「开机自动恢复」不成立</b>：需在本机 ima 连接器重抓快照后重跑解析。';
+        }
+        if(st || (sd && sd > 0)){
+          return ' → 源数据停在 ' + dd + '（已 ' + sd + ' 天）。' + (ranToday
+            ? '今日解析批已执行 ⇒ 属源方未发新稿 / 本机快照过期，需本机 ima 连接器补抓快照。'
+            : '今日解析批未执行 ⇒ 看门狗每 15 分自动补派；持续不恢复则为快照或源方问题。');
+        }
+        return ' → 今日解析批未执行（GitHub cron 漏触发），看门狗每 15 分自动补派，无需人工。';
+      };
+      var _hint = (it.id==='IMA_STRONG_STOCK') ? _v8ImaDiagHint()
+                : (it.id==='W52_HIGH' || /CN.?IP|_CN$|^CN_/i.test(it.id||'')) ? ' → CN-IP 自托管数据（需自托管 runner 在线抓取）；离线属机器未开机/未连网，开机后即恢复'
                 : (it.id==='SH_FIB' || it.id==='INST_TRADE') ? ' → 静候 16:40 CST STAGE A 采集批;或在 Actions 手动 Run workflow(force_run) 重跑本盘后算法链'
                 : (it.id==='MARKET_REGIME') ? ' → 静候 20:00 CST STAGE D 汇总批(final_recommend)前一并产出;或手动 Run workflow(force_run) 重跑'
                 : (it.id==='AVG_PRICE_DATA') ? ' → 盘中每 30 分自愈;非盘中时段按 24h 阈值判 fail,下一时段自愈'
