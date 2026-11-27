@@ -142,9 +142,9 @@ window.__domReadyFns=[];
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=6874e36f19" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=482e1b77e9" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=6e48384ebd" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=89886f7722" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=f33eb82eea" defer></script>
-    <script src="data/CRED_LEDGER.js?v=68ab3e3d62" defer></script>
+    <script src="data/CRED_LEDGER.js?v=131bbac7fa" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=77526705f2" defer></script>
     <script src="data/GOLD_POOL.js?v=88712959e8" defer></script>
@@ -157,7 +157,7 @@ window.__domReadyFns=[];
     <script src="data/MACRO_BRIEF.js?v=ce1658d136" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=6581dc7b0e" defer></script>
-<script src="data/LHB_DATA.js?v=c1b29be4ef" defer></script>
+<script src="data/LHB_DATA.js?v=92a74000cf" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
@@ -168,7 +168,7 @@ window.__domReadyFns=[];
 <script src="data/MARGIN_DATA.js?v=f59ffd2d07" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=03cc108884" defer></script>
 <script src="data/FUTURES_REALTIME.js?v=466d772ea2" defer></script>
-<script src="data/BOND_FUTURES.js?v=e6c5b40fe3" defer></script>
+<script src="data/BOND_FUTURES.js?v=cbebbd15f3" defer></script>
 <script src="data/SECTOR_TECH_JUDG.js?v=8c2979c9eb" defer></script>
 <script src="data/IPO_DATA.js?v=b6a4b8cd52" defer></script>
     <script src="data/CRISIS_DATA.js?v=2fcef3c782" defer></script>
@@ -177,7 +177,7 @@ window.__domReadyFns=[];
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
-<script src="data/US_HK_MAP.js?v=26ffef93ea" defer></script>
+<script src="data/US_HK_MAP.js?v=8ce1babe52" defer></script>
 <!-- 🚨 2026-09-23 主人令：大基金 增减持监控（暂未上架 > 观测类）。
      数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
@@ -1364,7 +1364,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=fd9a8a250e" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=dbb038a01c" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=6f72092723" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=9f9fbb7e1e" defer></script>
 <script src="data/VOLATILITY.js?v=a2ecfad2e8" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=661205a031" defer></script>
