@@ -1,25 +1,25 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 10:17:20",
+ "generated": "2026-11-27 10:30:56",
  "verdict": {
   "cap_pct": 30,
   "label": "守"
  },
  "inputs": {
-  "tactic_score": -4,
+  "tactic_score": -2,
   "tactic_exposure": 0.3,
-  "senti_phase": "退潮",
-  "senti_score": 53.0,
-  "zt": 54,
+  "senti_phase": "高潮",
+  "senti_score": 69.0,
+  "zt": 55,
   "max_ladder": 4,
-  "up": 1052,
-  "down": 1201,
-  "breadth": 0.4669329782512206,
+  "up": 784,
+  "down": 1488,
+  "breadth": 0.34507042253521125,
   "crisis": 35.7,
-  "sh_close": 3474.1,
-  "sh_chg": -0.08,
+  "sh_close": 3476.88,
+  "sh_chg": 0.01,
   "zz1000_close": 5531.84,
-  "flow_in_cnt": 14,
+  "flow_in_cnt": 35,
   "top_sectors": [
    "同花顺漂亮100",
    "高股息精选",
@@ -31,12 +31,12 @@
    "上海九百"
   ]
  },
- "checks_hit": 2,
+ "checks_hit": 4,
  "checks_total": 8,
  "list_gate_ok": false,
  "list_gate_why": "榜单陈旧11-26、validity=degraded、无分辨度max=4.1、缺维度inst_w52/inst_analyst",
  "forward_ref": {
-  "sh_close": 3474.1,
+  "sh_close": 3476.88,
   "date": "2026-11-27"
  }
 }

@@ -1,43 +1,109 @@
 {
   "version": "2.0",
-  "updated": "2026-11-26 03:14:04",
+  "updated": "2026-11-22 20:32:36",
   "sources": [
     "guanlan"
   ],
-  "total": 3,
+  "total": 9,
   "stocks": [
     {
-      "name": "中芯国际",
-      "code": "688981",
-      "full_code": "sh688981",
-      "exchange": "SH",
-      "market": "沪市",
-      "institution": "摩根士丹利",
-      "rating": "未评级",
+      "name": "机器人",
+      "code": "300024",
+      "full_code": "sz300024",
+      "exchange": "SZ",
+      "market": "深市",
+      "institution": "摩根大通",
+      "rating": "增持",
       "source": "外资研投",
-      "added_date": "2026-11-25"
+      "added_date": "2026-11-20"
     },
     {
-      "name": "中国船舶",
-      "code": "600150",
-      "full_code": "sh600150",
+      "name": "阿里巴巴",
+      "code": "09988",
+      "full_code": "09988.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "高盛",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "英矽智能",
+      "code": "03696",
+      "full_code": "03696.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "德意志银行",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "德业股份",
+      "code": "605117",
+      "full_code": "605117.SH",
       "exchange": "SH",
       "market": "沪市",
       "institution": "摩根大通",
       "rating": "增持",
       "source": "外资研投",
-      "added_date": "2026-11-25"
+      "added_date": "2026-11-20"
     },
     {
-      "name": "牧原股份",
-      "code": "002714",
-      "full_code": "002714.SZ",
+      "name": "联想集团",
+      "code": "0992",
+      "full_code": "0992.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "摩根士丹利",
+      "rating": "未评级",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "三花智控",
+      "code": "002050",
+      "full_code": "sz002050",
       "exchange": "SZ",
       "market": "深市",
-      "institution": "野村",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "和黄医药",
+      "code": "0013",
+      "full_code": "0013.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "花旗",
       "rating": "买入",
       "source": "外资研投",
-      "added_date": "2026-11-25"
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "和黄医药",
+      "code": "00013",
+      "full_code": "00013.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "花旗",
+      "rating": "买入",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
+    },
+    {
+      "name": "江苏宁沪高速公路",
+      "code": "0177",
+      "full_code": "0177.HK",
+      "exchange": "HK",
+      "market": "港股",
+      "institution": "摩根大通",
+      "rating": "增持",
+      "source": "外资研投",
+      "added_date": "2026-11-20"
     }
   ]
 }
