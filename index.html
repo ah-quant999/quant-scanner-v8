@@ -3797,6 +3797,32 @@ function fmtSigned(v){
       + repRow
       + '<div style="margin-top:7px;font-size:10.5px;color:var(--dim);line-height:1.6">历史回测仅供研究参考，不构成个人投资建议。</div>'
       + '</div>';
+    /* 🎯 共振回测结论：用 T+1 真实胜率/均值判「能不能当买卖点」，绝不拿未成熟样本下结论 */
+    try{
+      if(window.v8Concl){
+        var _rs1 = (T.per_horizon && T.per_horizon['T+1']) || null;
+        var _rsTxt, _rsTone;
+        if(_rs1 && _rs1.mature){
+          var _rw = Number(_rs1['win%']);
+          var _ra = (typeof _rs1['avg%'] === 'number') ? _rs1['avg%'] : null;
+          var _raS = (_ra===null) ? '—' : ((_ra>0?'+':'')+_ra.toFixed(2)+'%');
+          if(_rw >= 55){
+            _rsTxt = 'T+1 胜率 <b>'+_rw+'%</b>、均 '+_raS+' ⇒ 次日买有一定正期望，可作短线辅助，但仓位仍让位主线';
+            _rsTone = 'up';
+          } else if(_rw >= 45){
+            _rsTxt = 'T+1 胜率 '+_rw+'%、均 '+_raS+'，接近抛硬币 ⇒ 无 edge，别把共振当买卖点，只当关注名单';
+            _rsTone = 'gold';
+          } else {
+            _rsTxt = 'T+1 胜率仅 '+_rw+'%、均 '+_raS+' ⇒ 次日追买是负期望，禁止据此接力入场';
+            _rsTone = 'down';
+          }
+        } else {
+          _rsTxt = '样本未成熟（已跟踪 '+(T.n_tracked||0)+'/'+(T.n_signals||0)+'）⇒ 暂无可执行结论，只记录不据此交易';
+          _rsTone = 'dim';
+        }
+        window.v8Concl('resonTrackContainer', _rsTxt, _rsTone);
+      }
+    }catch(e){}
   };
   /* 数据懒到位兜底：RESONANCE_TRACK 走 defer，DOMContentLoaded 前后均可能晚于本段执行 */
   (function(){
@@ -6432,6 +6458,27 @@ c.innerHTML = h;
       html += '<span title="源报告「'+_e(D.source_title||'')+'」最新数据日 '+_e(D.data_date)+'｜距今 '+(D.stale_days)+' 天｜源侧停更，非抓取失败" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(255,82,82,0.10);color:#ff5252;border:1px solid rgba(255,82,82,0.63);white-space:nowrap">⚠️ 源停更 '+(D.stale_days)+' 天 · 数据日 '+_e(D.data_date)+'</span>';
     }
     html += '</div>';
+    /* 🎯 2026-11-27 结论行（源停更/无候选/有共振 三分支，绝不拿过期源当今日依据） */
+    try{
+      if(window.v8ConclHtml){
+        var _imaN = (D.stocks||[]).length;
+        var _imaSD = (D.stale_days == null ? 0 : Number(D.stale_days));
+        var _imaTxt, _imaTone;
+        if(D.source_stale && _imaSD >= 5){
+          _imaTxt = '源报告停在 '+_imaSD+' 天前（数据日 '+(D.data_date||'—')+'）⇒ 本卡已过期，不作今日依据；选股请回到因子榜';
+          _imaTone = 'down';
+        } else if(_imaN === 0){
+          _imaTxt = '本日源报告无候选 ⇒ 短线情绪侧无票，不硬凑';
+          _imaTone = 'gold';
+        } else {
+          _imaTxt = (D.cycle_stage ? ('情绪处于 <b>'+D.cycle_stage+'</b>'+(D.position_advice?('、源建议仓位 '+D.position_advice):'')+'；') : '')
+                  + '候选 <b>'+_imaN+'</b> 只' + (_reso>0 ? ('、与 v8 池共振 '+_reso+' 只') : '、与 v8 池无共振')
+                  + ' ⇒ ' + (_reso>0 ? '优先做共振那几只，单只不超过计划仓位三分之一' : '无共振则只作情绪观察，别单独据此建仓');
+          _imaTone = _reso > 0 ? 'up' : 'gold';
+        }
+        html += window.v8ConclHtml(_imaTxt, _imaTone);
+      }
+    }catch(e){}
     /* ── 情绪周期 + 汇总胶囊行 ── */
     html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11px">';
     if(D.cycle_stage){
@@ -9749,6 +9796,18 @@ function esc(s){
      pos ：prepend(默认·插容器内最前) | before(插容器前一个兄弟位，供树图等 flex 容器用)
      铁律：数据缺时不调用本函数，或传 dim 明写原因；绝不用假值凑结论。
            重复调用先删旧行，不叠加；容器不存在则静默返回 false，绝不抛错打断主渲染。 */
+  /* 🎯 同上组件的「纯字符串」版：给 host.innerHTML = '...' 整块拼接的卡用（无法 prepend DOM）。
+     与 v8Concl 视觉完全一致；调用方负责幂等（每次重渲染重算字符串，天然不叠加）。 */
+  window.v8ConclHtml = function(text, tone){
+    if(!text) return '';
+    var _col = tone==='up' ? 'var(--up)' : tone==='down' ? 'var(--down)'
+             : tone==='gold' ? 'var(--gold)' : 'var(--dim)';
+    return '<div class="concl-row" style="display:flex;align-items:flex-start;gap:8px;margin:0 0 10px;padding:7px 11px;'
+      + 'background:rgba(148,163,184,.08);border-left:3px solid ' + _col + ';border-radius:0 6px 6px 0;'
+      + 'font-size:12.5px;line-height:1.65;color:var(--txt)">'
+      + '<span style="flex:0 0 auto;font-weight:800;color:' + _col + ';letter-spacing:.5px">结论</span>'
+      + '<span style="flex:1 1 auto">' + text + '</span></div>';
+  };
   window.v8Concl = function(bodyId, text, tone, pos){
     try{
       var host = document.getElementById(bodyId);
@@ -12655,6 +12714,26 @@ function drawUpDownChart(){
       '</div>'+
       credHtml;
 
+    /* 🎯 数据健康结论：fail 才判红，empty/stale 只提示「是数据空不是页面坏」 */
+    try{
+      if(window.v8Concl){
+        var _dhTxt, _dhTone;
+        if(fail > 0){
+          _dhTxt = fail+' 个模块<b>真失败</b>（'+statusText+'）⇒ 相关卡片今天缺数，那几张的结论要打折，别用缺失数据下判断';
+          _dhTone = 'down';
+        } else if(empty > 0){
+          _dhTxt = '无失败，但 '+empty+' 个模块返回空 ⇒ 对应卡片今天无内容属数据侧空，不是页面坏';
+          _dhTone = 'gold';
+        } else if(staleCount > 0){
+          _dhTxt = '无失败，'+staleCount+' 个模块数据源离线空 ⇒ 这些卡显示的是旧值，判读先看各自时间戳';
+          _dhTone = 'gold';
+        } else {
+          _dhTxt = '本周期 '+runCount+' 个模块全正常' + (skipCount>0?('（'+skipCount+' 个未到本轮次，属正常分批）'):'') + ' ⇒ 数据链健康，各页结论可直接用';
+          _dhTone = 'up';
+        }
+        window.v8Concl('runnerTrackBody', _dhTxt, _dhTone);
+      }
+    }catch(e){}
     // 2026-08-10 CN runner1号机：接入孤儿数据源（RISK_GAUGE / WEEKEND_RUN / WEEKEND_META_REPORT）
     try {
       let extra = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">';
@@ -12723,6 +12802,23 @@ function drawUpDownChart(){
       nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--dim)">🌙 本机夜间审计：暂无（等待本机任务产出）</div>';
     }
     el.innerHTML = latestHtml + histBlock + nightlyBlock;
+    /* 🎯 审计结论：warn 属已知陈旧项不追，fail 才是硬异常 */
+    try{
+      if(window.v8Concl){
+        var _atTxt, _atTone;
+        if(overall === 'fail'){
+          _atTxt = '最近审计判定 <b>fail</b>（失败 '+(sum.fail||0)+' 项）⇒ 有硬异常，页面数据可信度下降，先修再信结论';
+          _atTone = 'down';
+        } else if(overall === 'warn' || (sum.warn||0) > 0){
+          _atTxt = '审计通过 '+(sum.ok||0)+'、警告 '+(sum.warn||0)+' 项、无失败 ⇒ 警告项属已知预期陈旧，不追';
+          _atTone = 'gold';
+        } else {
+          _atTxt = '审计 '+(sum.total||0)+' 项全通过（'+latest.date+' '+latest.time+'）⇒ 当日数据链无异常';
+          _atTone = 'up';
+        }
+        window.v8Concl('auditTrailBody', _atTxt, _atTone);
+      }
+    }catch(e){}
     // 2026-09-10：改用全站统一胶囊（原 textContent 直写 → 被 verify_card_badges 判为唯一漂移）
     setBadge('auditTrailTime', '', '', at.generated_at || (latest.date||''));
   }
@@ -13433,6 +13529,24 @@ function drawUpDownChart(){
 
     html = '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;font-size:12px">'+summaryBadge+' · 当前时间 '+fmtHm(now)+' · 状态按 data/*.js 最新时间戳判定</div>' + html;
 
+    /* 🎯 任务看板结论：漏跑(miss)才是问题，未到期(pending)属正常 */
+    try{
+      if(window.v8ConclHtml){
+        var _tsTxt, _tsTone;
+        if(missCards > 0){
+          _tsTxt = '今日 '+totalCards+' 张卡中 <b>'+missCards+' 张该更新没更新</b> ⇒ 对应页面是旧数据，看结论前先确认那张卡的时间戳';
+          _tsTone = 'down';
+        } else if(pendingCards > 0){
+          _tsTxt = '已到期卡片 '+okCards+' 张全部更新，'+pendingCards+' 张未到点 ⇒ 正常分批调度，不用管';
+          _tsTone = 'up';
+        } else {
+          _tsTxt = '今日 '+totalCards+' 张卡全部按时更新 ⇒ 无漏跑';
+          _tsTone = 'up';
+        }
+        html = window.v8ConclHtml(_tsTxt, _tsTone) + html;
+      }
+    }catch(e){}
+
     body.innerHTML = html;
 
     if(sum){
@@ -13636,6 +13750,26 @@ function drawUpDownChart(){
     });
 
     body.innerHTML = html;
+    /* 🎯 巡检结论 */
+    try{
+      if(window.v8Concl){
+        var _hcTxt, _hcTone;
+        var _hcW = (s.warn||0);
+        if(overall === 'fail' || (s.fail||0) > 0){
+          _hcTxt = '前端巡检 <b>失败 '+(s.fail||0)+' 项</b> ⇒ 有卡片渲染/数据异常，先看红项再信各页结论';
+          _hcTone = 'down';
+        } else if(overall === 'warn' || _hcW > 0){
+          _hcTxt = _hcW > 0
+            ? ('巡检告警 <b>'+_hcW+'</b> 项、无失败 ⇒ 属预期陈旧（等 OCR/盘后链补齐），不影响主结论')
+            : ('巡检判定 warn 但告警计数为 0（共 '+(s.total||0)+' 项、失败 0）⇒ 提示级，不影响主结论');
+          _hcTone = 'gold';
+        } else {
+          _hcTxt = '巡检全绿（'+((s.total!=null)?s.total:(H.items||[]).length)+' 项）⇒ 页面与数据均正常';
+          _hcTone = 'up';
+        }
+        window.v8Concl('healthCheckBody', _hcTxt, _hcTone);
+      }
+    }catch(e){}
 
   }
 
@@ -15148,6 +15282,30 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       return;
     }
 
+    /* 🎯 2026-11-27 主人令「该展示的继续展示，但是都要有结论」：金股池结论行
+       口径修正（本地实测抓到）：GOLD_POOL.stocks 无 status 字段，用 list.length-watchN 当"今日命中"会虚报 1109 只。
+       现改按 first_date 是否=今日 判新入池，并显式带出数据时点。 */
+    try{
+      if(window.v8Concl){
+        var _gpTodayStr = '';
+        try{ _gpTodayStr = new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Shanghai'}); }catch(e2){}
+        var _gpGe3 = 0, _gpToday = 0;
+        list.forEach(function(s){
+          if((s.signal_count||0) >= 3) _gpGe3++;
+          if(_gpTodayStr && String(s.first_date||'').slice(0,10) === _gpTodayStr) _gpToday++;
+        });
+        var _gpAsOf = (window._fmtAshareRel && window._fmtAshareRel(gp.update_time || gp.last_update || '')) || String(gp.update_time||gp.last_update||'').slice(0,16).replace('T',' ');
+        var _gpTxt, _gpTone;
+        if(_gpToday > 0){
+          _gpTxt = '今日新入池 <b>'+_gpToday+'</b> 只，池内共振≥3 的 <b>'+_gpGe3+'</b> 只是主线候选 ⇒ 优先这 '+_gpGe3+' 只，买点等回调确认，不在拉高处追';
+          _gpTone = _gpGe3 > 0 ? 'up' : 'gold';
+        } else {
+          _gpTxt = '数据截至 '+_gpAsOf+'：今日无新票入池，池内 '+list.length+' 只是存量、共振≥3 仅 <b>'+_gpGe3+'</b> 只 ⇒ 只从这 '+_gpGe3+' 只里挑，存量票不追，不必每天翻全池';
+          _gpTone = _gpGe3 > 0 ? 'gold' : 'dim';
+        }
+        window.v8Concl('stGoldPoolList', _gpTxt, _gpTone, 'before');
+      }
+    }catch(e){}
     if(sumEl){
       const ge2 = list.filter(s=>(s.signal_count||0)>=2).length;
       const ge3 = list.filter(s=>(s.signal_count||0)>=3).length;
@@ -15243,6 +15401,32 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         + '<span style="color:var(--dim);margin-left:auto">金股池 → 因子综合分降序（11 维因子加总，非收益预测）</span>'
         + '</div>';
     }
+    /* 🎯 因子榜结论：必须先过质量闸（validity≠ok 或最高分<10 ⇒ 只观察不许买）
+       口径修正（本地实测抓到）：TD.validity 是对象 {status,reason,max_score,...}，不是字符串，
+       直接拼会输出 [object Object]；现取 .status / .reason。 */
+    try{
+      if(window.v8Concl){
+        var _fsShow = arr.slice(0, Math.min(arr.length, 10));
+        var _fsMax = 0;
+        _fsShow.forEach(function(s){ var _v = Number(s.total_score); if(isFinite(_v) && _v > _fsMax) _fsMax = _v; });
+        var _fsHc = (TD.hc_count != null) ? Number(TD.hc_count) : null;
+        var _fsVo = TD.validity;
+        var _fsSt = (_fsVo && typeof _fsVo === 'object') ? String(_fsVo.status||'') : String(_fsVo||'');
+        var _fsWhy = (_fsVo && typeof _fsVo === 'object' && _fsVo.reason) ? String(_fsVo.reason).replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+        var _fsTxt, _fsTone;
+        if(_fsSt !== '' && _fsSt !== 'ok'){
+          _fsTxt = '本次榜单<b>质量闸未过</b>（'+_fsSt+(_fsWhy?('：'+_fsWhy):'')+'）⇒ 只作候选观察，不构成买入依据';
+          _fsTone = 'gold';
+        } else if(_fsMax < 10){
+          _fsTxt = '最高分仅 '+_fsMax.toFixed(1)+'（闸门 10）⇒ 今日无强票，宁可不做，别在弱信号里硬选';
+          _fsTone = 'gold';
+        } else {
+          _fsTxt = '最高分 <b>'+_fsMax.toFixed(1)+'</b>，榜内 '+_fsShow.length+' 只、双共振 '+(_fsHc===null?'—':_fsHc)+' 只 ⇒ 优先双共振那几只，其余等回踩不破 5 日线再买';
+          _fsTone = 'up';
+        }
+        window.v8Concl('stFinalSelList', _fsTxt, _fsTone, 'before');
+      }
+    }catch(e){}
     // 列表（Top5 标 🏷）— 2026-11-22 主人令：只展示 Top10
     const limit = Math.min(arr.length, 10);
     const top5 = arr.slice(0,5).map(s=>String(s.code));
@@ -15427,6 +15611,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     let intro = '<div style="background:#38bdf810;border:1px solid #38bdf833;border-radius:6px;padding:9px 11px;margin-bottom:11px;font-size:12px;line-height:1.75;color:#e8eef5">'
       + '<b style="color:#ffffff">这张卡给你什么信息（人话）</b>：找「跌到位、开始企稳」的老票——<b style="color:#ffffff">不是接飞刀</b>，要同时满足跌 6–22%、过去 60 日涨过、近 3 日不创新低、缩量、站上 5 日线，才进观察池。'
       + '命中 0 只说明当前没有符合条件的票，宁缺毋滥不凑数；它是<b style="color:#ffffff">观察源，不进最终推荐 Top3</b>。下方「前瞻跟踪战报」是这些信号真买后的收益回填，不是预测。</div>';
+    /* 🎯 回调企稳池结论（0 只命中必须明说「不接飞刀」，不许含糊） */
+    let _pbConcl = '';
+    try{
+      if(window.v8ConclHtml){
+        var _pbTxt, _pbTone;
+        if(cnt > 0){
+          _pbTxt = '命中 <b>'+cnt+'</b> 只' + (typeof P.scanned==='number' ? ('（扫描 '+P.scanned+' 只老票）') : '') + ' ⇒ 有票跌到位且企稳，但本卡是观察源、不进 Top3；动作 = 次日开盘不破前低才试仓，反弹不到位不加';
+          _pbTone = 'up';
+        } else {
+          _pbTxt = '0 只命中（跌 6–22% + 缩量 + 站上 5 日线没有同时满足）⇒ 今天不接飞刀，等真企稳再动手，不补位不凑数';
+          _pbTone = 'gold';
+        }
+        _pbConcl = window.v8ConclHtml(_pbTxt, _pbTone);
+      }
+    }catch(e){ _pbConcl = ''; }
     let sum = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px">'
       + pill('🎯 命中 <b>'+cnt+'</b> 只', cnt>0 ? '#ef5350' : '#94a3b8')
       + (P.signal_date ? pill('信号日 '+P.signal_date,'#38bdf8') : '')
@@ -15511,7 +15710,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       + '。本卡为<b>观察源</b>，独立于因子榜，不参与 Top3 排序（Top3 仍受因子榜硬闸约束）。信号为真实K线计算，命中数为0即代表当时全市场无合格企稳票，不补位、不伪造。</div>';
     let cmpHtml = '';
     try{ cmpHtml = buildPullbackCompareCard() || ''; }catch(e){ cmpHtml = ''; }
-    host.innerHTML = cmpHtml + head + intro + sum + body + trackHtml + note;
+    host.innerHTML = cmpHtml + head + intro + _pbConcl + sum + body + trackHtml + note;
   };
   function renderStPool(){
     const $ = id => document.getElementById(id);
@@ -15535,6 +15734,31 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var _isPre = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
       slotEl.textContent = _isPre ? '上游水源 · 盘前' : '上游水源 · 盘后';
     }
+    /* 🎯 观测候选池结论（判 7 个来源有无断供） */
+    try{
+      if(window.v8Concl && total > 0){
+        var _spOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'];
+        var _spExp = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'因子优选':50};
+        var _spMiss = [], _spThin = [];
+        _spOrder.forEach(function(k){
+          var _c0 = sd[k] || 0;
+          if(_c0 === 0) _spMiss.push(k.replace(/成交前\d+|研报/,''));
+          else if(_spExp[k] && _c0 < _spExp[k]*0.8) _spThin.push(k.replace(/成交前\d+|研报/,''));
+        });
+        var _spTxt, _spTone;
+        if(_spMiss.length >= 2){
+          _spTxt = '池内 <b>'+total+'</b> 只，但 '+_spMiss.length+' 个来源断供（'+_spMiss.join('、')+'）⇒ 选股面已变窄，今天只在已确认主线里挑，别指望冷门票补位';
+          _spTone = 'gold';
+        } else if(_spMiss.length === 1){
+          _spTxt = '池内 <b>'+total+'</b> 只，'+_spMiss[0]+' 无数据 ⇒ 该方向今日无票可选，其余来源照常' + (_spThin.length?('；'+_spThin.join('、')+' 偏少'):'');
+          _spTone = 'gold';
+        } else {
+          _spTxt = '池内 <b>'+total+'</b> 只，7 个来源全部到位 ⇒ 水源充足，下游选股不受限' + (_spThin.length?('（'+_spThin.join('、')+' 偏少）'):'');
+          _spTone = 'up';
+        }
+        window.v8Concl('stPoolSourceDist', _spTxt, _spTone, 'before');
+      }
+    }catch(e){}
     // 来源级分布（紧凑行，始终可见）
     const sdEl = $('stPoolSourceDist');
     if(sdEl){
