@@ -1,9 +1,9 @@
 {
- "update_time": "2026-11-27 07:16:30",
+ "update_time": "2026-11-27 10:17:16",
  "data_date": "2026-11-23",
  "universe": {
-  "total": 983,
-  "scanned": 953
+  "total": 980,
+  "scanned": 954
  },
  "signal": "收盘创20日新高 且 5日均量<0.85×20日均量（量价背离·缩量新高）",
  "hits": [
@@ -23,6 +23,51 @@
    }
   },
   {
+   "code": "002242",
+   "name": "九阳股份",
+   "case": false,
+   "price": 26.35,
+   "above_ma20": true,
+   "vol_ratio": 0.752,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-11-10",
+    "days_ago": 0,
+    "vol_ratio": 0.752
+   }
+  },
+  {
+   "code": "000651",
+   "name": "格力电器",
+   "case": false,
+   "price": 40.15,
+   "above_ma20": true,
+   "vol_ratio": 0.788,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-11-16",
+    "days_ago": 0,
+    "vol_ratio": 0.788
+   }
+  },
+  {
+   "code": "002086",
+   "name": "东方海洋",
+   "case": false,
+   "price": 2.25,
+   "above_ma20": true,
+   "vol_ratio": 0.812,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-09-07",
+    "days_ago": 0,
+    "vol_ratio": 0.812
+   }
+  },
+  {
    "code": "688309",
    "name": "恒誉科技",
    "case": false,
@@ -38,18 +83,33 @@
    }
   },
   {
-   "code": "000400",
-   "name": "许继电气",
+   "code": "001206",
+   "name": "依依股份",
    "case": false,
-   "price": 25.9,
+   "price": 17.17,
    "above_ma20": true,
-   "vol_ratio": 0.807,
-   "off_high20": -1.22,
+   "vol_ratio": 0.839,
+   "off_high20": 0.0,
+   "hit_now": true,
+   "recent": {
+    "date": "2026-09-21",
+    "days_ago": 0,
+    "vol_ratio": 0.839
+   }
+  },
+  {
+   "code": "300747",
+   "name": "锐科激光",
+   "case": false,
+   "price": 41.66,
+   "above_ma20": false,
+   "vol_ratio": 0.793,
+   "off_high20": -7.03,
    "hit_now": false,
    "recent": {
-    "date": "2026-11-24",
+    "date": "2026-11-12",
     "days_ago": 2,
-    "vol_ratio": 0.845
+    "vol_ratio": 0.808
    }
   },
   {
@@ -68,21 +128,6 @@
    }
   },
   {
-   "code": "301261",
-   "name": "恒工精密",
-   "case": false,
-   "price": 75.06,
-   "above_ma20": true,
-   "vol_ratio": 1.186,
-   "off_high20": -1.6,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-24",
-    "days_ago": 2,
-    "vol_ratio": 0.763
-   }
-  },
-  {
    "code": "603766",
    "name": "隆鑫通用",
    "case": false,
@@ -95,6 +140,21 @@
     "date": "2026-11-18",
     "days_ago": 3,
     "vol_ratio": 0.824
+   }
+  },
+  {
+   "code": "002862",
+   "name": "实丰文化",
+   "case": false,
+   "price": 15.06,
+   "above_ma20": true,
+   "vol_ratio": 1.949,
+   "off_high20": -1.63,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-08-28",
+    "days_ago": 3,
+    "vol_ratio": 0.754
    }
   },
   {
@@ -140,21 +200,6 @@
     "date": "2026-11-20",
     "days_ago": 4,
     "vol_ratio": 0.844
-   }
-  },
-  {
-   "code": "002311",
-   "name": "海大集团",
-   "case": false,
-   "price": 48.66,
-   "above_ma20": false,
-   "vol_ratio": 0.938,
-   "off_high20": -2.19,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-20",
-    "days_ago": 4,
-    "vol_ratio": 0.719
    }
   },
   {
@@ -218,6 +263,21 @@
    }
   },
   {
+   "code": "001979",
+   "name": "招商蛇口",
+   "case": false,
+   "price": 8.14,
+   "above_ma20": true,
+   "vol_ratio": 1.037,
+   "off_high20": -0.25,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-10-26",
+    "days_ago": 4,
+    "vol_ratio": 0.753
+   }
+  },
+  {
    "code": "601398",
    "name": "工商银行",
    "case": false,
@@ -278,6 +338,21 @@
    }
   },
   {
+   "code": "002626",
+   "name": "金达威",
+   "case": false,
+   "price": 16.7,
+   "above_ma20": true,
+   "vol_ratio": 0.531,
+   "off_high20": -1.53,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-08-28",
+    "days_ago": 5,
+    "vol_ratio": 0.699
+   }
+  },
+  {
    "code": "688069",
    "name": "德林海",
    "case": false,
@@ -290,21 +365,6 @@
     "date": "2026-09-09",
     "days_ago": 5,
     "vol_ratio": 0.819
-   }
-  },
-  {
-   "code": "000568",
-   "name": "泸州老窖",
-   "case": false,
-   "price": 78.01,
-   "above_ma20": false,
-   "vol_ratio": 0.651,
-   "off_high20": -4.74,
-   "hit_now": false,
-   "recent": {
-    "date": "2026-11-19",
-    "days_ago": 5,
-    "vol_ratio": 0.848
    }
   },
   {

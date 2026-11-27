@@ -1,25 +1,25 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 03:39:32",
+ "generated": "2026-11-27 10:17:20",
  "verdict": {
   "cap_pct": 30,
-  "label": "观"
+  "label": "守"
  },
  "inputs": {
-  "tactic_score": -1,
-  "tactic_exposure": 0.5,
-  "senti_phase": "狂热",
-  "senti_score": 85.0,
-  "zt": 76,
-  "max_ladder": 5,
-  "up": 683,
-  "down": 1605,
-  "breadth": 0.298513986013986,
+  "tactic_score": -4,
+  "tactic_exposure": 0.3,
+  "senti_phase": "退潮",
+  "senti_score": 53.0,
+  "zt": 54,
+  "max_ladder": 4,
+  "up": 1052,
+  "down": 1201,
+  "breadth": 0.4669329782512206,
   "crisis": 35.7,
-  "sh_close": 3469.42,
-  "sh_chg": -0.2,
-  "zz1000_close": 5648.63,
-  "flow_in_cnt": 40,
+  "sh_close": 3474.1,
+  "sh_chg": -0.08,
+  "zz1000_close": 5531.84,
+  "flow_in_cnt": 14,
   "top_sectors": [
    "同花顺漂亮100",
    "高股息精选",
@@ -27,16 +27,16 @@
   ],
   "top_stocks": [
    "广联航空",
-   "招商证券",
-   "国泰海通"
+   "优刻得",
+   "上海九百"
   ]
  },
- "checks_hit": 3,
+ "checks_hit": 2,
  "checks_total": 8,
  "list_gate_ok": false,
- "list_gate_why": "榜单陈旧11-20、validity=degraded、无分辨度max=4.7、缺维度inst_w52/inst_analyst",
+ "list_gate_why": "榜单陈旧11-26、validity=degraded、无分辨度max=4.1、缺维度inst_w52/inst_analyst",
  "forward_ref": {
-  "sh_close": 3469.42,
+  "sh_close": 3474.1,
   "date": "2026-11-27"
  }
 }
