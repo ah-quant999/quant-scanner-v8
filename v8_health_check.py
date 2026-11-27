@@ -138,9 +138,10 @@ CARD_DEFS = [
     #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
     # 🔴 2026-11-27 主人令（一劳永逸·「看板绿但数据旧」）：
     #   post_close_required = 每交易日在盘后**必须产出一次**的卡，不适用「非盘中就豁免」。
-    #   cycle=(16,30) = 盘后档真实产出锚点（cron 16:00 起抓 9915 只票约 5-10min + 部署推送）。
-    #   盘后「过了 16:30 + 3h 宽限仍未刷新」⇒ fail，当天可见，不再拖到次日 24h 窗口。
-    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后两档 16:00/20:00", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "post_close_required": True, "cycle": (16, 30), "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
+    #   cycle=(17,0) = 盘后档**判死线**（cron 16:00 起抓 9915 只票 5-10min + 部署推送，留足 1h 余量，
+    #   避免 16:30 恰在推送途中就判红；17:00 后仍未刷新即视为当日盘后档丢失）。
+    #   盘后「过了 17:00 + 3h 宽限仍未刷新」⇒ fail，当天可见，不再拖到次日 24h 窗口。
+    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘后两档 16:00/20:00", "max_age": 1440, "key_fields": ["update_time"], "premarket_keep": True, "post_close_required": True, "cycle": (17, 0), "weekend_update": False, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
     # 🆕 2026-11-16 主人拍板「统一自愈决策器·按此落地」：FUTURES_REALTIME（期指实时）此前
     #   CARD_DEFS 完全漏登记 ⇒ 健康面板不监控 + 自愈链够不到 ⇒ 断更只能靠主人肉眼发现
     #   （11-13 实测：cron 静默失联 + 缓存戳不同步双重故障，两处均已修，本条补上监控盲区）。
@@ -385,8 +386,8 @@ CARD_DEFS = [
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     # 🔴 2026-11-27 同 STOCK_QUOTE：每交易日盘后必须产出一次 ⇒ post_close_required，
-    #   盘后按 cycle 收紧判龄（实测盘后链 15:48 前后出数，deadline 给到 16:30 留足余量）。
-    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次(15:50前后)", "max_age": 1440, "key_fields": ["phase", "sector_count"], "post_close_required": True, "cycle": (16, 30), "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
+    #   盘后按 cycle 收紧判龄（实测盘后链 15:48 前后出数，deadline 给到 17:00 留足余量）。
+    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次(15:50前后)", "max_age": 1440, "key_fields": ["phase", "sector_count"], "post_close_required": True, "cycle": (17, 0), "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
     # 🔴 2026-11-27 主人令（图2「RUNNER_STATUS_HEALTH 停在 11-26 22:35 却判 ✓」根治）：
     #   本项此前**完全不在体检清单**（_LOW_FREQ_FILES 里只留一句「另有专门检查」，而那个检查
     #   只负责开 Issue，不看陈旧度）⇒ 「小九机离线」这条最关键的运维事实，只能由看板按 isToday
