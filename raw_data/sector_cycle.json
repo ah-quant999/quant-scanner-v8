@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-27 13:06:50",
+  "update_time": "2026-11-27 13:12:55",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "11/27"
   ],
   "columns": 30,
-  "cycle_count": 17,
+  "cycle_count": 16,
   "cycles": [
     {
       "sector": "AI算力",
@@ -204,22 +204,9 @@
       "end_idx": 29,
       "days": 2,
       "hot_days": 2,
-      "peak": 4,
+      "peak": 5,
       "peak_date": "11/27",
-      "total": 7,
-      "ongoing": true
-    },
-    {
-      "sector": "地产链",
-      "start": "11/27",
-      "end": "11/27",
-      "start_idx": 29,
-      "end_idx": 29,
-      "days": 1,
-      "hot_days": 1,
-      "peak": 3,
-      "peak_date": "11/27",
-      "total": 3,
+      "total": 8,
       "ongoing": true
     },
     {
@@ -230,9 +217,9 @@
       "end_idx": 29,
       "days": 1,
       "hot_days": 1,
-      "peak": 3,
+      "peak": 4,
       "peak_date": "11/27",
-      "total": 3,
+      "total": 4,
       "ongoing": true
     }
   ]
