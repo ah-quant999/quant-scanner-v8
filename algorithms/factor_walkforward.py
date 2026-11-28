@@ -216,6 +216,40 @@ def build_panel(klines):
     return dates, pos, bars
 
 
+_GUARD_WARNED = set()
+
+
+def _guard_factors(fmap):
+    """🛡 2026-11-28 主人令「一劳永逸」：因子级异常护栏（机制层，自动覆盖以后新增的因子）。
+
+    实测事故（GitHub Actions 日志 2026-11-28）：
+        factor_walkforward.py ← 退出码 1 | TypeError: bad operand type for unary -: 'NoneType'
+    ⇒ raw_data/factor_walkforward.json 自 2026-11-23 21:36 起断更，
+      前端健康检查卡报「文件 FACTOR_WALKFORWARD 失败 · 超过阈值 1949 分钟」。
+    直接病灶是 ivol60 对 None 取负（已在上方 _ivol60 内修正），但同类「None 参与算术」的雷
+    在 amp20（close=0 除零）、dviol60（r 含 None）、vol_conf（_pearson 含 None）等因子同样存在。
+
+    故此处不再逐点打补丁：把每个因子 callable 统一套 try/except →
+      异常 ⇒ 该票该时点因子值 = None（语义本就是「此票此时无此因子」，下游 evaluate 本就跳过 None），
+      单点异常绝不中断整链、不会让整个引擎退出码 1。
+    告警按因子名去重（模块级集合），每因子最多 1 条，避免 5000 只票刷屏。
+    """
+    out = {}
+    for _nm, _fn in fmap.items():
+        def _mk(nm, fn):
+            def _call(i):
+                try:
+                    return fn(i)
+                except (TypeError, ZeroDivisionError, IndexError, ValueError) as e:
+                    if nm not in _GUARD_WARNED:
+                        _GUARD_WARNED.add(nm)
+                        _log("    ⚠️ 因子 %s 计算异常 ⇒ 按缺失处理（同因子后续不再告警）: %s" % (nm, e))
+                    return None
+            return _call
+        out[_nm] = _mk(_nm, _fn)
+    return out
+
+
 def stock_series(rows):
     """预计算：日收益 r[]、隔夜 o[]、残差(先按 beta=1 用 r 减池均值，稍后统一)、前缀和。"""
     n = len(rows)
@@ -709,9 +743,20 @@ def make_resid_prep(rows, pool_r_at):
         var = (ss - s * s / m) / (m - 1)
         return var ** 0.5 if var > 0 else None
 
+    def _ivol60(i):
+        """特质波动率（取负）。🔴 2026-11-28 根治：_std 在「60 日残差方差=0」时返回 None
+        （长期停牌 / 一字板 / 数据缺行的票），旧写法 `-_std(...)` 直接对 None 取负 ⇒
+        TypeError: bad operand type for unary -: 'NoneType' ⇒ 整个引擎退出码 1 ⇒
+        raw_data/factor_walkforward.json 自 11-23 21:36 起断更（前端「失败·超阈值 1949 分钟」）。
+        None 的语义本就是「该票此时无此因子」，此处显式返回 None 即可，不许崩整链。"""
+        if i < 60:
+            return None
+        v = _std(i - 59, i + 1)
+        return -v if v is not None else None
+
     return {
         "resid_mom": lambda i: (ps[i - 19] - ps[i - 239] if i >= 240 else None),
-        "ivol60": (lambda i: (-_std(i - 59, i + 1) if i >= 60 else None)),
+        "ivol60": _ivol60,
     }
 
 
@@ -797,6 +842,8 @@ def main():
             if i >= 0:
                 pool_at[i] = pool_r[g]
         d["f"].update(make_resid_prep(rows, pool_at))
+        # 🛡 2026-11-28：两组因子合并后再统一套护栏（新增因子自动受保护，无需逐条登记）
+        d["f"] = _guard_factors(d["f"])
         prep[c] = d
     _log("  完成 %d 只" % len(prep))
 
