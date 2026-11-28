@@ -1,6 +1,6 @@
 {
  "date": "2026-11-28",
- "generated": "2026-11-28 06:05:05",
+ "generated": "2026-11-28 08:21:02",
  "verdict": {
   "cap_pct": 50,
   "label": "观"
@@ -21,9 +21,7 @@
   "zz1000_close": 5982.91,
   "flow_in_cnt": 33,
   "top_sectors": [
-   "基金减仓",
-   "通信技术",
-   "5G概念"
+   "5G"
   ],
   "top_stocks": [
    "哔哩哔哩-W",
