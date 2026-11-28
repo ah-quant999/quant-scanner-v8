@@ -1,0 +1,46 @@
+# 九宝量化 v8.0 — 双机分时按铃（云端执行版）
+#
+# 🔴 2026-11-28 主人令「双机能省 TOKEN 就省」·科学处置：
+#   按铃器 scripts/alimi_bell.py 是**纯脚本**（std-lib + GitHub API，窗口/阈值/去重全在
+#   脚本内部），原由本机 WorkBuddy 每小时起一次 LLM 只为跑它一句 —— 典型「用大模型跑
+#   一行 shell」反模式。迁到云端后：节拍从「每小时一次 LLM」变成「每小时一次 Actions」，
+#   LLM 消耗归零，判定逻辑逐字不变（同一脚本、同一阈值、同一去重）。
+#
+#   幂等与去重：脚本内部按「该时段应有数据但云端最近未成功运行」判定，双源同跑也不会
+#   重复派发；但为避免两源抢同一窗口，切换时**先 PAUSE 本地任务**（铁律：先停本地再启云端）。
+#
+#   为什么还需要它：数据看门狗（v8_cn_fetch_watchdog）虽是状态型兜底，但 GitHub 对
+#   schedule 的实际放行率极低（11-24~11-28 实测：名义 96 档/天，实际 schedule 仅 17 次），
+#   按铃是本机侧唯一「不依赖 GitHub cron 准点」的可信心跳腿，必须留，只是不必用 LLM 留。
+
+name: "🔔 双机分时按铃(云端)"
+
+on:
+  schedule:
+    # 与本地原节拍一致：每小时 :30。分钟漂移无害——判据是数据新鲜度，不是准点。
+    - cron: '30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # repository_dispatch（算法链）需要
+  actions: write    # workflow_dispatch（抓取链）需要
+
+concurrency:
+  group: v8-bell-cloud
+  cancel-in-progress: false
+
+jobs:
+  bell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: 检出（sparse·只要 scripts/）
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /scripts/
+          sparse-checkout-cone-mode: false
+      - name: 跑按铃器
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/alimi_bell.py

@@ -52,7 +52,11 @@ _VERBOSE = "--verbose" in sys.argv or _DRY
 
 
 def _headers():
-    pat = open(_PAT_FILE, encoding="utf-8").read().strip()
+    # 🔴 2026-11-28 主人令（省 token）：本器迁云端每时轮（v8_bell_cloud.yml），故 token 读取
+    #   增加 env 兜底 GH_TOKEN / GITHUB_TOKEN —— 云端由 `${{ github.token }}` 注入，无文件；
+    #   本机无该 env，仍走 _PAT_FILE 原路径，行为逐字不变。安全铁律不变：不打印、不落盘。
+    pat = (os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+           or open(_PAT_FILE, encoding="utf-8").read().strip())
     return {
         "Authorization": "Bearer " + pat,
         "Accept": "application/vnd.github+json",
