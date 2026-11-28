@@ -1,5 +1,5 @@
 {
- "update_time": "2026-11-28 21:16:53",
+ "update_time": "2026-11-29 00:59:00",
  "data_date": "2026-11-27",
  "head": {
   "label": "观 · 5 成",
@@ -41,11 +41,31 @@
  "buy": {
   "sectors": [
    {
+    "name": "比亚迪概念",
+    "type": "概念",
+    "net_5d": 1060.5,
+    "days": 14,
+    "net_today": 218.8,
+    "leaders": [],
+    "lead_src": "",
+    "etf": null
+   },
+   {
+    "name": "阿里巴巴概念",
+    "type": "概念",
+    "net_5d": 898.2,
+    "days": 10,
+    "net_today": 195.3,
+    "leaders": [],
+    "lead_src": "",
+    "etf": null
+   },
+   {
     "name": "5G",
-    "type": "行业",
+    "type": "概念",
     "net_5d": 522.1,
-    "days": 17,
-    "net_today": 57.0,
+    "days": 18,
+    "net_today": 418.0,
     "leaders": [],
     "lead_src": "",
     "etf": null
@@ -70,10 +90,10 @@
     "code": "300083",
     "name": "创世纪",
     "rank": 2,
-    "close": 9.89,
-    "chg": 13.288,
-    "stop": 8.9,
-    "target": 11.87,
+    "close": 11.31,
+    "chg": 7.0,
+    "stop": 10.18,
+    "target": 13.57,
     "rr": 2.0,
     "industry": "通用设备制造业",
     "same_theme": false,
@@ -84,15 +104,15 @@
     "code": "600838",
     "name": "上海九百",
     "rank": 3,
-    "close": 8.56,
-    "chg": -3.058,
-    "stop": 7.96,
+    "close": 12.18,
+    "chg": 2.18,
+    "stop": 11.33,
     "target": 13.99,
-    "rr": 9.06,
+    "rr": 2.12,
     "industry": "零售业",
     "same_theme": false,
-    "buyable": false,
-    "why": "今日因子榜第 3 名 · 信号 2 个 · 当日 -3.1% 在跌，等企稳"
+    "buyable": true,
+    "why": "今日因子榜第 3 名 · 信号 2 个"
    }
   ],
   "conflict": false,
@@ -103,22 +123,22 @@
     "sum5": 35,
     "leaders": [
      {
-      "code": "920799",
-      "name": "艾融软件",
-      "price": 29.51,
-      "chg": 30.0
+      "code": "300663",
+      "name": "科蓝软件",
+      "price": 6.64,
+      "chg": 20.07
      },
      {
-      "code": "920092",
-      "name": "汉鑫科技",
-      "price": 24.59,
-      "chg": 29.97
+      "code": "300324",
+      "name": "旋极信息",
+      "price": 6.05,
+      "chg": 20.04
      },
      {
-      "code": "920592",
-      "name": "华信永道",
-      "price": 27.5,
-      "chg": 29.96
+      "code": "300925",
+      "name": "法本信息",
+      "price": 13.31,
+      "chg": 20.02
      }
     ]
    },
@@ -128,21 +148,21 @@
     "sum5": 41,
     "leaders": [
      {
-      "code": "920298",
-      "name": "腾信精密",
-      "price": 93.08,
-      "chg": 30.0
-     },
-     {
-      "code": "920186",
-      "name": "中科仪",
-      "price": 56.84,
-      "chg": 26.0
-     },
-     {
       "code": "300461",
       "name": "田中精机",
       "price": 36.84,
+      "chg": 20.0
+     },
+     {
+      "code": "688610",
+      "name": "埃科光电",
+      "price": 69.9,
+      "chg": 20.0
+     },
+     {
+      "code": "301107",
+      "name": "瑜欣电子",
+      "price": 22.2,
       "chg": 20.0
      }
     ]
@@ -155,12 +175,12 @@
   "list_gate": {
    "name": "榜单有效",
    "gate": true,
-   "need": "update_time=2026-11-28 / validity=ok / max_score≥10 / 无缺失维度",
+   "need": "update_time=2026-11-29 / validity=ok / max_score≥10 / 无缺失维度",
    "now": "榜单2026-11-27 · validity=degraded · max=6.5 · 缺2维",
    "met": false,
    "why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
    "date": "2026-11-27",
-   "expect_date": "2026-11-28",
+   "expect_date": "2026-11-29",
    "status": "degraded",
    "max_score": 6.5,
    "data_missing": [
@@ -215,7 +235,7 @@
     {
      "name": "资金有主线",
      "need": "至少 10 个板块连续净流入",
-     "now": "33 个板块流入",
+     "now": "40 个板块流入",
      "met": true
     },
     {
@@ -233,12 +253,12 @@
     {
      "name": "榜单有效",
      "gate": true,
-     "need": "update_time=2026-11-28 / validity=ok / max_score≥10 / 无缺失维度",
+     "need": "update_time=2026-11-29 / validity=ok / max_score≥10 / 无缺失维度",
      "now": "榜单2026-11-27 · validity=degraded · max=6.5 · 缺2维",
      "met": false,
      "why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
      "date": "2026-11-27",
-     "expect_date": "2026-11-28",
+     "expect_date": "2026-11-29",
      "status": "degraded",
      "max_score": 6.5,
      "data_missing": [
@@ -289,7 +309,7 @@
  },
  "list_check": {
   "date": "2026-11-27",
-  "expect_date": "2026-11-28",
+  "expect_date": "2026-11-29",
   "status": "degraded",
   "max_score": 6.5,
   "data_missing": [
@@ -302,7 +322,7 @@
  "alpha": {
   "verdict": "FAIL",
   "ir_oos": 0.15,
-  "update_time": "2026-11-28 20:17:32"
+  "update_time": "2026-11-28 23:52:23"
  },
  "evidence": [
   {
@@ -327,16 +347,16 @@
   },
   {
    "name": "资金主线",
-   "plain": "今日净流入 33 个板块、净流出 47 个；主线是 5G",
-   "value": "5G"
+   "plain": "今日净流入 40 个板块、净流出 0 个；主线是 比亚迪概念",
+   "value": "比亚迪概念"
   }
  ],
  "caveat": "本卡是「把已有 9 个信号收敛成一个动作」的纪律工具，**不是**预测模型。其中「情绪周期当仓位闸门」这条规则**还没有样本外验证**（涨停热力历史只有 30 天），从今天起每天留痕，攒够 3-6 个月再回测。在此之前它只约束你别乱来，不代表能提高收益。",
  "sources": {
-  "tactic": "2026-11-28 21:16:53",
-  "verdict": "2026-11-28 21:16:53",
-  "senti": "2026-11-28 21:16:34",
+  "tactic": "2026-11-29 00:59:00",
+  "verdict": "2026-11-29 00:59:00",
+  "senti": "2026-11-29 00:58:35",
   "flow": "2026-11-28 16:13:48",
-  "trend": "2026-11-28 20:41"
+  "trend": "2026-11-29 00:20"
  }
 }

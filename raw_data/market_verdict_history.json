@@ -64,6 +64,19 @@
    "pace_hot": 0,
    "pace_cool": 0,
    "res_win": 42.1
+  },
+  {
+   "date": "2026-11-29",
+   "stance": "watch",
+   "score_norm": 0.042,
+   "crisis": 34.6,
+   "zt": 97,
+   "zt_ratio": 1.06,
+   "sh_net5": 827.0,
+   "tactic_score": 1,
+   "pace_hot": 0,
+   "pace_cool": 0,
+   "res_win": 42.1
   }
  ]
 }
