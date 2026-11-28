@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-28 13:12:29",
+  "update_time": "2026-11-28 15:12:54",
   "status": "ok",
   "process": {
     "ok": true,
@@ -17,14 +17,14 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 2,
+    "scanned": 0,
     "message": "最近日志无错误"
   },
   "github": {
     "ok": true,
     "consecutive_failures": 0,
     "checkout_failures": 0,
-    "latest_run_id": 46110248762,
+    "latest_run_id": 46117469290,
     "latest_failed": false,
     "latest_status": "completed",
     "stuck_min": 0,
