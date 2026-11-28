@@ -181,6 +181,13 @@ jobs:
           cp *.js _site/ 2>/dev/null || true
 
           cp *.html _site/ 2>/dev/null || true
+          # 🔴 2026-11-28 主人令「不要出现任何数据源、来源和算法、方法」：
+          #   v6 备忘录两页（「九宝量化 V6.0 - 逻辑详解」166KB / 144KB）原本随 `cp *.html`
+          #   被一并发布到 Pages，公开可访问，内含 算法 24 处 / 阈值 9 处 / 公式 5 处 /
+          #   胜率 7 处 / 回测 14 处，且标题仍是脱敏前的旧名。
+          #   仓库内暂留（guard_v6_memo 有多道「永久禁止删除」护栏，彻底删需 nolost_guard /
+          #   build_deploy / audit_weekly 等 8 处联动，另行安排），但**绝不进站点产物**。
+          rm -f _site/v6_memo.html _site/v6_memo.golden.html _site/v6_memory.html
           # 2026-11-28 主人令「只能我看」：robots.txt 必须随产物发布（原 cp 清单漏了它，
           #   导致 Pages 上 /robots.txt 恒 404、Disallow 形同不存在）。
           cp robots.txt _site/ 2>/dev/null || true
