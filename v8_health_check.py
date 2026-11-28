@@ -448,7 +448,7 @@ CARD_DEFS = [
     {"id": "FINAL_RECOMMEND_HISTORY", "name": "最终推荐Top3历史", "page": "最终推荐", "freq": "每晚D批(gen_final_recommend_history.py)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🆕 2026-11-08 主人令一劳永逸：补登此前漏登记的 5 张真实前端卡（与 V8_PAGE_SCHEDULE / 前端渲染 window.X 完全对应）
     #   此前这 5 张卡前端在跑、看板也在列，唯独运维(CARD_DEFS)漏登 ⇒ 每晚审计假装它们不存在、永不上红 ⇒ 真故障看不见。
-    {"id": "ETF_SUBSCRIPTION_EASTMONEY", "name": "资金热度·东财五分类", "page": "盘后数据", "freq": "每日盘前(T+1)", "max_age": 1440, "key_fields": ["categories", "total_net_amount_yi", "update_time"], "heal_cat": "post_close", "producer": "cloud_fetch_v8.py::update_v8（单源双视图派生）"},
+    {"id": "ETF_SUBSCRIPTION_TYPE", "name": "资金热度·东财五分类", "page": "盘后数据", "freq": "每日盘前(T+1)", "max_age": 1440, "key_fields": ["categories", "total_net_amount_yi", "update_time"], "heal_cat": "post_close", "producer": "cloud_fetch_v8.py::update_v8（单源双视图派生）"},
     {"id": "MARKET_THERMO", "name": "未来预测·牛转熊观测台", "page": "观测平台", "freq": "每日盘后(日更)", "max_age": 1440, "key_fields": ["D", "update_time"], "heal_cat": "algo_run", "raw_file": "market_thermo.json", "producer": "v8/gen_market_thermo.py"},
     {"id": "VALUATION_PERCENTILE", "name": "A股估值分位", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices", "update_time"], "heal_cat": "experiments", "producer": "fetch_valuation_percentile.py（v8_cn_fetch_experiments.yml）"},
     {"id": "PORTFOLIO_DATA", "name": "实时持仓(westock)", "page": "运维", "freq": "盘中每30分", "max_age": 1440, "_source_file": "PORTFOLIO", "key_fields": ["positions", "account", "update_time"], "heal_cat": "westock", "producer": "fetch_portfolio_westock.py", "note": "用户真实持仓·westock MCP 刷新；前端标 sourceMissing 表示 feed 不稳，需监控而非自愈"},

@@ -10,7 +10,7 @@ v8/gen_national_team.py —— 「国家队活跃度」复合信号（盘后规�
     留卡无增量信息；历史数据仍存于 data/HUIJIN_HOLDINGS.js，需要时单独调用。
 
 子信号（权重合计 100%，缺失项权重重分）：
-  A. 宽基ETF净申购突变（40%）  ← ETF_SUBSCRIPTION_EASTMONEY.js（东财口径·股票型 top_sub 宽基净申购额；由 update_v8.py 派生）
+  A. 宽基ETF净申购突变（40%）  ← ETF_SUBSCRIPTION_TYPE.js（官方分类口径·股票型 top_sub 宽基净申购额；由 update_v8.py 派生）
   B. 大金融相对强度（30%）     ← SECTOR_RS.js（银行/证券/保险/多元金融 relative_5d 均值）
   C. 大金融资金净流入（15%）   ← SECTOR_FUND_FLOW.js（银行/证券 板块净流入合计）
   D. 宽基ETF放量异动（15%）    ← raw_data/broad_etf_volume.json（cloud_fetch_v8 f_broad_etf_volume·post_close 档：
@@ -41,19 +41,19 @@ def clamp(v, lo, hi):
 def bj_now():
     return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
 
-# ── A. 宽基ETF净申购突变（东财五分类为主，老源「宽基」分类兜底，防新文件上线竞态/缺失） ──
+# ── A. 宽基ETF净申购突变（主源五分类为主，老源「宽基」分类兜底，防新文件上线竞态/缺失） ──
 # 🔴 2026-11-04 一劳永逸根治：原仅读 etf_subscription_eastmoney.js（小写孤儿名，云端从不产出/部署），
 #   国家队活跃度(20:50) 跑批 ⇒ load() 返 None ⇒ A 标「未就绪」、权重45%丢失 ⇒ 分从70+掉到46.5。
-#   根因：update_v8.py 实际派生的规范文件是大写 ETF_SUBSCRIPTION_EASTMONEY.js（已部署、含东财五分类），
+#   根因：update_v8.py 实际派生的规范文件是大写 ETF_SUBSCRIPTION_TYPE.js（已部署、含主源五分类），
 #   生成器却读了一个从不存在的文件名。现修正为读规范大写文件；并加：(1) 稳定 code 集识别宽基
-#   （防名称格式突变再翻车）；(2) 东财缺失/空 ⇒ 回落老源 ETF_NET_SUBSCRIPTION.js 的「宽基」分类
+#   （防名称格式突变再翻车）；(2) 主源缺失/空 ⇒ 回落老源 ETF_NET_SUBSCRIPTION.js 的「宽基」分类
 #   （始终存在），双源互备，永不再静默丢权重。
 KW_BROAD = ['沪深300','中证500','中证1000','50ETF','科创50','创业板','中证A500','中证2000',
             '300ETF','华夏300','500ETF','1000ETF','A500','科创综']
 BROAD_CODES = {'588000','510050','510300','510500','512100','159915','510310','510330',
                '512500','560010','588080','159919','510180','510880','515800','563000','561550','563300'}
 a_val = None; a_detail = None; a_ready = False; a_src = ''
-e = load('data/ETF_SUBSCRIPTION_EASTMONEY.js')
+e = load('data/ETF_SUBSCRIPTION_TYPE.js')
 if e:
     stock = (e.get('categories') or {}).get('股票型') or {}
     subs = stock.get('top_sub') or []
@@ -62,10 +62,10 @@ if e:
     net = sum((s.get('d_amount_yi') or 0) for s in broad)
     if broad:
         a_val = round(net, 1)
-        a_detail = '宽基净申购 %.1f 亿（%d 只宽基ETF·东财五分类）' % (net, len(broad))
+        a_detail = '宽基净申购 %.1f 亿（%d 只宽基ETF·主源五分类）' % (net, len(broad))
         a_ready = True
         a_src = 'eastmoney'
-# 兜底：东财五分类缺失/空 ⇒ 回落老源 ETF_NET_SUBSCRIPTION.js 的「宽基」分类（始终存在）
+# 兜底：主源五分类缺失/空 ⇒ 回落老源 ETF_NET_SUBSCRIPTION.js 的「宽基」分类（始终存在）
 if not a_ready:
     leg = load('data/ETF_NET_SUBSCRIPTION.js')
     if leg:
@@ -220,7 +220,7 @@ def _oneline():
 subs = []
 subs.append({
     'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,'freq':'T+1',
-    'value':a_val,'unit':'亿','detail':a_detail or '宽基ETF数据源（东财/老源）均未就绪',
+    'value':a_val,'unit':'亿','detail':a_detail or '宽基ETF数据源（主源/老源）均未就绪',
     'status':('✅活跃' if (a_val is not None and a_val>40) else ('🟡中性' if (a_val is not None and a_val>=0) else ('❌净赎回' if a_val is not None else '—未就绪')))
 })
 subs.append({

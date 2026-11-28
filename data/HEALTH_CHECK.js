@@ -763,7 +763,7 @@ window.HEALTH_CHECK = {
       "order": 63
     },
     {
-      "id": "ETF_SUBSCRIPTION_EASTMONEY",
+      "id": "ETF_SUBSCRIPTION_TYPE",
       "name": "资金热度·东财五分类",
       "page": "盘后数据",
       "freq": "每日盘前(T+1)",

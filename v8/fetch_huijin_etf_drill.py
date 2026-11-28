@@ -10,8 +10,8 @@ fetch_huijin_etf_drill.py — 汇金宽基 ETF 下钻数据源生成器
   1. 汇金公开增持的宽基 ETF 列表 (公开披露口径, 多发行人, 沪深300/中证500/上证50/
      科创50/中证1000/上证180/深证100/创业板 等宽基) — 硬编码真实代码/名称。
   2. 申赎变化 (d_shares_yi / d_amount_yi / pct / shares_yi): 优先匹配本地已落盘的
-     data/ETF_SUBSCRIPTION_EASTMONEY.js (东财五分类 Top 榜, 真实)。未进入 Top 榜的
-     代码在本机无数据 → ma20_mult / 申赎 标 null, 由云端 fetcher 补全 (走东财全量接口)。
+     data/ETF_SUBSCRIPTION_TYPE.js (主源五分类 Top 榜, 真实)。未进入 Top 榜的
+     代码在本机无数据 → ma20_mult / 申赎 标 null, 由云端 fetcher 补全 (走全量接口)。
   3. 较20日均倍数 (ma20_mult): 需盘中/历史 K 序列, 本机无 → null, 云端补。
 
 设计: 本脚本本机可跑 (只用本地东财文件, 无网络依赖即可产出真实可上线底表);
@@ -46,9 +46,9 @@ HUIJIN_ETFS = [
     ("159845", "中证1000ETF(华夏)"),
 ]
 
-def load_eastmoney_map():
-    """从本地 ETF_SUBSCRIPTION_EASTMONEY.js 抽 code->申赎明细 (真实, 仅 Top 榜覆盖)。"""
-    p = os.path.join(DATA, "ETF_SUBSCRIPTION_EASTMONEY.js")
+def load_etf_type_map():
+    """从本地 ETF_SUBSCRIPTION_TYPE.js 抽 code->申赎明细 (真实, 仅 Top 榜覆盖)。"""
+    p = os.path.join(DATA, "ETF_SUBSCRIPTION_TYPE.js")
     m = {}
     if not os.path.exists(p):
         return m
@@ -78,7 +78,7 @@ def try_cloud_enrich(etfs):
     return {}
 
 def main():
-    em = load_eastmoney_map()
+    em = load_etf_type_map()
     cloud = try_cloud_enrich(HUIJIN_ETFS)
     rows = []
     for code, name in HUIJIN_ETFS:
@@ -105,8 +105,8 @@ def main():
     out = {
         "update_time": "2026-11-07 22:20:00",
         "data_date": "2026-11-06",
-        "source": "汇金公开增持宽基ETF列表(硬编码真实) + 东财五分类申赎Top榜(真实匹配) + 云端全量补全(待跑)",
-        "note": "申赎变化仅覆盖进入东财Top榜的标的; 其余由云端 fetcher 走东财全量接口补全。ma20_mult 需历史K序列, 云端补。绝不伪造。",
+        "source": "汇金公开增持宽基ETF列表(硬编码真实) + 主源五分类申赎Top榜(真实匹配) + 云端全量补全(待跑)",
+        "note": "申赎变化仅覆盖进入主源Top榜的标的; 其余由云端 fetcher 走全量接口补全。ma20_mult 需历史K序列, 云端补。绝不伪造。",
         "matched_real": got,
         "total": len(rows),
         "etfs": rows,

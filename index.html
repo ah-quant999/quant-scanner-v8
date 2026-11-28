@@ -142,7 +142,7 @@ window.__domReadyFns=[];
     <script src="data/V8_VERDICT.js?v=8c6dc872a6" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=ef4b726d9c" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=6ca871b183" defer></script>
-    <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=3e4c39f025" defer></script>
+    <script src="data/ETF_SUBSCRIPTION_TYPE.js?v=f7dad435d8" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=af7d16e1e4" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=a6fded6d11" defer></script>
@@ -3297,7 +3297,7 @@ function fmtSigned(v){
     </div>
 
     <!-- 🚚 2026-11-18 主人令：「资金热度·净申赎」卡已并入下方「国家队活跃度」卡下半区
-         （国家队 A 路宽基净申购与资金热度卡同源 data/ETF_SUBSCRIPTION_EASTMONEY.js，信号+底层数据合一卡）。
+         （国家队 A 路宽基净申购与资金热度卡同源 data/ETF_SUBSCRIPTION_TYPE.js，信号+底层数据合一卡）。
          容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat/etfHeatTime" 与 renderEtfHeatByCategory() 不变，仅 DOM 归宿移动。 -->
 
     <!-- 🏛️ 2026-10-27 主人令：国家队活跃度（盘后数据）由「暂未上架」观测卡迁至盘后数据页
@@ -10858,16 +10858,16 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
        （净申赎 = 当日份额 − 上一交易日份额，真实的申购/赎回引致的份额变动）。
      旧实现渲染的是 window.ETF_INTRADAY_HEAT 里的「主力净流入」——
        那是按主动成交方向推断的**估算值**，与卡片标题「净申赎」名实不符，已整体替换。
-   🆕 2026-10-21 主人 P1：优先读 window.ETF_SUBSCRIPTION_EASTMONEY（主源官方基金类型
+   🆕 2026-10-21 主人 P1：优先读 window.ETF_SUBSCRIPTION_TYPE（主源官方基金类型
        五分类：股票型/债券型/货币型/商品型/跨境型，净申赎金额按亿元展示）——与
        ETF_NET_SUBSCRIPTION 同源同日（同一份真实份额数据、update_v8 单源派生），
        仅归类维度不同；新视图缺失时回退老视图（宽基/行业/主题/跨境/商品 · 亿份）。 */
   function renderEtfHeatByCategory(netSub){
     const el0=$('etfHeatSummary'), el1=$('etfHeatByCat');
-    // 🆕 2026-10-21 主人 P1：优先主源官方五分类视图（ETF_SUBSCRIPTION_EASTMONEY，与 ETF_NET_SUBSCRIPTION
+    // 🆕 2026-10-21 主人 P1：优先主源官方五分类视图（ETF_SUBSCRIPTION_TYPE，与 ETF_NET_SUBSCRIPTION
     //   同一份真实份额日环比数据，仅归类维度不同：股票型/债券型/货币型/商品型/跨境型 + 净申赎金额亿元）。
     //   缺失时回退老视图（宽基/行业/主题/跨境/商品 · 亿份），披露口径随视图切换，单源不混算。
-    const em=window.ETF_SUBSCRIPTION_EASTMONEY||null;
+    const em=window.ETF_SUBSCRIPTION_TYPE||null;
     const isEm=!!(em&&em.categories&&Object.keys(em.categories).length);
     const src=isEm?em:netSub;
     if(!src||!src.categories||!Object.keys(src.categories).length){
@@ -12453,7 +12453,7 @@ function drawUpDownChart(){
           {name:'日监控·主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分+盘后定稿', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'ETF 主力净流入'},
 
           {name:'资金热度·净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['0','8',':','2','5'], note:'真实份额申赎'},
-          {name:'资金热度·主源五分类', source:'ETF_SUBSCRIPTION_EASTMONEY', freq:'每日盘前', maturity:'T+1', slots:['0','8',':','2','5'], note:'股票/债券/货币/商品/跨境'},
+          {name:'资金热度·主源五分类', source:'ETF_SUBSCRIPTION_TYPE', freq:'每日盘前', maturity:'T+1', slots:['0','8',':','2','5'], note:'股票/债券/货币/商品/跨境'},
 
           {name:'每日洞察（含龙虎榜三通道）', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'八路汇合洞察 + 机构/游资/北向 当日·近7日·本月；2026-11-27 两卡合并、共振日历页下架'},
 
@@ -13184,7 +13184,7 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB', 'MAHORO_INSIGHTS', 'INDEX_VALUE_FRAMEWORK', 'WAVE_ELLIOTT', 'CITIC_PE_THERMO', 'MARKET_THERMO', 'CITIC_PE_BACKTEST', 'VALUATION_PERCENTILE', 'MARGIN_DATA'],
     '今日事件': ['V8_CAL', 'IPO_DATA', 'JUDGMENT_DATA', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST', 'US_HK_MAP'],
     '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'SECTOR_FUND_FLOW_INTRADAY', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'FUTURES_REALTIME', 'BOND_FUTURES', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],  /* 🛡 2026-11-20 审计补位：FUTURES_REALTIME/BOND_FUTURES 真卡在 CARD_DEFS 已登记但组序漏列 → 看板灯排队尾错位；按前端真实卡序（期指主力·情绪方向 → 国债期货罗盘）插入 CFFEX_HOLDINGS 之后 */
-    '盘后数据': ['SECTOR_FUND_FLOW_TREND', 'ETF_DAILY_MONITOR', 'ETF_NET_SUBSCRIPTION', 'ETF_SUBSCRIPTION_EASTMONEY', 'CFFEX_POSITION', 'W52_HIGH', 'EQBOND_ATTRACTION', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST', 'NATIONAL_TEAM', 'LHB_DATA'],  /* ⚖️ 2026-11-20 审计补位：EQBOND_ATTRACTION（股债性价比·温度计，11-19 新卡）CARD_DEFS 补登记后按前端真实卡序（市场宽度→股债性价比→解禁）插 W52_HIGH 之后 */
+    '盘后数据': ['SECTOR_FUND_FLOW_TREND', 'ETF_DAILY_MONITOR', 'ETF_NET_SUBSCRIPTION', 'ETF_SUBSCRIPTION_TYPE', 'CFFEX_POSITION', 'W52_HIGH', 'EQBOND_ATTRACTION', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST', 'NATIONAL_TEAM', 'LHB_DATA'],  /* ⚖️ 2026-11-20 审计补位：EQBOND_ATTRACTION（股债性价比·温度计，11-19 新卡）CARD_DEFS 补登记后按前端真实卡序（市场宽度→股债性价比→解禁）插 W52_HIGH 之后 */
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY', 'FINAL_RECOMMEND_DATA', 'FINAL_RECOMMEND_BACKTEST', 'FACTOR_LAB_BACKTEST', 'FACTOR_WALKFORWARD', 'FINAL_RECOMMEND_HISTORY'],
     '个股查询': ['DO_T_SPACE'],  /* 🆕 2026-11-08 主人令一劳永逸：做T空间（DO_T_SPACE）此前漏登健康巡检板 → 与 CARD_DEFS/看板对齐 */
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'IMA_STRONG_STOCK'],  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除；🗑 2026-10-24 主人令：连板梯队子页（前哨卡+回测实证卡）整体删除（负期望·不进选股）；🗑 2026-11-08 主人令一劳永逸：H_AUTO_BUY/H_AUTO_BUY_TRACK 已下线条目移除（模块下线、data 已删，留之=每天假红） */

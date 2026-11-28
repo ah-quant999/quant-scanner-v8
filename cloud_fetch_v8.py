@@ -2193,7 +2193,7 @@ def f_etf_net_subscription():
 
     # 🆕 2026-10-21 主人 P1：东方财富官方五分类视图（股票型/债券型/货币型/商品型/跨境型）。
     #   同一份真实份额日环比数据，按东财官方基金类型（fund_name_em）二次归类，
-    #   由 update_v8 派生 data/ETF_SUBSCRIPTION_EASTMONEY.js（单源双视图，禁止两套标准）。
+    #   由 update_v8 派生 data/ETF_SUBSCRIPTION_TYPE.js（单源双视图，禁止两套标准）。
     #   兜底：fund_name_em 失败/未命中时按名称关键词降级（与 _cat_of 同源思想，宁全勿缺）。
     em_type_map = {}
     try:

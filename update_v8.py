@@ -1618,9 +1618,9 @@ def build(category=None, detect_changes=False):
             out_path = _write_js(var_name, obj)
             updated += 1
             print(f"  ✅ {src_path.name} → {out_path.name}")
-            # 🆕 2026-10-21 主人 P1：ETF 净申赎 raw 同步派生东财五分类 js（单源双视图）
+            # 🆕 2026-10-21 主人 P1：ETF 净申赎 raw 同步派生主源五分类 js（单源双视图）
             if var_name == "ETF_NET_SUBSCRIPTION":
-                _derive_etf_eastmoney(obj)
+                _derive_etf_type(obj)
         except Exception as _e:
             # 🛡 2026-10-28 九宝量化（一劳永逸根治「单文件异常→整档位构建中断→US_HK_MAP 等后续文件被连坐 blank」）：
             #   单文件重建异常只隔离本文件、打印完整 traceback（下次运行即定位真凶），绝不再中断整批。
@@ -1645,10 +1645,10 @@ def build(category=None, detect_changes=False):
     return 0
 
 
-def _derive_etf_eastmoney(obj):
-    """🆕 2026-10-21 主人 P1：由 etf_net_subscription.json 派生 data/ETF_SUBSCRIPTION_EASTMONEY.js。
+def _derive_etf_type(obj):
+    """🆕 2026-10-21 主人 P1：由 etf_net_subscription.json 派生 data/ETF_SUBSCRIPTION_TYPE.js。
 
-    东方财富官方基金类型五分类视图（股票型/债券型/货币型/商品型/跨境型）——
+    官方基金类型五分类视图（股票型/债券型/货币型/商品型/跨境型）——
     与 ETF_NET_SUBSCRIPTION **同一份真实份额日环比数据**（上交所官方披露），
     仅归类维度不同（东财 fund_name_em 官方类型 vs 宽基/行业/主题/跨境/商品关键词）。
     单源双视图：raw 只抓一次、分类在 cloud_fetch_v8.f_etf_net_subscription 内一次生成，
@@ -1657,35 +1657,35 @@ def _derive_etf_eastmoney(obj):
     try:
         cats = obj.get("categories_em")
         if not isinstance(cats, dict) or not cats:
-            print("  ⏭️ categories_em 缺失（raw 为旧版无五分类），派生 ETF_SUBSCRIPTION_EASTMONEY 跳过")
+            print("  ⏭️ categories_em 缺失（raw 为旧版无五分类），派生 ETF_SUBSCRIPTION_TYPE 跳过")
             return None
         derived = {
             "update_time": obj.get("update_time", ""),
             "data_date": obj.get("data_date", ""),
             "prev_date": obj.get("prev_date", ""),
-            "source": (obj.get("source", "") + " · 东方财富官方基金类型五分类").strip(" ·"),
+            "source": (obj.get("source", "") + " · 官方基金类型五分类").strip(" ·"),
             "scope": obj.get("scope", ""),
             "unit": "net_amount_yi=分类净申赎亿元(按单位净值折算) / net_share_yi=净申赎亿份",
             "total_net_share_yi": obj.get("total_net_share_yi", 0),
             "total_net_amount_yi": obj.get("total_net_amount_yi", 0),
             "total_etf": obj.get("total_etf", 0),
             "categories": cats,
-            "note": ("东方财富五分类口径（股票型/债券型/货币型/商品型/跨境型）。"
+            "note": ("官方五分类口径（股票型/债券型/货币型/商品型/跨境型）。"
                      "数据与 ETF_NET_SUBSCRIPTION 同源同日：净申赎 = 当日份额 − 上一交易日份额"
                      "（上交所官方披露），金额按单位净值折算，非按成交方向推断的估算值。"),
         }
         DATA_DIR.mkdir(exist_ok=True)
-        out = DATA_DIR / "ETF_SUBSCRIPTION_EASTMONEY.js"
+        out = DATA_DIR / "ETF_SUBSCRIPTION_TYPE.js"
         out.write_text(
-            "window.ETF_SUBSCRIPTION_EASTMONEY = "
+            "window.ETF_SUBSCRIPTION_TYPE = "
             + json.dumps(derived, ensure_ascii=False, separators=(',', ':')) + ";\n",
             encoding="utf-8",
         )
         n = sum(c.get("count", 0) for c in cats.values())
-        print(f"  ✅ 派生 {out.name}（东财五分类 {n} 只 · {derived['data_date']}）")
+        print(f"  ✅ 派生 {out.name}（主源五分类 {n} 只 · {derived['data_date']}）")
         return out
     except Exception as e:
-        print(f"  ⚠️ 派生 ETF_SUBSCRIPTION_EASTMONEY 失败（不影响主产物）: {e}")
+        print(f"  ⚠️ 派生 ETF_SUBSCRIPTION_TYPE 失败（不影响主产物）: {e}")
         return None
 
 
