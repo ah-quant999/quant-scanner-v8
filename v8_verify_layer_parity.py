@@ -163,7 +163,7 @@ def main() -> int:
     pending_mismatches = []  # raw 比 data 新（待 post_close 构建重建）→ 按时段判定
     unable = []
     stale_data = []
-    stale_raw = []           # 🛡 2026-11-19：raw 语义日期绝对陈旧（交易日口径）→ 恒失败
+    stale_raw = []           # 2026-11-28：raw 语义日期绝对陈旧（交易日口径）→ 仅告警，不阻断
     missing_raw = []
     missing_data = []
     checked = 0
@@ -189,9 +189,10 @@ def main() -> int:
         raw_dp = _date_part(raw_date)
         data_dp = _date_part(data_date)
 
-        # 🛡🛡 2026-11-19：raw 绝对陈旧拦截（交易日历口径）——堵住「双边同陈旧」绕过。
+        # 🛡🛡 2026-11-19：raw 绝对陈旧检测（交易日历口径）——堵住「双边同陈旧」绕过。
         #   与下方 raw/data 对齐校验独立：即使 data 日期恰好等于 raw 旧日期（闸门原判「一致」），
-        #   只要 raw 语义日期距今 >STALE_RAW_TDAYS 个交易日，即判陈旧并阻断。
+        #   只要 raw 语义日期距今 >STALE_RAW_TDAYS 个交易日，即记入 stale_raw。
+        #   🔴 2026-11-28：该判定降级为「告警」——陈旧归数据链修，不阻断代码发布（原因见文件尾部）。
         if raw_dp and _v8_date is not None:
             _rdt = _parse_date(raw_dp)
             if _rdt is not None:
@@ -255,11 +256,11 @@ def main() -> int:
         for u in unable:
             print(f"    - {u['var']}: raw={u['raw_date']} data={u['data_date']}")
     if stale_data:
-        print(f"  ❌ data 层超过 {STALE_DAYS} 天未更新（raw 无日期字段，属陈旧静默上线）：")
+        print(f"  ⚠️ data 层超过 {STALE_DAYS} 天未更新（raw 无日期字段，属陈旧静默上线，仅告警）：")
         for s in stale_data:
             print(f"    - {s['var']}: data={s['data_date']} 已陈旧 {s['stale_days']} 天")
     if stale_raw:
-        print(f"  ❌ raw 层语义日期绝对陈旧（距今日 >{STALE_RAW_TDAYS} 个交易日，双边同旧也会拦截）：")
+        print(f"  ⚠️ raw 层语义日期绝对陈旧（距今日 >{STALE_RAW_TDAYS} 个交易日，仅告警不阻断）：")
         for s in stale_raw:
             print(f"    - {s['var']}: raw={s['raw_date']} 已陈旧 {s['tdays']} 个交易日")
     if mismatches:
@@ -271,24 +272,41 @@ def main() -> int:
         for m in pending_mismatches:
             print(f"    - {m['var']}: raw={m['raw_date']} vs data={m['data_date']}")
 
-    # 🛡 失败条件（2026-09-11 起，2026-11-19 增 raw 绝对陈旧）：
-    #   · 真错位（mismatches）              → 恒失败
-    #   · data 层陈旧静默上线（stale_data）  → 恒失败（>STALE_DAYS 天，与时段无关）
-    #   · 🆕 raw 层绝对陈旧（stale_raw）      → 恒失败（>STALE_RAW_TDAYS 交易日，堵双边同旧绕过）
-    #   · 待重建（pending_mismatches）       → 仅当已过盘后重建窗口才失败；盘前/盘中只告警放行
-    _hard = bool(mismatches) or bool(stale_data) or bool(stale_raw) or (bool(pending_mismatches) and after_rebuild)
+    # 🛡 失败条件（2026-09-11 起；🔴 2026-11-28 主人令重大调整「陈旧与发布解耦」）：
+    #   · 真错位（mismatches）        → 恒失败（这是真 bug：data 比 raw 新/无法解析，页面显示错数据）
+    #   · 待重建（pending）           → 仅当已过盘后重建窗口才失败；盘前/盘中只告警放行
+    #   · data 层陈旧（stale_data）   → 🆕 降级为告警，不阻断（见下）
+    #   · raw 层绝对陈旧（stale_raw） → 🆕 降级为告警，不阻断（见下）
+    #
+    # 🔴 为什么把「陈旧」从阻断里摘出去（2026-11-28 事故复盘 · 主人令）：
+    #   病灶：E 批算法链连续 7 天未跑通（factor_walkforward 的 ivol60 取负崩），
+    #         BACKTEST_EXPECTANCY(11-21) / PULLBACK_TRACK(11-22) / FACTOR_WALKFORWARD(11-23) 全部停更
+    #         ⇒ 本闸门判「陈旧静默上线」⇒ 🛑 阻断部署 ⇒ **7 天 201 次构建 0 成功**。
+    #   致命之处：这条闸门本想防「旧数据冒充新数据」，实际却把「代码修复也一起锁死」——
+    #         数据链断的那几天，任何 index.html/Python 修缮都发不出去，越修越积压，形成死锁。
+    #   正确分工：**数据陈旧归数据链（health_check + 邮件告警 + 页面卡头标注数据日期）**，
+    #         本闸门只管「两层是否自相矛盾」这一件它真正擅长的事。
+    #   风险对冲（缺一不可，勿删）：
+    #     ① 陈旧仍逐项打印 ⚠️ 并给出停更天数，不静默；
+    #     ② 前端卡头必须标注「数据来自 X 收盘」（综合研判卡已实现，见 index.html _dataAsOf）；
+    #     ③ v8_health_check.py 对陈旧源继续按阈值发告警邮件。
+    #   判据：陈旧 = 数据问题，可自动恢复；错位 = 逻辑问题，必须人工修。两者不能同一把锁。
+    _hard = bool(mismatches) or (bool(pending_mismatches) and after_rebuild)
     if _hard:
         _why = []
         if mismatches:
             _why.append(f"真错位 {len(mismatches)} 项")
-        if stale_data:
-            _why.append(f"陈旧静默上线 {len(stale_data)} 项")
-        if stale_raw:
-            _why.append(f"raw 层绝对陈旧 {len(stale_raw)} 项")
         if pending_mismatches and after_rebuild:
             _why.append(f"盘后重建窗口已过仍有 {len(pending_mismatches)} 项未重建")
         print(f"\n🛑 {'；'.join(_why)}，阻断部署/推送。")
         return 1
+
+    if stale_data or stale_raw:
+        print(f"\n⚠️ 存在「数据陈旧但仍放行部署」{len(stale_data) + len(stale_raw)} 项 —— 这是数据链问题，"
+              f"不是页面代码问题，故不阻断（2026-11-28 主人令）：")
+        print("   · 页面卡头会标注真实数据日期，不会把旧数据冒充成新数据；")
+        print("   · 陈旧项的修复归盘后算法链（E 批）+ v8_health_check 告警，与本闸门无关。")
+        return 0
 
     if pending_mismatches:
         print(f"\n⏳ 仅存在「raw 已更新、data/*.js 待下一次 post_close 构建重建」的正常中间态"
