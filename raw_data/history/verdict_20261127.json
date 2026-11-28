@@ -1,6 +1,6 @@
 {
  "date": "2026-11-27",
- "generated": "2026-11-27 22:59:44",
+ "generated": "2026-11-27 23:03:33",
  "verdict": {
   "cap_pct": 50,
   "label": "攻"
@@ -12,9 +12,9 @@
   "senti_score": 85.0,
   "zt": 97,
   "max_ladder": 6,
-  "up": 2227,
-  "down": 118,
-  "breadth": 0.949680170575693,
+  "up": 2230,
+  "down": 116,
+  "breadth": 0.9505541346973572,
   "crisis": 34.6,
   "sh_close": 3606.49,
   "sh_chg": 3.73,
