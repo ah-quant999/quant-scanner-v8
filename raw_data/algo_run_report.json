@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-11-28 08:16:10",
-  "run_start": "2026-11-28 06:09:18",
-  "ok": 49,
-  "fail": 2,
+  "update_time": "2026-11-28 10:31:04",
+  "run_start": "2026-11-28 08:25:31",
+  "ok": 48,
+  "fail": 3,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
       "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     },
     {
       "script": "factor_walkforward.py",
