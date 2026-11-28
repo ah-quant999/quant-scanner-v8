@@ -2196,15 +2196,6 @@ window.STRATEGY_WALKFORWARD = {
          ═══════════════════════════════════════════════════════════════════════ -->
 
     <!-- 子 Tab 导航 -->
-    <div class="final-tabs" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top5</button>
-      <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
-      <button class="final-tab" data-final="fa" onclick="switchFinalTab('fa')">🧪 因子实验室 <span style="font-size:10px;color:var(--dim)">非策略·加分项</span></button>
-      <!-- 2026-10-25 主人令：本页只留「选哪几只」——
-           执行层（收益转化算法）+ 复盘层（回测 N 日胜率 / 每日 Top3 历史）三卡整组迁至
-           「🎯 选股策略 → 📌 最终跟踪」子页（pane id=st-track），懒加载与数据源不变。 -->
-    </div>
-
     <!-- 子 Pane：最终推荐 Top5（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位；🔴 2026-10-27 主人令：保留 Top5，统一口径去掉 Top3 重复展示）
          口径 = 当日因子积分榜（TOP10_DAILY）按「因子综合分」（11 维因子加总，非收益预测）降序前 5 名，同序同分；
          强势跟踪当日新入选仍入候选池展示，但不凭强度分竞位 Top3（事故：迪安诊断 78.0 插队致两榜对不上）。 -->
@@ -2221,134 +2212,7 @@ window.STRATEGY_WALKFORWARD = {
     </div>
 
     <!-- 子 Pane：今日推荐候选池 -->
-    <div id="final-pane-cand" class="final-pane">
-      <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043">
-        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🎯</span>今日推荐候选池 <!-- 🔴 2026-10-11：三重共识已下架移出聚合；🔴 2026-10-18：四量终极下架移出聚合 -->
-          <span id="finalCandBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap"></span>
-        </h3>
-        <div id="finalCandBody" style="padding:12px 4px 2px"><div class="note">加载中…</div></div>
-      </div>
-    </div>
-
-
-
-        <div id="final-pane-fa" class="final-pane">
-    <!-- 🗂 2026-11-27 主人令「v8 卡太多了，科学处置」：因子实验室子页 4 卡位 → 1 卡位（内嵌 4 tab）
-         原 4 卡：🧪因子实验室(纯静态口径说明) / 🧮每日因子计算 / 🏆当日因子计分榜 / 🎯因子榜Top10。
-         铁律：4 个 pane 保留全部原始 DOM id（dfcHost/dsbHost/stFinalSelList/stFinalSelTime/dfcBadge/
-               dsbBadge/dfcUpdSlot/dsbUpdSlot）⇒ 三个渲染函数一行未改；本改造纯 DOM 收口，零数据口径变动。 -->
-    <div class="card" id="factorHubCard" style="border-left:4px solid #26d9c2;margin-bottom:14px">
-      <style>
-        #factorHubCard .fa-tab{font-size:12px;font-weight:600;color:var(--sub);background:transparent;border:1px solid transparent;border-radius:8px;padding:5px 11px;cursor:pointer;transition:all .15s}
-        #factorHubCard .fa-tab:hover{color:var(--txt);background:var(--bg2)}
-        #factorHubCard .fa-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}
-        #factorHubCard .fa-pane{margin-top:2px}
-        #factorHubCard .fa-pane>h3{margin-top:0}
-      </style>
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🧪</span>因子中心
-        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#26d9c222;color:#26d9c2;border:1px solid #26d9c24d">非选股策略 · 只加分不改池</span>
-      </h3>
-      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px">
-        <button class="fa-tab active" data-fa="top10" onclick="switchFaTab('top10')">🎯 因子榜 Top10</button>
-        <button class="fa-tab" data-fa="dsb" onclick="switchFaTab('dsb')">🏆 当日计分榜</button>
-        <button class="fa-tab" data-fa="dfc" onclick="switchFaTab('dfc')">🧮 每日因子计算</button>
-        <button class="fa-tab" data-fa="lab" onclick="switchFaTab('lab')">📖 因子定位</button>
-      </div>
-      <div class="fa-pane" id="fa-pane-lab" style="display:none">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-    <span style="font-size:15px;font-weight:700;color:var(--txt)">🧪 因子实验室</span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d">非选股策略 · 不评星级</span>
-    </div>
-    <div style="font-size:12px;line-height:1.8;color:var(--sub)">
-    <b style="color:#25e5ff">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
-    <b style="color:#25e5ff">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="padding:1px 4px;border-radius:3px">final_score</code> 让排序前移，不命中则不动；<b style="color:#ffd024">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
-    <b style="color:#25e5ff">与左侧策略的区别</b>：强势跟踪<b>产出股票池</b>；本页<b>不产池</b>，故为 <b>0⭐</b> 观测项，不参与星级评定。（🔴 2026-10-18：四量终极/三重共识/逆势龙头已下架）<br>
-    <b style="color:#25e5ff">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）。（2026-09-20 主人令：策略回测页的 🧪 因子实验室回测卡<b>已整体移除</b> —— 它不是选股策略，不回测、不展示；因子跟踪只在最终推荐页。）<br>
-    <b style="color:#f59e0b">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
-    </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════════
-         🧮 每日因子计算（2026-09-19 主人令新建；2026-09-20 主人令：原「已纳入因子」第二步已删，
-            本卡回归单卡单步 = 每日打分引擎（generate_top10.py 投影）的静态展示，与「🏆 当日因子计分榜」收口）
-           原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日因子计算」
-         数据源：algorithms/generate_top10.py 的**真实现**（P1~P5 段 + 形态/资金/板块/机构/基本面）
-         🔴 铁律：本卡是代码的**投影**，每个权重都必须能在源码里指到行；
-                  凡「未回测/薄样本」证据，一律如实标注，不许美化（沿用 09-18 主人令）。
-         ═══════════════════════════════════════════════════════════════ -->
-      <div class="fa-pane" id="fa-pane-dfc" style="display:none">
-    <!-- 🔻 2026-09-19 主人令（图像取证）：①「更新于」徽章提到卡名正后方（全站规范：卡名置顶 + 更新于紧随，仍读产物真值不写死）
-         ②、卡名行右侧「回测 时间」删除（不重复占卡头） ③「入选后打分全表 / 共 N 项」下移第二行 -->
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-    <span style="font-size:15px;font-weight:700;color:var(--txt)">🧮 每日因子计算</span>
-    <span id="dfcUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
-    </div>
-    <!-- 🔍 2026-09-20 主人令（4 图取证）「放大」：本行徽章 + 项数 10px → 12px、内边距 1px 8px → 2px 10px，
-         与放大后的本行头部同档（全卡层级一致，禁某一段特立独行）。 -->
-    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px">
-    <span style="padding:2px 10px;border-radius:11px;font-size:12px;font-weight:700;color:#41c9ff;border:1px solid #41c9ff4d">入选后打分全表</span>
-    <span id="dfcBadge" style="font-size:12px;color:var(--dim)"></span>
-    </div>
-    <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
-    <b style="color:#41c9ff">它做什么</b>：<b>终选输出</b>（金股池按「因子综合分」降序的子集，即 <code style="padding:1px 4px;border-radius:3px">TOP10_DAILY.top10</code>）里的每只票，按下列<b>全部因子</b>逐项算分、加总成 
-    <code style="padding:1px 4px;border-radius:3px">raw_total</code>，
-    再归一化到 0~100 得 
-    <code style="padding:1px 4px;border-radius:3px">total_score</code>。
-    <b style="color:#ffd024">因子只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
-    <b style="color:#22c55e">当前实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红/上涨趋势——🆕 2026-11-21 审计起**方向与弃用态随每日 walk-forward 实测动态**，IS/OOS 分段异号信号自动 0 权重弃用，当前实测见下表明细）
-    + 个股历史胜率均益 1 + 回测反哺组合 1 + P5 walk-forward 达标 2（换手率趋势/60日成交额中位数，PASS 才启用）
-    + P4 研究 2（残差动量<span style="color:#ff5252">反</span>/低波动）+ 过热惩罚 2（RSI&gt;70 / 20日涨幅≥20%，<b>只罚不奖</b>）
-    + 质差一票否决 1（风控淘汰）。<b style="color:#94a3b8">已下架 14 项（整项）+ 2 项半下架</b>（RSI&lt;30 加分、20日涨幅 0~10% 加分 —— 加分侧删、惩罚侧保留），
-    <b>全部留在下方全表并逐项注明下架原因与证据</b>（逻辑详解页 2026-10-04 已整体下架，本表即因子逻辑唯一详解处）。
-    </div>
-    <!-- 🔻 2026-09-19 主人令：头部静态保留；明细全表默认折叠，主展示=「🏆 当日因子计分榜」（每日计算）
-         🔄 2026-10-25 主人令「现在到底多少个因子，写清楚」：26 为清账前旧口径 —— 清账后原表 26 项中
-         14 项整项下架、2 项半下架，另 2026-10-23 嵌入的「个股历史胜率/期望」此前漏登全表 → 已补入；
-         现全表 27 项 = 实际计分 13 + 已下架 14。计数由 dfcBadge 按行动态统计，不再硬编码。 -->
-    <details style="margin:4px 0 0">
-    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#41c9ff;user-select:none;padding:4px 0">▸ 展开 · 明细：因子打分全表 27 项 = 实际计分 13 + 已下架 14（保留原因）（静态口径 · 代码投影）</summary>
-    <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
-    </details>
-
-    </div>
-    <!-- ═══════════════════════════════════════════════════════════════
-         🏆 当日因子计分榜（2026-09-19 主人令新建；同日二次令：标注「第三步」，为因子链条收口卡
-            顺序 = 因子实验室定位卡 → 🧮 每日因子计算 → 🏆 当日因子计分榜）
-           原话：「这张专门成立一张，把当天<b>终选输出</b>（金钻+缠论共振 38 只）的各因子加减分全列出来，
-                  按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
-         数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按「因子综合分」降序的子集，由 generate_top10.py 落盘，每票 11 维因子分 + 文字明细；历史实绩 winrate_score 仅作置信微调与展示，不再定排序（2026-11-18 主人令「测算未来收益最好的股」范式）
-         🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码精确匹配）
-         ═══════════════════════════════════════════════════════════════ -->
-      <div class="fa-pane" id="fa-pane-dsb" style="display:none">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-    <span style="font-size:15px;font-weight:700;color:var(--txt)">🏆 当日因子计分榜</span>
-    <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">最新一轮榜单</span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">全榜按因子总分降序 · 🏷=当日最终推荐</span>
-    <span id="dsbBadge" style="font-size:10px;color:var(--dim)"></span>
-    </div>
-    <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
-    <b style="color:#f59e0b">怎么读</b>：<b>终选输出</b>每只票（金钻+缠论共振 38 只）的<b>各因子加减分</b>逐项列出（<span style="color:#ff5252">红=加分</span> / <span style="color:#26d9c2">绿=扣分</span> / 灰=0），<b>全榜按</b>
-    <code style="padding:1px 4px;border-radius:3px">total_score</code> <b>从高到低排列</b>；
-    标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单（🔴 2026-10-20 主人令「口径和评分都一致」：该名单严格 = 本榜 total_score 降序前 N 名、逐票 final_score := total_score，**同序同分**；不齐时算法层硬断言拒绝落盘 + 链闸 verify_fr_factor_consistency 两层校验报警）。
-    <br><span style="color:var(--dim)">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊；「最终推荐」为独立管线，更新时刻可能早于/晚于本榜（错批时以链闸一致性校验为准，不一致即告警）。</span>
-    </div>
-    <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
-    </div>
-
-    <!-- ═════════════════════════════════════════════════════════════════════════
-         🎯 因子榜 Top10（2026-11-22 主人令：因子榜属「因子实验室」产物，从选股池 tab 迁入本页，
-            置于「🏆 当日因子计分榜」下方；只展示 Top10，避免与「最终推荐」混淆）
-         数据源：TOP10_DAILY.top10（与计分榜同源），每日盘后随算法链刷新
-         ═════════════════════════════════════════════════════════════════════════ -->
-      <div class="fa-pane active" id="fa-pane-top10">
-      <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>因子榜 Top10 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
-      <div id="stFinalSelSummary" class="tp-stocklist"></div>
-      <div id="stFinalSelList" class="tp-stocklist"></div>
-      <div class="note">口径：金股池按「因子综合分」降序的精选子集（selection_mode=top_by_expected_return 为历史字段名沿用；实为 11 维因子加总：前瞻期望项 ±15（分值权重，非收益百分比）+ 证据门控因子 + winrate 置信微调 ±5，历史实绩不再定排序）。⚠️ 2026-11-27 主人令：样本外 T+10 胜率 24.7%/均益 −8.22%（n=1029）未过门槛，故本榜不再以「收益预测」命名。本卡 = <b>因子榜 Top10（本榜前 10 名）</b>；🏷 Top5 = 本榜前 5 名。⚠️ 本榜 = 金股池内收益率排序榜，非独立另建池，非「最终推荐」（最终推荐为独立管线）。</div>
-    </div>
-    </div>
-    </div>  </section>
+  </section>
 
   <!-- ============ 🔍 个股查询（2026-08-09 提升为一级导航） ============ -->
   <section id="sec-query">
@@ -2531,7 +2395,7 @@ window.STRATEGY_WALKFORWARD = {
           <div class="ipo-grid" id="ipoGrid-listedToday"><div class="note" style="grid-column:1/-1">加载中…</div></div>
         </div>
         <div class="ipo-sec" data-cat="todayApply"><div class="ipo-sec-title">今日申购</div><div class="ipo-grid" id="ipoGrid-todayApply"><div class="note" style="grid-column:1/-1">加载中…</div></div></div>
-        <div class="ipo-sec" data-cat="tracking"><div class="ipo-sec-title">上市日追踪5日</div><div class="ipo-grid" id="ipoGrid-tracking"><div class="note" style="grid-column:1/-1">加载中…</div></div></div>
+        <div class="ipo-sec" data-cat="tracking"><div class="ipo-sec-title">上市日追踪 T+5 <span style="font-size:11px;font-weight:400;color:var(--dim)">（跨日跟踪，非当日事件）</span></div><div class="ipo-grid" id="ipoGrid-tracking"><div class="note" style="grid-column:1/-1">加载中…</div></div></div>
         <div class="ipo-tabs" id="ipoTabs" style="margin-top:12px">
           <button class="ipo-tab" data-cat="futureApply">待申购</button>
           <button class="ipo-tab" data-cat="pricing">待定价</button>
@@ -3480,13 +3344,11 @@ function fmtSigned(v){
 
     <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
         <div class="card v8grp" id="grpObs" style="border-left:4px solid #94a3b8;margin-bottom:16px">
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌙</span>盘后观测 · 风险与位置 <span class="v8grp-badge amb">🗂 折叠 5 张 · 点标签切换 · 默认看IF持仓</span></h3>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🌙</span>盘后观测 · 风险与位置 <span class="v8grp-badge amb">🗂 折叠 3 张 · 大盘层（持仓/宽度/股债）· 点标签切换</span></h3>
       <div class="grp-tabs">
         <button class="grp-tab active" onclick="v8GrpTab('grpObs',0)">🧭 IF会员持仓</button>
         <button class="grp-tab" onclick="v8GrpTab('grpObs',1)">📊 市场宽度</button>
         <button class="grp-tab" onclick="v8GrpTab('grpObs',2)">⚖️ 股债性价比</button>
-        <button class="grp-tab" onclick="v8GrpTab('grpObs',3)">🌊 严重异动</button>
-        <button class="grp-tab" onclick="v8GrpTab('grpObs',4)">🏛 股东增减持</button>
       </div>
       <div class="grp-pane active">
         <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
@@ -3502,7 +3364,16 @@ function fmtSigned(v){
       <div id="eqbondBody"><div class="ipo-empty">加载中…</div></div>
       <div class="note">口径：ERP = 1 / 沪深300 PE_TTM − 10Y国债；股息利差 = A股股息率(乐咕乐股·代理口径) − 10Y国债。分位基于 1000 个交易日同日对齐样本；股债比价为沪深300 / 国债指数。<b>股息率为代理口径，与沪深300严格股息率不完全一致；温度计只做状态观测，不是机械买卖信号。</b></div>
       </div>
-      <div class="grp-pane">
+    </div>
+    <!-- 🗂 2026-11-28 A4：原 5 张同组混装（大盘层 3 + 个股层 2），按对象轴拆为两行。
+         容器 id（cffexPosBody/breadthBody/eqbondBody/severeSwingBody/shareholderChangeBody）与渲染函数一行未改。 -->
+    <div class="card v8grp" id="grpStockObs" style="border-left:4px solid #f9a8d4;margin-bottom:16px">
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🎯</span>盘后观测 · 个股异动 <span class="v8grp-badge">🗂 折叠 2 张 · 个股层（异动/增减持）· 点标签切换</span></h3>
+      <div class="grp-tabs">
+        <button class="grp-tab active" onclick="v8GrpTab('grpStockObs',0)">🌊 严重异动</button>
+        <button class="grp-tab" onclick="v8GrpTab('grpStockObs',1)">🏛 股东增减持</button>
+      </div>
+<div class="grp-pane">
               <div id="severeSwingCard"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
         <span style="font-size:15px;font-weight:700;color:#ff5252">&#x1F4A5; 严重异动雷达</span>
         <span id="severeSwingFresh" style="display:inline-flex;align-items:center">&#x2014;</span>
@@ -3518,7 +3389,8 @@ function fmtSigned(v){
       <div class="note">口径：按金额聚合<b>增持榜/减持榜</b>与<b>行业板块聚焦</b>；<b>非投资建议</b>。增持红 / 减持绿（红涨绿跌铁律）；增持股默认仅显示前 3 只，可展开其余。</div>
       </div>
       </div>
-    </div>
+    </div><!--/grpStockObs-->
+
 
 
 
@@ -3557,6 +3429,7 @@ function fmtSigned(v){
       <!-- 🗑 2026-11-08 主人令：📌 最终跟踪 子页整体下线（职责已由 📊 回测跟踪 st-bt 承接） -->
       <!-- 2026-11-08 主人令：新建「回测跟踪」子页，集中两张回测卡（每日洞察回测 + 最终推荐回测） -->
       <button class="st-tab" data-st="bt" onclick="switchSt('bt')">📊 回测跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600">每日洞察·最终推荐</span></button>
+      <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子中心 <span style="font-size:10px;color:var(--dim);font-weight:600">非策略·加分项</span></button>
       <!-- 🗑 2026-10-23 主人令：三新算法（缩量回踩/板块共振/龙虎机构）选股策略子页随算法整支下架删除 -->
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
@@ -3691,7 +3564,124 @@ function fmtSigned(v){
            仅前端展示卡与渲染/调度同步下线。 -->
     </div><!--/st-bt-->
 
-  </section>
+  
+    <!-- 🗂 2026-11-28 归档归位（A1）：因子中心自「🏆 最终推荐」迁入本页第 5 子页。
+         因子是选股方法论与中间产物，输出的是「加分项」而非「今天买哪几只」，故归「选股策略」。
+         容器 id factorHubCard、内嵌 4 tab（fa-pane-top10/dsb/dfc/lab）与三个渲染函数一行未改。 -->
+    <div id="st-pane-fa" class="st-pane">
+<div class="card" id="factorHubCard" style="border-left:4px solid #26d9c2;margin-bottom:14px">
+      <style>
+        #factorHubCard .fa-tab{font-size:12px;font-weight:600;color:var(--sub);background:transparent;border:1px solid transparent;border-radius:8px;padding:5px 11px;cursor:pointer;transition:all .15s}
+        #factorHubCard .fa-tab:hover{color:var(--txt);background:var(--bg2)}
+        #factorHubCard .fa-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+        #factorHubCard .fa-pane{margin-top:2px}
+        #factorHubCard .fa-pane>h3{margin-top:0}
+      </style>
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🧪</span>因子中心
+        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#26d9c222;color:#26d9c2;border:1px solid #26d9c24d">非选股策略 · 只加分不改池</span>
+      </h3>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px">
+        <button class="fa-tab active" data-fa="top10" onclick="switchFaTab('top10')">🎯 因子榜 Top10</button>
+        <button class="fa-tab" data-fa="dsb" onclick="switchFaTab('dsb')">🏆 当日计分榜</button>
+        <button class="fa-tab" data-fa="dfc" onclick="switchFaTab('dfc')">🧮 每日因子计算</button>
+        <button class="fa-tab" data-fa="lab" onclick="switchFaTab('lab')">📖 因子定位</button>
+      </div>
+      <div class="fa-pane" id="fa-pane-lab" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+    <span style="font-size:15px;font-weight:700;color:var(--txt)">🧪 因子实验室</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d">非选股策略 · 不评星级</span>
+    </div>
+    <div style="font-size:12px;line-height:1.8;color:var(--sub)">
+    <b style="color:#25e5ff">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
+    <b style="color:#25e5ff">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="padding:1px 4px;border-radius:3px">final_score</code> 让排序前移，不命中则不动；<b style="color:#ffd024">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
+    <b style="color:#25e5ff">与左侧策略的区别</b>：强势跟踪<b>产出股票池</b>；本页<b>不产池</b>，故为 <b>0⭐</b> 观测项，不参与星级评定。（🔴 2026-10-18：四量终极/三重共识/逆势龙头已下架）<br>
+    <b style="color:#25e5ff">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）。（2026-09-20 主人令：策略回测页的 🧪 因子实验室回测卡<b>已整体移除</b> —— 它不是选股策略，不回测、不展示；因子跟踪只在最终推荐页。）<br>
+    <b style="color:#f59e0b">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
+    </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         🧮 每日因子计算（2026-09-19 主人令新建；2026-09-20 主人令：原「已纳入因子」第二步已删，
+            本卡回归单卡单步 = 每日打分引擎（generate_top10.py 投影）的静态展示，与「🏆 当日因子计分榜」收口）
+           原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日因子计算」
+         数据源：algorithms/generate_top10.py 的**真实现**（P1~P5 段 + 形态/资金/板块/机构/基本面）
+         🔴 铁律：本卡是代码的**投影**，每个权重都必须能在源码里指到行；
+                  凡「未回测/薄样本」证据，一律如实标注，不许美化（沿用 09-18 主人令）。
+         ═══════════════════════════════════════════════════════════════ -->
+      <div class="fa-pane" id="fa-pane-dfc" style="display:none">
+    <!-- 🔻 2026-09-19 主人令（图像取证）：①「更新于」徽章提到卡名正后方（全站规范：卡名置顶 + 更新于紧随，仍读产物真值不写死）
+         ②、卡名行右侧「回测 时间」删除（不重复占卡头） ③「入选后打分全表 / 共 N 项」下移第二行 -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+    <span style="font-size:15px;font-weight:700;color:var(--txt)">🧮 每日因子计算</span>
+    <span id="dfcUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
+    </div>
+    <!-- 🔍 2026-09-20 主人令（4 图取证）「放大」：本行徽章 + 项数 10px → 12px、内边距 1px 8px → 2px 10px，
+         与放大后的本行头部同档（全卡层级一致，禁某一段特立独行）。 -->
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px">
+    <span style="padding:2px 10px;border-radius:11px;font-size:12px;font-weight:700;color:#41c9ff;border:1px solid #41c9ff4d">入选后打分全表</span>
+    <span id="dfcBadge" style="font-size:12px;color:var(--dim)"></span>
+    </div>
+    <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
+    <b style="color:#41c9ff">它做什么</b>：<b>终选输出</b>（金股池按「因子综合分」降序的子集，即 <code style="padding:1px 4px;border-radius:3px">TOP10_DAILY.top10</code>）里的每只票，按下列<b>全部因子</b>逐项算分、加总成 
+    <code style="padding:1px 4px;border-radius:3px">raw_total</code>，
+    再归一化到 0~100 得 
+    <code style="padding:1px 4px;border-radius:3px">total_score</code>。
+    <b style="color:#ffd024">因子只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
+    <b style="color:#22c55e">当前实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红/上涨趋势——🆕 2026-11-21 审计起**方向与弃用态随每日 walk-forward 实测动态**，IS/OOS 分段异号信号自动 0 权重弃用，当前实测见下表明细）
+    + 个股历史胜率均益 1 + 回测反哺组合 1 + P5 walk-forward 达标 2（换手率趋势/60日成交额中位数，PASS 才启用）
+    + P4 研究 2（残差动量<span style="color:#ff5252">反</span>/低波动）+ 过热惩罚 2（RSI&gt;70 / 20日涨幅≥20%，<b>只罚不奖</b>）
+    + 质差一票否决 1（风控淘汰）。<b style="color:#94a3b8">已下架 14 项（整项）+ 2 项半下架</b>（RSI&lt;30 加分、20日涨幅 0~10% 加分 —— 加分侧删、惩罚侧保留），
+    <b>全部留在下方全表并逐项注明下架原因与证据</b>（逻辑详解页 2026-10-04 已整体下架，本表即因子逻辑唯一详解处）。
+    </div>
+    <!-- 🔻 2026-09-19 主人令：头部静态保留；明细全表默认折叠，主展示=「🏆 当日因子计分榜」（每日计算）
+         🔄 2026-10-25 主人令「现在到底多少个因子，写清楚」：26 为清账前旧口径 —— 清账后原表 26 项中
+         14 项整项下架、2 项半下架，另 2026-10-23 嵌入的「个股历史胜率/期望」此前漏登全表 → 已补入；
+         现全表 27 项 = 实际计分 13 + 已下架 14。计数由 dfcBadge 按行动态统计，不再硬编码。 -->
+    <details style="margin:4px 0 0">
+    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#41c9ff;user-select:none;padding:4px 0">▸ 展开 · 明细：因子打分全表 27 项 = 实际计分 13 + 已下架 14（保留原因）（静态口径 · 代码投影）</summary>
+    <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
+    </details>
+
+    </div>
+    <!-- ═══════════════════════════════════════════════════════════════
+         🏆 当日因子计分榜（2026-09-19 主人令新建；同日二次令：标注「第三步」，为因子链条收口卡
+            顺序 = 因子实验室定位卡 → 🧮 每日因子计算 → 🏆 当日因子计分榜）
+           原话：「这张专门成立一张，把当天<b>终选输出</b>（金钻+缠论共振 38 只）的各因子加减分全列出来，
+                  按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
+         数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按「因子综合分」降序的子集，由 generate_top10.py 落盘，每票 11 维因子分 + 文字明细；历史实绩 winrate_score 仅作置信微调与展示，不再定排序（2026-11-18 主人令「测算未来收益最好的股」范式）
+         🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码精确匹配）
+         ═══════════════════════════════════════════════════════════════ -->
+      <div class="fa-pane" id="fa-pane-dsb" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+    <span style="font-size:15px;font-weight:700;color:var(--txt)">🏆 当日因子计分榜</span>
+    <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">最新一轮榜单</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">全榜按因子总分降序 · 🏷=当日最终推荐</span>
+    <span id="dsbBadge" style="font-size:10px;color:var(--dim)"></span>
+    </div>
+    <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
+    <b style="color:#f59e0b">怎么读</b>：<b>终选输出</b>每只票（金钻+缠论共振 38 只）的<b>各因子加减分</b>逐项列出（<span style="color:#ff5252">红=加分</span> / <span style="color:#26d9c2">绿=扣分</span> / 灰=0），<b>全榜按</b>
+    <code style="padding:1px 4px;border-radius:3px">total_score</code> <b>从高到低排列</b>；
+    标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单（🔴 2026-10-20 主人令「口径和评分都一致」：该名单严格 = 本榜 total_score 降序前 N 名、逐票 final_score := total_score，**同序同分**；不齐时算法层硬断言拒绝落盘 + 链闸 verify_fr_factor_consistency 两层校验报警）。
+    <br><span style="color:var(--dim)">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊；「最终推荐」为独立管线，更新时刻可能早于/晚于本榜（错批时以链闸一致性校验为准，不一致即告警）。</span>
+    </div>
+    <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════════════
+         🎯 因子榜 Top10（2026-11-22 主人令：因子榜属「因子实验室」产物，从选股池 tab 迁入本页，
+            置于「🏆 当日因子计分榜」下方；只展示 Top10，避免与「最终推荐」混淆）
+         数据源：TOP10_DAILY.top10（与计分榜同源），每日盘后随算法链刷新
+         ═════════════════════════════════════════════════════════════════════════ -->
+      <div class="fa-pane active" id="fa-pane-top10">
+      <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>因子榜 Top10 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
+      <div id="stFinalSelSummary" class="tp-stocklist"></div>
+      <div id="stFinalSelList" class="tp-stocklist"></div>
+      <div class="note">口径：金股池按「因子综合分」降序的精选子集（selection_mode=top_by_expected_return 为历史字段名沿用；实为 11 维因子加总：前瞻期望项 ±15（分值权重，非收益百分比）+ 证据门控因子 + winrate 置信微调 ±5，历史实绩不再定排序）。⚠️ 2026-11-27 主人令：样本外 T+10 胜率 24.7%/均益 −8.22%（n=1029）未过门槛，故本榜不再以「收益预测」命名。本卡 = <b>因子榜 Top10（本榜前 10 名）</b>；🏷 Top5 = 本榜前 5 名。⚠️ 本榜 = 金股池内收益率排序榜，非独立另建池，非「最终推荐」（最终推荐为独立管线）。</div>
+    </div>
+    </div>
+    </div><!--/st-pane-fa-->
+</section>
 
 
   <!-- 🗑 2026-11-27 主人令「共振日历 TAB 页删除干净」：原「共振日历」整个 section（data-sec=rc）已删除。
@@ -9949,7 +9939,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     </div>`;
   }
 
-  const CAT_LABELS={listedToday:'今日上市',todayApply:'今日申购',futureApply:'待申购',pricing:'待定价',preListing:'待上市',tracking:'上市日追踪5日'};
+  const CAT_LABELS={listedToday:'今日上市',todayApply:'今日申购',futureApply:'待申购',pricing:'待定价',preListing:'待上市',tracking:'上市日追踪 T+5（跨日）'};
   const DIRECT=['listedToday','todayApply','tracking'];
   let activeTab=null, grouped={}, today='';
 
@@ -14770,8 +14760,14 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       setTimeout(function(){ try{ window.__renderShareholderIncreaseBT(); }catch(e){ console.warn('[bt] shIncBt', e); } }, 80);
       /* 🗑 2026-11-22：原 __renderFactorYield 调度随卡删除（按收益率排选卡已下线） */
     }
+    // 🗂 2026-11-28 A1：因子中心自「最终推荐」迁入本页第 5 子页；切页即重渲（幂等，防 defer 数据迟到）
+    if(n==='fa'){
+      setTimeout(function(){ try{ if(typeof window.switchFaTab==='function') window.switchFaTab('top10'); }catch(e){ console.warn('[fa] tab', e); } }, 30);
+      setTimeout(function(){ try{ if(typeof window.__renderFactorPane==='function') window.__renderFactorPane(); }catch(e){} }, 60);
+    }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
-    // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
+    // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码，已删净。
+    // 🗂 2026-11-28 A1 复启：因子中心自「最终推荐」迁回本页第 5 子页（st-pane-fa），分支已在下方恢复。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
@@ -18846,7 +18842,7 @@ hm += '</div>'; // /ulPaneBacktest
   //     ⚠️ 本卡未改任何数据源、未补造数值；数据层根因（SH_FIB 取数差一日）已报CN runner1号机修 fetch 脚本。
   window.__fwRetry = 0;
   // ═══════════════════════════════════════════════════════════════════════════════
-  // 🧭 大盘 5 卡汇总解析（2026-09-17 主人令：放在「📊 大盘观测」最顶部）
+  // 🧭 大盘 5 项指标汇总解析（2026-09-17 主人令：放在「📊 大盘观测」最顶部）
   //   目的：把下方 5 卡（周期位置+广度 / 波浪 / 斐波窗口 / 中信PE / 指数估值，DOM 顺序 0.5→1→2→3→4）收敛成「同向 or 分歧」一句话 + 5 行摘要。
   //   取数口径（全部真实字段，缺则如实空态，绝不填 0、绝不编造）：
   //     · 波浪位置  ← WAVE_ELLIOTT.meta.{date,last,pct} + marks[]（与卡1同源）
@@ -18912,7 +18908,7 @@ hm += '</div>'; // /ulPaneBacktest
     if(!okW && !okF && !okT && !okV){
       if(window.__obsSumRetry < 20){ window.__obsSumRetry = (window.__obsSumRetry||0)+1; setTimeout(window.__renderObsSummary, 500); return; }
       dst.innerHTML = '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-        + '<span style="font-size:15px;font-weight:700;color:#c084fc">🧭 大盘 5 卡汇总解析</span></div>'
+        + '<span style="font-size:15px;font-weight:700;color:#c084fc">🧭 大盘 5 项指标汇总解析</span></div>'
         + '<div class="note" style="padding:16px;text-align:center;color:var(--dim)">5 卡数据均未到位（WAVE_ELLIOTT / SH_FIB / CITIC_PE / VALUATION_PERCENTILE / MARKET_THERMO）</div>';
       return;
     }
@@ -19014,7 +19010,7 @@ hm += '</div>'; // /ulPaneBacktest
     // ── 拼版式 ───────────────────────────────────────────────────────────────
     var h = '';
     h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-      + '<span style="font-size:15px;font-weight:700;color:#c084fc">🧭 大盘 5 卡汇总解析</span>'
+      + '<span style="font-size:15px;font-weight:700;color:#c084fc">🧭 大盘 5 项指标汇总解析</span>'
       + '<span style="font-size:11.5px;color:' + DIM + '">下方 5 卡同向 / 分歧一句话收敛 \u00b7 \u8bfb\u771f\u5b9e\u5b57\u6bb5\uff0c\u7f3a\u5219\u7a7a\u6001</span>'
       + '</div>';
 
@@ -19355,17 +19351,17 @@ h+=`</div>`;
     var base12=fwd12(50,60);
 
     // ── 统一卡头（2026-10-05 主人令：新卡顶部加卡片名+更新于，全站统一 v8CardHeader）──
-    var html=window.v8CardHeader('&#x1F52E;','未来预测 · ①②长期趋势与估值','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标（③康波 / ④2027 见下方独立卡）','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
+    var html=window.v8CardHeader('&#x1F52E;','未来预测 · 27年长期走势与周期位置','27年长期走势 + val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标（③康波 / ④2027 见下方折叠）','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
     html+='<div style="padding:14px">';
     // 📆 逐卡频率标注（非整卡月更）：本卡交易日 16:10 日更；月频只有所列字段，禁止冒充固定月更日。
     html+='<div style="font-size:11px;line-height:1.7;color:var(--dim);border:1px solid rgba(255,208,36,.28);border-radius:7px;padding:7px 10px;margin-bottom:11px">'
        + '📆 <b style="color:#ffd024">本卡交易日 16:10 日更</b>；月频字段：PE 分位<b>月末补齐</b>、社融<b>次月中旬（央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>。'
-       + '<span style="color:#8b93a1">①27年走势 / ②PE分位 均为月度序列，右端末档为进行中月份，交易日滚动改写。</span></div>';
+       + '<span style="color:#8b93a1">27年走势为月度序列，右端末档为进行中月份，交易日滚动改写。</span></div>';
     // ── KPI 行已移至「上证/沪深300 点位条」之后（2026-10-05 二次令）──
     // ── 分析方法（核心/用法/限制）──
     html+='<div style="border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.75;font-size:12px;color:var(--txt)">'
       +'<b style="color:'+C_AMB+'">&#x1F4CC; 核心：</b>本页用「市场温度(val10) + EDHEC牛熊状态机 + 9项牛转熊先行指标」三维研判A股所处周期位置，并给出2027年度多情景推演；全部数据来自 v8 日更管线(window.MARKET_THERMO)，零未来函数。<br>'
-      +'<b style="color:'+C_AMB+'">&#x1F4A1; 用法：</b>先看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「贵不贵/险不险/牛熊哪一程」；①图①看长期趋势、②图②看估值分位；③看康波长波定位；④看2027情景表定「预期与仓位倾向」。<br>'
+      +'<b style="color:'+C_AMB+'">&#x1F4A1; 用法：</b>先看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「贵不贵/险不险/牛熊哪一程」；看27年长期走势定「长期方向」；③看康波长波定位；④看2027情景表定「预期与仓位倾向」（②PE分位已并入「大盘观测·估值水位」）。<br>'
       +'<b style="color:'+C_AMB+'">&#x26A0; 限制：</b>情景表为研究性推演(非买卖建议)，概率随数据滚动更新；社融/PMI等宏观源滞后1–5个月属正常并已如实标注；本页只判「周期位置与风险水位」，不给具体买卖点。'
       +'</div>';
     // ── 一句话结论（2026-10-16 主人令「都是活卡不要死的」：禁硬编码死文案——
@@ -19424,10 +19420,7 @@ h+=`</div>`;
     // ── 图① ──
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:16px 0 6px">&#x2460; 27年走势：上证综指（右轴）+ 全A等权（左轴对数）· 绿=熊市段 / 琥珀=牛市中回调 / 留白=牛市上行（20%规则·月收盘）</div>';
     html+='<div id="futureC1" style="height:380px"></div>';
-    // ── 图② ──
-    html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
-    html+='<div id="futureC2" style="height:260px"></div>';
-    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(T.generated):T.generated)+'（每日刷新）<br>📅 两图为月度序列，右端末档 = <b style="color:'+C_TXT+'">'+D.dates[D.dates.length-1]+'</b>（当月至今·进行中，交易日滚动更新；估值分位为月频，当月值月末补齐）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
+    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(T.generated):T.generated)+'（每日刷新）<br>📅 图为月度序列，右端末档 = <b style="color:'+C_TXT+'">'+D.dates[D.dates.length-1]+'</b>（当月至今·进行中，交易日滚动更新；估值分位为月频，当月值月末补齐）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
     // ── ④ 2027 情景（2026-11-22 二次令：原 big card 内 ③ 小节独立成卡，编号顺延 ④；数据仍走同一 MARKET_THERMO）──
     function tgt(v,r){ return Math.round(v*(1+r/100)); }
     var scn=[{name:'牛市',p:25,r:[15,22],col:C_GRN,drv:'强财政货币延续 + 居民资金入市 + 估值扩张 + 盈利兑现'},
@@ -19463,10 +19456,9 @@ h+=`</div>`;
     function _tickLbl(v,i){ return (i===_lastI||(i%_step===0&&_lastI-i>=_step))?v:''; }
     // 🛡 2026-10-16 一劳永逸：echarts 未就绪 ⇒ 两图降级文案 + 'echartsready' 事件整页重渲
     if(!window.echarts){
-      var _oC1=document.getElementById('futureC1'), _oC2=document.getElementById('futureC2');
+      var _oC1=document.getElementById('futureC1');
       var _oMsg='<div class="ipo-empty">⚠️ 图表组件（ECharts）加载失败——已自动尝试备用源，请稍候或刷新页面</div>';
       if(_oC1) _oC1.innerHTML=_oMsg;
-      if(_oC2) _oC2.innerHTML=_oMsg;
       if(!window.__OBS_RETRY){
         // 🛡 2026-11-22 修补：原回调引用未定义的 tab ⇒ ECharts 迟到时抛 ReferenceError，未来预测卡永久降级。
         window.__OBS_RETRY=function(){ if(typeof window.__obsRenderPane==='function') window.__obsRenderPane('future'); };
@@ -19502,37 +19494,7 @@ h+=`</div>`;
         {name:'200MA',type:'line',data:D.ma200,showSymbol:false,lineStyle:{width:1,color:'#8b93a1',type:'dashed'}}
       ]
     });
-    var c2=echarts.init(document.getElementById('futureC2'));
-    var ext2=[];
-    for(var i2=3;i2<D.val10.length-3;i2++){
-      var v2=D.val10[i2]; if(v2==null) continue;
-      var isMax=true,isMin=true;
-      for(var k2=i2-3;k2<=i2+3;k2++){ if(k2===i2||D.val10[k2]==null) continue;
-        if(D.val10[k2]>=v2) isMax=false; if(D.val10[k2]<=v2) isMin=false; }
-      if(isMax&&v2>=65) ext2.push({coord:[D.dates[i2],v2],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
-        label:{show:true,formatter:D.dates[i2].slice(2,7)+'·'+v2,fontSize:10,fontWeight:700,color:C_RED,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:6}});
-      if(isMin&&v2<=20) ext2.push({coord:[D.dates[i2],v2],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
-        label:{show:true,formatter:D.dates[i2].slice(2,7)+'·'+v2,fontSize:10,fontWeight:700,color:C_GRN,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:6}});
-    }
-    /* 🔴 2026-10-18 口径归一：图②线=PE 月末分位，标注必须挂同一序列同一坐标
-       （此前挂 val10_d 价格分位 88.3 于最末月槽，线本身没到 80 ⇒ 视觉割裂）。
-       保留 position:'top'（2026-10-17 修复的右缘裁切问题，末非空槽靠近右缘仍适用）。 */
-    var _curV = (_pvI>=0?D.val10[_pvI]:null);
-    if(_curV!=null) ext2.push({coord:[D.dates[_pvI],_curV],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
-      label:{show:true,formatter:'当前 '+_curV+' ('+D.dates[_pvI]+' 月末)',fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:8}});
-    c2.setOption({
-      backgroundColor:'transparent', tooltip:TIP,
-      grid:{left:44,right:56,top:24,bottom:58},
-      dataZoom:[{type:'inside',zoomOnMouseWheel:false},{type:'slider',height:16,bottom:2,borderColor:'#3a4149',textStyle:{color:'#9aa4b2',fontSize:9}}],
-      xAxis:{type:'category',data:D.dates,axisLabel:{interval:0,formatter:_tickLbl,color:'#9aa4b2',fontSize:10,showMaxLabel:true},axisLine:{lineStyle:{color:'#3a4149'}}},
-      yAxis:Object.assign({type:'value',name:'分位',min:0,max:100,nameTextStyle:{color:C_DIM}},AXS),
-      series:[{name:'10年PE分位',type:'line',data:D.val10,showSymbol:false,lineStyle:{width:1.6,color:C_PUR},areaStyle:{color:'rgba(192,132,252,0.08)'},
-        markPoint:{silent:true,data:ext2},
-        markLine:{silent:true,symbol:['none','none'],lineStyle:{type:'dashed',width:1.4},label:{fontSize:11,fontWeight:700,textBorderColor:'#14181e',textBorderWidth:3},data:[
-          {yAxis:80,lineStyle:{color:C_RED},label:{formatter:'贵 80',position:'end',distance:4,color:C_RED}},
-          {yAxis:50,lineStyle:{color:C_GRN},label:{formatter:'便宜 50',position:'end',distance:4,color:C_GRN}}]}}]
-    });
-    setTimeout(function(){ try{c1.resize();c2.resize();}catch(e){} },60);
+    setTimeout(function(){ try{c1.resize();}catch(e){} },60);
     try{ console.log('[renderFutureCard] ok runs(bear)=' + bearRuns.length + ' val10=' + c.val10); }catch(e){}
   };
 
@@ -19572,30 +19534,38 @@ h+=`</div>`;
     // ── 卡０：大盘 5 卡汇总解析（2026-09-17 主人令：放在大盘观测最顶部）──
     //   读数口径：WAVE_ELLIOTT / CITIC_PE_THERMO / CITIC_PE_BACKTEST / VALUATION_PERCENTILE / SH_FIB；缺则如实空态
     hm += '<div class="card" id="obsSummaryBody" style="margin-bottom:16px;border-left:4px solid #c084fc">'
-       + '<div class="note" style="padding:20px;text-align:center;color:var(--dim)">🧭 大盘 5 卡汇总解析 加载中…</div></div>';
-    // ── 卡0.5：周期位置 + 广度观测（2026-10-27 主人令 C 方案：由盘后数据页「熊市见底信号」拆出「周期位置+广度观测」层迁入大盘观测，接 EDHEC 牛熊状态机；牛市显示「牛市上行·无需抄底」，熊市才显「见底信号」）──
+       + '<div class="note" style="padding:20px;text-align:center;color:var(--dim)">🧭 大盘 5 项指标汇总解析 加载中…</div></div>';
+    // ── 卡1：🧭 周期位置 · 广度观测（原卡0.5，位置前移）
+    //    🗂 2026-11-28 B5：原「🌡 中信PE观测」「📈 A股指数观测」两张独立估值卡折入本卡下方 details。
+    //       依据：VALUATION_PERCENTILE 原本在全站被 4 处画法消费（汇总 / 本卡 / 中信PE / A股指数 / 未来预测②），
+    //       收敛为「一张卡里一处估值区」。容器 id citicPeObserveBody / indexObserveBody 与两个渲染函数一行未改。
     hm += '<div class="card" id="cycleBreadthBody" style="margin-bottom:16px;border-left:4px solid #fb923c">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
        + '<span style="font-size:15px;font-weight:700;color:#fb923c">🧭 周期位置 · 广度观测</span>'
        + '<span class="fresh" id="cycleBreadthFresh">&#x2014;</span>'
        + '<span style="font-size:11.5px;color:var(--dim)">EDHEC 牛熊状态机（月频·中线）+ 广度/股价/资金三观测点</span></div>'
        + '<div id="cycleBreadthInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim)">加载中…</div></div>'
+       + '<details style="margin-top:12px;border-top:1px dashed rgba(71,85,105,.35);padding-top:10px">'
+       + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:#ffd024">🏷 估值水位（中信 PE + A股指数分位）<span style="font-size:11px;font-weight:400;color:var(--dim)"> · 点开看</span></summary>'
+       + '<div id="citicPeObserveBody" style="padding:10px 0 0"><div class="note" style="padding:16px;text-align:center;color:var(--dim)">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>'
+       + '<div id="indexObserveBody" style="padding:14px 0 0;border-top:1px dashed rgba(71,85,105,.25);margin-top:10px"><div class="note" style="padding:16px;text-align:center;color:var(--dim)">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>'
+       + '</details>'
        + '</div>';
-    // ── 卡1：艾略特波浪 · 深度分析（容器 id / 渲染函数 __renderElliottWave 均未变，仅换宿主）──
+    // ── 卡2：📊 艾略特波浪 · 深度分析（容器 id / 渲染函数 __renderElliottWave 均未变）
+    //    🗂 2026-11-28 B5：原「🧪 斐波那契观测窗」独立卡折入本卡下方 details。
+    //       依据：两卡同源（SH_FIB + WAVE_ELLIOTT），只是同一组数据的两种画法。
+    //       容器 id fibWindowBody 与渲染函数一行未改。
     hm += '<div class="card" id="elliottWaveBody" style="margin-bottom:16px;border-left:4px solid #ff7ac2">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
        + '<span style="font-size:15px;font-weight:700;color:#ff7ac2">📊 艾略特波浪 · 深度分析</span>'
        + '<span class="fresh" id="elliottWaveFresh">&#x2014;</span>'
        + '<span style="font-size:11.5px;color:var(--dim)">真实收盘序列 + 人工浪型拐点 + 关键位 · CN runner1号机日频刷新</span></div>'
        + '<div id="elliottWaveInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim)">加载中&#x2026;</div></div>'
+       + '<details style="margin-top:12px;border-top:1px dashed rgba(71,85,105,.35);padding-top:10px">'
+       + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:#41c9ff">🧪 斐波那契观测窗<span style="font-size:11px;font-weight:400;color:var(--dim)"> · 同源 SH_FIB · 点开看</span></summary>'
+       + '<div id="fibWindowBody" style="padding:10px 0 0"><div class="note" style="padding:16px;text-align:center;color:var(--dim)">&#x1F9EA; 斐波那契观测窗 加载中&#x2026;</div></div>'
+       + '</details>'
        + '</div>';
-    // ── 卡2：斐波那契观测窗（← 2026-09-15 主人令：由「🔒 已下架」盘前区迁入，紧贴波浪卡下方，不合卡）──
-    hm += '<div class="card" id="fibWindowBody" style="margin-bottom:16px;border-left:4px solid #41c9ff">'
-       + '<div class="note" style="padding:20px;text-align:center;color:var(--dim)">&#x1F9EA; 斐波那契观测窗 加载中&#x2026;</div></div>';
-    // ── 卡3：中信 PE 观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
-    hm += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border-left:4px solid #ffd024"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>';
-    // ── 卡4：A股指数观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
-    hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #41c9ff"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
     hm += '</div>'; // /obsPaneMarket
     // ══ 子页③：🔮 未来预测（2026-11-22 二次令：4 层观测链 = ①27年走势 ②PE分位 ③康波长波 ④2027推演）══
     //   频率铁律（主人令「标明每月几日更新」）：本页没有「整卡月更」卡——①②所在大卡与④均为交易日 16:10 日更，
@@ -19603,20 +19573,29 @@ h+=`</div>`;
     //   禁止把月频字段冒充整卡月更，也禁止编造固定日期。
     hm += '<div id="obsPaneFuture" style="display:' + (_act==='future' ? 'block' : 'none') + '">';
     hm += '<div style="border:1px solid rgba(255,208,36,.35);border-radius:9px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.8;color:var(--dim);background:rgba(255,208,36,.05)">'
-       + '<b style="color:#ffd024">📆 更新频率（逐卡真实标注）：</b>'
-       + '①27年走势 / ②PE分位 所在大卡 = <b style="color:var(--txt)">交易日 16:10 日更</b>，其中 PE 分位<b>月末补齐</b>、社融<b>次月中旬（约10–15日，央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>；'
-       + '③康波周期 = <b style="color:#fbbf24">每月10日 18:00 自动更新</b>（v8_kondratiev_monthly；不设1日因 CPI/PPI 次月上旬才发布，1日会系统滞后一个月；GDP 季度/CPI·PPI 月度按可得最新值如实标注）；'
-       + '④2027推演 = <b style="color:var(--txt)">随大卡每交易日刷新</b>（情景概率滚动更新）。'
-       + '<br><span style="color:#8b93a1">①→④ 是研判链：长期趋势 → 估值水位 → 长波定位 → 年度推演；均为观测研究，不构成买卖建议。</span></div>';
-    hm += '<div class="card" id="futureCardBody" style="margin-bottom:16px;border-left:4px solid #ffd024"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">🔮 未来预测 · 牛熊观测台 加载中…</div></div>';
-    // 🌊 第③层：康波周期（整卡从「暂未上架」迁入，容器 id / 渲染函数不变）
-    hm += '<div class="card" id="kondratievCard" style="margin-bottom:16px;border-left:4px solid #38bdf8">'
-       // 🌊 2026-11-23 二次令：卡头统一由 __renderKondratiev 用 v8CardHeader 填充（含「🦊 更新于」）。
+       + '<b style="color:#ffd024">📆 更新频率（逐项真实标注）：</b>'
+       + '主卡（27年长期走势）= <b style="color:var(--txt)">交易日 16:10 日更</b>，其中社融<b>次月中旬（约10–15日，央行发布日浮动）</b>、PMI<b>月末/次月初（统计局发布日浮动）</b>；'
+       + '③康波周期 = <b style="color:#fbbf24">每月10日 18:00 自动更新</b>（v8_kondratiev_monthly；不设1日因 CPI/PPI 次月上旬才发布）；'
+       + '④2027推演 = <b style="color:var(--txt)">随主卡每交易日刷新</b>（情景概率滚动更新）。'
+       + '<br><span style="color:#8b93a1">🗂 2026-11-28 收口：原 4 层各自成卡 → 现 1 张主卡 + ③④ 折叠。研判链不变：长期趋势 → 长波定位 → 年度推演；均为观测研究，不构成买卖建议。</span></div>';
+    // 🗂 2026-11-28 B6：未来预测 3 卡 → 1 卡。
+    //   主展示 = ①27年长期走势（含 9 项牛转熊观测台）；③康波 / ④2027展望 折入主卡下方 details。
+    //   ②PE分位（原 futureC2 图）已整段删除 —— 估值分位改由「大盘观测·周期位置·估值水位」单点承载。
+    //   ⚠ 铁律：futureCardBody / kondratievCard / futureOutlookCard / kondHeader / kondratievBody /
+    //     futureOutlookBody 六个容器 id 全部保留，__renderFutureCard / __renderKondratiev 一行未改（仅删②图）。
+    hm += '<div class="card" id="futureMasterCard" style="margin-bottom:16px;border-left:4px solid #ffd024">'
+       + '<div id="futureCardBody"><div class="note" style="padding:20px;text-align:center;color:var(--dim)">🔮 未来预测 · 牛熊观测台 加载中…</div></div>'
+       + '<details style="margin-top:14px;border-top:1px dashed rgba(71,85,105,.35);padding-top:10px">'
+       + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:#38bdf8">🌊 ③ 康波周期<span style="font-size:11px;font-weight:400;color:var(--dim)"> · 长波定位 · 点开看</span></summary>'
+       + '<div id="kondratievCard" style="padding:10px 0 0">'
        + '<div id="kondHeader"></div>'
-       + '<div id="kondratievBody"><div class="note">康波数据加载中&#x2026;</div></div></div>';
-    // ④ 第4层：2027 年度展望（原 big card 内 ③ 小节拆出为独立卡，编号顺延为 ④；内容仍由 __renderFutureCard 同源渲染）
-    hm += '<div class="card" id="futureOutlookCard" style="margin-bottom:16px;border-left:4px solid #c084fc">'
-       + '<div id="futureOutlookBody"><div class="note">④ 2027 年度展望加载中&#x2026;</div></div></div>';
+       + '<div id="kondratievBody"><div class="note">康波数据加载中&#x2026;</div></div></div>'
+       + '</details>'
+       + '<details style="margin-top:10px;border-top:1px dashed rgba(71,85,105,.35);padding-top:10px">'
+       + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:#c084fc">🔮 ④ 2027 年度展望<span style="font-size:11px;font-weight:400;color:var(--dim)"> · 情景推演 · 点开看</span></summary>'
+       + '<div id="futureOutlookCard" style="padding:10px 0 0"><div id="futureOutlookBody"><div class="note">④ 2027 年度展望加载中&#x2026;</div></div></div>'
+       + '</details>'
+       + '</div>';
     hm += '</div>'; // /obsPaneFuture
     var _host = document.getElementById('obsHost');
 
@@ -20748,8 +20727,8 @@ window.__renderV8CalToday();
 
     if(allStocks && allStocks.length){
       h+='<div style="margin-top:12px;padding:10px 12px;border:1px solid rgba(65,201,255,0.36);border-radius:9px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
-      h+='<span style="font-size:12px;color:var(--sub)">📋 共 '+allStocks.length+' 只候选按综合分排序，已在「今日推荐候选池」Tab 完整展开</span>';
-      h+='<button onclick="switchFinalTab(\'cand\')" style="cursor:pointer;font-size:12px;font-weight:700;color:#41c9ff;border:1px solid rgba(65,201,255,0.51);border-radius:6px;padding:5px 12px;white-space:nowrap">查看完整候选池 →</button>';
+      h+='<span style="font-size:12px;color:var(--sub)">📋 共 '+allStocks.length+' 只候选按综合分排序，已在「选股策略 · 观测候选股池」按来源展开</span>';
+      h+='<button onclick="window._gotoStPool()" style="cursor:pointer;font-size:12px;font-weight:700;color:#41c9ff;border:1px solid rgba(65,201,255,0.51);border-radius:6px;padding:5px 12px;white-space:nowrap">→ 选股策略 · 观测候选股池</button>';
       h+='</div>';
     }
 
@@ -21032,6 +21011,17 @@ window.__renderV8CalToday();
     }catch(e){ console.warn('[switchFaTab]', name, e); }
   };
 
+  // 🗂 2026-11-28 A2：本页候选池子页已下线（候选池归「选股策略 · 观测候选股池」），
+  //   原「查看完整候选池 →」按钮改调本函数跳转，避免结果页再摊一遍输入名单。
+  window._gotoStPool = function(){
+    try{
+      var el = document.querySelector('[data-sec="st"]');
+      if(typeof window.guardLock === 'function') window.guardLock('st', el);
+      else window.switchSec('st', el);
+    }catch(e){ try{ window.switchSec('st', document.querySelector('[data-sec="st"]')); }catch(_e){} }
+    setTimeout(function(){ try{ window.switchSt('pool'); }catch(e){} }, 350);
+  };
+
   window.switchFinalTab = function(name){
     document.querySelectorAll('.final-tab').forEach(function(btn){
       var isActive = btn.dataset.final === name;
@@ -21052,7 +21042,7 @@ window.__renderV8CalToday();
       setTimeout(function(){ try{ window.renderFinalHist(); }catch(e){ console.error('[renderFinalHist]', e); } }, 30);
     }
     // 🔴 2026-09-20 主人令：「🧪 因子实验室」由「选股策略」页迁入本页第 3 子 Tab，
-    //   渲染触发随之语义归位到此（原 window.switchSt('fa') 分支已删）。
+    //   渲染触发随之语义归位到此（2026-11-28 A1：又迁回选股策略第 5 子页，两处分支并存互为兜底）。
     //   注：页面级 _renderPostReady 已在 DOMContentLoaded 无条件预渲
     //   （__renderFactorPane 内部串起「每日因子计算 / 当日因子计分榜」两卡），
     //   此处仅作切换兜底重渲 + 数据就绪重试（复用 __stRetryTab 的 fa 分支）。
