@@ -1,6 +1,6 @@
 {
  "date": "2026-11-28",
- "generated": "2026-11-28 11:14:36",
+ "generated": "2026-11-28 13:35:17",
  "verdict": {
   "cap_pct": 50,
   "label": "观"
@@ -12,29 +12,27 @@
   "senti_score": 85.0,
   "zt": 97,
   "max_ladder": 6,
-  "up": 2230,
-  "down": 116,
-  "breadth": 0.9505541346973572,
+  "up": 2227,
+  "down": 118,
+  "breadth": 0.949680170575693,
   "crisis": 34.6,
   "sh_close": 3606.49,
   "sh_chg": 3.73,
-  "zz1000_close": 5531.84,
-  "flow_in_cnt": 14,
+  "zz1000_close": 5982.91,
+  "flow_in_cnt": 33,
   "top_sectors": [
-   "同花顺漂亮100",
-   "高股息精选",
-   "液冷概念"
+   "5G"
   ],
   "top_stocks": [
-   "广联航空",
-   "优刻得",
+   "哔哩哔哩-W",
+   "创世纪",
    "上海九百"
   ]
  },
  "checks_hit": 7,
  "checks_total": 8,
  "list_gate_ok": false,
- "list_gate_why": "榜单陈旧11-26、validity=degraded、无分辨度max=4.1、缺维度inst_w52/inst_analyst",
+ "list_gate_why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
  "forward_ref": {
   "sh_close": 3606.49,
   "date": "2026-11-28"
