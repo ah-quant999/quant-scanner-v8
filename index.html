@@ -145,7 +145,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=a6fded6d11" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=f33eb82eea" defer></script>
     <script src="data/CRED_LEDGER.js?v=b7be97faeb" defer></script>
-    <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
+    <!-- 2026-08-31 精简：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=6cd751c7bb" defer></script>
     <script src="data/GOLD_POOL.js?v=dd81269210" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
@@ -864,7 +864,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdB
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
    规则：① 只保留「值得买入」的股票；② 按统一买入评分降序；③ 每只股票汇总关键详情；④ 三不原则独立第二行。
    数据：🥇三重共识（🔴 2026-10-18：四量终极已下架移出；金股池【当前无独立卡片】：renderGoldPool 已于 2026-08-06
-   轻量化时删除，GOLD_POOL 仅在「个股查询 → 策略命中」以 ⭐ 命中标签呈现）；渲染由 initCardBadges / switchSec('td') 触发。 */
+   精简时删除，GOLD_POOL 仅在「个股查询 → 策略命中」以 ⭐ 命中标签呈现）；渲染由 initCardBadges / switchSec('td') 触发。 */
 function __judgmentCandidatesHTML(){
   var SQ = window.STOCK_QUOTE || {};
   var sq = SQ.stocks || {};
@@ -1411,7 +1411,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🆕 2026-11-18 主人令：股债性价比温度计观测卡（沪深300估值 vs 中债10Y） -->
 <script src="data/EQBOND_ATTRACTION.js?v=2a999ee5af" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=c1647ccdf5" defer></script>
-<!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
+<!-- 2026-08-31 精简：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=9219acf31d" defer></script>
 <script src="data/HB_XIAOJIU.js?v=9346cd4a19" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=22358c0bdd" defer></script>
@@ -13072,7 +13072,7 @@ function drawUpDownChart(){
   // 🛡 2026-09-01：renderRunnerTrack 此前只在 IIFE 内被 9198 行调用、未挂 window，
   //   导致运维「数据健康总览」无法被外部/自愈脚本重绘（排障时只能整页刷新）。补挂导出。
   window.renderRunnerTrack = renderRunnerTrack;
-    // 🛡 2026-08-31 轻量化：window.V8_PAGE_SCHEDULE 为死赋值（全仓无定义、无读取），已删除。
+    // 🛡 2026-08-31 精简：window.V8_PAGE_SCHEDULE 为死赋值（全仓无定义、无读取），已删除。
   /* ---- 状态视觉单一真相源（2026-09-15 主人令一劳永逸） ----
      后端 v8_health_check 发出的 status 全集：ok / warn / fail / limited / info。
      映射铁律（主人纪律：数据及时真实可靠，算法科学严谨）：
@@ -15509,7 +15509,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       if(dataObj.slot) slot = dataObj.slot;
       if(dataObj.horizon) horizon = dataObj.horizon;
     }
-    // 🛡 2026-08-31 轻量化：window.V8_CARD_META 全仓无定义，相关 slot/horizon 元信息分支不生效，已移除（下方 dataObj.slot/horizon 仍保留）。
+    // 🛡 2026-08-31 精简：window.V8_CARD_META 全仓无定义，相关 slot/horizon 元信息分支不生效，已移除（下方 dataObj.slot/horizon 仍保留）。
     var badge = (t ? _uBadge(slot, horizon, dataObj ? dataObj.update_time : null) : '');
     // 2026-08-09 全站统一：「更新于」胶囊必须紧跟卡名，不得靠右；
     // subtitle 不再使用 flex:1 撑满空间挤压胶囊。
@@ -21599,7 +21599,7 @@ window.__renderV8CalToday();
         }, 250);
       }
       if(sec==='lg'){
-        // 2026-08-31 轻量化：逻辑详解已拆为独立页 logic.html，主站不再含 sec-lg 容器。
+        // 2026-08-31 精简：逻辑详解已拆为独立页 logic.html，主站不再含 sec-lg 容器。
         // 旧的 ?sec=lg&sub=xx 深链改为自动打开独立页（保持 deep link 可用）。
         try{ window.open('./logic.html' + (sub ? '#lg-' + sub : ''), '_blank'); }catch(e){}
       }
