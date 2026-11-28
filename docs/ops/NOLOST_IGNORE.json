@@ -1,7 +1,7 @@
 {
   "_readme": "有意删除、不参与自愈的受保护路径（NOLOST_IGNORE）。删受保护文件前必须先登记，否则守卫会补回。",
-   "reason": "2026-11-05 FF3 退役 8 件 + 2026-11-26 SECTOR_YEAR_FLOW 整链退役 3 件：均无生产方、前端零引用、产物陈旧，永久退出自愈守卫保护（防从基线复活）。",
-  "updated": "2026-11-26 22:20",
+  "reason": "2026-11-05 FF3 退役 8 件 + 2026-11-26 SECTOR_YEAR_FLOW 整链退役 3 件：均无生产方、前端零引用、产物陈旧，永久退出自愈守卫保护（防从基线复活）。 2026-11-28 主人令（主站上线前脱敏）：三个内部备忘页 v6_memo / v6_memory / v6_memo.golden 含算法、阈值、数据源与决策记录，已从公开站点下线，永久退出自愈保护（防止守卫补回）。",
+  "updated": "2026-11-28 18:05",
   "paths": [
     "algorithms/gen_ff3_ranksum.py",
     "algorithms/ff3_upgrade_backtest.py",
@@ -13,6 +13,9 @@
     "raw_data/ff3_upgrade_backtest_report.json",
     ".github/workflows/v8_sector_year_flow.yml",
     "data/SECTOR_YEAR_FLOW.js",
-    "raw_data/sector_year_flow.json"
+    "raw_data/sector_year_flow.json",
+    "v6_memo.html",
+    "v6_memory.html",
+    "v6_memo.golden.html"
   ]
 }
