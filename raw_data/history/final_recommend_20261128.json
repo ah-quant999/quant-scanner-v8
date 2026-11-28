@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-11-28 12:42:25",
+  "update_time": "2026-11-28 15:25:34",
   "crisis_score": 34.6,
   "crisis_high": false,
   "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
@@ -7,7 +7,7 @@
   "top_n": 2,
   "data_degraded": false,
   "signal_edge": {
-    "source": "backtest_expectancy@2026-11-28 11:44:41",
+    "source": "backtest_expectancy@2026-11-28 14:17:40",
     "degraded": false,
     "effective": {
       "jinzuan": -0.406,
@@ -34,7 +34,7 @@
       "jigou": false
     },
     "loaded": {
-      "generated": "2026-11-28 11:44:41",
+      "generated": "2026-11-28 14:17:40",
       "hit": 4,
       "n_snapshots": 119,
       "date_range": [
@@ -94,7 +94,7 @@
   "consensus_stocks": [],
   "all_candidates": [],
   "factor_chain": {
-    "update_time": "2026-11-28 12:42:25",
+    "update_time": "2026-11-28 15:25:33",
     "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
     "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
     "gate": {
@@ -146,6 +146,6 @@
     "reason": "观澜台/IMA 候选池为空（zsxq token 可能过期，强势跟踪源不可用）",
     "ima_data_date": "2026-11-24",
     "ima_pool_total": 0,
-    "assessed_at": "2026-11-28 12:42:25"
+    "assessed_at": "2026-11-28 15:25:34"
   }
 }
