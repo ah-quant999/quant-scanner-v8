@@ -553,10 +553,32 @@ def main():
         buy["answer"] = "今天不买，只观察 —— 榜单无效（%s）。" % _why
         buy["answer_short"] = "不买（榜单无效：%s）" % _why
 
+    # 🗣 2026-11-28 主人令 P0-2：根治「7/7 条却说不加仓」的自相矛盾。
+    #   病灶：旧模板无条件写「只满足 %d/%d 条」，而 hit 与 total 都是 7 时，
+    #         会印出「加仓条件只满足 7/7 条，不加仓」—— 字面就是逻辑错乱，主人一眼看出卡在自打嘴巴。
+    #   真相：7 条盘面条件确实全满足了，否决来自第 8 条「榜单有效」（一票否决、不进 7 条计数）。
+    #   修法：按「谁在拦」分四种情形说人话，不再一律甩给「只满足 X 条」。
+    _need_n = _i((triggers.get("add") or {}).get("need"), 5)
+    _miss = (_gate.get("data_missing") or []) if isinstance(_gate, dict) else []
+    _gate_why = "、".join(_miss) if _miss else ((_gate or {}).get("why") or "榜单降级")
     if buy["answer_short"].startswith("不买"):
-        so = ("所以今天不用动：仓位上限是 %d%%，但加仓条件只满足 %d/%d 条，**不加仓**。"
-              "上限是天花板，不是让你必须用满 —— 空仓也是一种仓位。"
-              % (round(cap * 100), hit, 7))
+        if not _gate_ok and hit >= 7:
+            so = ("所以今天不动，但**不是盘面不给机会** —— 7 条开仓条件全满足了（%d/%d），"
+                  "卡在第 8 条「榜单有效」上：%s。"
+                  "这是自家榜单数据没修好，不是行情问题；榜单补齐的那天，这 7 条会直接变成「可以加仓」。"
+                  % (hit, 7, _gate_why))
+        elif not _gate_ok:
+            so = ("所以今天不动：仓位上限 %d%%，盘面只满足 %d/%d 条（需 ≥%d 条），"
+                  "并且「榜单有效」这一条也没过（%s）。两道都得补上才谈仓位。"
+                  % (round(cap * 100), hit, 7, _need_n, _gate_why))
+        elif hit < _need_n:
+            so = ("所以今天不用动：仓位上限是 %d%%，但加仓条件只满足 %d/%d 条（需 ≥%d 条），**不加仓**。"
+                  "上限是天花板，不是让你必须用满 —— 空仓也是一种仓位。"
+                  % (round(cap * 100), hit, 7, _need_n))
+        else:
+            so = ("所以今天不用动：仓位上限 %d%%，盘面条件够了，但**方向与标的对不上**"
+                  "（钱在进的板块没有成型标的）⇒ 硬凑就是送钱，空仓等明天。"
+                  % round(cap * 100))
     else:
         so = ("所以今天可以做，但**只能拿上限以内的钱做**：仓位上限 %d%%，分批建，"
               "一次打满明天一个低开就全吐回去。" % round(cap * 100))
@@ -590,9 +612,32 @@ def main():
                    if buy["factor"] < 1.0 else "",
                    _per_adj / 2))
 
+    # ⚠️ 2026-11-28 修正（主人核对时发现「是编的」）：旧版 evidence 把五信号写死成
+    #   「趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1」，与 MARKET_TACTIC.dims 真实值不符
+    #   （宽度实际 +1、量能实际 0），且五项加总为 -2 却印着「合计 +1」—— 完全对不上账。
+    #   现改为逐项读 dims 生成，任何一项变动都自动跟随，杜绝硬编码。
+    _DIMS = tac.get("dims") or {}
+    _dim_parts = []
+    for _k, _n in (("trend", "趋势"), ("breadth", "宽度"), ("zt", "涨停"), ("volume", "量能"), ("flow", "资金")):
+        _sc = _i((_DIMS.get(_k) or {}).get("score"), 0)
+        _dim_parts.append("%s %s" % (_n, ("%+d" % _sc) if _sc else "0"))
+    _dim_txt = "、".join(_dim_parts)
+
+    # 🔴 2026-11-28 主人令 P1-5（数据日期标注的配套）：data_date 必须是「行情真实归属日」。
+    #   病灶：旧版取 MARKET_TACTIC.data_date —— 该字段由凌晨重算写入、恒等于「今天」，
+    #         于是周六上午打开页面会看到「今天涨停 97 家、上涨 2227 家」，而 97 家实际是周五的；
+    #         卡头胶囊又把 update_time 刷成本轮时刻 ⇒ 双重伪装成实时。
+    #   修法：优先取 INDEX_QUOTES.update_time 的日期（行情快照的真实时点，收盘后不再变），
+    #         其次涨停热力，最后才回落 tactic。前端据此在卡头标注「数据归属 X 收盘」。
+    def _md(s):
+        return str(s or "")[:10]
+
+    _asof = (_md(idx.get("update_time")) or _md(heat.get("update_time"))
+             or _md(tac.get("data_date")) or TODAY)
+
     verdict = {
         "update_time": NOW.strftime("%Y-%m-%d %H:%M:%S"),
-        "data_date": (tac.get("data_date") or TODAY),
+        "data_date": _asof,
         "head": {
             "label": "%s · %d 成" % (tac_lab, round(cap * 10)),
             "stance": tac.get("regime") or "",
@@ -630,8 +675,8 @@ def main():
         "alpha": {"verdict": str(alpha.get("verdict") or "—"),
                   "ir_oos": alpha.get("ir_oos"), "update_time": alpha.get("update_time") or ""},
         "evidence": [
-            {"name": "攻防档位", "plain": "五个信号打分：趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1，合计 %+d"
-             % _i(tac.get("score")), "value": "%+d" % _i(tac.get("score"))},
+            {"name": "攻防档位", "plain": "五个信号打分：%s，合计 %+d"
+             % (_dim_txt, _i(tac.get("score"))), "value": "%+d" % _i(tac.get("score"))},
             {"name": "个股宽度", "plain": "%d 家涨 / %d 家跌，上涨占比 %.0f%%（低于 45%% 就是普跌）"
              % (up, down, (breadth or 0) * 100), "value": "%.0f%%" % ((breadth or 0) * 100)},
             {"name": "情绪周期", "plain": "%s（%d 分），涨停 %d 家、最高 %s 板"
