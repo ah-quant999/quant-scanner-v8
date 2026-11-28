@@ -1,5 +1,5 @@
 window.FRACTAL_CONFLUENCE = {
- "update_time": "2026-11-28 10:35:45",
+ "update_time": "2026-11-28 10:35:27",
  "sample": {
   "start": "2005-01-04",
   "end": "2026-11-27",
