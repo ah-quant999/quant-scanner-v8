@@ -181,6 +181,9 @@ jobs:
           cp *.js _site/ 2>/dev/null || true
 
           cp *.html _site/ 2>/dev/null || true
+          # 2026-11-28 主人令「只能我看」：robots.txt 必须随产物发布（原 cp 清单漏了它，
+          #   导致 Pages 上 /robots.txt 恒 404、Disallow 形同不存在）。
+          cp robots.txt _site/ 2>/dev/null || true
 
           mkdir -p _site/assets
 
