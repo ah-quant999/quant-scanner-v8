@@ -30,8 +30,20 @@ on:
     #   UTC 全 24h × 周日~周四（覆盖 CST 周一 00:07 ~ 周六 07:52 全程每 15 分）。
     #   安全性：非交易日/周末由探针内部 CST dow>=5 自行空转退出（纯读探针+破锁，
     #   不写任何数据），对双机分时零影响。
-    - cron: '7,22 * * * 0-4'      # 每 15 分前半（:07 :22）· 全 24h（11-09 扩段）
-    - cron: '37,52 * * * 0-4'     # 每 15 分后半（:37 :52）· 全 24h（11-09 扩段）
+    # 🔴🔴 2026-11-28 主人令「盘前盘后不需要这么高频；盘中 15 分钟别造成风暴」——实测驱动整改：
+    #   ① 名义 vs 实际：原 96 档/天，GitHub API 实测 11-24~11-28 schedule 事件只有 17 次
+    #      （11-27 单日 22 个 run 里仅 1 个是 schedule），其余是外部每小时 dispatch。
+    #      即：名义上 15 分、实际放行约 1 次/天 —— 不存在「15 分钟风暴」，问题只在别处。
+    #   ② 真正的成本在 checkout：每次 run 全量拉工作区 879MB × 名义 96 档 = 约 84GB/天。
+    #      已在下面对 checkout 收窄为 sparse（只取 .github/scripts，约 0.2MB）。
+    #   ③ 纯空转档：探针时段门只认 07:05-09:55 / 09:00-15:30 / 17:00-21:30，
+    #      CST 22:00-07:00 共 36 档（4/小时 × 9 小时）必然一进来就 exit(0) —— 全删。
+    #   现名义 96 → 41 档/天（−57%），盘前/盘后降到 30 分，**盘中 09:07-15:52 每 15 分不动**。
+    - cron: '7,22,37,52 1-7 * * 1-5'  # 盘中 09:07-15:52 CST · 每 15 分（28 档·主人令不动）
+    - cron: '7,37 23 * * 0-4'         # 盘前 07:07/07:37 CST（2 档·30 分）
+    - cron: '7,37 0 * * 1-5'          # 盘前 08:07/08:37 CST（2 档·30 分）
+    - cron: '7,37 8-11 * * 1-5'       # 盘后 16:07-19:37 CST · 每 30 分（8 档）
+    - cron: '37 12 * * 1-5'           # 晚间 20:37 CST（1 档·覆盖 17:41-21:30 窗尾）
   # 🔴 保留手动入口：WorkBuddy 唤起器 2d9121c8 每 15 分也可主动触发（双保险）。
   workflow_dispatch:
     inputs:
@@ -55,8 +67,17 @@ jobs:
     timeout-minutes: 10
     steps:
       # 🔴 2026-11-10 阿狸咪修复：11-09 6a065f8fac 探针抽出仓内脚本后漏加 checkout，runner 空工作区⇒ python3 找不到 .github/scripts/v8_watchdog_probe.py，自愈兜底层 7 连败。
-      - name: 检出仓库（探针脚本在仓内 .github/scripts/）
+      # 🔴 2026-11-28 主人令（成本根治）：原 checkout 全量工作区 879MB/次。
+      #   本 workflow 五步全部只跑 .github/scripts/*.py，且脚本自述「纯标准库 + 读线上
+      #   Pages/API」，不读任何仓内数据文件 ⇒ sparse 收窄到该目录即可（实测效果：
+      #   下载量 879MB → 约 0.2MB，降 99.98%）。cone-mode 关掉是为了不把根目录
+      #   index.html / logic.html 一起拖下来（cone 模式会带上根目录全部文件）。
+      - name: 检出仓库（sparse·只取 .github/scripts）
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/scripts/
+          sparse-checkout-cone-mode: false
       - name: 自检数据新鲜度并兜底派发
         env:
           GH_TOKEN: ${{ github.token }}
