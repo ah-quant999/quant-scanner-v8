@@ -1026,3 +1026,5 @@
 {"kind": "cycle", "at": "2026-11-28 11:56:11", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0, "feature_anchors": {"checked": 11, "missing_n": 1}}
 {"kind": "feature_anchor_missing", "severity": "high", "checked": 11, "missing": [{"id": "ui_pattern_plain", "label": "分型×共振·白话结论", "needle": "光看 K 线", "owner": "主人令 2026-11-25『白字说人话』（commit 05d50ff）"}], "hint": "线上 index.html 主人功能标记消失；若为有令删除请更新 FEATURE_ANCHORS.json 移除该锚点并写明 owner，否则视为无命令回滚", "at": "2026-11-28 12:06:20"}
 {"kind": "cycle", "at": "2026-11-28 12:06:21", "snapshot_new": 2, "clobbered": [], "healed": [], "unpublished": 0, "feature_anchors": {"checked": 11, "missing_n": 1}}
+{"kind": "feature_anchor_missing", "severity": "high", "checked": 11, "missing": [{"id": "ui_pattern_plain", "label": "分型×共振·白话结论", "needle": "光看 K 线", "owner": "主人令 2026-11-25『白字说人话』（commit 05d50ff）"}], "hint": "线上 index.html 主人功能标记消失；若为有令删除请更新 FEATURE_ANCHORS.json 移除该锚点并写明 owner，否则视为无命令回滚", "at": "2026-11-28 13:07:27"}
+{"kind": "cycle", "at": "2026-11-28 13:07:27", "snapshot_new": 0, "clobbered": [], "healed": [], "unpublished": 0, "feature_anchors": {"checked": 11, "missing_n": 1}}
