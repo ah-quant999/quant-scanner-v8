@@ -217,8 +217,8 @@ window.__domReadyFns=[];
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
     <script src="data/FRESHNESS_STATUS.js?v=bcfc65a650" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=1ab4486b75" defer></script>
-    <!-- 🗑 2026-11-27：CONCEPT_ETF_MAP 注入已停（卡片下线，前端无消费方）；data/CONCEPT_ETF_MAP.js 文件保留备查。 -->    <!-- 🆕 2026-11-21 主人令「因子审计·一劳永逸」：backtest_expectancy 回测产物发布为 data/*.js，
-         消除因子计分卡 P2 显示层硬表镜像滞后（09-20 镜像 vs 11-21 实测：机构变红/上涨趋势方向翻转+异号弃用）；
+    <!-- 🗑 2026-11-27：CONCEPT_ETF_MAP 注入已停（卡片下线，前端无消费方）；data/CONCEPT_ETF_MAP.js 文件保留备查。 -->    <!-- 🆕 2026-11-21 主人令「指标审计·一劳永逸」：backtest_expectancy 回测产物发布为 data/*.js，
+         消除指标计分卡 P2 显示层硬表镜像滞后（09-20 镜像 vs 11-21 实测：机构变红/上涨趋势方向翻转+异号弃用）；
          ?v=0 由 cache-bot/链尾缓存戳步骤接管 -->
     <script src="data/BACKTEST_EXPECTANCY.js?v=6f281648b5" defer></script>
     <!-- 🆕 2026-11-22 主人令：回调池展示数据源注入（gen_pullback_pool.py → data/PULLBACK_POOL.js，选股策略·回调池tab 消费 window.PULLBACK_POOL）；?v=0 由缓存戳 bot 接管 -->
@@ -373,7 +373,7 @@ window.V8_CAL = {weeks:[],legend:[]};
   /* ---- AI 市场速览·盘中实时择时（2026-09-09 一劳永逸） ----
      AI速览是盘中实时任务（gen_market_brief.py，09:25 起持续刷新），其「持仓建议」必须读
      本卡自己的盘中信号（health.signal + sentiment.signal），不得读盘后 E 批回测
-     OPTIMIZED_STRATEGY（那是选股因子门控 v8FactorGate 的正职，错接=假死）。 */
+     OPTIMIZED_STRATEGY（那是选股指标门控 v8FactorGate 的正职，错接=假死）。 */
   window.v8IntradayGate = function(){
     /* 2026-09-14 主人令：AI市场速览 = 全站唯一择时关口。
        本函数聚合两类结论：
@@ -403,14 +403,14 @@ window.V8_CAL = {weeks:[],legend:[]};
     return {ok:(_ga_l==='green'), light:_ga_l, posColor:mkt.color, posIcon:mkt.icon, color:obsColor, name:obsName, observation:obs,
             verdict:mkt.verdict, regime:mkt.name, evidence:mkt.evidence, date:mkt.date||''};
   };
-  /* ---- 因子择时闸门：v8MarketGate(择时) ∩ 因子分位门槛 ----
-     因子长多组合 t<2，仅作「排序信号」而非独立策略，故必须叠加择时闸门。
-     pass 条件：① 市场闸门开放(阴跌磨底/恐慌下行) ② 因子值位于全列表前 topFrac 分位。 */
+  /* ---- 指标择时闸门：v8MarketGate(择时) ∩ 指标分位门槛 ----
+     指标长多组合 t<2，仅作「排序信号」而非独立策略，故必须叠加择时闸门。
+     pass 条件：① 市场闸门开放(阴跌磨底/恐慌下行) ② 指标值位于全列表前 topFrac 分位。 */
   window.v8FactorGate = function(factorVal, allVals, topFrac){
     topFrac = topFrac || 0.2;
     var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {light:'gray', name:'未知'};
     /* 2026-11-19 主人令：闸门改读亮灯 light——市场不行（红灯）禁买，黄灯谨慎期不放行，
-       仅绿灯（市场行+盘中偏强）开放因子组合。旧 if(!mkt.open) 是回测逆向口径（grind/panic
+       仅绿灯（市场行+盘中偏强）开放指标组合。旧 if(!mkt.open) 是回测逆向口径（grind/panic
        反而开放），与「市场不行不能开仓」矛盾，废除。 */
     if(mkt.light !== 'green'){
       var _rsn = mkt.light === 'red' ? ('择时封闭·市场不行（' + mkt.name + '）禁开仓')
@@ -419,14 +419,14 @@ window.V8_CAL = {weeks:[],legend:[]};
       return {pass:false, reason:_rsn, color: mkt.light === 'yellow' ? '#ffd024' : '#ff5252'};
     }
     if(!allVals || !allVals.length || factorVal==null) {
-      return {pass:false, reason:'因子缺失', color:'#94a3b8'};
+      return {pass:false, reason:'指标缺失', color:'#94a3b8'};
     }
     var sorted = allVals.slice().sort(function(a,b){return b-a;});
     var thr = sorted[Math.floor(sorted.length*topFrac)];
     if(factorVal >= thr){
-      return {pass:true, reason:'择时开放·因子前'+Math.round(topFrac*100)+'%', color:'#26d9c2'};  // 绿灯=可买
+      return {pass:true, reason:'择时开放·指标前'+Math.round(topFrac*100)+'%', color:'#26d9c2'};  // 绿灯=可买
     }
-    return {pass:false, reason:'择时开放·因子未达分位', color:'#ffd024'};
+    return {pass:false, reason:'择时开放·指标未达分位', color:'#ffd024'};
   };
   /* ---- 中国时间（Asia/Shanghai）统一解析与格式化 ---- */
   window._parseAsCST = function(ts){
@@ -1482,7 +1482,7 @@ window.RISK_GUARD = {
 window.STRATEGY_WALKFORWARD = {
   "update_time": "2026-10-26 07:54:17",
   "source": "raw_data/history/final_recommend_*.json（41 个每日快照）",
-  "method": "因子清账 + 胜率加权 组合的【样本外选股稳定性】跨期验证（非收益率 跨期，历史快照无已实现盈亏）",
+  "method": "指标清账 + 胜率加权 组合的【样本外选股稳定性】跨期验证（非收益率 跨期，历史快照无已实现盈亏）",
   "is_ratio": 0.7,
   "is_window": {
     "n": 28,
@@ -2132,7 +2132,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/INDEX_VALUE_FRAMEWORK.js?v=18ddf3722a" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <!-- 🆕 2026-09-19 主人令（CN runner2号机的工程师）：跨期验证 真值（verdict / IR_跨期 / 跑赢基准率），
-         供「🧮 每日因子计算」卡读 P5 段闸门真值（指标库页唯一消费者）。
+         供「🧮 每日指标计算」卡读 P5 段闸门真值（指标库页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=2ba5409ab6" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=97a1018093" defer></script>
@@ -2143,7 +2143,7 @@ window.STRATEGY_WALKFORWARD = {
     <script src="data/MOMENTUM_FILTER.js?v=7e0dced043" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/IMA_STRONG_BACKTEST.js?v=5ae12f1585" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
-    <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三因子（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三因子已并入指标库主评分 P5（amt60/turntrend/ivol60 纯加分项、跨期验证 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
+    <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）整支下架；🗑 2026-11-04 主人令：资金异动三指标（FF3 · 第四支自研算法）经独立回测差（胜率 T+1 44.8%/T+3 40%/T+5 33.3%/T+20 0%、平均收益全空）且三指标已并入指标库主评分 P5（amt60/turntrend/ivol60 纯加分项、跨期验证 验证 PASS）→ 整支下架删除（前端挂载 + 后端脚本 gen_ff3_ranksum.py/ff3_upgrade_backtest.py + data/FF3_RANKSUM_*.js + raw_data/ff3_ranksum_*.json 全部清除）。 -->
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -2181,7 +2181,7 @@ window.STRATEGY_WALKFORWARD = {
 <main>
   <!-- ============ 🏆 最终推荐（2026-08-08 新建：全站唯一买卖决策入口） ============ -->
   <section id="sec-final" class="active">
-    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">因子积分榜同序同分 · Top5 · --</span></div>
+    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">指标积分榜同序同分 · Top5 · --</span></div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
          🎯 综合研判 · 唯一卡头（2026-11-26 主人令第四轮收口）
@@ -2197,7 +2197,7 @@ window.STRATEGY_WALKFORWARD = {
 
     <!-- 子 Tab 导航 -->
     <!-- 子 Pane：最终推荐 Top5（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位；🔴 2026-10-27 主人令：保留 Top5，统一口径去掉 Top3 重复展示）
-         口径 = 当日因子积分榜（TOP10_DAILY）按「因子综合分」（11 维因子加总，非收益预测）降序前 5 名，同序同分；
+         口径 = 当日指标积分榜（TOP10_DAILY）按「指标综合分」（11 维指标加总，非收益预测）降序前 5 名，同序同分；
          强势跟踪当日新入选仍入候选池展示，但不凭强度分竞位 Top3（事故：迪安诊断 78.0 插队致两榜对不上）。 -->
     <div id="final-pane-rec" class="final-pane active">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #ffd024">
@@ -2247,7 +2247,7 @@ window.STRATEGY_WALKFORWARD = {
           <li>🧮 <b>算法现场评分</b>：0-100 综合分（技术面/基本面/资金面）+ 策略命中(三重共识/金股池/候选池)，结论置顶</li>
           <li>🎯 <b>止盈止损</b>：止损三口径取最严、止盈三口径级联（盈亏比≥1.5）、支撑/压力、操作建议</li>
           <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签（含 💧 关联板块资金流向，按净额排序取前 8）</li>
-          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识（含 P4 因子）、金股池、候选池</li>
+          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识（含 P4 指标）、金股池、候选池</li>
           <li>🐉 <b>龙虎榜</b>：上榜类别（机游共振/机构独买/游资独买）、机构/游资净买、上榜原因</li>
           <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
           <li>📌 <b>展示口径</b>：各扩展卡「有数据才显示」，无数据整卡不渲染（不产空壳卡）</li>
@@ -3420,10 +3420,10 @@ function fmtSigned(v){
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
-      <!-- 🆕 2026-11-22 主人令：回调池子tab（回调企稳信号展示；独立于因子榜的观察源，不参与Top3排序） -->
+      <!-- 🆕 2026-11-22 主人令：回调池子tab（回调企稳信号展示；独立于指标榜的观察源，不参与Top3排序） -->
       <button class="st-tab" data-st="pullback" onclick="switchSt('pullback')">🔄 回调池</button>
       <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）子页 tab 随算法整支下架删除 -->
-      <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 tab 随算法整支下架删除 -->
+      <!-- 🗑 2026-11-04 主人令：资金异动三指标（FF3）子页 tab 随算法整支下架删除 -->
       <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
            ⇒ 收益转化算法 / 回测 N 日胜率 / 每日 Top3 历史 三卡整组迁入本子页（原在「最终推荐·rec」）。 -->
       <!-- 🗑 2026-11-08 主人令：📌 最终跟踪 子页整体下线（职责已由 📊 回测跟踪 st-bt 承接） -->
@@ -3454,7 +3454,7 @@ function fmtSigned(v){
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
     <!-- ===== 2026-09-11 主人令纠正：候选股池来源级新鲜感不在选股策略页，已移至运维页数据健康总览卡内 ===== -->
-      <!-- ===== 2026-11-22 主人令：因子榜Top10卡已迁入「最终推荐 → 指标库」积分榜下方（本卡属指标库产物，不属选股池）；渲染触发同步迁移 ===== -->
+      <!-- ===== 2026-11-22 主人令：指标榜Top10卡已迁入「最终推荐 → 指标库」积分榜下方（本卡属指标库产物，不属选股池）；渲染触发同步迁移 ===== -->
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #ffd024">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">⭐</span>金股池 <span id="stGoldPoolTime">—</span> <span id="stGoldPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">累计信号池 · 盘后</span></h3>
@@ -3474,13 +3474,13 @@ function fmtSigned(v){
           <button id="stPoolOtherBtn" onclick="window.toggleStPoolOther()" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer">▾ 展开其他来源（主板/创业板/科创板/港股）</button>
         </div>
         <div id="stPoolOtherList" class="tp-stocklist" style="display:none"></div>
-        <div class="note note-insight">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报) + 全市场流动性溢出(A股成交额前300保底) + 因子优选(amt60/turntrend/ivol60三因子全中)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280 且 全市场流动性溢出>0 且 因子优选>0 视为健康。</div>
+        <div class="note note-insight">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报) + 全市场流动性溢出(A股成交额前300保底) + 指标优选(amt60/turntrend/ivol60三指标全中)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280 且 全市场流动性溢出>0 且 指标优选>0 视为健康。</div>
       </div>
     </div><!--/st-pool-->
 
 
 
-    <!-- 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页 pane 随算法整支下架删除 -->
+    <!-- 🗑 2026-11-04 主人令：资金异动三指标（FF3）子页 pane 随算法整支下架删除 -->
 
 
 
@@ -3504,7 +3504,7 @@ function fmtSigned(v){
 
     <!-- ===== TAB 页面：🔄 回调池（2026-11-22 主人令新建，置于强势跟踪右侧）=====
          数据源 window.PULLBACK_POOL（gen_pullback_pool.py 产出，每日盘后随算法链刷新）。
-         定位：独立于因子榜的观察源，用真值+前瞻持续验证；不参与 Top3 排序（Top3 硬闸 _aligned_topfactor 约束仍在）。
+         定位：独立于指标榜的观察源，用真值+前瞻持续验证；不参与 Top3 排序（Top3 硬闸 _aligned_topfactor 约束仍在）。
          当下命中 0 只属正常（下跌尚未企稳），如实展示空态，不凑数（宁缺毋滥）。 -->
     <div id="st-pullback" class="st-pane">
       <div class="card" id="pullbackBody" style="border-left:4px solid #38bdf8">
@@ -3560,13 +3560,13 @@ function fmtSigned(v){
       </div>
       <!-- 🗑 2026-11-22 主人令「这卡没用了，删除吧」：原「📈 按收益率排选（真实回测）」卡（factorYieldCard，
            读 FACTOR_LAB.yield_rank 的样本内回看榜）整卡删除——样本内回看非真实信号流、自带强势股偏置，
-           与宗旨「选出未来收益率最高」无关且易误导。数据源 FACTOR_LAB_BACKTEST 仍由算法链产出（供每日因子计算卡徽章用），
+           与宗旨「选出未来收益率最高」无关且易误导。数据源 FACTOR_LAB_BACKTEST 仍由算法链产出（供每日指标计算卡徽章用），
            仅前端展示卡与渲染/调度同步下线。 -->
     </div><!--/st-bt-->
 
   
     <!-- 🗂 2026-11-28 归档归位（A1）：策略研究自「🏆 最终推荐」迁入本页第 5 子页。
-         因子是选股方法论与中间产物，输出的是「加分项」而非「今天买哪几只」，故归「选股策略」。
+         指标是选股方法论与中间产物，输出的是「加分项」而非「今天买哪几只」，故归「选股策略」。
          容器 id factorHubCard、内嵌 4 tab（fa-pane-top10/dsb/dfc/lab）与三个渲染函数一行未改。 -->
     <div id="st-fa" class="st-pane">
 <div class="card" id="factorHubCard" style="border-left:4px solid #26d9c2;margin-bottom:14px">
@@ -3581,10 +3581,10 @@ function fmtSigned(v){
         <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#26d9c222;color:#26d9c2;border:1px solid #26d9c24d">非选股策略 · 只加分不改池</span>
       </h3>
       <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px">
-        <button class="fa-tab active" data-fa="top10" onclick="switchFaTab('top10')">🎯 因子榜 Top10</button>
+        <button class="fa-tab active" data-fa="top10" onclick="switchFaTab('top10')">🎯 指标榜 Top10</button>
         <button class="fa-tab" data-fa="dsb" onclick="switchFaTab('dsb')">🏆 当日计分榜</button>
-        <button class="fa-tab" data-fa="dfc" onclick="switchFaTab('dfc')">🧮 每日因子计算</button>
-        <button class="fa-tab" data-fa="lab" onclick="switchFaTab('lab')">📖 因子定位</button>
+        <button class="fa-tab" data-fa="dfc" onclick="switchFaTab('dfc')">🧮 每日指标计算</button>
+        <button class="fa-tab" data-fa="lab" onclick="switchFaTab('lab')">📖 指标定位</button>
       </div>
       <div class="fa-pane" id="fa-pane-lab" style="display:none">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
@@ -3592,18 +3592,18 @@ function fmtSigned(v){
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d">非选股策略 · 不评星级</span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub)">
-    <b style="color:#25e5ff">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
-    <b style="color:#25e5ff">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="padding:1px 4px;border-radius:3px">final_score</code> 让排序前移，不命中则不动；<b style="color:#ffd024">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
+    <b style="color:#25e5ff">定位</b>：本页只研究「这个指标有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
+    <b style="color:#25e5ff">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="padding:1px 4px;border-radius:3px">final_score</code> 让排序前移，不命中则不动；<b style="color:#ffd024">绝不会因为某只票命中某个指标就把它拉进池子</b>。<br>
     <b style="color:#25e5ff">与左侧策略的区别</b>：强势跟踪<b>产出股票池</b>；本页<b>不产池</b>，故为 <b>0⭐</b> 观测项，不参与星级评定。（🔴 2026-10-18：四量终极/三重共识/逆势龙头已下架）<br>
-    <b style="color:#25e5ff">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）。（2026-09-20 主人令：策略回测页的 🧪 指标库回测卡<b>已整体移除</b> —— 它不是选股策略，不回测、不展示；因子跟踪只在最终推荐页。）<br>
-    <b style="color:#f59e0b">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
+    <b style="color:#25e5ff">与「策略回测」页的区别</b>：本页 = <b>指标分层研究</b>（五分位/看区分度）。（2026-09-20 主人令：策略回测页的 🧪 指标库回测卡<b>已整体移除</b> —— 它不是选股策略，不回测、不展示；指标跟踪只在最终推荐页。）<br>
+    <b style="color:#f59e0b">无转正路径</b>（2026-09-18 主人令）：指标<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
     </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════
-         🧮 每日因子计算（2026-09-19 主人令新建；2026-09-20 主人令：原「已纳入因子」第二步已删，
-            本卡回归单卡单步 = 每日打分引擎（generate_top10.py 投影）的静态展示，与「🏆 当日因子计分榜」收口）
-           原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日因子计算」
+         🧮 每日指标计算（2026-09-19 主人令新建；2026-09-20 主人令：原「已纳入指标」第二步已删，
+            本卡回归单卡单步 = 每日打分引擎（generate_top10.py 投影）的静态展示，与「🏆 当日指标计分榜」收口）
+           原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日指标计算」
          数据源：algorithms/generate_top10.py 的**真实现**（P1~P5 段 + 形态/资金/板块/机构/基本面）
          🔴 铁律：本卡是代码的**投影**，每个权重都必须能在源码里指到行；
                   凡「未验证/薄样本」证据，一律如实标注，不许美化（沿用 09-18 主人令）。
@@ -3612,7 +3612,7 @@ function fmtSigned(v){
     <!-- 🔻 2026-09-19 主人令（图像取证）：①「更新于」徽章提到卡名正后方（全站规范：卡名置顶 + 更新于紧随，仍读产物真值不写死）
          ②、卡名行右侧「回测 时间」删除（不重复占卡头） ③「入选后打分全表 / 共 N 项」下移第二行 -->
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-    <span style="font-size:15px;font-weight:700;color:var(--txt)">🧮 每日因子计算</span>
+    <span style="font-size:15px;font-weight:700;color:var(--txt)">🧮 每日指标计算</span>
     <span id="dfcUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
     </div>
     <!-- 🔍 2026-09-20 主人令（4 图取证）「放大」：本行徽章 + 项数 10px → 12px、内边距 1px 8px → 2px 10px，
@@ -3622,62 +3622,62 @@ function fmtSigned(v){
     <span id="dfcBadge" style="font-size:12px;color:var(--dim)"></span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
-    <b style="color:#41c9ff">它做什么</b>：<b>终选输出</b>（金股池按「因子综合分」降序的子集，即 <code style="padding:1px 4px;border-radius:3px">TOP10_DAILY.top10</code>）里的每只票，按下列<b>全部因子</b>逐项算分、加总成 
+    <b style="color:#41c9ff">它做什么</b>：<b>终选输出</b>（金股池按「指标综合分」降序的子集，即 <code style="padding:1px 4px;border-radius:3px">TOP10_DAILY.top10</code>）里的每只票，按下列<b>全部指标</b>逐项算分、加总成 
     <code style="padding:1px 4px;border-radius:3px">raw_total</code>，
     再归一化到 0~100 得 
     <code style="padding:1px 4px;border-radius:3px">total_score</code>。
-    <b style="color:#ffd024">因子只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
+    <b style="color:#ffd024">指标只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
     <b style="color:#22c55e">当前实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红/上涨趋势——🆕 2026-11-21 审计起**方向与弃用态随每日 跨期验证 实测动态**，样本内外 分段异号信号自动 0 权重弃用，当前实测见下表明细）
     + 个股历史胜率均益 1 + 回测反哺组合 1 + P5 跨期验证 达标 2（换手率趋势/60日成交额中位数，PASS 才启用）
     + P4 研究 2（残差动量<span style="color:#ff5252">反</span>/低波动）+ 过热惩罚 2（RSI&gt;70 / 20日涨幅≥20%，<b>只罚不奖</b>）
     + 质差一票否决 1（风控淘汰）。<b style="color:#94a3b8">已下架 14 项（整项）+ 2 项半下架</b>（RSI&lt;30 加分、20日涨幅 0~10% 加分 —— 加分侧删、惩罚侧保留），
-    <b>全部留在下方全表并逐项注明下架原因与证据</b>（逻辑详解页 2026-10-04 已整体下架，本表即因子逻辑唯一详解处）。
+    <b>全部留在下方全表并逐项注明下架原因与证据</b>（逻辑详解页 2026-10-04 已整体下架，本表即指标逻辑唯一详解处）。
     </div>
-    <!-- 🔻 2026-09-19 主人令：头部静态保留；明细全表默认折叠，主展示=「🏆 当日因子计分榜」（每日计算）
-         🔄 2026-10-25 主人令「现在到底多少个因子，写清楚」：26 为清账前旧口径 —— 清账后原表 26 项中
+    <!-- 🔻 2026-09-19 主人令：头部静态保留；明细全表默认折叠，主展示=「🏆 当日指标计分榜」（每日计算）
+         🔄 2026-10-25 主人令「现在到底多少个指标，写清楚」：26 为清账前旧口径 —— 清账后原表 26 项中
          14 项整项下架、2 项半下架，另 2026-10-23 嵌入的「个股历史胜率/期望」此前漏登全表 → 已补入；
          现全表 27 项 = 实际计分 13 + 已下架 14。计数由 dfcBadge 按行动态统计，不再硬编码。 -->
     <details style="margin:4px 0 0">
-    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#41c9ff;user-select:none;padding:4px 0">▸ 展开 · 明细：因子打分全表 27 项 = 实际计分 13 + 已下架 14（保留原因）（静态口径 · 代码投影）</summary>
-    <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
+    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#41c9ff;user-select:none;padding:4px 0">▸ 展开 · 明细：指标打分全表 27 项 = 实际计分 13 + 已下架 14（保留原因）（静态口径 · 代码投影）</summary>
+    <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F9EE; 每日指标计算加载中&#x2026;</div></div>
     </details>
 
     </div>
     <!-- ═══════════════════════════════════════════════════════════════
-         🏆 当日因子计分榜（2026-09-19 主人令新建；同日二次令：标注「第三步」，为因子链条收口卡
-            顺序 = 指标库定位卡 → 🧮 每日因子计算 → 🏆 当日因子计分榜）
-           原话：「这张专门成立一张，把当天<b>终选输出</b>（金钻+缠论共振 38 只）的各因子加减分全列出来，
+         🏆 当日指标计分榜（2026-09-19 主人令新建；同日二次令：标注「第三步」，为指标链条收口卡
+            顺序 = 指标库定位卡 → 🧮 每日指标计算 → 🏆 当日指标计分榜）
+           原话：「这张专门成立一张，把当天<b>终选输出</b>（金钻+缠论共振 38 只）的各指标加减分全列出来，
                   按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
-         数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按「因子综合分」降序的子集，由 generate_top10.py 落盘，每票 11 维因子分 + 文字明细；历史实绩 winrate_score 仅作置信微调与展示，不再定排序（2026-11-18 主人令「测算未来收益最好的股」范式）
+         数据源：data/TOP10_DAILY.js（= 当日<b>终选输出</b>：金股池按「指标综合分」降序的子集，由 generate_top10.py 落盘，每票 11 维指标分 + 文字明细；历史实绩 winrate_score 仅作置信微调与展示，不再定排序（2026-11-18 主人令「测算未来收益最好的股」范式）
          🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码精确匹配）
          ═══════════════════════════════════════════════════════════════ -->
       <div class="fa-pane" id="fa-pane-dsb" style="display:none">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-    <span style="font-size:15px;font-weight:700;color:var(--txt)">🏆 当日因子计分榜</span>
+    <span style="font-size:15px;font-weight:700;color:var(--txt)">🏆 当日指标计分榜</span>
     <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px"></span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">最新一轮榜单</span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">全榜按因子总分降序 · 🏷=当日最终推荐</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid #f59e0b4d">全榜按指标总分降序 · 🏷=当日最终推荐</span>
     <span id="dsbBadge" style="font-size:10px;color:var(--dim)"></span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px">
-    <b style="color:#f59e0b">怎么读</b>：<b>终选输出</b>每只票（金钻+缠论共振 38 只）的<b>各因子加减分</b>逐项列出（<span style="color:#ff5252">红=加分</span> / <span style="color:#26d9c2">绿=扣分</span> / 灰=0），<b>全榜按</b>
+    <b style="color:#f59e0b">怎么读</b>：<b>终选输出</b>每只票（金钻+缠论共振 38 只）的<b>各指标加减分</b>逐项列出（<span style="color:#ff5252">红=加分</span> / <span style="color:#26d9c2">绿=扣分</span> / 灰=0），<b>全榜按</b>
     <code style="padding:1px 4px;border-radius:3px">total_score</code> <b>从高到低排列</b>；
     标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单（🔴 2026-10-20 主人令「口径和评分都一致」：该名单严格 = 本榜 total_score 降序前 N 名、逐票 final_score := total_score，**同序同分**；不齐时算法层硬断言拒绝落盘 + 链闸 verify_fr_factor_consistency 两层校验报警）。
     <br><span style="color:var(--dim)">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊；「最终推荐」为独立管线，更新时刻可能早于/晚于本榜（错批时以链闸一致性校验为准，不一致即告警）。</span>
     </div>
-    <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
+    <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim)">&#x1F3C6; 当日指标计分榜加载中&#x2026;</div></div>
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════════
-         🎯 因子榜 Top10（2026-11-22 主人令：因子榜属「指标库」产物，从选股池 tab 迁入本页，
-            置于「🏆 当日因子计分榜」下方；只展示 Top10，避免与「最终推荐」混淆）
+         🎯 指标榜 Top10（2026-11-22 主人令：指标榜属「指标库」产物，从选股池 tab 迁入本页，
+            置于「🏆 当日指标计分榜」下方；只展示 Top10，避免与「最终推荐」混淆）
          数据源：TOP10_DAILY.top10（与计分榜同源），每日盘后随算法链刷新
          ═════════════════════════════════════════════════════════════════════════ -->
       <div class="fa-pane active" id="fa-pane-top10">
-      <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>因子榜 Top10 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
+      <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px"><span class="ic">🎯</span>指标榜 Top10 <span id="stFinalSelTime">—</span> <span id="stFinalSelSlot" style="font-size:11px;color:var(--sub);font-weight:400">收益率优先 · 盘前</span></h3>
       <div id="stFinalSelSummary" class="tp-stocklist"></div>
       <div id="stFinalSelList" class="tp-stocklist"></div>
-      <div class="note">口径：金股池按「因子综合分」降序的精选子集（selection_mode=top_by_expected_return 为历史字段名沿用；实为 11 维因子加总：前瞻期望项 ±15（分值权重，非收益百分比）+ 证据门控因子 + winrate 置信微调 ±5，历史实绩不再定排序）。⚠️ 2026-11-27 主人令：样本外 T+10 胜率 24.7%/均益 −8.22%（n=1029）未过门槛，故本榜不再以「收益预测」命名。本卡 = <b>因子榜 Top10（本榜前 10 名）</b>；🏷 Top5 = 本榜前 5 名。⚠️ 本榜 = 金股池内收益率排序榜，非独立另建池，非「最终推荐」（最终推荐为独立管线）。</div>
+      <div class="note">口径：金股池按「指标综合分」降序的精选子集（selection_mode=top_by_expected_return 为历史字段名沿用；实为 11 维指标加总：前瞻期望项 ±15（分值权重，非收益百分比）+ 证据门控指标 + winrate 置信微调 ±5，历史实绩不再定排序）。⚠️ 2026-11-27 主人令：样本外 T+10 胜率 24.7%/均益 −8.22%（n=1029）未过门槛，故本榜不再以「收益预测」命名。本卡 = <b>指标榜 Top10（本榜前 10 名）</b>；🏷 Top5 = 本榜前 5 名。⚠️ 本榜 = 金股池内收益率排序榜，非独立另建池，非「最终推荐」（最终推荐为独立管线）。</div>
     </div>
     </div>
     </div><!--/st-fa-->
@@ -4067,7 +4067,7 @@ c.innerHTML = h;
   window.__STAR_KIND = { '候选池': 'pool', '金股池': 'pool', '黄金池': 'pool' };   // 基础股池（上游水源·不评星/不进榜/不回测）
   window.__STAR_PROFILE_OF = {                                    // 信号性质 → 权重档
     /* 🔴🔴 2026-09-16 主人令（第三轮纠偏）：「现在的选股策略只要这几个
-       （四量终极 / 三重共识 / 选股生命周期 / 因子 / 逆势龙头），其他的你不要乱加」——
+       （四量终极 / 三重共识 / 选股生命周期 / 指标 / 逆势龙头），其他的你不要乱加」——
        本表是**选股策略专属**的权重档登记处，只登记选股策略页上的卡
        （⚠️ 2026-09-18 补：指标库虽同页，但它是**加分项**、不产股票池 ⇒ **不登记**，见下方注释）。
         🔴🔴 2026-09-18 (g) **本表语义定正 = 参评资格登记处**：未登记 ⇒ **不评星级**。
@@ -4082,7 +4082,7 @@ c.innerHTML = h;
          · ❌ '强势突破'   —— page=暂未上架，未进选股策略页（其定位见回测页"不列入排名"区块）
        清掉后这两张卡不再获得任何选股策略口径的评级待遇。 */
     '三重共识': 'medium', '逆势龙头': 'short',   /* 🔴 2026-10-18：'四量终极': 'long' 随四量下架移除 */
-    /* 🔴🔴 2026-09-18 主人令（第四轮纠偏）：「因子只是加分减分项，不是选股策略」——
+    /* 🔴🔴 2026-09-18 主人令（第四轮纠偏）：「指标只是加分减分项，不是选股策略」——
        ⇒ **指标库不评星级**：本表不再登记它（原 2026-09-16 的 'medium' 登记作废）。
        撤销登记后，两个派生问题自动消解（它们本由「位置在选股策略页」错误推导而来）：
          ① promoteRule「≥4⭐方可入选选股策略主tab」的自举悖论 —— 它因**位置**拿星，
@@ -4090,7 +4090,7 @@ c.innerHTML = h;
          ② 本表自述「只登记选股策略页上的卡」被它污染 —— 虽同页，但它是**加分项**
             不是策略：位置在，身份不在。
        ⚠️ 原 09-16 那个 4⭐ 本已存疑（长档依赖大盘 β：250 日 L1 79.8% vs L5 70.9%，
-          异常换手因子样本外多空价差 −0.042% 无预测力）。现改为**不评级**；
+          异常换手指标样本外多空价差 −0.042% 无预测力）。现改为**不评级**；
           「升级中」警示改由 __BETA_DEP_FLAG 挂在**卡片角标**上（与星级彻底解耦）。
        ⚠️ 与「逆势龙头」对齐：两者同为本页**不评星**观测项。
           🔴 2026-09-18 (g) 更正：原文写「后者因 maxN 不足不可评级」是**错的** ——
@@ -4135,7 +4135,7 @@ c.innerHTML = h;
       short: '⏳ 升级中',
       tip: '长档依赖 β · 样本外无效：持有 250 日 L1(最强分位) 胜率 79.8%，'
          + '而 L5(最弱分位) 也有 70.9% —— 长档收益绝大部分是大盘 β；'
-         + '异常换手因子样本外多空价差 −0.042%（无预测力）。'
+         + '异常换手指标样本外多空价差 −0.042%（无预测力）。'
          + '⚠️ 2026-09-18 主人令：本项**不是星级**，是挂在卡片角标上的数据基座警示；'
          + '指标库已改为**不评星级**（见 __STAR_PROFILE_OF 注释）。'
     }
@@ -4609,7 +4609,7 @@ c.innerHTML = h;
 /* ═══════════ 📈 策略回测（统一 · 2026-08-13；2026-09-16 口径收敛 + 精简）═══════════
    🏁 算法回测总表 — BACKTEST_ALL_ALGOS（+ 强势跟踪前端合成行）→ "每个算法的最佳持有期值多少"
    各策略逐档明细卡 — 四量终极 / 三重共识 / 强势跟踪 / 逆势龙头
-   🗑️ 2026-09-20 主人令：指标库回测卡已整体移出本页（非选股策略；因子跟踪只在最终推荐页）
+   🗑️ 2026-09-20 主人令：指标库回测卡已整体移出本页（非选股策略；指标跟踪只在最终推荐页）
    设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
    🗑️ 2026-09-16 删除：综合回测卡、K线信号回测卡、完整明细折叠壳、生命周期独立块、
       星级委员会规则块、跨策略档位矩阵块（主人令「其他杂七杂八的都不要，看着太乱」）。
@@ -4843,7 +4843,7 @@ c.innerHTML = h;
      指标库只要在最终推荐页那边跟踪就好」）：
      原「🧪 指标库回测」独立分层回测卡（_renderFactorLabBacktest，2026-09-13 加入）整卡移除。
      数据链不动：algorithms/factor_lab_backtest.py 仍每日产出 FACTOR_LAB_BACKTEST ——
-     唯一消费方 = 最终推荐页「🧪 每日因子计算」卡的「✅ 回测已达标」徽章（产物投影铁律）。 */
+     唯一消费方 = 最终推荐页「🧪 每日指标计算」卡的「✅ 回测已达标」徽章（产物投影铁律）。 */
 
   window._renderPeriodBacktestCard = _renderPeriodBacktestCard;
 
@@ -4976,7 +4976,7 @@ c.innerHTML = h;
            指标库只要在最终推荐页那边跟踪就好」）：
            指标库在数据层自标 trade/选股策略，无法派生区分 ⇒ 在此按卡名排除。
            其回测产物 FACTOR_LAB_BACKTEST 仍由算法链产出 —— 唯一消费方 =
-           最终推荐页「🧪 每日因子计算」卡的「✅ 回测已达标」徽章（产物投影铁律）。 */
+           最终推荐页「🧪 每日指标计算」卡的「✅ 回测已达标」徽章（产物投影铁律）。 */
         if(r.card === '指标库') return false;
         return true;
       };
@@ -5668,7 +5668,7 @@ c.innerHTML = h;
         var _imaSD = (D.stale_days == null ? 0 : Number(D.stale_days));
         var _imaTxt, _imaTone;
         if(D.source_stale && _imaSD >= 5){
-          _imaTxt = '源报告停在 '+_imaSD+' 天前（数据日 '+(D.data_date||'—')+'）⇒ 本卡已过期，不作今日依据；选股请回到因子榜';
+          _imaTxt = '源报告停在 '+_imaSD+' 天前（数据日 '+(D.data_date||'—')+'）⇒ 本卡已过期，不作今日依据；选股请回到指标榜';
           _imaTone = 'down';
         } else if(_imaN === 0){
           _imaTxt = '本日源报告无候选 ⇒ 短线情绪侧无票，不硬凑';
@@ -5751,8 +5751,8 @@ c.innerHTML = h;
   // ===== 指标库（异常换手率 + ROE_TTM 大市值档）=====
   window.__flRetry = 0;
   // ═════════════════════════════════════════════════════════════════════════
-  // 🧮 每日因子计算（2026-09-19 主人令新建）
-  //   主人原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日因子计算」
+  // 🧮 每日指标计算（2026-09-19 主人令新建）
+  //   主人原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日指标计算」
   //   数据源：algorithms/generate_top10.py 的**真实现**；本卡是代码的投影。
   //   🔴 铁律（沿用 09-18 主人令）：证据分级如实标注，不许美化；
   //      凡「未验证/薄样本」必须显红/橙，绝不假装 跨期验证。
@@ -5775,7 +5775,7 @@ c.innerHTML = h;
     //   跨期验证 = 绿（≥4/5 年 跨期 检验通过，配给分）
     //   薄样本       = 橙（少量信号日实测，不足以定权重）
     //   未验证       = 红（无任何样本外证据）
-    //   规则式       = 灰（非统计因子，属工程规则/风控口径）
+    //   规则式       = 灰（非统计指标，属工程规则/风控口径）
     var _evColor = function(e){
       e = String(e||'');
       if(e.indexOf('跨期验证') >= 0) return '#22c55e';
@@ -5806,7 +5806,7 @@ c.innerHTML = h;
     //     ① window.BACKTEST_EXPECTANCY.by_factor（回测产物 · 2026-11-21 主人令起发布为 data/*.js，每日盘后转换）
     //     ② SIGNAL_EDGE_DEFAULT 硬表 —— 与 algorithms/generate_top10.py 逐字对齐（仅 ① 缺席时的兜底）
     //     ③ 都读不到 ⇒ 显示「未载入」，不编数
-    //   🔴 2026-11-21 因子审计实锤：09-20 硬表镜像与 11-21 实测几乎全翻转
+    //   🔴 2026-11-21 指标审计实锤：09-20 硬表镜像与 11-21 实测几乎全翻转
     //      （金钻 09-20 正向+0.532 → 11-21 反向-0.458；机构变红/上涨趋势 09-20 反向 → 11-21 正 edge
     //       但 样本内外 异号 ⇒ 代码侧自动弃用 0 权重）⇒ 镜像只作兜底、真值以 ① 为准，
     //      且前端逐行复刻 signal_edge_score 的 样本内外 异号闸门（真实现逐行抄铁律）。
@@ -5827,7 +5827,7 @@ c.innerHTML = h;
       var hard = (_SIG_EDGE_SRC[x.k] != null) ? _SIG_EDGE_SRC[x.k] : null;
       var e    = (dyn != null) ? dyn : hard;
       var useDyn = (dyn != null);
-      // 🔴 2026-11-21 因子审计：逐行复刻 generate_top10.signal_edge_score 的 样本内外 异号闸门——
+      // 🔴 2026-11-21 指标审计：逐行复刻 generate_top10.signal_edge_score 的 样本内外 异号闸门——
       //   分段超额(excess_is/excess_oos 的 5 日档)异号 ⇒ 证据矛盾 ⇒ 0 权重弃用（2026-10-23 主人令 P0-b）。
       var _a5 = (r.excess_is || {})['5'], _b5 = (r.excess_oos || {})['5'];
       var _consistent = ((_a5 == null) || (_b5 == null)) ? true : ((_a5 > 0) === (_b5 > 0));
@@ -5865,7 +5865,7 @@ c.innerHTML = h;
       title: 'P2 · 基础信号（四信号 edge × 置信度收缩）',
       color: '#ff5252',
       note: '权重 = T+5 超额 edge × 2.5，按样本量收缩防过拟合（signal_confidence）；单信号上限 ±30 分。'
-          + '🆕 2026-11-21 因子审计：**方向不再写死**——edge&lt;0 ⇒ 命中扣分（反向），edge&gt;0 ⇒ 命中加分；'
+          + '🆕 2026-11-21 指标审计：**方向不再写死**——edge&lt;0 ⇒ 命中扣分（反向），edge&gt;0 ⇒ 命中加分；'
           + '**样本内外 分段超额异号 ⇒ 自动弃用 0 权重**（前端逐行复刻 generate_top10.signal_edge_score 真实现，含闸门）。'
           + (_p2anyDyn
               ? '　取值：回测产物动态覆盖（data/BACKTEST_EXPECTANCY.js 每日盘后转换，真值随时刷新）。'
@@ -5876,7 +5876,7 @@ c.innerHTML = h;
     });
 
     GROUPS.push({
-      title: 'P3 · 量能 / 行为因子（K 线可算，4 项）',
+      title: 'P3 · 量能 / 行为指标（K 线可算，4 项）',
       color: '#25e5ff',
       note: '全部只从开高低收量计算，与四信号正交。单票合计上限 +13 分。',
       src: 'generate_top10.py L437-508',
@@ -5898,12 +5898,12 @@ c.innerHTML = h;
       { k:'amt60', f:'成交活跃度', w:'已启用', why:'成交长期偏低的标的更容易被资金关注' },
       { k:'turntrend', f:'换手率趋势', w:'已启用', why:'缩量时筹码更稳' }
     ];
-    // 🆕 2026-09-20：P5 note 需要「本层因子实际达标情况」⇒ 先按产物整表统计（全量因子，非仅 _p5all）
+    // 🆕 2026-09-20：P5 note 需要「本层指标实际达标情况」⇒ 先按产物整表统计（全量指标，非仅 _p5all）
     var _fwAll = Object.keys(_fwF).map(function(k){ return _fwF[k]; });
     var _fwN   = _fwAll.length;
     var _fwPass= _fwAll.filter(function(r){ return String(r.verdict||'').toUpperCase() === 'PASS'; });
     var _fwPassNames = _fwPass.map(function(r){ return r.label || r.id || ''; }).filter(Boolean);
-    var _fwWorst = null;   // 差得最少（缺口最小）的因子：用于「差 N 年」表述
+    var _fwWorst = null;   // 差得最少（缺口最小）的指标：用于「差 N 年」表述
     _fwAll.forEach(function(r){
       if (String(r.verdict||'').toUpperCase() === 'PASS') return;
       var PN = (r.win_pass_n!=null)?r.win_pass_n:4;
@@ -5953,9 +5953,9 @@ c.innerHTML = h;
       note: '仅当最近一次跨期验证通过才启用；复验不达标即自动失效。'
           + '候选标的过少时不启用（样本不足无统计意义）。极低流动性标的自动排除。'
           + '<br><b style="color:#cbd5e1">判定口径：</b>须同时满足「跨期稳定性」与「长期跑赢同期全池等权基准」两项，具体参数不公开。'
-          + '<br><b style="color:#cbd5e1">回测达标情况（全部候选因子）：</b>'
+          + '<br><b style="color:#cbd5e1">回测达标情况（全部候选指标）：</b>'
           + (_fwN
-              ? ('共 ' + _fwN + ' 个候选因子，当前 <b style="color:'
+              ? ('共 ' + _fwN + ' 个候选指标，当前 <b style="color:'
                  + (_fwPass.length ? '#22c55e' : '#ff5252') + '">'
                  + (_fwPass.length ? _fwPass.length + ' 个 verdict=PASS' : '无一 PASS') + '</b>'
                  + (_fwPass.length ? '（' + _fwPassNames.join(' / ') + '）' : '')
@@ -5966,10 +5966,10 @@ c.innerHTML = h;
           + '<br><b style="color:#cbd5e1">本卡实际计分范围：</b>'
           + '<b>仅 ' + _p5all.length + ' 个</b>（'
           + _p5all.map(function(x){ return x.f; }).join(' / ') + '）'
-          + ' —— 其余因子即使 verdict=PASS，也因<b>未实现计分函数</b>而不参与打分'
+          + ' —— 其余指标即使 verdict=PASS，也因<b>未实现计分函数</b>而不参与打分'
           + '（见 <code>generate_top10.py</code> P5 段「不进评分」清单，属有意设计非缺陷）。'
-          + '<br><b style="color:#25e5ff">停用 ≠ 废弃（故不删因子）</b>：这是<b>动态闸门</b>，'
-          + '每日盘后重跑，任一因子一旦转 PASS 会<b>自动恢复计分</b>；删掉就等于永久放弃这条路。'
+          + '<br><b style="color:#25e5ff">停用 ≠ 废弃（故不删指标）</b>：这是<b>动态闸门</b>，'
+          + '每日盘后重跑，任一指标一旦转 PASS 会<b>自动恢复计分</b>；删掉就等于永久放弃这条路。'
           + '需要留意的是：该判定随窗口滑动会翻转（新增一天数据即触发全历史重算），'
           + '故「今天停用」不代表「永久失效」。',
       src: 'generate_top10.py L669-830',
@@ -5977,9 +5977,9 @@ c.innerHTML = h;
     });
 
     GROUPS.push({
-      title: 'P4 · 研究因子（残差动量反向 + 低波，带状态门控）',
+      title: 'P4 · 研究指标（残差动量反向 + 低波，带状态门控）',
       color: '#c084fc',
-      note: '分数 = 状态分桶 edge（开门/关门 n≥30 优先）× 防噪闸门(|edge|≥1.0) × 收缩，单因子 ±6。',
+      note: '分数 = 状态分桶 edge（开门/关门 n≥30 优先）× 防噪闸门(|edge|≥1.0) × 收缩，单指标 ±6。',
       src: 'generate_top10.py L517-660',
       rows: [
         { f:'残差动量（反向）', w:'已启用', dir:'反', ev:'薄样本',
@@ -5989,14 +5989,14 @@ c.innerHTML = h;
       ]
     });
 
-    // 🆕 2026-10-25 主人令「现在到底多少个因子」：补登 2026-10-23 嵌入的个股历史胜率/期望因子
+    // 🆕 2026-10-25 主人令「现在到底多少个指标」：补登 2026-10-23 嵌入的个股历史胜率/期望指标
     //   —— generate_top10.py 已实际计分（score_winrate/fusion，top1 顺络电子 45.4→14.9 分）
     //   但本全表此前漏登 → 计数对不上。WINRATE_WEIGHT=1.0 / WINRATE_TERM_MAX=55（L134-138）。
     GROUPS.push({
       title: '个股历史胜率 / 期望（2026-10-23 主人令嵌入 · 均益主导）',
       color: '#ff7ac2',
       note: 'gen_stock_winrate 逐票产出：该票历史信号后的实际收益表现直接进 total_score，'
-          + '使「历史信号后平均涨得最多」的票自然顶到因子榜前列（最终推荐=因子榜顺序）。',
+          + '使「历史信号后平均涨得最多」的票自然顶到指标榜前列（最终推荐=指标榜顺序）。',
       src: 'generate_top10.py WINRATE_WEIGHT/TERM_MAX',
       rows: [
         { f:'个股历史胜率/期望', w:'已启用', dir:'双向', ev:'2026-10-23 嵌入',
@@ -6008,7 +6008,7 @@ c.innerHTML = h;
     GROUPS.push({
       title: '形态 / 资金 / 板块 / 机构（工程规则 + 实测）',
       color: '#ffd024',
-      note: '这些是**工程规则**（非统计因子），依据为历史实盘口径与单次实测，标注如实。',
+      note: '这些是**工程规则**（非统计指标），依据为历史实盘口径与单次实测，标注如实。',
       src: 'generate_top10.py L1240-1360',
       rows: [
         { f:'EMA 结构', w:'已下架·DROP/NO_EDGE', dir:'—', ev:'2026-10-25 清账',
@@ -6107,14 +6107,14 @@ c.innerHTML = h;
        + '<span style="color:#22c55e;font-weight:700">● 跨期验证</span> = ≥4/5 年 跨期 检验通过，才配给分；'
        + '<span style="color:#fb923c;font-weight:700">● 薄样本</span> = 少量信号日实测，样本不足以定权重；'
        + '<span style="color:#ff5252;font-weight:700">● 未验证</span> = 无任何样本外证据；'
-       + '<span style="color:#94a3b8;font-weight:700">● 规则式</span> = 工程规则/风控口径，非统计因子。'
+       + '<span style="color:#94a3b8;font-weight:700">● 规则式</span> = 工程规则/风控口径，非统计指标。'
        + '</div>';
 
     // 页脚：动态真值
     h += '<div style="margin-top:9px;font-size:10.5px;color:var(--dim);line-height:1.75">'
        + '🔎 本卡为 <code>algorithms/generate_top10.py</code> 的**代码投影**，每行权重均可在源码中定位（见各组右上角行号）。'
        + (_fwAt ? ('　跨期验证 回测时间：<b>'+_e(_fwAt)+'</b>。') : '')
-       + '<br>📌 因子只改<b>排序</b>，不决定谁能进池；进池由 scanner 选股策略决定。仅研究参考，不构成投资建议。'
+       + '<br>📌 指标只改<b>排序</b>，不决定谁能进池；进池由 scanner 选股策略决定。仅研究参考，不构成投资建议。'
        + '</div>';
 
     host.innerHTML = h;
@@ -6122,7 +6122,7 @@ c.innerHTML = h;
     // 顶部小徽章
     var bd = document.getElementById('dfcBadge');
     if(bd){
-      // 🔄 2026-10-25 主人令「现在到底多少个因子，写清楚」：不再只给总数 ——
+      // 🔄 2026-10-25 主人令「现在到底多少个指标，写清楚」：不再只给总数 ——
       //   按行分类统计：w 以「已下架」开头 = 整项下架；其余 = 实际计分（含半下架保留惩罚侧的行）。
       var _n = 0, _off = 0;
       GROUPS.forEach(function(G){
@@ -6139,10 +6139,10 @@ c.innerHTML = h;
   window.__dailyFactorCalcReady = true;
 
   // ═════════════════════════════════════════════════════════════════════════
-  // 🏆 当日因子计分榜（2026-09-19 主人令新建）
-  //   原话：「这张专门成立一张，把当天进候选池股票的各种因子加减分全列出来，
+  // 🏆 当日指标计分榜（2026-09-19 主人令新建）
+  //   原话：「这张专门成立一张，把当天进候选池股票的各种指标加减分全列出来，
   //          按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
-  //   数据源：data/TOP10_DAILY.js 的 top20（generate_top10.py 落盘，每票 11 维因子分 + 文字明细）。
+  //   数据源：data/TOP10_DAILY.js 的 top20（generate_top10.py 落盘，每票 11 维指标分 + 文字明细）。
   //   🔴 2026-10-01 主人令：前端统一按 total_score 降序重排（不再「照产物原序」裸信），
   //      🏷「最终推荐」仅作行标记 ← FINAL_RECOMMEND_DATA.stocks（代码数字位精确匹配），不置顶。
   //   口径注：本榜 = generate_top10.py 的 total_score 评分体系（决定排序的主力分）；
@@ -6178,7 +6178,7 @@ c.innerHTML = h;
       if(n < 0) return '<b style="color:#26d9c2">'+n+'</b>';
       return '<span style="color:#64748b">0</span>';
     };
-    // 12 维因子列（照 generate_top10.py breakdown 全量：base/enhance/form/fund/sector/inst/quality/backtest/breakout/research/p4/p5）
+    // 12 维指标列（照 generate_top10.py breakdown 全量：base/enhance/form/fund/sector/inst/quality/backtest/breakout/research/p4/p5）
     // 🔴 2026-09-22 主人令「这两个很重要，逻辑一定不能出问题，审计修正」：
     //   实证发现【父子重复暴露】—— 源码 generate_top10.py 里
     //     L1208 breakout_5d ⇒ enhance += 5
@@ -6207,21 +6207,21 @@ c.innerHTML = h;
     //      带 ↳ 的 4 列仍是「增强」的子项，父列已含，不计二次。
     //   ② 逐股算式：每行下方加一行「算式」——
     //      逐项相加 → raw → ×门禁 ÷归一化分母 ×100 → ×个股regime = 总分，可逐股复现。
-    //   ③ 空列自适应：全池恒为 0 的维度自动隐藏（当前 = 因子清账下架的 形态/资金/板块/机构），
+    //   ③ 空列自适应：全池恒为 0 的维度自动隐藏（当前 = 指标清账下架的 形态/资金/板块/机构），
     //      四列 0 不再占版面（否则会被误读成「分数丢了」），底部一行注明隐藏了哪几维；
-    //      将来因子重启、任一票出现非 0 即自动回到表内。
+    //      将来指标重启、任一票出现非 0 即自动回到表内。
     var ADDKEYS = ['score_base','score_enhance','score_form','score_fund','score_sector',
                    'score_inst','score_quality','score_backtest','score_winrate','score_winrate_fusion'];
     var LBL = {}; FACTS.forEach(function(f){ LBL[f[1]] = f[0]; });
     var _detKeys = ['form_detail','fund_detail','sector_detail','inst_detail','quality_detail','research_detail','p4_detail','p5_detail'];
-    // 🔴 2026-10-01 主人令（反转 09-23 置顶序）：本榜=因子计分榜，全榜统一按 total_score 降序；
-    //   🏷「最终推荐」仅作行标记（见上方 _rec），不再置顶、不再向榜内注入因子池外标的。
+    // 🔴 2026-10-01 主人令（反转 09-23 置顶序）：本榜=指标计分榜，全榜统一按 total_score 降序；
+    //   🏷「最终推荐」仅作行标记（见上方 _rec），不再置顶、不再向榜内注入指标池外标的。
     //   缘由（实测 2026-10-01）：FR 与 TOP10 是两条管线、update_time 可错批（FR 13:08 vs TOP10 15:35），
-    //   置顶混排会把 FR 旧批的 final_score 冒充「总分」列、池外标的因子列全 0 —— 榜面即假。
+    //   置顶混排会把 FR 旧批的 final_score 冒充「总分」列、池外标的指标列全 0 —— 榜面即假。
     //   （09-23 置顶令的背景是两榜同批同源；盘中 lite 重算 TOP10 不联动 FR 后，置顶=混批，故按新令反转。）
     rows = rows.slice().sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); });
     // 🧮 ③ 空列自适应（全池恒 0 的维度不占列；算式行仍逐项列出，分数绝不隐藏）
-    //   DELIST_SET = 因子清账下架维度，与 algorithms/generate_top10.py 的 DELIST_DIMS 对齐
+    //   DELIST_SET = 指标清账下架维度，与 algorithms/generate_top10.py 的 DELIST_DIMS 对齐
     //   （2026-10-25 清账：form/fund/sector/inst/quality_score 正向倾斜下架，恒计 0；质差一票否决保留）
     var DELIST_SET = { score_form:1, score_fund:1, score_sector:1, score_inst:1, score_quality:1 };
     var _hide = {}, _hiddenKeys = [];
@@ -6340,19 +6340,19 @@ c.innerHTML = h;
     var _ts = (D.total_scored == null) ? '' : ('　全池评分 <b style="color:var(--txt)">'+_e(D.total_scored)+'</b> 只（明细落盘 top'+rows.length+'）');
     h += '<div style="font-size:10.5px;color:var(--dim);margin-top:9px;line-height:1.75">'
        + '口径：本榜 = <code>algorithms/generate_top10.py</code> 的 total_score 评分体系（决定排序的主力分，产物原序=已降序）；'
-       + '因子链 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
-       + '因子列缺失记 0。<b style="color:var(--sub)">⚠️ 带 ↳ 的 4 列是「增强」的子项，已计入增强，<u>勿再相加</u></b>。'
+       + '指标链 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
+       + '指标列缺失记 0。<b style="color:var(--sub)">⚠️ 带 ↳ 的 4 列是「增强」的子项，已计入增强，<u>勿再相加</u></b>。'
        + '<b style="color:var(--sub)">总分算法（2026-10-25 版 · 五步，可逐股复现）：</b>'
        + '<br>① <b>表内 10 个加数列</b>——信号基础 / 增强 / 形态 / 资金 / 板块 / 机构 / 质量 / 回测反哺 / <b>胜率</b> / <b>胜率名次</b>；带 ↳ 的 4 列（5日突破·研究·P4·P5）已含在「增强」内，<u>勿再相加</u>。'
-       + '其中：质量 = 原始质量分 ×0.5 ×池内0.5 ×报告时效 ×活跃度；机构 = 原始机构分 ×3（IC 最强因子）；形态 = <b>全池横截面中性化值</b>（名次映射 -4~+4，只保留相对强弱）；'
+       + '其中：质量 = 原始质量分 ×0.5 ×池内0.5 ×报告时效 ×活跃度；机构 = 原始机构分 ×3（IC 最强指标）；形态 = <b>全池横截面中性化值</b>（名次映射 -4~+4，只保留相对强弱）；'
        + '<b>胜率</b> = 该股历史 T+5 收缩胜率分（无记录记 0）；<b>胜率名次</b> = 该股胜率在当日池内的名次百分位 ×±跨度（rank-fusion，无记录居中→0）。'
        + '<br>② <code>raw = 10 个加数逐项相加</code>（T+5 胜率 &lt;30% 且样本≥3 的另扣 30 分「强制降级」，表内算式已列该项）；'
        + '<br>③ <code>总分 = clamp( raw × 门禁乘子 ' + _gmTxt + ' ÷ 归一化分母 ' + _divTxt + ' × 100 , 0 , 100 ) × 个股regime系数</code>，门禁乘子 = clamp( 开仓系数 × IC权重 ' + _icwTxt + ' × regime权重 ' + _rgwTxt + ' , 0.3 , 1.05 )，全池统一；当日 regime = ' + _regTxt + '。'
        + '<br>④ 每行下方「🧮 算式」= 该股完整推导（逐项相加 → raw → ×门禁 ÷分母 ×100 → ×regime = 总分），<b>拿计算器可逐股复现，允许 ±0.1 舍入差</b>。'
-       + '<br>⑤ 全榜按总分降序排名（🏷「最终推荐」仅作行标记，不置顶、不注入因子池外标的）。'
+       + '<br>⑤ 全榜按总分降序排名（🏷「最终推荐」仅作行标记，不置顶、不注入指标池外标的）。'
        + (_hiddenKeys.length
             ? '<br><span style="color:#f59e0b">⚠️ 今日全池计 0 的维度已不占列：<b>' + _hiddenKeys.map(function(k){return LBL[k];}).join(' / ') + '</b></span>'
-              + (_dlLbl.length ? '（其中 <b>' + _dlLbl.join(' / ') + '</b> 为因子清账下架维度，恒计 0、不参与评分）' : '')
+              + (_dlLbl.length ? '（其中 <b>' + _dlLbl.join(' / ') + '</b> 为指标清账下架维度，恒计 0、不参与评分）' : '')
               + (_zLbl.length ? '（<b>' + _zLbl.join(' / ') + '</b> 今日全池未得分）' : '')
               + '。仅为版面清晰而收起，<u>分数并未删掉</u>：每行「🧮 算式」照样逐项列出该股全部加数；任一维度日后出现非 0 会自动回到表内。'
             : '')
@@ -6379,7 +6379,7 @@ c.innerHTML = h;
   //     ② 止损放哪   初始止损 = 产物 stop_loss（fixedP10 或前低，由 compute_stop_target_from_closes 给）
   //     ③ 什么时候挪 浮盈 ≥1R → 止损提到成本价；≥2R → 提到成本+1R；之后按最高收盘 −8% 追踪
   //     ④ 什么时候走 持有 ≥ 建议持有期 未达 1R → 减半；≥ 持有期+5 → 清出；账户 −8%/−12%/−15% 三级硬约束
-  //   数据源：data/TOP10_DAILY.js（与「当日因子计分榜」同一产物，close / stop_loss /
+  //   数据源：data/TOP10_DAILY.js（与「当日指标计分榜」同一产物，close / stop_loss /
   //     target_price / win_rate / wr_win5 / wr_n5 / regime_adjust / total_score），
   //     持有期取产物 suggested_hold_days。常量集中在下面 4 行，改一处全站生效。
   // ═════════════════════════════════════════════════════════════════════════
@@ -7350,7 +7350,7 @@ window.__renderIndexObserve = function(){
     + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
 };
 
-  // ===== 🧪 因子补缺 跨期验证 进度跟踪（2026-09-10 主人令：暂未上架·实验区最下方）=====
+  // ===== 🧪 指标补缺 跨期验证 进度跟踪（2026-09-10 主人令：暂未上架·实验区最下方）=====
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
@@ -8838,7 +8838,7 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     h+=_algoScoreBar('资金面', Math.round(flowScore), '#ffd024');
     h+='</div></div>';
     h+='</div>';
-    // 层3 依据（因子明细）
+    // 层3 依据（指标明细）
     h+='<div style="font-size:11px;color:var(--sub);line-height:1.7;border-top:1px dashed var(--border);padding-top:8px">';
     h+='<div>📈 动量 <b style="color:'+(pct>=0?'var(--up)':'var(--down)')+'">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</b> · 成交额 '+(amount>1e8?(amount/1e8).toFixed(2)+'亿':'-')+(amount>3e8?' · 放量':'')+'</div>';
     if(f.roe!=null) h+='<div>🧬 ROE <b>'+f.roe.toFixed(1)+'%</b> · 营收增速 '+(f.revenue_growth!=null?(f.revenue_growth>=0?'+':'')+f.revenue_growth.toFixed(1)+'%':'-')+'</div>';
@@ -8863,8 +8863,8 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     const top = window.TOP10_DAILY || {};
     const trow = (top.top10||[]).find(r=>normCode(r.code)===nc);
     if(trow) hits.push({name:'🧬 三重共识', color:'var(--purple)', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
-    // P4 研究因子明细（2026-09-05）：仅 score_p4 非零时显示（如「残差动量+18.0% -6」）
-    if(trow && trow.score_p4) hits.push({name:'🧊 P4因子', color: trow.score_p4>0 ? 'var(--up)' : 'var(--down)', detail:(trow.p4_detail||('评分调整 '+trow.score_p4))});
+    // P4 研究指标明细（2026-09-05）：仅 score_p4 非零时显示（如「残差动量+18.0% -6」）
+    if(trow && trow.score_p4) hits.push({name:'🧊 P4指标', color: trow.score_p4>0 ? 'var(--up)' : 'var(--down)', detail:(trow.p4_detail||('评分调整 '+trow.score_p4))});
     // 金股池
     const gp = window.GOLD_POOL || {};
     const gstocks = gp.stocks || {};
@@ -12476,15 +12476,15 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'最终推荐·Top5', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15','20:15'], note:'因子积分榜前5同序同分（2026-10-20 主人令：口径和评分都一致；2026-10-27 升 Top5）'},
+          {name:'最终推荐·Top5', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15','20:15'], note:'指标积分榜前5同序同分（2026-10-20 主人令：口径和评分都一致；2026-10-27 升 Top5）'},
 
           {name:'今日推荐候选池聚合', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'候选池聚合'},
 
           {name:'指标库', source:'FACTOR_LAB', freq:'收盘后1次', slots:['19:15'], note:'非策略·加分项'},
           {name:'最终推荐·强势板块龙头股', source:'FINAL_RECOMMEND_DATA', freq:'每日盘后(算法链)', slots:['19:15','20:15'], note:'最终推荐主数据'},
           {name:'最终推荐Top3回测', source:'FINAL_RECOMMEND_BACKTEST', freq:'收盘后(算法链)', slots:['19:15'], note:'Top3信号层回测'},
-          {name:'指标库回测', source:'FACTOR_LAB_BACKTEST', freq:'每日盘后(挂链)', slots:['19:15'], note:'因子回测'},
-          {name:'因子WalkForward', source:'FACTOR_WALKFORWARD', freq:'每日盘后(挂链)', slots:['19:15'], note:'因子滚动验证'},
+          {name:'指标库回测', source:'FACTOR_LAB_BACKTEST', freq:'每日盘后(挂链)', slots:['19:15'], note:'指标回测'},
+          {name:'指标WalkForward', source:'FACTOR_WALKFORWARD', freq:'每日盘后(挂链)', slots:['19:15'], note:'指标滚动验证'},
           {name:'最终推荐Top3历史', source:'FINAL_RECOMMEND_HISTORY', freq:'每晚D批', slots:['20:15'], note:'Top3历史轨迹'},
 
         ]
@@ -14746,7 +14746,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(bodyEl) bodyEl.innerHTML = rh;
   };
 
-  /* 🗑 2026-11-04 主人令：资金异动三因子（FF3）子页渲染块随算法整支下架删除 */
+  /* 🗑 2026-11-04 主人令：资金异动三指标（FF3）子页渲染块随算法整支下架删除 */
 
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
@@ -14801,10 +14801,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       setTimeout(function(){ try{ if(typeof window.switchFaTab==='function') window.switchFaTab('top10'); }catch(e){ console.warn('[fa] tab', e); } }, 30);
       setTimeout(function(){ try{ if(typeof window.__renderFactorPane==='function') window.__renderFactorPane(); }catch(e){} }, 60);
     }
-    // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
+    // 2026-09-12 主人令：指标子页（原暂未上架·指标类迁入）
     // 2026-10-06 CN runner2号机的工程师：fa（指标库）分支经审计为不可达死代码，已删净。
     // 🗂 2026-11-28 A1 复启：策略研究自「最终推荐」迁回本页第 5 子页（st-pane-fa），分支已在下方恢复。
-  // 2026-09-18 主人令：子页名统一「指标库」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
+  // 2026-09-18 主人令：子页名统一「指标库」（原「🧪 指标」），且不评星级（指标=加分项，非选股策略）。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
     // 🔴 2026-09-17 主人令「统一口径不要打架」：切 tab 时重渲所有静态星级占位
@@ -14822,9 +14822,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       pullback:function(){return !!(window.PULLBACK_POOL&&typeof window.PULLBACK_POOL.count==='number');},
       // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
       bt:function(){return !!window.FINAL_RECOMMEND_BACKTEST;},  /* 2026-11-27：共振回测卡删除，判据摘 RESONANCE_TRACK */
-      // 2026-09-12 主人令：指标库子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
+      // 2026-09-12 主人令：指标库子页（原暂未上架·指标类迁入）就绪判定，双源任一到位即可
       // 🗂 2026-11-28 补齐：策略研究子页（st-fa）原无键 ⇒ 默认 return true ⇒ 永不重试，
-      //   defer 数据迟到时首渲即空卡、此后再不补渲。任一因子源到位即认为可渲。
+      //   defer 数据迟到时首渲即空卡、此后再不补渲。任一指标源到位即认为可渲。
       fa:function(){return !!(window.FACTOR_LAB||window.TOP10_DAILY||window.FINAL_RECOMMEND_DATA||window.FACTOR_WALKFORWARD);},
     };
     var _chk=_map[n]||function(){return true;};
@@ -14967,12 +14967,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     _goldPoolExpanded = !_goldPoolExpanded;
     renderStGoldPool();
   };
-  // ===== 因子榜 Top10 卡片渲染（数据源 TOP10_DAILY.top10；2026-11-22 改名+只展示前10）=====
+  // ===== 指标榜 Top10 卡片渲染（数据源 TOP10_DAILY.top10；2026-11-22 改名+只展示前10）=====
   window.renderFinalSelection = function(){
     const $ = id => document.getElementById(id);
     const TD = window.TOP10_DAILY || {};
     const arr = (TD.top10 && Array.isArray(TD.top10)) ? TD.top10 : [];
-    // 时间胶囊（因子榜为盘前定稿·盘中不刷新，与选股池[盘后]口径区分）
+    // 时间胶囊（指标榜为盘前定稿·盘中不刷新，与选股池[盘后]口径区分）
     const tEl = $('stFinalSelTime');
     const ts = TD.update_time || '';
     if(tEl){
@@ -14984,7 +14984,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     const sumEl = $('stFinalSelSummary'), listEl = $('stFinalSelList');
     if(!arr.length){
       if(sumEl) sumEl.innerHTML = '';
-      if(listEl) listEl.innerHTML = '<div class="note" style="text-align:center">因子榜数据暂不可用（data/TOP10_DAILY.js 待算法链更新）</div>';
+      if(listEl) listEl.innerHTML = '<div class="note" style="text-align:center">指标榜数据暂不可用（data/TOP10_DAILY.js 待算法链更新）</div>';
       return;
     }
     // 摘要 pills
@@ -14993,14 +14993,14 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       const modeTxt = mode.indexOf('high_conviction') >= 0 ? '高信念共振' : (mode || '—');
       const pill = (t,c)=>'<span style="background:'+c+'1a;color:'+c+';border:1px solid '+c+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap">'+t+'</span>';
       sumEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px">'
-        + pill('🎯 因子榜 <b>'+Math.min(arr.length,10)+'</b> 只','#26d9c2')
+        + pill('🎯 指标榜 <b>'+Math.min(arr.length,10)+'</b> 只','#26d9c2')
         + '<span title="selection_mode='+ (mode||'—') +'" style="color:#41c9ff;border:1px solid #41c9ff4d;border-radius:4px;padding:2px 7px;white-space:nowrap">模式 '+modeTxt+'</span>'
         + (TD.hc_count != null ? pill('双共振 <b>'+TD.hc_count+'</b> 只','#ffd024') : '')
         + (TD.total_scored != null ? pill('金股池 <b>'+TD.total_scored+'</b> 只','#c084fc') : '')
-        + '<span style="color:var(--dim);margin-left:auto">金股池 → 因子综合分降序（11 维因子加总，非收益预测）</span>'
+        + '<span style="color:var(--dim);margin-left:auto">金股池 → 指标综合分降序（11 维指标加总，非收益预测）</span>'
         + '</div>';
     }
-    /* 🎯 因子榜结论：必须先过质量闸（validity≠ok 或最高分<10 ⇒ 只观察不许买）
+    /* 🎯 指标榜结论：必须先过质量闸（validity≠ok 或最高分<10 ⇒ 只观察不许买）
        口径修正（本地实测抓到）：TD.validity 是对象 {status,reason,max_score,...}，不是字符串，
        直接拼会输出 [object Object]；现取 .status / .reason。 */
     try{
@@ -15049,7 +15049,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     h += '</div>';
     if(listEl) listEl.innerHTML = h;
   };
-  // 选股池子页统一渲染入口：金股池（上）+ 观测候选股池（下）｜因子榜Top10 已迁入指标库，渲染随之迁移
+  // 选股池子页统一渲染入口：金股池（上）+ 观测候选股池（下）｜指标榜Top10 已迁入指标库，渲染随之迁移
   window.renderStPoolAll = function(){
     try{ renderStGoldPool(); }catch(e){ try{ console.warn('[金股池] 渲染失败', e); }catch(_){} }
     try{ renderStPool(); }catch(e){ try{ console.warn('[选股池] 渲染失败', e); }catch(_){} }
@@ -15193,7 +15193,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     return html;
   }
   // ===== 🔄 回调池子tab 渲染（数据源 window.PULLBACK_POOL；2026-11-22 主人令新建）=====
-  //   独立于因子榜的观察源，只展示不参与Top3排序；当下0只=下跌未企稳，如实空态不凑数。
+  //   独立于指标榜的观察源，只展示不参与Top3排序；当下0只=下跌未企稳，如实空态不凑数。
   window.renderPullbackPool = function(){
     const host = document.getElementById('pullbackBody');
     if(!host) return;
@@ -15306,7 +15306,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
     }catch(e){ trackHtml=''; }
     const note = '<div class="note" style="margin-top:10px">口径：'+ (P.caliber || '无前视·老票回调企稳信号')
-      + '。本卡为<b>观察源</b>，独立于因子榜，不参与 Top3 排序（Top3 仍受因子榜硬闸约束）。信号为真实K线计算，命中数为0即代表当时全市场无合格企稳票，不补位、不伪造。</div>';
+      + '。本卡为<b>观察源</b>，独立于指标榜，不参与 Top3 排序（Top3 仍受指标榜硬闸约束）。信号为真实K线计算，命中数为0即代表当时全市场无合格企稳票，不补位、不伪造。</div>';
     let cmpHtml = '';
     try{ cmpHtml = buildPullbackCompareCard() || ''; }catch(e){ cmpHtml = ''; }
     host.innerHTML = cmpHtml + head + intro + _pbConcl + sum + body + trackHtml + note;
@@ -15336,8 +15336,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     /* 🎯 观测候选池结论（判 7 个来源有无断供） */
     try{
       if(window.v8Concl && total > 0){
-        var _spOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'];
-        var _spExp = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'因子优选':50};
+        var _spOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','指标优选'];
+        var _spExp = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'指标优选':50};
         var _spMiss = [], _spThin = [];
         _spOrder.forEach(function(k){
           var _c0 = sd[k] || 0;
@@ -15361,8 +15361,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 来源级分布（紧凑行，始终可见）
     const sdEl = $('stPoolSourceDist');
     if(sdEl){
-      const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'];
-      const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'因子优选':50};
+      const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','指标优选'];
+      const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'指标优选':50};
       let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:4px 0 10px;font-size:12px">';
       order.forEach(function(s){
         const cnt = sd[s]||0;
@@ -15411,7 +15411,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         return h;
       };
       const allBySrc = {};
-      ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'].forEach(function(src){
+      ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','指标优选'].forEach(function(src){
         allBySrc[src] = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
       });
       // 外资研投：直接展开
@@ -15424,7 +15424,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         }
       }
       // 其他来源：收起，提供弹窗式展开按钮
-      const otherOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','全市场流动性溢出','因子优选'];
+      const otherOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','全市场流动性溢出','指标优选'];
       const otherStocksTotal = otherOrder.reduce(function(acc, src){ return acc + (allBySrc[src]||[]).length; }, 0);
       if(otherEl){
         let html = '<div style="margin-top:8px">';
@@ -15446,7 +15446,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(!otherEl) return;
     const expanded = otherEl.style.display !== 'none';
     otherEl.style.display = expanded ? 'none' : 'block';
-    if(btn) btn.textContent = expanded ? '▾ 展开其他来源（主板/创业板/科创板/港股/流动性溢出/因子优选）' : '▴ 收起其他来源';
+    if(btn) btn.textContent = expanded ? '▾ 展开其他来源（主板/创业板/科创板/港股/流动性溢出/指标优选）' : '▴ 收起其他来源';
   };
   // 2026-08-06 23:44 修复：胶囊激活 init 不放在这里 — renderFourVolume/renderV8Crds
   // 在后续的 script 块里定义（7799 之后），此处还看不到它们。
@@ -16851,7 +16851,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
     // 2026-08-18 主人令：ETF·龙头参考 已迁入「暂未上架 > 调试专区」，此处不再重复渲染
 
-    // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（观测类仅保留概念ETF龙头参考；因子/宏观类已迁出）。
+    // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（观测类仅保留概念ETF龙头参考；指标/宏观类已迁出）。
 
     // ===== 子 tab 导航（🆕 2026-11-24 主人令：拆为「研判类 / 个股类」两子页）=====
 //   研判类(默认)：综合研判(综合解析/市场状态机/板块年度净流入) / 板块技术研判 / 分型共振回测 / 量价背离（🚚 2026-11-24 主人令：增持榜回测→股东增减持卡下、现金流回测→现金流质量榜卡下）
@@ -17057,11 +17057,11 @@ h += '</div>'; // /ulPaneStock（个股类子页）
 //   与渲染函数（__renderElliottWave / __renderFibWindow / __renderCiticPeObserve / __renderIndexObserve）均未变，
 //   仅换宿主；派发入口见 window.__renderObsPlatform / window.__obsRenderPane。
 
-// 2026-09-12 主人令：本页子页从 4 组（观测类 / 回测·框架 / 因子类 / 宏观类）收敛为 1 组「观测类」。
+// 2026-09-12 主人令：本页子页从 4 组（观测类 / 回测·框架 / 指标类 / 宏观类）收敛为 1 组「观测类」。
 //   三组迁出去向（卡片容器 id 全部保留，仅换宿主；渲染函数按 id 取容器，故迁页零改动）：
 //     · 回测·框架 3 卡  RPS 30天样本考核（已删）/ 中信PE观测（已并到暂未上架）/ 指数观测（已并到暂未上架）
 //       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）现仅保留其它回测类卡壳
-//     · 因子类   2 卡  每日因子计算（原含「已纳入因子」第二步，2026-09-20 删） / 当日因子计分榜
+//     · 指标类   2 卡  每日指标计算（原含「已纳入指标」第二步，2026-09-20 删） / 当日指标计分榜
 //       → 选股策略 → 🧪 指标库 子页（直挂静态卡，stFaHost 壳已删；__renderFactorPane 只做就地填充）
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
 //       （2026-09-13 主人令：「新周期判定」已下沉至「暂未上架 → 观测类」最下方
@@ -17091,7 +17091,7 @@ h += '</div>'; // /ulPaneStock（个股类子页）
        尾部，覆盖首渲即可触发；defer 数据未到时由 _fillUsHkMap 内部 600ms×30 自愈轮询补渲）。 */
     window._fillUsHkMap();
     // 2026-09-12 搬迁收口：指标库 / 中信PE回测 / 指数估值中枢 /
-    //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
+    //   指标审计 / 指标补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
     //   其填充调用随之迁至各新宿主的骨架函数尾部（__renderBtExtraPane /
     //   __renderFactorPane / __renderMacroPane）。本页只保留观测类 5 卡的填充。
     // 大盘观察卡：默认不预加载（用户切到「大盘观察」tab 时由 __ulSwitch 触发），
@@ -18645,8 +18645,8 @@ h+='</div>';
       var srcEl = document.getElementById('freshCandidateSources');
       var rowEl = document.getElementById('freshRowCandidateSrc');
       if(!srcEl || !rowEl) return;
-      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'];
-      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'因子优选':50};
+      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','指标优选'];
+      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'指标优选':50};
       var html = '<div style="display:flex;flex-wrap:wrap;gap:4px 12px;padding:4px 0;font-size:11px">';
       order.forEach(function(s){
         var cnt = sd[s]||0;
@@ -18687,7 +18687,7 @@ h+='</div>';
       timeEl.textContent = (window._fmtAshareRel ? window._fmtAshareRel(ts) : null)
                            || String(ts).slice(0,16).replace('T',' ');
       var ageH = (Date.now() - (window._parseAsCST ? window._parseAsCST(ts) : new Date(String(ts).replace(/-/g,'/'))).getTime())/36e5;
-      // 因子为本地计算、周级刷新，72h 内视为正常
+      // 指标为本地计算、周级刷新，72h 内视为正常
       var cls = ageH < 72 ? 's-ok' : 's-warn';
       var txt = ageH < 72 ? '正常' : '待更新';
       statusEl.innerHTML = '<span class="status-dot '+cls+'"></span>'+txt;
@@ -18877,18 +18877,18 @@ hm += '</div>'; // /ulPaneBacktest
     // 2026-09-13 主人令：原回测卡 / 原指数中枢卡 已并入暂未上架合并卡，此处不再调用
   };
   /* 🔴 指标库子页渲染（2026-09-19 建；2026-09-20 主人令精简为两卡）：
-     ① 「📊 因子审计」卡下线（__renderFactorAudit / factorAuditBody / data/FACTOR_AUDIT.js 前端引用全删）；
-     ② 「已纳入因子」（factorLabBody）第二步删除 —— 其数据源 factor_chain.integrated 实测恒空
-        （skipped=true，skip_reason=「FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 因子融合整体跳过」），
-        且内容与「入选后打分全表」「🏆 当日因子计分榜」口径重复，故不再保留；
+     ① 「📊 指标审计」卡下线（__renderFactorAudit / factorAuditBody / data/FACTOR_AUDIT.js 前端引用全删）；
+     ② 「已纳入指标」（factorLabBody）第二步删除 —— 其数据源 factor_chain.integrated 实测恒空
+        （skipped=true，skip_reason=「FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 指标融合整体跳过」），
+        且内容与「入选后打分全表」「🏆 当日指标计分榜」口径重复，故不再保留；
      ③ stFaHost 空壳骨架已移除 —— 本函数只负责子页两卡的就地填充。 */
   /* 🗑 2026-11-22 主人令「这卡没用了，删除吧」：__renderFactorYield（按收益率排选卡渲染器）整函数删除。
-     卡壳 #factorYieldCard 同笔移除；数据源 FACTOR_LAB_BACKTEST 仍产出供每日因子计算卡徽章使用。 */
+     卡壳 #factorYieldCard 同笔移除；数据源 FACTOR_LAB_BACKTEST 仍产出供每日指标计算卡徽章使用。 */
 
   window.__renderFactorPane = function(){
-    try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
-    try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
-    try{ if(typeof window.renderFinalSelection==='function') window.renderFinalSelection(); }catch(e){ console.warn('因子榜Top10卡渲染失败', e); }
+    try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日指标计算卡渲染失败', e); }
+    try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日指标计分榜渲染失败', e); }
+    try{ if(typeof window.renderFinalSelection==='function') window.renderFinalSelection(); }catch(e){ console.warn('指标榜Top10卡渲染失败', e); }
     try{ if(typeof window.__renderExecAlgo==='function') window.__renderExecAlgo(); }catch(e){ console.warn('收益转化算法渲染失败', e); }
     /* 📦 2026-11-17 主人令：按收益率排选卡迁入「选股策略→回测跟踪」(st-bt)，渲染触发随之迁出（见 switchSt bt 分支）。 */
   };
@@ -19490,7 +19490,7 @@ h+=`</div>`;
              {name:'熊市',p:25,r:[-13,-5],col:C_RED,drv:'外部冲击 + 盈利证伪 + 流动性收紧 + 杠杆退潮'}];
     var outHtml='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0">'
       +'<span style="font-size:14px;font-weight:800;color:#ffd024">④</span>'
-      +'<span style="font-size:14px;font-weight:800;color:var(--cyan)">2027 年度展望 · 多因子情景推演</span>'
+      +'<span style="font-size:14px;font-weight:800;color:var(--cyan)">2027 年度展望 · 多指标情景推演</span>'
       +'<span style="font-size:11px;color:#8b93a1;border:1px solid #8b93a155;border-radius:4px;padding:1px 6px">📆 交易日日更 · 研究性推演非买卖建议</span></div>'
       +'<div style="padding:12px 14px">';
     outHtml+='<div style="font-size:13px;color:var(--dim);line-height:1.7;margin-bottom:9px">1 年维度 · 概率与点位锚随当日真实数据滚动刷新；仅作研究与仓位倾向参考，不给买卖点。</div>';
@@ -20308,10 +20308,10 @@ window.__renderV8CalToday();
        数据侧 limit_up=true 才显示；title 全文见 final_recommend.py limit_up_note） */
     if(s.limit_up) h+='<span class="fr-tag" style="color:#ff5252;border-color:rgba(239,68,68,.45);font-weight:700;cursor:help" title="'+_fe(s.limit_up_note||'今日收盘已封涨停，次日大概率高开/一字板，实际可能买不进；若一字开盘请勿追高，等开板回踩再确认')+'">🚫 已涨停·次日难买</span>';
     // 2026-09-03 主人令：综合评分写出来（所有名次统一渲染）
-    // 🔴 2026-10-20 主人令「口径和评分都一致」：Top3 全部来自当日因子榜 ⇒ 评分
-    //   直接显示 final_score（=因子积分榜 total_score，两张卡一眼可比）；
+    // 🔴 2026-10-20 主人令「口径和评分都一致」：Top3 全部来自当日指标榜 ⇒ 评分
+    //   直接显示 final_score（=指标积分榜 total_score，两张卡一眼可比）；
     //   10-14 的 mix_pct 池内归一化竞位分已废止（不再作为 Top 卡展示口径）。
-    if(s.final_score!=null) h+='<span class="fr-tag" style="color:#f59e0b;border-color:rgba(245,158,11,.4);font-weight:800" title="因子总分 = 因子积分榜 total_score 同口径（2026-10-20 主人令：口径和评分都一致）">⭐ 因子分 '+_fn(s.final_score,1)+'</span>';
+    if(s.final_score!=null) h+='<span class="fr-tag" style="color:#f59e0b;border-color:rgba(245,158,11,.4);font-weight:800" title="指标总分 = 指标积分榜 total_score 同口径（2026-10-20 主人令：口径和评分都一致）">⭐ 指标分 '+_fn(s.final_score,1)+'</span>';
     h+='</div>';
 
     // 概念标签
@@ -20614,7 +20614,7 @@ window.__renderV8CalToday();
     var buyH='';
     if(l1) buyH+='<div><span style="color:'+BLU+';font-size:11px;font-weight:700">L1 钱在连续进（最稳）</span></div>'+l1;
     if(l2) buyH+='<div style="margin-top:'+(l1?'6px':'0')+'"><span style="color:'+GLD+';font-size:11px;font-weight:700">L2 今日涨停龙头（追高，只等回调不追板）</span></div>'+l2;
-    if(l3) buyH+='<div style="margin-top:'+((l1||l2)?'6px':'0')+'"><span style="color:#94a3b8;font-size:11px;font-weight:700">L3 因子榜（与资金不一定同向）</span></div>'+l3;
+    if(l3) buyH+='<div style="margin-top:'+((l1||l2)?'6px':'0')+'"><span style="color:#94a3b8;font-size:11px;font-weight:700">L3 指标榜（与资金不一定同向）</span></div>'+l3;
     if(!buyH) buyH='<span style="color:'+DIM+'">三层都没有成型标的 \u2014\u2014 不硬凑</span>';
     h+=row('买什么','#41c9ff',buyH);
 
@@ -20772,7 +20772,7 @@ window.__renderV8CalToday();
     var D=window.FINAL_RECOMMEND_DATA||null;
     // 🔴 2026-10-26 主人令「最终推荐必须 = 终选输出 Top3，旧管线删掉」：
     //   主推与辅助全部直接来源于已上线的 TOP10_DAILY.top10（= 终选输出：金钻+缠论共振 38 只），
-    //   按 total_score 降序取 Top3 = 设计上应推的最终推荐，与「终选输出卡 / 因子积分榜」同源同序；
+    //   按 total_score 降序取 Top3 = 设计上应推的最终推荐，与「终选输出卡 / 指标积分榜」同源同序；
     //   彻底弃用陈旧独立的 FINAL_RECOMMEND_DATA.stocks（旧 20 只批次 2026-10-25，曾错批）；
     //   🔴 2026-11-07 主人令「最终推荐·宁缺毋滥」：TOP10_DAILY 即当日唯一"收益率最高"真源，缺失即"今日未算出"，绝不以陈旧 FINAL_RECOMMEND_DATA 兜底滥竽充数。
     var TD = window.TOP10_DAILY || null;
@@ -20789,7 +20789,7 @@ window.__renderV8CalToday();
         + ' · max_score=' + String(_vld.max_score == null ? '—' : _vld.max_score)
         + '（健康阈值 ≥10）<br>'
         + '原因：' + String(_vld.reason || '榜单分辨度不足或状态降级')
-        + '。候选池与因子榜照常可查，但分数接近并列不等于「未来收益率最高」，故不硬排前 5。</div>';
+        + '。候选池与指标榜照常可查，但分数接近并列不等于「未来收益率最高」，故不硬排前 5。</div>';
       return;
     }
     function _normTop10(s){
@@ -20808,7 +20808,7 @@ window.__renderV8CalToday();
         stop_loss:s.stop_loss, target_price:s.target_price, risk_reward:s.risk_reward,
         stop_loss_method:s.stop_loss_method, target_price_method:s.target_price_method,
         enter_date:_ut0.slice(0,10), horizon:'短线', limit_up:false, sector_fund:[],
-        reasons:['金钻+缠论共振 · 因子总分 '+(s.total_score||0)]
+        reasons:['金钻+缠论共振 · 指标总分 '+(s.total_score||0)]
       };
     }
     var _sorted = _tdList.slice().sort(function(a,b){ return (Number(b.total_score)||0)-(Number(a.total_score)||0); });
@@ -20845,10 +20845,10 @@ window.__renderV8CalToday();
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(mainStocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
     // 🔴 2026-10-20 主人令「要口径和评分都一致」：卡头标签回到唯一口径——
-    //   最终推荐 Top5 = 当日因子积分榜前 5 名（同序同分，一眼对得上）；
+    //   最终推荐 Top5 = 当日指标积分榜前 5 名（同序同分，一眼对得上）；
     //   强势跟踪当日新入选仍入候选池展示，但不凭强度分竞位（10-14 混排形态废止）。
     var _ig=D.ima_intake||{}, _rg=D.realflow_gate||{};
-    var _lab='终选输出 Top'+mainStocks.length+'（金钻+缠论共振 · 因子榜镜像，与候选池同源同序）'
+    var _lab='终选输出 Top'+mainStocks.length+'（金钻+缠论共振 · 指标榜镜像，与候选池同源同序）'
       +' · 候选池 '+(D.total_candidates||_tdList.length)+' 只';
     if(tag) tag.textContent=_lab;
     // 2026-09-01 主人令：构建 code → {consensus_count, algos_hit} 索引，给股票卡片加 🤝 N/3 蓝色 chip
@@ -20935,12 +20935,12 @@ window.__renderV8CalToday();
     var sel=document.getElementById('finalCandBody'); if(!sel) return;
     var el = sel;
     var D=window.FINAL_RECOMMEND_DATA||null;
-    // 🔴 2026-10-26 主人令：候选池也直接来源于已上线的 TOP10_DAILY.top10（= 终选输出 38 只），与最终推荐/因子榜同源同序
+    // 🔴 2026-10-26 主人令：候选池也直接来源于已上线的 TOP10_DAILY.top10（= 终选输出 38 只），与最终推荐/指标榜同源同序
     var TD = window.TOP10_DAILY || null;
     var _tdList = (TD && TD.top10) ? TD.top10 : [];
     // 🔴 2026-11-19 主人令·中长线甄选根治：候选池 2026-10-26 改读 TOP10_DAILY.top10 时
     //   _norm 把 horizon 写死'短线'，把 final_recommend.py horizon_for 的判定成果
-    //   （2026-11-16 因子榜=独立中线源）整轨丢掉 ⇒ 中长线列结构性恒 0。
+    //   （2026-11-16 指标榜=独立中线源）整轨丢掉 ⇒ 中长线列结构性恒 0。
     //   现从 FINAL_RECOMMEND_DATA.all_candidates 按 code 映射真实 horizon（同链同口径），
     //   映射不到兜底'短线'（宁缺毋滥，不冒充）。实测今晚 20/20 全命中、中长线 14+。
     var _frHz={};
@@ -20962,11 +20962,11 @@ window.__renderV8CalToday();
         stop_loss:s.stop_loss,target_price:s.target_price,risk_reward:s.risk_reward,
         stop_loss_method:s.stop_loss_method,target_price_method:s.target_price_method,
         enter_date:_u.slice(0,10),horizon:_hz,limit_up:false,support:null,resistance:null,
-        reasons:['金钻+缠论共振 · 因子总分 '+(s.total_score||0)]};
+        reasons:['金钻+缠论共振 · 指标总分 '+(s.total_score||0)]};
     }
     var _candList = _tdList.map(_norm).filter(Boolean);
     // 🔴 2026-11-20 主人令「短线又没了」根治：候选池 10-26 起只读 TOP10_DAILY.top10，
-    //   今晚 20 只全为因子榜中线票 ⇒ 短线列结构性恒 0（与中长线恒 0 是同一类根因：
+    //   今晚 20 只全为指标榜中线票 ⇒ 短线列结构性恒 0（与中长线恒 0 是同一类根因：
     //   渲染层换数据源时丢字段）。终选链 FINAL_RECOMMEND_DATA.all_candidates 中另有
     //   horizon_for 判定的真实短线票（同链同口径、当日真源、非陈旧兜底），按 code 去重并入，
     //   短线/中长线两列都如实呈现。宁缺毋滥不破：只并入当日 all_candidates 纯短线真票。
@@ -21036,8 +21036,8 @@ window.__renderV8CalToday();
 
     // 2026-08-13 主人令：候选池统一按 final_score 排序，不再 A股/港股分组。
     // 公平原则：市场来源本身不是负面信号，谁分高谁靠前。
-    // 🔴 2026-10-20 主人令「口径和评分都一致」：排序键 = 因子总分（final_score，
-    //   与因子积分榜 total_score 同口径）优先；未入因子榜的强势跟踪新入选票
+    // 🔴 2026-10-20 主人令「口径和评分都一致」：排序键 = 指标总分（final_score，
+    //   与指标积分榜 total_score 同口径）优先；未入指标榜的强势跟踪新入选票
     //   （final_score=0 占位）按 mix_pct 池内相对强度次之——不再用强度分
     //   混排竞位（10-14 形态废止），两类票在池内分层展示、互不冒充。
     var all=_candList.slice();
@@ -21066,14 +21066,14 @@ window.__renderV8CalToday();
       var pct=s.pct_chg;
       var price=s.close;
       var tags='';
-      // 2026-09-03 主人令：评分写出来（按 final_score 降序、分数越高排越前面）——含基本面因子 ROE_TTM 计分
-      // 🔴 2026-10-20 主人令「口径和评分都一致」：评分列与因子积分榜对齐——
-      //   已入因子榜的票显示 final_score（=因子榜 total_score，两榜一眼可比）；
-      //   未入因子榜的强势跟踪新入选票（final_score=0 占位）显示 mix_pct，
-      //   title 如实标注「未入因子榜·池内相对强度展示值·不参与最终推荐名次」。
+      // 2026-09-03 主人令：评分写出来（按 final_score 降序、分数越高排越前面）——含基本面指标 ROE_TTM 计分
+      // 🔴 2026-10-20 主人令「口径和评分都一致」：评分列与指标积分榜对齐——
+      //   已入指标榜的票显示 final_score（=指标榜 total_score，两榜一眼可比）；
+      //   未入指标榜的强势跟踪新入选票（final_score=0 占位）显示 mix_pct，
+      //   title 如实标注「未入指标榜·池内相对强度展示值·不参与最终推荐名次」。
       var _sc=null, _scTip='';
-      if((s.final_score||0)>0){ _sc=s.final_score; _scTip='因子总分（与因子积分榜 total_score 同口径）'; }
-      else if(s.mix_pct!=null){ _sc=s.mix_pct; _scTip='未入当日因子榜：池内相对强度展示值（min-max 0-100），不参与最终推荐名次'; }
+      if((s.final_score||0)>0){ _sc=s.final_score; _scTip='指标总分（与指标积分榜 total_score 同口径）'; }
+      else if(s.mix_pct!=null){ _sc=s.mix_pct; _scTip='未入当日指标榜：池内相对强度展示值（min-max 0-100），不参与最终推荐名次'; }
       if(_sc!=null) tags+='<span class="no-shrink" style="display:inline-block;padding:2px 7px;border-radius:999px;color:#f59e0b;border:1px solid rgba(245,158,11,.4);font-size:11px;font-weight:800;white-space:nowrap" title="'+_scTip+'">⭐ '+_fn(_sc,1)+'分</span>';
       tags+=_mkTag(board, _boardColor(board));
       // 2026-08-13 主人令：取消「已降权」市场歧视标签；港股暂无基本面数据源，
@@ -21148,8 +21148,8 @@ window.__renderV8CalToday();
     // 2026-09-03 主人令：短线只展示评分前 20 名（64 只太多），其余按分截断；中长线全展
     var _SHORT_TOP = 20;
     var shortShow = shortList.slice(0, _SHORT_TOP);
-    var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+ordered.length+' 只（按因子总分排序 · 短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
-    h+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px">公平原则：A股/港股统一按因子总分（final_score，与因子积分榜同口径）排序，市场来源本身不是负面信号。强势跟踪当日新入选票未入因子榜的按池内相对强度（mix_pct）次序列后、仅作展示，不参与最终推荐名次。港股因暂无基本面数据源，标记「数据待补」（灰色信息标签，不降权）。'+(shortList.length>_SHORT_TOP?'短线仅展示评分前 '+_SHORT_TOP+' 名，其余 '+(shortList.length-_SHORT_TOP)+' 只按分截断。':'')+'</div>';
+    var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+ordered.length+' 只（按指标总分排序 · 短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
+    h+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px">公平原则：A股/港股统一按指标总分（final_score，与指标积分榜同口径）排序，市场来源本身不是负面信号。强势跟踪当日新入选票未入指标榜的按池内相对强度（mix_pct）次序列后、仅作展示，不参与最终推荐名次。港股因暂无基本面数据源，标记「数据待补」（灰色信息标签，不降权）。'+(shortList.length>_SHORT_TOP?'短线仅展示评分前 '+_SHORT_TOP+' 名，其余 '+(shortList.length-_SHORT_TOP)+' 只按分截断。':'')+'</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
       +'<div><div style="font-size:12px;font-weight:800;color:#41c9ff;margin-bottom:6px;display:flex;align-items:center;gap:4px">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">(评分前 '+shortShow.length+'/'+shortList.length+')</span></div>'+_renderColumn(shortShow,'短线候选','⚡','#41c9ff')+'</div>'
       +'<div><div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'+_renderColumn(longList,'中长线候选','🌿','#22c55e')+'</div>'
@@ -21221,7 +21221,7 @@ window.__renderV8CalToday();
     // 🔴 2026-09-20 主人令：「🧪 指标库」由「选股策略」页迁入本页第 3 子 Tab，
     //   渲染触发随之语义归位到此（2026-11-28 A1：又迁回选股策略第 5 子页，两处分支并存互为兜底）。
     //   注：页面级 _renderPostReady 已在 DOMContentLoaded 无条件预渲
-    //   （__renderFactorPane 内部串起「每日因子计算 / 当日因子计分榜」两卡），
+    //   （__renderFactorPane 内部串起「每日指标计算 / 当日指标计分榜」两卡），
     //   此处仅作切换兜底重渲 + 数据就绪重试（复用 __stRetryTab 的 fa 分支）。
     if(name==='fa'){
       if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
