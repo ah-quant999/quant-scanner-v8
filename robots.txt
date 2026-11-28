@@ -1,0 +1,6 @@
+# 九宝数据 v8.0 — 全站不对外索引
+# 2026-11-28 主人令：主站只给本机看，不做对外展示。
+# 真正生效的是 index.html 里的 <meta name="robots" content="noindex...">；
+# 本文件是给遵守 robots 的爬虫的第二道门。
+User-agent: *
+Disallow: /
