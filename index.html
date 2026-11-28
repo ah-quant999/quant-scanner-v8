@@ -2911,7 +2911,7 @@ window.STRATEGY_WALKFORWARD = {
           <!-- 亚太市场概览（2026-08-30：实时数据补位） -->
               <div class="card v8grp" id="grpEnv" style="border-left:4px solid #41c9ff;margin-bottom:16px">
       <style>
-        /* 🗂 2026-11-27 主人令：折叠组沿用「因子中心」tab 范式——同页同时段、同用途的确认级卡片叠成一张卡 */
+        /* 🗂 2026-11-27 主人令：折叠组沿用「策略研究」tab 范式——同页同时段、同用途的确认级卡片叠成一张卡 */
         /* 🎨 2026-11-27 夜间主人令（图5「折叠的都要明显标注，现在颜色和字体很容易看不到」）：
            未选中 tab 由 var(--sub) 提到 #c7d5e6 + 实底描边，选中态改为青底深字（对比度最高）；
            徽章统一 .v8grp-badge（11.5px/800/实底/描边），不再各卡各写一套 10px 淡色。 */
@@ -3565,7 +3565,7 @@ function fmtSigned(v){
     </div><!--/st-bt-->
 
   
-    <!-- 🗂 2026-11-28 归档归位（A1）：因子中心自「🏆 最终推荐」迁入本页第 5 子页。
+    <!-- 🗂 2026-11-28 归档归位（A1）：策略研究自「🏆 最终推荐」迁入本页第 5 子页。
          因子是选股方法论与中间产物，输出的是「加分项」而非「今天买哪几只」，故归「选股策略」。
          容器 id factorHubCard、内嵌 4 tab（fa-pane-top10/dsb/dfc/lab）与三个渲染函数一行未改。 -->
     <div id="st-fa" class="st-pane">
@@ -3577,7 +3577,7 @@ function fmtSigned(v){
         #factorHubCard .fa-pane{margin-top:2px}
         #factorHubCard .fa-pane>h3{margin-top:0}
       </style>
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🧪</span>因子中心
+      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ic">🧪</span>策略研究
         <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#26d9c222;color:#26d9c2;border:1px solid #26d9c24d">非选股策略 · 只加分不改池</span>
       </h3>
       <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px">
@@ -14757,8 +14757,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     //    根治方案：废弃硬编码数组，直接遍历 .st-pane 实际 DOM 按 id === 'st-'+n 匹配 ——
     //    新增/删除子页零登记，显隐永远与 DOM 一致，此类事故从机制上根除。
     // 🗂 2026-11-28 一劳永逸：pane id 兼容两种命名（st-<n> / st-pane-<n>）。
-    //   事故复盘：11-28 因子中心自「最终推荐」迁入本页，pane 命名为 st-pane-fa，
-    //   而本函数按 p.id === 'st-'+n 严格匹配 ⇒ 永不 active ⇒ 点「因子中心」整页全黑且无任何报错。
+    //   事故复盘：11-28 策略研究自「最终推荐」迁入本页，pane 命名为 st-pane-fa，
+    //   而本函数按 p.id === 'st-'+n 严格匹配 ⇒ 永不 active ⇒ 点「策略研究」整页全黑且无任何报错。
     //   修法：统一取「键」再比较（去掉 st-pane- / st- 前缀），新旧命名都能命中；
     //   并加零命中兜底——宁可显示第一页，也不给主人一张全黑的空页面。
     var _stHit = 0;
@@ -14796,14 +14796,14 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       setTimeout(function(){ try{ window.__renderShareholderIncreaseBT(); }catch(e){ console.warn('[bt] shIncBt', e); } }, 80);
       /* 🗑 2026-11-22：原 __renderFactorYield 调度随卡删除（按收益率排选卡已下线） */
     }
-    // 🗂 2026-11-28 A1：因子中心自「最终推荐」迁入本页第 5 子页；切页即重渲（幂等，防 defer 数据迟到）
+    // 🗂 2026-11-28 A1：策略研究自「最终推荐」迁入本页第 5 子页；切页即重渲（幂等，防 defer 数据迟到）
     if(n==='fa'){
       setTimeout(function(){ try{ if(typeof window.switchFaTab==='function') window.switchFaTab('top10'); }catch(e){ console.warn('[fa] tab', e); } }, 30);
       setTimeout(function(){ try{ if(typeof window.__renderFactorPane==='function') window.__renderFactorPane(); }catch(e){} }, 60);
     }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 CN runner2号机的工程师：fa（指标库）分支经审计为不可达死代码，已删净。
-    // 🗂 2026-11-28 A1 复启：因子中心自「最终推荐」迁回本页第 5 子页（st-pane-fa），分支已在下方恢复。
+    // 🗂 2026-11-28 A1 复启：策略研究自「最终推荐」迁回本页第 5 子页（st-pane-fa），分支已在下方恢复。
   // 2026-09-18 主人令：子页名统一「指标库」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
@@ -14823,7 +14823,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       // 2026-11-08 主人令：回测跟踪子页（st-bt）就绪判定——两张回测卡双源（RESONANCE_TRACK + FINAL_RECOMMEND_BACKTEST）任一到位即补渲
       bt:function(){return !!window.FINAL_RECOMMEND_BACKTEST;},  /* 2026-11-27：共振回测卡删除，判据摘 RESONANCE_TRACK */
       // 2026-09-12 主人令：指标库子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
-      // 🗂 2026-11-28 补齐：因子中心子页（st-fa）原无键 ⇒ 默认 return true ⇒ 永不重试，
+      // 🗂 2026-11-28 补齐：策略研究子页（st-fa）原无键 ⇒ 默认 return true ⇒ 永不重试，
       //   defer 数据迟到时首渲即空卡、此后再不补渲。任一因子源到位即认为可渲。
       fa:function(){return !!(window.FACTOR_LAB||window.TOP10_DAILY||window.FINAL_RECOMMEND_DATA||window.FACTOR_WALKFORWARD);},
     };
@@ -21168,7 +21168,7 @@ window.__renderV8CalToday();
   }
 
   // 子 Tab 切换
-  /* 🗂 2026-11-27 主人令：因子中心内嵌 tab 切换（4 卡收口为 1 卡位）。
+  /* 🗂 2026-11-27 主人令：策略研究内嵌 tab 切换（4 卡收口为 1 卡位）。
      显示控制全走 inline display，不依赖 CSS 是否加载；切 tab 时兜底重渲对应卡，
      防「隐藏期渲染 → 切回来是空表」的老问题。 */
   window.switchFaTab = function(name){
