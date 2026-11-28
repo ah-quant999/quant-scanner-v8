@@ -1,6 +1,6 @@
 {
- "date": "2026-11-28",
- "generated": "2026-11-28 18:55:19",
+ "date": "2026-11-27",
+ "generated": "2026-11-28 21:16:53",
  "verdict": {
   "cap_pct": 50,
   "label": "观"
@@ -35,6 +35,6 @@
  "list_gate_why": "榜单陈旧11-27、validity=degraded、无分辨度max=6.5、缺维度inst_w52/inst_analyst",
  "forward_ref": {
   "sh_close": 3606.49,
-  "date": "2026-11-28"
+  "date": "2026-11-27"
  }
 }
