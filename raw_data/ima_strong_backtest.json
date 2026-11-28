@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28 11:30:13",
+ "generated": "2026-11-28 13:05:07",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -243,7 +243,7 @@
   }
  },
  "oos_segment": {
-  "generated": "2026-11-28 11:30 CST",
+  "generated": "2026-11-28 13:05 CST",
   "method": "信号日次一交易日开盘买入，T+5/T+10/T+20 收盘卖出，扣双边 0.30%",
   "split_rule": "按信号日时间顺序取 60% 分位为切点；first_selected < split = 样本内，>= split = 样本外；不在 OOS 重拟合",
   "min_oos_required": 30,

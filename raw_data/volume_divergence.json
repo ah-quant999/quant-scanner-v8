@@ -1,6 +1,6 @@
 {
- "update_time": "2026-11-28 12:49:44",
- "data_date": "2026-11-27",
+ "update_time": "2026-11-28 13:05:25",
+ "data_date": "2026-11-23",
  "universe": {
   "total": 1048,
   "scanned": 1044
@@ -8,18 +8,18 @@
  "signal": "收盘创20日新高 且 5日均量<0.85×20日均量（量价背离·缩量新高）",
  "hits": [
   {
-   "code": "603268",
-   "name": "松发股份",
+   "code": "601100",
+   "name": "恒立液压",
    "case": false,
-   "price": 177.95,
+   "price": 93.25,
    "above_ma20": true,
-   "vol_ratio": 0.793,
+   "vol_ratio": 0.697,
    "off_high20": 0.0,
    "hit_now": true,
    "recent": {
-    "date": "2026-11-27",
+    "date": "2026-11-23",
     "days_ago": 0,
-    "vol_ratio": 0.793
+    "vol_ratio": 0.697
    }
   },
   {
@@ -53,6 +53,21 @@
    }
   },
   {
+   "code": "600028",
+   "name": "中国石化",
+   "case": false,
+   "price": 5.92,
+   "above_ma20": true,
+   "vol_ratio": 0.868,
+   "off_high20": -1.82,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-18",
+    "days_ago": 3,
+    "vol_ratio": 0.806
+   }
+  },
+  {
    "code": "688082",
    "name": "盛美上海",
    "case": false,
@@ -68,18 +83,18 @@
    }
   },
   {
-   "code": "601100",
-   "name": "恒立液压",
+   "code": "603766",
+   "name": "隆鑫通用",
    "case": false,
-   "price": 91.0,
+   "price": 16.18,
    "above_ma20": true,
-   "vol_ratio": 1.126,
-   "off_high20": -3.19,
+   "vol_ratio": 1.125,
+   "off_high20": -0.61,
    "hit_now": false,
    "recent": {
-    "date": "2026-11-24",
+    "date": "2026-11-18",
     "days_ago": 3,
-    "vol_ratio": 0.775
+    "vol_ratio": 0.824
    }
   },
   {
@@ -98,6 +113,51 @@
    }
   },
   {
+   "code": "603268",
+   "name": "松发股份",
+   "case": false,
+   "price": 166.47,
+   "above_ma20": true,
+   "vol_ratio": 0.753,
+   "off_high20": -6.0,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-19",
+    "days_ago": 4,
+    "vol_ratio": 0.833
+   }
+  },
+  {
+   "code": "601021",
+   "name": "春秋航空",
+   "case": false,
+   "price": 44.95,
+   "above_ma20": true,
+   "vol_ratio": 0.768,
+   "off_high20": -1.66,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-19",
+    "days_ago": 4,
+    "vol_ratio": 0.811
+   }
+  },
+  {
+   "code": "600011",
+   "name": "华能国际",
+   "case": false,
+   "price": 7.74,
+   "above_ma20": true,
+   "vol_ratio": 0.924,
+   "off_high20": -3.01,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.848
+   }
+  },
+  {
    "code": "601601",
    "name": "中国太保",
    "case": false,
@@ -110,6 +170,51 @@
     "date": "2026-11-16",
     "days_ago": 4,
     "vol_ratio": 0.806
+   }
+  },
+  {
+   "code": "605499",
+   "name": "东鹏饮料",
+   "case": false,
+   "price": 112.6,
+   "above_ma20": true,
+   "vol_ratio": 0.97,
+   "off_high20": -4.08,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.774
+   }
+  },
+  {
+   "code": "600887",
+   "name": "伊利股份",
+   "case": false,
+   "price": 32.85,
+   "above_ma20": true,
+   "vol_ratio": 1.003,
+   "off_high20": -1.5,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.811
+   }
+  },
+  {
+   "code": "600660",
+   "name": "福耀玻璃",
+   "case": false,
+   "price": 57.08,
+   "above_ma20": true,
+   "vol_ratio": 1.163,
+   "off_high20": -1.92,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-17",
+    "days_ago": 4,
+    "vol_ratio": 0.828
    }
   },
   {
@@ -155,6 +260,21 @@
     "date": "2026-09-09",
     "days_ago": 5,
     "vol_ratio": 0.819
+   }
+  },
+  {
+   "code": "601598",
+   "name": "中国外运",
+   "case": false,
+   "price": 7.02,
+   "above_ma20": false,
+   "vol_ratio": 0.952,
+   "off_high20": -5.52,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-16",
+    "days_ago": 5,
+    "vol_ratio": 0.829
    }
   },
   {
@@ -215,6 +335,21 @@
     "date": "2026-11-20",
     "days_ago": 5,
     "vol_ratio": 0.766
+   }
+  },
+  {
+   "code": "600039",
+   "name": "四川路桥",
+   "case": false,
+   "price": 8.73,
+   "above_ma20": true,
+   "vol_ratio": 1.119,
+   "off_high20": -2.89,
+   "hit_now": false,
+   "recent": {
+    "date": "2026-11-16",
+    "days_ago": 5,
+    "vol_ratio": 0.783
    }
   },
   {
