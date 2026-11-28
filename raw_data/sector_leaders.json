@@ -1,6 +1,6 @@
 {
   "update_time": "2026-11-28 13:01",
-  "republish_time": "2026-11-28 18:55:40",
+  "republish_time": "2026-11-28 21:08:03",
   "data_date": "2026-11-27",
   "rule_ver": 2,
   "top_n": 5,
@@ -3367,7 +3367,7 @@
       "match": "norm"
     }
   ],
-  "fr_count": 12,
+  "fr_count": 11,
   "fr_sectors": [
     {
       "name": "元件",
@@ -3671,49 +3671,6 @@
       "match": "norm"
     },
     {
-      "name": "通用设备",
-      "bk": "BK0545",
-      "cons_count": 100,
-      "leaders": [
-        {
-          "code": "920186",
-          "name": "中科仪",
-          "price": 56.84,
-          "chg": 26.0,
-          "main_net": 87177321.0
-        },
-        {
-          "code": "688610",
-          "name": "埃科光电",
-          "price": 69.9,
-          "chg": 20.0,
-          "main_net": 9075789.0
-        },
-        {
-          "code": "301107",
-          "name": "瑜欣电子",
-          "price": 22.2,
-          "chg": 20.0,
-          "main_net": 27994842.0
-        },
-        {
-          "code": "300567",
-          "name": "精测电子",
-          "price": 100.44,
-          "chg": 20.0,
-          "main_net": 130356168.0
-        },
-        {
-          "code": "688627",
-          "name": "精智达",
-          "price": 208.16,
-          "chg": 20.0,
-          "main_net": 157374749.0
-        }
-      ],
-      "match": "exact"
-    },
-    {
       "name": "其他电子",
       "bk": "BK1223",
       "cons_count": 33,
@@ -3757,6 +3714,49 @@
       "match": "norm"
     },
     {
+      "name": "医疗服务",
+      "bk": "BK0727",
+      "cons_count": 54,
+      "leaders": [
+        {
+          "code": "300363",
+          "name": "博腾股份",
+          "price": 27.6,
+          "chg": 20.0,
+          "main_net": 12071449.0
+        },
+        {
+          "code": "688202",
+          "name": "美迪西",
+          "price": 72.2,
+          "chg": 14.42,
+          "main_net": -21457827.0
+        },
+        {
+          "code": "301096",
+          "name": "百诚医药",
+          "price": 27.5,
+          "chg": 14.11,
+          "main_net": -19162417.0
+        },
+        {
+          "code": "688315",
+          "name": "诺禾致源",
+          "price": 17.4,
+          "chg": 13.5,
+          "main_net": -3901960.0
+        },
+        {
+          "code": "688796",
+          "name": "百奥赛图",
+          "price": 66.99,
+          "chg": 13.12,
+          "main_net": 2262181.0
+        }
+      ],
+      "match": "exact"
+    },
+    {
       "name": "通信服务",
       "bk": "BK0736",
       "cons_count": 38,
@@ -3795,49 +3795,6 @@
           "price": 15.28,
           "chg": 12.6,
           "main_net": 11375480.0
-        }
-      ],
-      "match": "exact"
-    },
-    {
-      "name": "贵金属",
-      "bk": "BK0732",
-      "cons_count": 13,
-      "leaders": [
-        {
-          "code": "000603",
-          "name": "盛达资源",
-          "price": 26.25,
-          "chg": 10.02,
-          "main_net": 115213420.0
-        },
-        {
-          "code": "000426",
-          "name": "兴业银锡",
-          "price": 20.47,
-          "chg": 9.99,
-          "main_net": 365485034.0
-        },
-        {
-          "code": "002716",
-          "name": "湖南白银",
-          "price": 7.13,
-          "chg": 8.69,
-          "main_net": 140627140.0
-        },
-        {
-          "code": "300139",
-          "name": "晓程科技",
-          "price": 36.48,
-          "chg": 7.83,
-          "main_net": 23111564.0
-        },
-        {
-          "code": "001337",
-          "name": "四川黄金",
-          "price": 34.36,
-          "chg": 7.71,
-          "main_net": 34808702.0
         }
       ],
       "match": "exact"
@@ -4164,5 +4121,5 @@
   "neo_fallback_count": 0,
   "retained_count": 0,
   "em_boards_source": "live",
-  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-28 18:45:32 跟随 FINAL 重算(一劳永逸) | fr_sectors 已于 2026-11-28 18:55:40 跟随 FINAL 重算(一劳永逸)"
+  "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*) | fr_sectors 已于 2026-11-28 21:08:03 跟随 FINAL 重算(一劳永逸)"
 }
