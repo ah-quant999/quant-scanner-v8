@@ -8897,7 +8897,7 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
 
   /* 🔍 2026-11-27 主人令（图6「查不了了？」）一劳永逸：
      ETF 走独立面板，不再套个股那套（止盈止损/算法评分/龙虎榜/停牌对 ETF 无意义）。
-     背景：STOCK_QUOTE 的 ETF 腿来自 akshare fund_etf_spot_em（主源 实时接口），
+     背景：STOCK_QUOTE 的 ETF 腿来自 行情源实时接口（主源），
      2026-11-27 16:48 那批被主源限流 ⇒ meta.etf_count=0 —— 1666 只 ETF 在「清单」里却不在「行情」里，
      旧逻辑对每只 ETF 都吐四张「未收录」，主人看到的就是「什么都查不了」。
      现口径：有行情 → 出行情卡；无行情 → 出一张说明卡（含清单信息 + 当日 ETF 活跃榜命中），
@@ -12213,7 +12213,7 @@ function drawUpDownChart(){
       '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">'+
         '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px">🔌 外部数据源（候选股池上游）</div>'+
         '<table style="width:100%;font-size:11px"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">项目</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">说明</th></tr></thead><tbody>'+
-          '<tr id="extSrcAkshare"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">akshare（港股/行业）</td><td id="extSrcAkStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
+          '<tr id="extSrcAkshare"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">行情源（港股/行业）</td><td id="extSrcAkStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
           '<tr id="extSrcGuanlan"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">外资研投（知识星球研报）</td><td id="extSrcGlStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcGlDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
         '</tbody></table>'+
       '</div>';
@@ -18826,7 +18826,7 @@ h+='</div>';
     var cand = window.CANDIDATE || {};
     var sd = cand.source_dist || {};
 
-    // akshare：港股>0 说明 akshare 港股接口可用（或 gold_pool 兜底生效）
+    // 行情源：港股>0 说明港股接口可用（或 gold_pool 兜底生效）
     var hkCnt = sd['港股成交前50'] || 0;
     _setExtSrcRow('Ak', hkCnt > 0, hkCnt > 0
       ? '港股 '+hkCnt+'只（行情源实时或备用池兜底）'
