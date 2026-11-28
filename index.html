@@ -183,7 +183,7 @@ window.__domReadyFns=[];
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=4a942fc91e" defer></script>
 <script src="data/SHAREHOLDER_CHANGE.js?v=fb7d8aabce" defer></script>
-<script src="data/INVEST_AVOID.js?v=35722b6b5b" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
+<script src="data/INVEST_AVOID.js?v=d6ef578088" defer></script><!-- 投资避雷针 consolidate 单一源（盘前链 v8_morning_plan.yml 07:50 刷新） -->
 <!-- 🆕 2026-10-30 主人令：严重异动雷达 + 重要公告速览（孤儿模块，全站零重复）；🆕 2026-11-05 主人令：重要公告速览卡迁「今日事件」页；🆕 2026-11-08 主人令：严重异动雷达卡迁「盘后数据」页（股东增减持·结构化监控卡下方）。 -->
     <script src="data/SEVERE_SWING.js?v=a1c9cae8c2" defer></script>
     <script src="data/KEY_NOTICES.js?v=ef2dcc4e89" defer></script>
@@ -10318,6 +10318,17 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
           _prevSnap = _snaps[i]; break;
         }
       }
+      /* 🔴 2026-11-28 一劳永逸：快照日期不够新就当作「无对照」。
+         病灶：SECTOR_PHASE_HISTORY 停在 2026-08-17（已 102 天），而本段只判「日期 ≠ 今天」，
+               于是把三个月前的阶段当成「昨日」去比 ⇒ 分类格子上会冒出百天前的迁移箭头，
+               看起来像「昨天刚从下跌转上涨」，实为误导。
+         修法：距今 >7 个自然日即视为无对照（不显示箭头、不报错）；
+               数据恢复更新后功能自动回来，无需再改代码。 */
+      if(_prevSnap){
+        var _pd=Date.parse(String(_prevSnap.date||'').slice(0,10));
+        var _td=Date.parse(_todayStr);
+        if(isFinite(_pd)&&isFinite(_td)&&(_td-_pd)/86400000>7) _prevSnap=null;
+      }
       const _prevMap = (_prevSnap && _prevSnap.phases) || {};
       const _transitions = {};
       rows.forEach(function(r) {
@@ -17577,7 +17588,30 @@ window.__renderComprehensiveSynthesis = function(){
       }
       if(_jTs && _jTs !== _cts) _subs.push('判定 ' + _shortTs(_jTs, _cts));
       if(_iTs && _iTs !== _cts) _subs.push('避雷 ' + _shortTs(_iTs, _cts));
-      if(_cts && typeof _uBadge === 'function'){ _cf.innerHTML = _uBadge('auto','',_cts, _subs.join(' &#183; '), ''); }
+      /* 🔴 2026-11-28 主人令 P1-5：卡头必须说清「这批数字是哪天的」。
+         病灶：V8_VERDICT 每轮 build 都会把 update_time 刷成当前时刻、data_date 刷成今天，
+               而底层 INDEX_QUOTES / LIMIT_UP_HEATMAP 可能还停在上一交易日收盘 ⇒
+               周六打开页面会看到「今天涨停 97 家」，实际那是周五的。
+         修法：按 data_date 与真实时钟比对，标注「数据归属」，把陈旧显性化。 */
+      var _dataAsOf=function(V){
+        if(!V) return '';
+        var dd=String(V.data_date||'').slice(0,10);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dd)) return '';
+        var now=new Date();
+        var mm=('0'+(now.getMonth()+1)).slice(-2), dt=('0'+now.getDate()).slice(-2);
+        var todayStr=now.getFullYear()+'-'+mm+'-'+dt;
+        if(dd!==todayStr){
+          return '<span style="font-size:11px;font-weight:700;color:'+GLD+';background:rgba(255,208,36,.12);'
+            +'border:1px solid rgba(255,208,36,.35);border-radius:4px;padding:1px 6px;margin-left:6px"'
+            +' title="本卡数字来自 '+dd+' 收盘，不是今天">数据归属 '+dd.slice(5)+' 收盘</span>';
+        }
+        var mins=now.getHours()*60+now.getMinutes();
+        if(mins>=900){
+          return '<span style="font-size:11px;color:'+SUB+';margin-left:6px">\u00b7 截至今日 15:00</span>';
+        }
+        return '<span style="font-size:11px;color:'+SUB+';margin-left:6px">\u00b7 盘中快照</span>';
+      };
+      if(_cts && typeof _uBadge === 'function'){ _cf.innerHTML = _uBadge('auto','',_cts, _subs.join(' &#183; '), '') + _dataAsOf(_VD); }
       else { _cf.innerHTML = '&#x2014;'; }
     }
   }catch(e){}
@@ -20486,6 +20520,21 @@ window.__renderV8CalToday();
         tag='中性';
         act='不构成加减仓理由 → <b style="color:'+SUB+'">按攻防档位执行</b>。';
       }
+      /* 🔴 2026-11-28 主人令 P0-3：情绪段与总裁决打架的统一。
+         病灶：情绪热且家数在扩时，本段会写「可跟主线」，而下方结论写「今天不买」，
+               两段并排读起来自相矛盾（主人实测提过）。
+         修法：结论为「不买」时，在情绪动作后补一句「这条热情为什么没能变成动作」。 */
+      if(isNo){
+        var _cw=[];
+        var _lc=V.list_check||{};
+        if(_lc.met===false){
+          var _miss=(_lc.data_missing||[]).join('/');
+          _cw.push('榜单没过'+( _miss?'（缺 '+_miss+'）':('（'+(_lc.status||'降级')+'）')));
+        }
+        var _td=((window.MARKET_TACTIC||{}).dims||{}).trend||{};
+        if(_td.score!=null && Number(_td.score)<0) _cw.push('趋势项为负');
+        if(_cw.length) act+=' <span style="color:'+GLD+'">但今天仍不动：'+_cw.join(' + ')+' ⇒ 情绪再热也不加仓。</span>';
+      }
       return '<span style="color:'+SUB+'">'+bits.join(' · ')+'</span> → <b style="color:'+GLD+'">'+tag+'</b>：'+act;
     }
 
@@ -20498,8 +20547,51 @@ window.__renderV8CalToday();
         +'<span style="flex:1;min-width:0;font-size:12.5px;line-height:1.78;color:'+TXT+'">'+inner+'</span></div>';
     }
 
+    /* ── 档位归因：五信号逐项列分，红绿标出「被谁压住」（2026-11-28 主人令 P0-1）──
+       为什么需要：卡头只写「观 · 5 成」「加仓条件 7/7」，主人看不出「涨成这样凭什么只给 5 成」。
+       真实原因藏在 MARKET_TACTIC.dims：趋势 −1（20日 −1.4% / 60日 −12.7%，均线空头）、
+       宽度 +1、涨停 0、量能 0、资金 +1、危机 0 ⇒ 合计 +1。
+       这一行把「压住档位的那一项」直接点名，不再让主人猜。
+       数据源 window.MARKET_TACTIC（页面已注入）⇒ 无需等 gen_verdict 重算即可生效。
+       ⚠️ 旧 evidence[0].plain 曾把五信号写死成「趋势 -1、宽度 -1、涨停 0、量能 -1、资金 +1」，
+          与真实 dims 不符且加总不为 +1 —— 本函数改为直接读 dims，不再做任何硬编码。 */
+    function _attribLine(){
+      var T=window.MARKET_TACTIC||null;
+      if(!T||!T.dims) return '';
+      var D=T.dims, ORD=['trend','breadth','zt','volume','flow','crisis'];
+      var LBL={trend:'趋势',breadth:'宽度',zt:'涨停',volume:'量能',flow:'资金',crisis:'危机'};
+      var bits=[], neg=[], pos=[];
+      for(var i=0;i<ORD.length;i++){
+        var k=ORD[i], d=D[k]; if(!d) continue;
+        var sc=Number(d.score||0);
+        var col=(sc>0?RED:(sc<0?GRN:SUB));   /* 红涨绿跌：正分偏多=红，负分偏空=绿 */
+        var txt=LBL[k]+' '+(sc>0?'+':'')+sc;
+        if(k==='crisis' && d.radar!=null) txt+='<span style="color:'+DIM+';font-weight:400">('+Math.round(Number(d.radar))+'/60)</span>';
+        bits.push('<span style="color:'+col+';font-weight:700">'+txt+'</span>');
+        if(sc<0) neg.push(LBL[k]); else if(sc>0) pos.push(LBL[k]);
+      }
+      if(!bits.length) return '';
+      var tot=Number(T.score||0);
+      var head='<span style="color:'+SUB+'">五信号</span> '+bits.join('<span style="color:'+DIM+'"> · </span>')
+        +'<span style="color:'+SUB+'"> = </span><b style="color:'+(tot>0?RED:(tot<0?GRN:TXT))+';">'+(tot>0?'+':'')+tot+' 分</b>';
+      var why='';
+      if(neg.length){
+        var tr=D.trend||{};
+        why=' → <b style="color:'+GRN+'">压住档位的是「'+neg.join('、')+'」</b>';
+        if(neg.indexOf('趋势')>=0 && (tr.p20!=null||tr.p60!=null)){
+          why+='（平均股价 20日 '+(tr.p20>0?'+':'')+tr.p20+'% / 60日 '+tr.p60+'%，均线空头排列）';
+        }
+        why+='，其余项撑起的分被它抵掉了 —— 所以只是「反弹」不是「反转」。';
+      }else if(pos.length){
+        why=' → 没有负分项，档位由 <b style="color:'+RED+'">'+pos.join('、')+'</b> 顶起来。';
+      }else{
+        why=' → 六项全零，档位中性。';
+      }
+      return head+why;
+    }
     var _pn='';
     if(P['读今天']) _pn+=_para('大盘定性',DIM,B(P['读今天']));
+    var _at=_attribLine(); if(_at) _pn+=_para('档位归因',DIM,_at);
     var _sl=_sentiLine(); if(_sl) _pn+=_para('情绪',DIM,_sl);
     if(P['所以'])   _pn+=_para('所以',DIM,B(P['所以']));
     if(P['怎么做']) _pn+=_para('怎么做',DIM,B(P['怎么做']));
@@ -20541,9 +20633,65 @@ window.__renderV8CalToday();
       h+=row('\u522b\u78b0','#ef5350',avTxt+' <span style="color:'+DIM+';font-size:11px">\u94b1\u5728\u5f80\u5916\u8d70</span>'+avNote);
     }
 
-    var sig='<span style="color:'+GRN+'">加</span> 检查表满 '+hitN+'/'+hitT+' \u2192 上限提到 5 成'
+    /* ── ③ 信号变：从「死规则文案」改成「带现值的规则」（2026-11-28 主人令 P1-4）──
+       原版只写「危机雷达>60 → 1 成」，主人不知道此刻离触发还有多远；
+       现版把现值并排给出 ⇒ 一眼看出「危险有多远、今天算不算危险」。
+       🔴 2026-11-28 实测：卡面 CRISIS_DATA.score=34.6、LIMIT_UP 阈值 40/60，
+          也就是说当前离「强制降档」还有 25.4 分，离「扣分」还有 5.4 分。 */
+    var _cs=window.CRISIS_DATA||{}, _cNow=Number(_cs.score);
+    var _cTxt=isFinite(_cNow)
+      ? ('<b style="color:'+(_cNow>=60?RED:(_cNow>=40?GLD:GRN))+'">'+Math.round(_cNow)+'</b><span style="color:'+DIM+'">/60</span>')
+      : '<span style="color:'+DIM+'">—</span>';
+    var _iqArr=(window.INDEX_QUOTES||{}).items||[], _sh=null;
+    for(var _i=0;_i<_iqArr.length;_i++){ if(String(_iqArr[_i].code)==='000001'){ _sh=_iqArr[_i]; break; } }
+    var _shChg=_sh?Number(_sh.chg):NaN;
+    var _shTxt=isFinite(_shChg)
+      ? ('<b style="color:'+(_shChg>=0?RED:GRN)+'">'+(_shChg>0?'+':'')+_shChg.toFixed(2)+'%</b>')
+      : '<span style="color:'+DIM+'">—</span>';
+    var _hitOk=(hitN>=5);
+    var sig='<span style="color:'+GRN+'">加</span> 检查表 <b style="color:'+( _hitOk?GLD:SUB)+'">'+hitN+'/'+hitT+'</b><span style="color:'+DIM+'">（满 5 条提上限）</span>'
       + ' <span style="color:'+DIM+'">|</span> '
-      + '<span style="color:'+RED+'">减</span> 危机雷达&gt;60 \u2192 1 成 \u00b7 沪指单日跌 2% \u2192 减半 \u00b7 单票 -7% \u2192 止损';
+      + '<span style="color:'+RED+'">减</span> 危机雷达 '+_cTxt+'<span style="color:'+DIM+'">（≥60 砍到 1 成）</span>'
+      + ' \u00b7 沪指今日 '+_shTxt+'<span style="color:'+DIM+'">（跌 2% 减半）</span>'
+      + ' \u00b7 单票 <b style="color:'+GLD+'">-7%</b><span style="color:'+DIM+'"> 止损</span>';
+
+    /* ── ④ 我的持仓：直接消费 window.PORTFOLIO（2026-11-28 主人令 P2）──
+       数据来自 data/PORTFOLIO.js（westock 同步侧写入，updated_at 在行尾标注）。
+       只回答「手上这几只现在什么状态、离 -7% 止损多远」，不给买卖建议。
+       🔴 2026-11-26 曾按「不用管我的持仓」整段摘除 gen_verdict 里的 PORTFOLIO 读取；
+          本次是主人重新要求「持仓段」，改成**纯前端只读**，不参与任何仓位/档位计算，
+          因此不会影响裁决口径。 */
+    function _posBlock(){
+      var PF=window.PORTFOLIO||{}, ps=PF.positions||[];
+      if(!ps.length) return '';
+      var rows=ps.map(function(p){
+        var cost=Number(p.cost_price), live=Number(p.live_price), qty=Number(p.qty||0);
+        var pnl=(isFinite(cost)&&isFinite(live)&&cost>0)?((live/cost-1)*100):NaN;
+        var amt=isFinite(pnl)?((live-cost)*qty):NaN;
+        var col=isFinite(pnl)?(pnl>=0?RED:GRN):SUB;
+        var line='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;padding:2px 0">'
+          + '<b style="color:'+TXT+'">'+E(p.name||p.code)+'</b>'
+          + '<span style="color:'+DIM+';font-size:11px">'+E(p.code||'')+' \u00d7 '+qty+'</span>'
+          + '<span style="color:'+SUB+';font-size:11px">成本 '+pct(cost,2)+' \u2192 现价 '+pct(live,2)+'</span>'
+          + '<b style="color:'+col+'">'+(isFinite(pnl)?(pnl>0?'+':'')+pnl.toFixed(1)+'%':'—')+'</b>';
+        if(isFinite(amt)) line+='<span style="color:'+col+';font-size:11px">'+(amt>0?'+':'')+amt.toFixed(0)+' 元</span>';
+        if(isFinite(pnl)&&pnl<=-7){
+          line+='<span style="color:'+RED+';font-size:11px;font-weight:700">已破 -7% 止损线 '+(Math.abs(pnl)-7).toFixed(1)+' 个点</span>';
+        }else if(isFinite(pnl)&&pnl>-7&&pnl<=-4){
+          line+='<span style="color:'+GLD+';font-size:11px">距 -7% 只剩 '+(pnl+7).toFixed(1)+' 个点</span>';
+        }
+        line+='</div>';
+        return line;
+      }).join('');
+      var acct=PF.account||{};
+      var sum='<div style="margin-top:3px;font-size:11px;color:'+DIM+'">'
+        + '总资产 '+pct(acct.total_assets,0)+' \u00b7 市值 '+pct(acct.market_value,0)
+        + ' \u00b7 可用 '+pct(acct.available_cash,0)
+        + ' \u00b7 累计 '+(acct.total_profit_rate!=null?((acct.total_profit_rate>0?'+':'')+Number(acct.total_profit_rate).toFixed(2)+'%'):'—')
+        + ' <span style="color:'+SUB+'">（'+E(PF.updated_at||PF.update_time||'')+' 同步）</span></div>';
+      return rows+sum;
+    }
+
     var szHtml='';
     var hasSz=!!(V.sizing&&V.sizing.per_stock_pct!=null);
     if(hasSz){
@@ -20552,8 +20700,9 @@ window.__renderV8CalToday();
         + ' \u00b7 \u6700\u591a '+E(V.sizing.max_positions)+' \u53ea'
         + ' \u00b7 \u6b62\u635f '+E(V.sizing.stop_loss_pct)+'%';
     }
-    h+=row('\u4fe1\u53f7\u53d8','#ffd024',sig,!hasSz);
-    if(hasSz) h+=row('\u989d\u5ea6',GLD,szHtml,true);
+    h+=row('\u4fe1\u53f7\u53d8','#ffd024',sig,!hasSz&&!(_posBlock()));
+    var _pb=_posBlock();
+    if(_pb) h+=row('\u6211\u7684\u6301\u4ed3','#c084fc',_pb,!hasSz);    if(hasSz) h+=row('\u989d\u5ea6',GLD,szHtml,true);
     h+='</div>';
 
     /* ── ④「凭什么这么说」收进折叠：默认不看，要复核才点开 ──
