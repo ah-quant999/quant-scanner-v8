@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-11-28 12:55:24",
-  "total": 1503,
+  "update_time": "2026-11-28 16:48:25",
+  "total": 1494,
   "grade_summary": {
     "A": 30,
     "B": 33,
     "C": 325,
     "D": 920,
-    "no_data": 195
+    "no_data": 186
   },
   "stocks": {
     "hk_00005": {
@@ -2484,6 +2484,15 @@
       "cfo_to_asset": 5.65,
       "cf_queried": true
     },
+    "sh_600796": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.2445,
+      "revenue_growth": 9.7151,
+      "reason": "ROE差(2.2%) | 营收持平(9.7%)",
+      "cfo_to_asset": 0.07,
+      "cf_queried": true
+    },
     "sh_600803": {
       "score": 45,
       "grade": "C",
@@ -2874,6 +2883,30 @@
       "revenue_growth": 11.7331,
       "reason": "ROE差(4.7%) | 营收增长(11.7%)",
       "cfo_to_asset": 4.34,
+      "cf_queried": true
+    },
+    "sh_601002": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.7293,
+      "revenue_growth": 22.8977,
+      "reason": "ROE差(4.7%) | 营收高增(22.9%)",
+      "cfo_to_asset": 5.5,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_601007": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.6788999999999998,
+      "revenue_growth": 25.3213,
+      "reason": "ROE差(1.7%) | 营收高增(25.3%)",
+      "cfo_to_asset": 4.36,
       "cf_queried": true
     },
     "sh_601009": {
@@ -4120,6 +4153,15 @@
       "revenue_growth": 55.863099999999996,
       "reason": "ROE一般(13.0%) | 营收高增(55.9%)",
       "cfo_to_asset": 1.11,
+      "cf_queried": true
+    },
+    "sh_603508": {
+      "score": 40,
+      "grade": "C",
+      "roe": 7.818300000000001,
+      "revenue_growth": 16.0379,
+      "reason": "ROE偏低(7.8%) | 营收增长(16.0%)",
+      "cfo_to_asset": 7.89,
       "cf_queried": true
     },
     "sh_603520": {
@@ -9240,6 +9282,15 @@
         ]
       }
     },
+    "sz_000777": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.495,
+      "revenue_growth": 12.504100000000001,
+      "reason": "ROE差(2.5%) | 营收增长(12.5%)",
+      "cfo_to_asset": -12.4,
+      "cf_queried": true
+    },
     "sz_000792": {
       "score": 55,
       "grade": "C",
@@ -12507,6 +12558,15 @@
       "cfo_to_asset": -2.48,
       "cf_queried": true
     },
+    "sz_300193": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.7352999999999996,
+      "revenue_growth": 23.6645,
+      "reason": "ROE差(3.7%) | 营收高增(23.7%)",
+      "cfo_to_asset": 3.89,
+      "cf_queried": true
+    },
     "sz_300199": {
       "score": 70,
       "grade": "A",
@@ -15286,180 +15346,6 @@
         ]
       }
     },
-    "sh_600796": {
-      "score": 15,
-      "grade": "D",
-      "roe": 2.2445,
-      "revenue_growth": 9.7151,
-      "reason": "ROE差(2.2%) | 营收持平(9.7%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": 0.07,
-      "cfo_to_or": 0.0072,
-      "asset_turn": 0.0972,
-      "cf_queried": true
-    },
-    "sz_513900": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_520720": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sh_601002": {
-      "score": 30,
-      "grade": "D",
-      "roe": 4.7293,
-      "revenue_growth": 22.8977,
-      "reason": "ROE差(4.7%) | 营收高增(22.9%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": 5.5,
-      "cfo_to_or": 0.2404,
-      "asset_turn": 0.229,
-      "cf_queried": true,
-      "news": {
-        "score": 15,
-        "tags": [
-          "中报预增"
-        ]
-      }
-    },
-    "sz_513990": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_520860": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sh_601007": {
-      "score": 30,
-      "grade": "D",
-      "roe": 1.6788999999999998,
-      "revenue_growth": 25.3213,
-      "reason": "ROE差(1.7%) | 营收高增(25.3%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": 4.36,
-      "cfo_to_or": 0.1722,
-      "asset_turn": 0.2532,
-      "cf_queried": true
-    },
-    "sz_515580": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_560660": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sh_603508": {
-      "score": 40,
-      "grade": "C",
-      "roe": 7.818300000000001,
-      "revenue_growth": 16.0379,
-      "reason": "ROE偏低(7.8%) | 营收增长(16.0%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": 7.89,
-      "cfo_to_or": 0.4921,
-      "asset_turn": 0.1604,
-      "cf_queried": true
-    },
-    "sz_516390": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_561360": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_000777": {
-      "score": 25,
-      "grade": "D",
-      "roe": 2.495,
-      "revenue_growth": 12.504100000000001,
-      "reason": "ROE差(2.5%) | 营收增长(12.5%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": -12.4,
-      "cfo_to_or": -0.9919,
-      "asset_turn": 0.125,
-      "cf_queried": true
-    },
-    "sz_516660": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_561760": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_300193": {
-      "score": 30,
-      "grade": "D",
-      "roe": 3.7352999999999996,
-      "revenue_growth": 23.6645,
-      "reason": "ROE差(3.7%) | 营收高增(23.7%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": 3.89,
-      "cfo_to_or": 0.1646,
-      "asset_turn": 0.2366,
-      "cf_queried": true
-    },
-    "sz_516780": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_563150": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
     "sz_399006": {
       "score": 0,
       "grade": "",
@@ -15484,30 +15370,6 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_510900": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_517050": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
-    "sz_588960": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
-      "cf_queried": true
-    },
     "sz_513150": {
       "score": 0,
       "grade": "",
@@ -15524,7 +15386,7 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_513550": {
+    "sz_513900": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -15532,7 +15394,7 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_517390": {
+    "sz_520720": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -15540,7 +15402,7 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_513560": {
+    "sz_513990": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -15548,7 +15410,7 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_520560": {
+    "sz_520860": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -15556,7 +15418,7 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_513890": {
+    "sz_515580": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -15564,7 +15426,55 @@
       "reason": "无基本面数据",
       "cf_queried": true
     },
-    "sz_520670": {
+    "sz_560660": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_516390": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_561360": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_516660": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_561760": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_516780": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_563150": {
       "score": 0,
       "grade": "",
       "roe": null,

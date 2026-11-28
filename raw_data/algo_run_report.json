@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-11-28 15:31:23",
-  "run_start": "2026-11-28 12:54:11",
-  "ok": 48,
-  "fail": 3,
+  "update_time": "2026-11-28 18:48:02",
+  "run_start": "2026-11-28 16:29:43",
+  "ok": 49,
+  "fail": 2,
   "failed_scripts": [
     {
       "script": "refresh_kline_freshness.py",
@@ -11,10 +11,6 @@
     {
       "script": "v8/fetch_citic_pe.py",
       "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
-    },
-    {
-      "script": "factor_walkforward.py",
-      "reason": "退出码 1 | TypeError: bad operand type for unary -: 'NoneType'"
     }
   ],
   "skipped_by_time_gate": []
