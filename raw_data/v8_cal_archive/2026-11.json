@@ -1,6 +1,6 @@
 {
  "month": "2026年11月",
- "update_time": "2026-11-27 23:42",
+ "update_time": "2026-11-28 08:23",
  "legend": [
   {
    "title": "重要政策",
@@ -529,24 +529,24 @@
     {
      "num": 27,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "富时A50交割日",
        "cls": "a50",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 耐用品订单",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 28,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
