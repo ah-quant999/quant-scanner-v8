@@ -439,7 +439,12 @@ CARD_DEFS = [
     #   逐条补齐登记，按真实节拍给 max_age=1440（盘后产物 24h 红线），保留真故障监控（生产者真漏刷仍 fail 触发自愈）。
     {"id": "CITIC_PE_BACKTEST", "name": "中信PE回测", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     {"id": "FACTOR_LAB_BACKTEST", "name": "因子实验室回测", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
-    {"id": "FACTOR_WALKFORWARD", "name": "因子WalkForward", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    # 🗂 2026-11-28 主人令「一劳永逸」：本项自 11-23 21:36 起断更（前端报「失败·超阈值 1949 分钟」），
+    #   根因 = factor_walkforward.py 的 ivol60 对 None 取负崩链（已修，见该文件 _ivol60 / _guard_factors）。
+    #   同批修口径三件事：① page 随 A1 迁移订正「最终推荐」→「选股策略」（因子中心已迁该页第 5 子页）；
+    #   ② 加 weekend_update=False —— 本产物挂盘后算法链，周末无盘后窗口，weekend 免检防周日/周一假红；
+    #   ③ 补 producer 字段，失败时能一眼定位是哪个生成器。
+    {"id": "FACTOR_WALKFORWARD", "name": "因子WalkForward", "page": "选股策略", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "weekend_update": False, "heal_cat": "algo_run", "producer": "algorithms/factor_walkforward.py"},
     {"id": "FINAL_RECOMMEND_HISTORY", "name": "最终推荐Top3历史", "page": "最终推荐", "freq": "每晚D批(gen_final_recommend_history.py)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🆕 2026-11-08 主人令一劳永逸：补登此前漏登记的 5 张真实前端卡（与 V8_PAGE_SCHEDULE / 前端渲染 window.X 完全对应）
     #   此前这 5 张卡前端在跑、看板也在列，唯独运维(CARD_DEFS)漏登 ⇒ 每晚审计假装它们不存在、永不上红 ⇒ 真故障看不见。
