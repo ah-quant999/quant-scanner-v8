@@ -348,17 +348,108 @@ def analyze(name, q):
 
 
 def judge_text(items):
-    """整体研判：L4 行业清单 + 状态分布 + 趋势结构计数。"""
+    """一句话结论（2026-11-28 主人令「要说人话写清楚」）。
+
+    旧版实测病灶（主人截图）：`➖ 今日无四项目标全共振(L4)行业，最高为 L3：…` ——
+      ① 括号不闭合、`四项目标全共振` 语序断裂，读不成句子；
+      ② 全是 L4/L3 档位缩写，没说「今天到底处于什么状态」；
+      ③ 结论后面又塞一段「趋势向上（分位≥90%且均线多头）」的术语尾巴，一句话变成两截。
+    新版只回答一件事：**今天最强的一档是谁、有几个**，用完整中文句子，不夹术语缩写。
+    更细的「差在哪 / 结构如何 / 钱往哪走」由 judge_points() 分行输出。
+    """
+    n = len(items)
+    if not n:
+        return "今天没有取到行业数据。"
     l4 = [x["name"] for x in items if x["level"] == "L4"]
     l3 = [x["name"] for x in items if x["level"] == "L3"]
-    up = [x["name"] for x in items if x["state"] == "趋势向上"]
+    l2 = [x["name"] for x in items if x["level"] == "L2"]
     if l4:
-        s = "🔴 资金+趋势+位置+量价四项共振的行业：" + "、".join(l4[:8]) + ("等%d个" % len(l4) if len(l4) > 8 else "") + "，置信度最高（L4）"
+        return ("今天 %d 个行业里，有 %d 个「四项全满足」的最强档（资金进、均线上行、位置偏高、放量）：%s%s。"
+                % (n, len(l4), "、".join(l4[:6]), "等" if len(l4) > 6 else ""))
+    if l3:
+        return ("今天 %d 个行业里，没有「四项全满足」的最强档；最强的一档是「三项满足」，共 %d 个：%s%s。"
+                % (n, len(l3), "、".join(l3[:6]), "等" if len(l3) > 6 else ""))
+    if l2:
+        return ("今天 %d 个行业里，最强也只有「两项满足」（共 %d 个：%s），四项条件同时成立的行业一个都没有，整体偏弱。"
+                % (n, len(l2), "、".join(l2[:6])))
+    return "今天 %d 个行业里，连「两项满足」的都没有，四项条件基本全灭，属于全面弱势。" % n
+
+
+def judge_points(items):
+    """2~3 条「人话」要点（2026-11-28 主人令）。
+
+    每条只答一个主人看得懂的问题，且硬性约束：**全部由真实字段统计得出，不夹带操作建议**
+    （沿用 2026-10-29 主人令「只描述真实数据，不建议仓位/抄底」）：
+      ① 没到最强档，差的是哪一项？（从 basis 的 ❌ 标记逐项计数）
+      ② 31 个行业的结构分布长什么样？（structure_counts 真实计数）
+      ③ 钱是集中在少数方向，还是面铺开？（net_yi 正负计数）
+    """
+    pts = []
+    n = len(items)
+    if not n:
+        return pts
+
+    lv = {"L4": 0, "L3": 0, "L2": 0, "L1": 0}
+    for x in items:
+        lv[x["level"]] = lv.get(x["level"], 0) + 1
+    best = "L4" if lv["L4"] else ("L3" if lv["L3"] else ("L2" if lv["L2"] else "L1"))
+
+    # ① 最强档差在哪（L4 已满则跳过这条，改说「四项齐了」）
+    top = [x for x in items if x["level"] == best]
+    if best == "L4":
+        pts.append("最强档四项全部满足：资金在进、均线多头、位置偏高、量能放大，四个条件同时成立的有 %d 个行业。"
+                   % len(top))
+    elif top:
+        miss = {"资金": 0, "趋势": 0, "位置": 0, "量价": 0}
+        for x in top:
+            b = x.get("basis") or ""
+            for k in miss:
+                if ("❌" + k) in b:
+                    miss[k] += 1
+        # 每项缺失的「人话含义」——必须与实际判据同义，不能瞎解释
+        #   （资金=主力净流入且当日涨；趋势=EMA 多头≥2；位置=近60日分位≥70%；量价=5日量比≥1.1）
+        MISS_MEAN = {
+            "资金": "主力还在净流出，钱没进来",
+            "趋势": "均线还没排成多头，趋势没立起来",
+            "位置": "价格还在近 60 日的中低位、没到 70% 分位，属于低位启动、不是高位接力",
+            "量价": "没放量，量能配合不上",
+        }
+        detail = "、".join(["%s %d 个（%s）" % (k, v, MISS_MEAN[k]) for k, v in miss.items() if v])
+        if detail:
+            pts.append("这 %d 个最强行业差在哪：%s。四项全齐才升最强档、缺一项就落一档，"
+                       "逐项对照见每个行业下方的依据行。" % (len(top), detail))
+        else:
+            pts.append("这 %d 个最强行业各差一项条件，逐项对照见每个行业下方的依据行。" % len(top))
+
+    # ② 结构分布说人话
+    sc = structure_counts(items)
+    up = sc.get("趋势向上", 0)
+    rep = sc.get("底部修复", 0)
+    ral = sc.get("下跌反弹", 0)
+    weak = sc.get("弱势整理", 0)
+    osc = sc.get("震荡", 0)
+    struct = "趋势向上 %d 个、底部修复 %d 个、下跌反弹 %d 个、弱势整理 %d 个、震荡 %d 个" % (up, rep, ral, weak, osc)
+    if up > 0 and up >= n * 0.5:
+        reading = "过半行业走在上行趋势里，是趋势型行情"
+    elif rep + ral >= n * 0.5:
+        reading = "过半行业还停在修复/反弹阶段，说明是修复行情、尚未转成全面趋势"
+    elif weak + osc >= n * 0.5:
+        reading = "过半行业在整理或震荡，属于无方向的结构市"
     else:
-        s = "➖ 今日无四项目标全共振(L4)行业，最高为 L3：" + ("、".join(l3[:6]) if l3 else "无")
-    if up:
-        s += "；趋势向上（分位≥90%且均线多头）：" + "、".join(up[:6])
-    return s
+        reading = "各形态都不占多数，方向分散"
+    pts.append("31 个行业的形态分布：%s —— %s。" % (struct, reading))
+
+    # ③ 资金面松紧
+    inflow = sum(1 for x in items if (x.get("net_yi") or 0) > 0)
+    pct = inflow * 100.0 / n
+    if pct >= 60:
+        fread = "多数行业都在进钱，资金面偏宽松、有扩散迹象"
+    elif pct >= 35:
+        fread = "进钱与失血各占一半，资金在少数方向之间来回，没形成合力"
+    else:
+        fread = "多数行业在失血，资金只肯去极少数方向"
+    pts.append("资金面：%d/%d 个行业主力净流入为正（%.0f%%），%s。" % (inflow, n, pct, fread))
+    return pts
 
 
 def structure_counts(items):
@@ -423,11 +514,16 @@ def main():
         "structure_counts": structure_counts(items),
         "items": items,
         "judgment": judge_text(items),
+        # 🗣 2026-11-28 主人令「说人话写清楚」：一句话结论之外，再给 2~3 条分行要点（全部真实字段统计）。
+        #    前端 renderSectorTech 优先渲染本字段；旧数据无此键时自动退回单行 judgment。
+        "judgment_points": judge_points(items),
         "note": "日频盘后研判，非盘中实时信号。压力=斐波那契61.8%位/161.8%延伸位与近20/60日高，支撑=38.2%位/EMA20/波段底50%。资金验证=东财BK主力净流入5/10/20/60日累计（同源同secid）。仅供观测，不改选股排序。红涨绿跌由前端按chg处理。",
     }
     if no_write:
         print("\n=== 研判 ===")
         print(out["judgment"])
+        for _p in out.get("judgment_points", []):
+            print("  · " + _p)
         print("共 %d 行业" % len(items))
         return
     if "--out" in sys.argv:
