@@ -194,6 +194,10 @@ MUST_HAVE_CRON = {
     #   解释占比 PC1 + 60 日均 z 分位，产 data/SECTOR_RESONANCE.js，并进「市场宽度」卡）。
     #   建链时漏本名单 ⇒ build_deploy [4/8] 判「有 cron 但未登记」红。
     "v8_sector_resonance": "板块共振度(申万一级31·PC1吸收率+z分位·云端18:40)",
+    # 2026-11-28 小九补登记：按铃上云（主人令「双机能省 TOKEN 就省」）。
+    #   每小时 :30 云端跑 scripts/alimi_bell.py（纯标准库 + GitHub API，判定/阈值/去重全在脚本内）。
+    #   建链时漏本名单 ⇒ build_deploy [4/8] 判「有 cron 但未登记」红 ⇒ 云端 deploy 被阻断。
+    "v8_bell_cloud": "双机分时按铃(云端·每小时:30·数据缺口派发)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────

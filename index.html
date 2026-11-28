@@ -7712,6 +7712,14 @@ window.__renderIndexObserve = function(){
              工作日 20:30 CST 跑 cn runner，产 data/SHAREHOLDER_CHANGE.js：增持榜/减持榜/三级行业聚合）。
              建链时只写了 .github/workflows/ 与前端卡，**漏了「名单 + 文档源」双登记** ⇒
              门禁前移 [4/8] 恒红。本项即该缺口的收口（名单见 align_logic_ops.py MUST_HAVE_CRON、文档见本清单）。
+          2026-11-28 补登记（小九 · 按铃上云收尾缺口）：
+            · v8_bell_cloud —— 双机分时按铃（云端执行版，每小时 :30，数据缺口时派发抓取/算法链）。
+              主人令「双机能省 TOKEN 就省」：原由本机 WorkBuddy 每小时起一次 LLM 只为跑
+              scripts/alimi_bell.py 一句，迁云端后 LLM 消耗归零、判定逻辑逐字不变。
+              建链时同样只写了 workflow、漏了「名单 + 文档源」双登记 ⇒ 当日 build_deploy 的
+              [4/8] align_logic_ops 恒红 ⇒ 云端 ubuntu deploy 全链被阻断（与 09-23、11-04 同款）。
+              本项即该缺口收口：名单见 align_logic_ops.py MUST_HAVE_CRON、文档见本清单。
+            ⚠️ 教训（第 N 次重演）：新建带 cron 的 workflow 必须当轮完成双登记，否则数据上不了线。
          3 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急 / 事件驱动）：
            v8_algo_run | v8_build_deploy | v8_align_gate
          2026-11-19 补登记（小九 · GitHub schedule 日间失灵根治）：
